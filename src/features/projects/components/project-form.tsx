@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
@@ -12,8 +13,11 @@ import {
 } from '@/features/projects/schemas/project.schema';
 import { ROUTES } from '@/config/constants';
 
+interface Org { id: string; name: string }
+
 export function ProjectForm() {
   const router = useRouter();
+  const [orgs, setOrgs] = useState<Org[]>([]);
   const {
     register,
     handleSubmit,
@@ -21,6 +25,13 @@ export function ProjectForm() {
   } = useForm<CreateProjectInput>({
     resolver: zodResolver(createProjectSchema),
   });
+
+  useEffect(() => {
+    fetch('/api/organizations')
+      .then((r) => r.json())
+      .then((j) => { if (j.success) setOrgs(j.data); })
+      .catch(() => {});
+  }, []);
 
   async function onSubmit(data: CreateProjectInput) {
     const res = await fetch('/api/projects', {
@@ -58,6 +69,24 @@ export function ProjectForm() {
           <p className="text-destructive text-xs">{errors.description.message}</p>
         )}
       </div>
+
+      {orgs.length > 0 && (
+        <div className="space-y-1.5">
+          <label htmlFor="organizationId" className="text-sm font-medium">
+            Organization <span className="text-muted-foreground">(optional)</span>
+          </label>
+          <select
+            id="organizationId"
+            className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-offset-2"
+            {...register('organizationId')}
+          >
+            <option value="">No organization</option>
+            {orgs.map((org) => (
+              <option key={org.id} value={org.id}>{org.name}</option>
+            ))}
+          </select>
+        </div>
+      )}
 
       <Button type="submit" disabled={isSubmitting}>
         {isSubmitting ? 'Creating…' : 'Create project'}
