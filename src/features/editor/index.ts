@@ -1,0 +1,13 @@
+export { EditorContainer } from './components/editor-container';
+export { MonacoEditorWrapper } from './components/monaco-editor';
+export type { MonacoEditorHandle } from './components/monaco-editor';
+export { CommandPalette } from './components/command-palette';
+export { CommandPaletteProvider, useCommandPalette } from './components/providers/command-palette-provider';
+export type { Command } from './components/providers/command-palette-provider';
+export { EditorToolbar } from './components/editor-toolbar';
+export { LanguageSelector } from './components/language-selector';
+export { useEditor } from './hooks/use-editor';
+export { useCommandPaletteActions } from './hooks/use-command-palette-actions';
+export * from './types';
+export * from './schemas/editor.schema';
+export { detectLanguage } from './utils/language-detector';
