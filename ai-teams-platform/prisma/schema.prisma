@@ -1,0 +1,1702 @@
+generator client {
+  provider = "prisma-client"
+  output   = "./generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─────────────────────────────
+// Enums
+// ─────────────────────────────
+
+enum ProjectStatus {
+  PLANNING
+  IN_PROGRESS
+  REVIEW
+  COMPLETED
+  ARCHIVED
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+  BLOCKED
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum AgentRole {
+  CEO
+  ARCHITECT
+  DEVELOPER
+  QA
+  UI_UX
+  DEVOPS
+  DOCUMENTATION
+  SECURITY
+  OPERATIONS
+}
+
+enum AgentStatus {
+  IDLE
+  WORKING
+  BLOCKED
+  OFFLINE
+  ERROR
+  PAUSED
+}
+
+// ─────────────────────────────
+// Core Models
+// ─────────────────────────────
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  avatar    String?
+  password  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  projects           Project[]
+  activities         Activity[]
+  accounts           Account[]
+  sessions           Session[]
+  recentProjects     RecentProject[]
+  favoriteProjects   FavoriteProject[]
+  workspacePreference WorkspacePreference?
+  editorPreference   EditorPreference?
+  organizations      Membership[]
+  ownedOrgs          Organization[]
+  notifications      Notification[]
+  marketplaceRatings MarketplaceRating[]
+
+  @@index([email])
+  @@map("users")
+}
+
+model Project {
+  id             String        @id @default(cuid())
+  name           String
+  slug           String?       @unique
+  description    String?
+  icon           String?       @default("folder")
+  color          String?       @default("#6366f1")
+  status         ProjectStatus @default(PLANNING)
+  ownerId        String
+  organizationId String?
+  favorite       Boolean       @default(false)
+  lastOpenedAt   DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  owner        User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  tasks      Task[]
+  documents  Document[]
+  workflows  Workflow[]
+  repository Repository?
+  folders    Folder[]
+
+  productDocuments      ProductDocument[]
+  architectureDocuments ArchitectureDocument[]
+  developmentTasks     DevelopmentTask[]
+  qualityReports       QualityReport[]
+
+  recentProjects    RecentProject[]
+  favoriteProjects  FavoriteProject[]
+  teamProjects      TeamProject[]
+
+  // AI Usage
+  usageLogs       AIUsageLog[]
+
+  // Quality Engine
+  testCases       TestCase[]
+  bugReports      BugReport[]
+  coverageReports CoverageReport[]
+  // Documentation Engine
+  knowledgeItems  KnowledgeItem[]
+  // Deployment Engine
+  environments    Environment[]
+  deployments     Deployment[]
+  releases        Release[]
+  // Analytics Engine
+  platformEvents  PlatformEvent[]
+  metrics         Metric[]
+  projectHealth   ProjectHealth?
+
+  // Prompt 18: Security Engine
+  securityIssues SecurityIssue[]
+  securityScans  SecurityScan[]
+
+  // Prompt 19: Product Management
+  productStrategies ProductStrategy[]
+  requirements      Requirement[]
+  roadmaps          Roadmap[]
+  productDecisions  ProductDecision[]
+
+  // Prompt 20: Design System
+  designSystemConfig DesignSystemConfig?
+
+  // Prompt 21: Customer Support
+  feedback Feedback[]
+
+  // Prompt 23: Billing (uses AIUsageLog via cost service)
+
+  // Prompt 24: Marketplace (no direct relation)
+
+  // Prompt 25: AI Learning (uses Agent relation)
+
+  @@index([ownerId])
+  @@index([organizationId])
+  @@index([status])
+  @@index([slug])
+  @@map("projects")
+}
+
+model Task {
+  id              String       @id @default(cuid())
+  title           String
+  description     String?
+  status          TaskStatus   @default(TODO)
+  priority        TaskPriority @default(MEDIUM)
+  projectId       String
+  assignedAgentId String?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  project       Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  assignedAgent Agent?  @relation(fields: [assignedAgentId], references: [id], onDelete: SetNull)
+
+  @@index([projectId])
+  @@index([status])
+  @@map("tasks")
+}
+
+model Agent {
+  id           String      @id @default(cuid())
+  name         String
+  role         AgentRole
+  status       AgentStatus @default(IDLE)
+  capabilities String[]    @default([])
+  instructions String?
+  description  String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  tasks        Task[]
+  memories     Memory[]
+  configuration AgentConfiguration?
+  permissions   AgentPermission[]
+  usageLogs     AIUsageLog[]
+  memberships   Membership[]
+
+  productDocuments     ProductDocument[]
+  architectureDocuments ArchitectureDocument[]
+  developmentTasks     DevelopmentTask[]
+  qualityReports       QualityReport[]
+
+  // Prompt 21: Customer Support
+  supportTickets SupportTicket[]
+
+  // Prompt 25: AI Learning
+  performanceRecords AgentPerformance[]
+  skills             AgentSkill[]
+  learningRecords    LearningRecord[]
+  improvements       Improvement[]
+  benchmarks         Benchmark[]
+
+  @@index([role])
+  @@map("agents")
+}
+
+model Activity {
+  id        String   @id @default(cuid())
+  userId    String
+  action    String
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("activities")
+}
+
+// ─────────────────────────────
+// Prepared for future phases
+// ─────────────────────────────
+
+model Document {
+  id        String   @id @default(cuid())
+  projectId String
+  type      String
+  title     String
+  content   String
+  version   Int      @default(1)
+  author    String   @default("Documentation AI")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project  Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  versions DocumentVersion[]
+
+  @@index([projectId])
+  @@map("documents")
+}
+
+model DocumentVersion {
+  id         String   @id @default(cuid())
+  documentId String
+  content    String
+  version    Int
+  createdAt  DateTime @default(now())
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId])
+  @@map("document_versions")
+}
+
+model Workflow {
+  id        String   @id @default(cuid())
+  projectId String
+  name      String
+  status    String   @default("PENDING")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  steps   WorkflowStep[]
+  approvalRequests ApprovalRequest[]
+
+  @@index([projectId])
+  @@map("workflows")
+}
+
+model WorkflowStep {
+  id          String   @id @default(cuid())
+  workflowId  String
+  name        String
+  description String
+  agentRole   String
+  status      String   @default("PENDING")
+  input       String?
+  output      String?
+  error       String?
+  order       Int
+  startedAt   DateTime?
+  completedAt DateTime?
+  createdAt   DateTime @default(now())
+
+  workflow Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+
+  @@index([workflowId])
+  @@map("workflow_steps")
+}
+
+model Conversation {
+  id         String   @id @default(cuid())
+  projectId  String
+  workflowId String?
+  title      String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  messages Message[]
+
+  @@index([projectId])
+  @@map("conversations")
+}
+
+model Message {
+  id             String   @id @default(cuid())
+  conversationId String
+  senderId       String
+  senderName     String
+  senderRole     String
+  type           String   @default("agent")
+  content        String
+  metadata       Json?
+  createdAt      DateTime @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@map("messages")
+}
+
+model AIProvider {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  baseUrl     String?
+  defaultModel String
+  enabled     Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  models   AIModel[]
+
+  @@map("ai_providers")
+}
+
+model AIModel {
+  id             String   @id @default(cuid())
+  providerId     String
+  name           String
+  maxTokens      Int      @default(4096)
+  costPer1kInput Float    @default(0)
+  costPer1kOutput Float   @default(0)
+  enabled        Boolean  @default(true)
+  createdAt      DateTime @default(now())
+
+  provider AIProvider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, name])
+  @@map("ai_models")
+}
+
+model AIUsageLog {
+  id               String   @id @default(cuid())
+  provider         String
+  providerId       String?
+  model            String
+  projectId        String?
+  agentId          String?
+  workflowId       String?
+  taskId           String?
+  promptTokens     Int      @default(0)
+  completionTokens Int      @default(0)
+  totalTokens      Int      @default(0)
+  costUsd          Float    @default(0)
+  latencyMs        Int?
+  createdAt        DateTime @default(now())
+
+  agent   Agent?   @relation(fields: [agentId], references: [id], onDelete: SetNull)
+  project Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  @@index([agentId])
+  @@index([projectId])
+  @@index([createdAt])
+  @@map("ai_usage_logs")
+}
+
+model AgentConfiguration {
+  id                String @id @default(cuid())
+  agentId           String @unique
+  maxConcurrentTasks Int   @default(1)
+  timeoutMs         Int   @default(30000)
+  retryCount        Int   @default(2)
+  customConfig      Json?
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+}
+
+model AgentPermission {
+  id        String @id @default(cuid())
+  agentId   String
+  resource  String
+  action    String
+  grantedAt DateTime @default(now())
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@unique([agentId, resource, action])
+  @@map("agent_permissions")
+}
+
+model AIEventLog {
+  id        String   @id @default(cuid())
+  eventType String
+  source    String
+  message   String
+  metadata  Json?
+  level     String   @default("info")
+  createdAt DateTime @default(now())
+
+  @@index([eventType])
+  @@index([source])
+  @@index([createdAt])
+  @@map("ai_event_logs")
+}
+
+model Repository {
+  id              String   @id @default(cuid())
+  projectId       String   @unique
+  provider        String   @default("internal")
+  path            String
+  currentBranchId String?
+  createdAt       DateTime @default(now())
+
+  project Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  files   File[]
+  branches GitBranch[]
+  gitCommits GitCommit[]
+
+  @@map("repositories")
+}
+
+// ─────────────────────────────
+// Phase 3 — AI Employee Models
+// ─────────────────────────────
+
+model ProductDocument {
+  id        String   @id @default(cuid())
+  projectId String
+  agentId   String
+  vision    Json
+  requirements Json
+  plan      Json
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  agent   Agent   @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([agentId])
+  @@map("product_documents")
+}
+
+model ArchitectureDocument {
+  id        String   @id @default(cuid())
+  projectId String
+  agentId   String
+  architecture Json
+  databaseDesign Json
+  apiSpec   Json
+  decisions Json
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  agent   Agent   @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([agentId])
+  @@map("architecture_documents")
+}
+
+model DevelopmentTask {
+  id        String   @id @default(cuid())
+  projectId String
+  agentId   String
+  plan      Json
+  status    String   @default("PENDING")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  agent   Agent   @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  codeChanges CodeGenerationRecord[]
+
+  @@index([projectId])
+  @@index([agentId])
+  @@map("development_tasks")
+}
+
+model CodeGenerationRecord {
+  id       String   @id @default(cuid())
+  taskId   String
+  file     String
+  changeType String
+  description String
+  code     String @db.Text
+  createdAt DateTime @default(now())
+
+  task DevelopmentTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+  @@map("code_generation_records")
+}
+
+model QualityReport {
+  id        String   @id @default(cuid())
+  projectId String
+  agentId   String
+  score     Float
+  issues    Json
+  testPlan  Json
+  recommendations Json
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  agent   Agent   @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([agentId])
+  @@map("quality_reports")
+}
+
+model File {
+  id           String   @id @default(cuid())
+  repositoryId String
+  folderId     String?
+  path         String
+  content      String
+  language     String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  repository Repository    @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  folder     Folder?       @relation(fields: [folderId], references: [id], onDelete: SetNull)
+  metadata   FileMetadata?
+
+  @@index([repositoryId])
+  @@index([folderId])
+  @@map("files")
+}
+
+model Memory {
+  id         String   @id @default(cuid())
+  agentId    String
+  content    String
+  importance String   @default("MEDIUM")
+  embedding  Float[]  @default([])
+  createdAt  DateTime @default(now())
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agentId])
+  @@map("memories")
+}
+
+// ─────────────────────────────
+// Phase 4 — Workspace Models
+// ─────────────────────────────
+
+model Folder {
+  id        String   @id @default(cuid())
+  projectId String
+  parentId  String?
+  name      String
+  path      String
+  createdAt DateTime @default(now())
+
+  project  Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  parent   Folder?  @relation("FolderChildren", fields: [parentId], references: [id], onDelete: Cascade)
+  children Folder[] @relation("FolderChildren")
+  files    File[]
+
+  @@index([projectId])
+  @@index([parentId])
+  @@map("folders")
+}
+
+model FileMetadata {
+  id         String   @id @default(cuid())
+  fileId     String   @unique
+  pinned     Boolean  @default(false)
+  isHidden   Boolean  @default(false)
+  lastOpened DateTime?
+
+  file File @relation(fields: [fileId], references: [id], onDelete: Cascade)
+
+  @@map("file_metadata")
+}
+
+model FavoriteProject {
+  id        String   @id @default(cuid())
+  userId    String
+  projectId String
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, projectId])
+  @@map("favorite_projects")
+}
+
+model RecentProject {
+  id           String   @id @default(cuid())
+  userId       String
+  projectId    String
+  lastOpenedAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, projectId])
+  @@index([userId, lastOpenedAt])
+  @@map("recent_projects")
+}
+
+model WorkspacePreference {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  theme     String   @default("system")
+  layout    Json
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("workspace_preferences")
+}
+
+model EditorPreference {
+  id          String @id @default(cuid())
+  userId      String @unique
+  preferences Json
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("editor_preferences")
+}
+
+// ─────────────────────────────
+// Phase 4 — Git Engine
+// ─────────────────────────────
+
+model GitBranch {
+  id           String   @id @default(cuid())
+  repositoryId String
+  name         String
+  type         String   @default("FEATURE")
+  createdAt    DateTime @default(now())
+
+  repository Repository  @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  commits    GitCommit[]
+
+  @@unique([repositoryId, name])
+  @@map("git_branches")
+}
+
+model GitCommit {
+  id           String   @id @default(cuid())
+  repositoryId String
+  branchId     String
+  message      String
+  author       String
+  createdAt    DateTime @default(now())
+
+  repository Repository  @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  branch     GitBranch   @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  changes    GitChange[]
+
+  @@index([repositoryId])
+  @@map("git_commits")
+}
+
+model GitChange {
+  id        String   @id @default(cuid())
+  commitId  String
+  file      String
+  type      String
+  createdAt DateTime @default(now())
+
+  commit GitCommit @relation(fields: [commitId], references: [id], onDelete: Cascade)
+
+  @@index([commitId])
+  @@map("git_changes")
+}
+
+// ─────────────────────────────
+// Phase 4 — Quality Engine
+// ─────────────────────────────
+
+model TestCase {
+  id          String   @id @default(cuid())
+  projectId   String
+  name        String
+  description String?
+  type        String
+  framework   String
+  file        String
+  status      String   @default("PENDING")
+  createdAt   DateTime @default(now())
+
+  project    Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  executions TestExecution[]
+
+  @@index([projectId])
+  @@map("test_cases")
+}
+
+model TestExecution {
+  id        String   @id @default(cuid())
+  testId    String
+  result    String
+  logs      String   @default("")
+  duration  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  test TestCase @relation(fields: [testId], references: [id], onDelete: Cascade)
+
+  @@index([testId])
+  @@map("test_executions")
+}
+
+model BugReport {
+  id          String   @id @default(cuid())
+  projectId   String
+  severity    String
+  title       String
+  description String
+  file        String?
+  line        Int?
+  solution    String?
+  status      String   @default("OPEN")
+  createdAt   DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("bug_reports")
+}
+
+model CoverageReport {
+  id         String   @id @default(cuid())
+  projectId  String
+  percentage Float
+  files      Json
+  createdAt  DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("coverage_reports")
+}
+
+// ─────────────────────────────
+// Phase 4 — Documentation Engine
+// ─────────────────────────────
+
+model KnowledgeItem {
+  id        String   @id @default(cuid())
+  projectId String
+  source    String
+  content   String
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("knowledge_items")
+}
+
+// ─────────────────────────────
+// Phase 4 — Deployment Engine
+// ─────────────────────────────
+
+model Environment {
+  id            String   @id @default(cuid())
+  projectId     String
+  name          String
+  variables     Json     @default("{}")
+  configuration Json?
+  createdAt     DateTime @default(now())
+
+  project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  deployments Deployment[]
+
+  @@unique([projectId, name])
+  @@map("environments")
+}
+
+model Deployment {
+  id            String   @id @default(cuid())
+  projectId     String
+  environmentId String
+  provider      String
+  status        String   @default("PENDING")
+  releaseId     String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  project     Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  environment Environment       @relation(fields: [environmentId], references: [id], onDelete: Cascade)
+  steps       DeploymentStep[]
+  logs        DeploymentLog[]
+
+  @@index([projectId])
+  @@map("deployments")
+}
+
+model DeploymentStep {
+  id           String   @id @default(cuid())
+  deploymentId String
+  name         String
+  status       String   @default("PENDING")
+  logs         String   @default("")
+  createdAt    DateTime @default(now())
+
+  deployment Deployment @relation(fields: [deploymentId], references: [id], onDelete: Cascade)
+
+  @@index([deploymentId])
+  @@map("deployment_steps")
+}
+
+model DeploymentLog {
+  id           String   @id @default(cuid())
+  deploymentId String
+  type         String
+  message      String
+  timestamp    DateTime @default(now())
+
+  deployment Deployment @relation(fields: [deploymentId], references: [id], onDelete: Cascade)
+
+  @@index([deploymentId])
+  @@map("deployment_logs")
+}
+
+model Release {
+  id        String   @id @default(cuid())
+  projectId String
+  version   String
+  commit    String?
+  status    String   @default("PENDING")
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("releases")
+}
+
+// ─────────────────────────────
+// Phase 4 — Analytics Engine
+// ─────────────────────────────
+
+model PlatformEvent {
+  id        String   @id @default(cuid())
+  projectId String
+  type      String
+  source    String
+  data      Json?
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, createdAt])
+  @@index([type])
+  @@map("platform_events")
+}
+
+model Metric {
+  id        String   @id @default(cuid())
+  projectId String
+  name      String
+  value     Float
+  category  String
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, category, createdAt])
+  @@map("metrics")
+}
+
+model ProjectHealth {
+  id              String   @id @default(cuid())
+  projectId       String   @unique
+  score           Int
+  status          String
+  recommendations String[]
+  updatedAt       DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("project_health")
+}
+
+// ─────────────────────────────
+// Phase 4 — Quality Engine (Supplementary)
+// ─────────────────────────────
+
+model CodeReview {
+  id        String   @id @default(cuid())
+  commitId  String
+  score     Float
+  issues    Json     @default("[]")
+  summary   String?
+  createdAt DateTime @default(now())
+
+  @@index([commitId])
+  @@map("code_reviews")
+}
+
+// ─────────────────────────────
+// Phase 4 — Documentation Engine (Supplementary)
+// ─────────────────────────────
+
+model AgentDecision {
+  id         String   @id @default(cuid())
+  agentId    String
+  decision   String
+  reasoning  String
+  outcome    String
+  confidence Float
+  createdAt  DateTime @default(now())
+
+  @@index([agentId])
+  @@map("agent_decisions")
+}
+
+// ─────────────────────────────
+// Phase 4 — Prompt 13: Collaboration
+// ─────────────────────────────
+
+model Organization {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  ownerId   String
+  settings  Json?
+  createdAt DateTime @default(now())
+
+  owner   User         @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  teams   Team[]
+  projects Project[]
+  members Membership[]
+  installations PluginInstallation[]
+  marketplaceInstallations MarketplaceInstallation[]
+  customRoles    CustomRole[]
+  policies       Policy[]
+  auditLogs      AuditLog[]
+  orgSettings    OrganizationSettings?
+  creditAccount  CreditAccount?
+  subscriptions  Subscription[]
+  budgets        Budget[]
+
+  @@map("organizations")
+}
+
+model Team {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  description    String?
+  createdAt      DateTime @default(now())
+
+  organization Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  memberships  Membership[]
+  projects     TeamProject[]
+
+  @@index([organizationId])
+  @@map("teams")
+}
+
+model TeamProject {
+  id        String @id @default(cuid())
+  teamId    String
+  projectId String
+
+  team    Team    @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, projectId])
+  @@map("team_projects")
+}
+
+model Membership {
+  id             String   @id @default(cuid())
+  organizationId String
+  teamId         String?
+  userId         String?
+  agentId        String?
+  type           String
+  role           String
+  createdAt      DateTime @default(now())
+
+  organization Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  team         Team?         @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user         User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  agent        Agent?        @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  permissions  MemberPermission[]
+
+  @@index([organizationId])
+  @@index([teamId])
+  @@map("memberships")
+}
+
+model MemberPermission {
+  id           String @id @default(cuid())
+  membershipId String
+  permission   String
+
+  membership Membership @relation(fields: [membershipId], references: [id], onDelete: Cascade)
+
+  @@unique([membershipId, permission])
+  @@map("member_permissions")
+}
+
+model Comment {
+  id         String   @id @default(cuid())
+  authorType String
+  authorId   String
+  targetType String
+  targetId   String
+  content    String
+  createdAt  DateTime @default(now())
+
+  mentions Mention[]
+
+  @@index([targetType, targetId])
+  @@map("comments")
+}
+
+model Mention {
+  id         String   @id @default(cuid())
+  commentId  String
+  targetType String
+  targetId   String
+  createdAt  DateTime @default(now())
+
+  comment Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@index([commentId])
+  @@map("mentions")
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  message   String
+  link      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, read])
+  @@map("notifications")
+}
+
+// ─────────────────────────────
+// Phase 4 — Prompt 14: Plugin System
+// ─────────────────────────────
+
+model Plugin {
+  id            String   @id @default(cuid())
+  name          String
+  description   String?
+  version       String
+  author        String
+  type          String
+  status        String   @default("REGISTERED")
+  configuration Json?
+  createdAt     DateTime @default(now())
+
+  installations PluginInstallation[]
+  permissions   PluginPermission[]
+
+  @@map("plugins")
+}
+
+model PluginInstallation {
+  id             String   @id @default(cuid())
+  pluginId       String
+  organizationId String
+  configuration  Json?
+  enabled        Boolean  @default(true)
+  installedAt    DateTime @default(now())
+
+  plugin       Plugin       @relation(fields: [pluginId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([pluginId, organizationId])
+  @@map("plugin_installations")
+}
+
+model PluginPermission {
+  id         String @id @default(cuid())
+  pluginId   String
+  permission String
+
+  plugin Plugin @relation(fields: [pluginId], references: [id], onDelete: Cascade)
+
+  @@unique([pluginId, permission])
+  @@map("plugin_permissions")
+}
+
+// ─────────────────────────────
+// Phase 4 — Prompt 17: Approval Gates
+// ─────────────────────────────
+
+model ApprovalRequest {
+  id         String   @id @default(cuid())
+  workflowId String
+  stepId     String
+  type       String
+  status     String   @default("PENDING")
+  createdAt  DateTime @default(now())
+
+  workflow Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+
+  @@index([workflowId])
+  @@map("approval_requests")
+}
+
+// ─────────────────────────────
+// Prompt 18: Security Engine
+// ─────────────────────────────
+
+model SecurityIssue {
+  id             String   @id @default(cuid())
+  projectId      String
+  type           String
+  severity       String
+  description    String
+  location       String?
+  recommendation String?
+  status         String   @default("OPEN")
+  createdAt      DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, status])
+  @@map("security_issues")
+}
+
+model SecurityScan {
+  id        String   @id @default(cuid())
+  projectId String
+  status    String   @default("RUNNING")
+  result    Json?
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("security_scans")
+}
+
+model SecurityRule {
+  id          String @id @default(cuid())
+  framework   String
+  requirement String
+  description String?
+
+  @@map("security_rules")
+}
+
+// ─────────────────────────────
+// Prompt 19: Product Management
+// ─────────────────────────────
+
+model ProductStrategy {
+  id        String   @id @default(cuid())
+  projectId String   @unique
+  vision    String
+  mission   String?
+  goals     String[]
+  metrics   String[]
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  @@map("product_strategies")
+}
+
+model Requirement {
+  id          String   @id @default(cuid())
+  projectId   String
+  title       String
+  description String
+  category    String   @default("FUNCTIONAL")
+  priority    String   @default("MEDIUM")
+  status      String   @default("IDEA")
+  createdAt   DateTime @default(now())
+
+  project Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  stories UserStory[]
+
+  @@index([projectId, status])
+  @@map("requirements")
+}
+
+model UserStory {
+  id            String   @id @default(cuid())
+  requirementId String
+  title         String
+  description   String
+  criteria      String[]
+  priority      String   @default("MEDIUM")
+  createdAt     DateTime @default(now())
+
+  requirement Requirement @relation(fields: [requirementId], references: [id], onDelete: Cascade)
+  @@index([requirementId])
+  @@map("user_stories")
+}
+
+model Roadmap {
+  id         String   @id @default(cuid())
+  projectId  String
+  name       String
+  milestones Json
+  createdAt  DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  @@map("roadmaps")
+}
+
+model ProductDecision {
+  id        String   @id @default(cuid())
+  projectId String
+  title     String
+  reason    String
+  impact    String?
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  @@map("product_decisions")
+}
+
+// ─────────────────────────────
+// Prompt 20: Design System
+// ─────────────────────────────
+
+model DesignSystemConfig {
+  id            String   @id @default(cuid())
+  projectId     String   @unique
+  name          String   @default("Default")
+  configuration Json?
+  createdAt     DateTime @default(now())
+
+  project    Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  components DesignComponent[]
+  tokens     DesignToken[]
+
+  @@map("design_system_configs")
+}
+
+model DesignComponent {
+  id              String   @id @default(cuid())
+  designSystemId  String
+  name            String
+  category        String
+  code            String
+  documentation   String?
+  createdAt       DateTime @default(now())
+
+  designSystem DesignSystemConfig @relation(fields: [designSystemId], references: [id], onDelete: Cascade)
+  @@index([designSystemId])
+  @@map("design_components")
+}
+
+model DesignToken {
+  id             String @id @default(cuid())
+  designSystemId String
+  category       String
+  name           String
+  value          String
+
+  designSystem DesignSystemConfig @relation(fields: [designSystemId], references: [id], onDelete: Cascade)
+  @@unique([designSystemId, category, name])
+  @@map("design_tokens")
+}
+
+// ─────────────────────────────
+// Prompt 21: Customer Support
+// ─────────────────────────────
+
+model SupportConversation {
+  id         String   @id @default(cuid())
+  customerId String
+  status     String   @default("OPEN")
+  createdAt  DateTime @default(now())
+
+  messages SupportMessage[]
+  @@map("support_conversations")
+}
+
+model SupportMessage {
+  id             String   @id @default(cuid())
+  conversationId String
+  sender         String
+  content        String
+  createdAt      DateTime @default(now())
+
+  conversation SupportConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  @@index([conversationId])
+  @@map("support_messages")
+}
+
+model Feedback {
+  id         String   @id @default(cuid())
+  projectId  String
+  customerId String
+  type       String
+  content    String
+  priority   String   @default("MEDIUM")
+  status     String   @default("NEW")
+  createdAt  DateTime @default(now())
+
+  project   Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  sentiment SentimentResult?
+
+  @@index([projectId, type])
+  @@map("feedback")
+}
+
+model SupportTicket {
+  id              String   @id @default(cuid())
+  customerId      String
+  title           String
+  description     String
+  category        String?
+  priority        String   @default("MEDIUM")
+  status          String   @default("OPEN")
+  assignedAgentId String?
+  createdAt       DateTime @default(now())
+
+  assignedAgent Agent? @relation(fields: [assignedAgentId], references: [id], onDelete: SetNull)
+  @@map("support_tickets")
+}
+
+model SentimentResult {
+  id         String  @id @default(cuid())
+  feedbackId String  @unique
+  score      Float
+  emotion    String
+  priority   String
+
+  feedback Feedback @relation(fields: [feedbackId], references: [id], onDelete: Cascade)
+  @@map("sentiment_results")
+}
+
+// ─────────────────────────────
+// Prompt 22: Enterprise Governance
+// ─────────────────────────────
+
+model OrganizationSettings {
+  id             String @id @default(cuid())
+  organizationId String @unique
+  configuration  Json?
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  @@map("organization_settings")
+}
+
+model CustomRole {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  permissions    String[]
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  @@unique([organizationId, name])
+  @@map("custom_roles")
+}
+
+model Policy {
+  id             String   @id @default(cuid())
+  organizationId String
+  type           String
+  configuration  Json
+  enabled        Boolean  @default(true)
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  @@index([organizationId])
+  @@map("policies")
+}
+
+model AuditLog {
+  id             String   @id @default(cuid())
+  organizationId String
+  actorType      String
+  actorId        String
+  action         String
+  metadata       Json?
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  @@index([organizationId, createdAt])
+  @@map("audit_logs")
+}
+
+// ─────────────────────────────
+// Prompt 23: Billing
+// ─────────────────────────────
+
+model CreditAccount {
+  id             String   @id @default(cuid())
+  organizationId String   @unique
+  balance        Float    @default(0)
+  monthlyLimit   Float    @default(0)
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  @@map("credit_accounts")
+}
+
+model Plan {
+  id       String @id @default(cuid())
+  name     String @unique
+  price    Float
+  limits   Json
+  features String[]
+
+  subscriptions Subscription[]
+  @@map("plans")
+}
+
+model Subscription {
+  id             String    @id @default(cuid())
+  organizationId String    @unique
+  planId         String
+  status         String    @default("ACTIVE")
+  startDate      DateTime  @default(now())
+  endDate        DateTime?
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  plan         Plan         @relation(fields: [planId], references: [id])
+  @@map("subscriptions")
+}
+
+model Budget {
+  id             String   @id @default(cuid())
+  organizationId String
+  projectId      String?
+  amount         Float
+  period         String   @default("MONTHLY")
+  alertThreshold Float    @default(0.8)
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  @@index([organizationId])
+  @@map("budgets")
+}
+
+// ─────────────────────────────
+// Prompt 24: Marketplace
+// ─────────────────────────────
+
+model MarketplaceItem {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  type        String
+  author      String
+  category    String?
+  downloads   Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  versions      MarketplaceVersion[]
+  ratings       MarketplaceRating[]
+  installations MarketplaceInstallation[]
+
+  @@index([type, category])
+  @@map("marketplace_items")
+}
+
+model MarketplaceVersion {
+  id        String   @id @default(cuid())
+  itemId    String
+  version   String
+  changelog String?
+  payload   Json
+  createdAt DateTime @default(now())
+
+  item MarketplaceItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  @@unique([itemId, version])
+  @@map("marketplace_versions")
+}
+
+model MarketplaceRating {
+  id        String   @id @default(cuid())
+  itemId    String
+  userId    String
+  score     Int
+  comment   String?
+  createdAt DateTime @default(now())
+
+  item MarketplaceItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  user User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([itemId, userId])
+  @@map("marketplace_ratings")
+}
+
+model MarketplaceInstallation {
+  id             String   @id @default(cuid())
+  itemId         String
+  organizationId String
+  version        String
+  status         String   @default("INSTALLED")
+  installedAt    DateTime @default(now())
+
+  item         MarketplaceItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  organization Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  @@unique([itemId, organizationId])
+  @@map("marketplace_installations")
+}
+
+// ─────────────────────────────
+// Prompt 25: AI Learning
+// ─────────────────────────────
+
+model AgentPerformance {
+  id       String   @id @default(cuid())
+  agentId  String
+  taskType String
+  score    Float
+  metrics  Json
+  createdAt DateTime @default(now())
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  @@index([agentId, taskType])
+  @@map("agent_performance")
+}
+
+model AgentSkill {
+  id      String @id @default(cuid())
+  agentId String
+  skill   String
+  level   Float  @default(50)
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  @@unique([agentId, skill])
+  @@map("agent_skills")
+}
+
+model LearningRecord {
+  id         String   @id @default(cuid())
+  agentId    String
+  experience String
+  result     String
+  lesson     String?
+  createdAt  DateTime @default(now())
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  @@index([agentId])
+  @@map("learning_records")
+}
+
+model Improvement {
+  id        String   @id @default(cuid())
+  agentId   String
+  change    String
+  reason    String
+  impact    String?
+  status    String   @default("PROPOSED")
+  createdAt DateTime @default(now())
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  @@index([agentId])
+  @@map("improvements")
+}
+
+model Benchmark {
+  id        String   @id @default(cuid())
+  agentId   String
+  task      String
+  score     Float
+  result    Json?
+  createdAt DateTime @default(now())
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  @@map("benchmarks")
+}
+
+// ─────────────────────────────
+// Prompt 26: Operations Center
+// ─────────────────────────────
+
+model SystemHealth {
+  id        String   @id @default(cuid())
+  service   String
+  status    String
+  latencyMs Int?
+  message   String?
+  createdAt DateTime @default(now())
+
+  @@index([service, createdAt])
+  @@map("system_health_checks")
+}
+
+model Incident {
+  id          String   @id @default(cuid())
+  type        String
+  severity    String
+  description String
+  status      String   @default("OPEN")
+  createdAt   DateTime @default(now())
+  resolvedAt  DateTime?
+
+  alerts          Alert[]
+  recoveryActions RecoveryAction[]
+
+  @@index([status, severity])
+  @@map("incidents")
+}
+
+model Alert {
+  id         String   @id @default(cuid())
+  incidentId String
+  channel    String
+  status     String   @default("SENT")
+  createdAt  DateTime @default(now())
+
+  incident Incident @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+  @@map("alerts")
+}
+
+model RecoveryAction {
+  id               String   @id @default(cuid())
+  incidentId       String
+  action           String
+  status           String   @default("PENDING")
+  result           String?
+  requiresApproval Boolean  @default(true)
+  createdAt        DateTime @default(now())
+
+  incident Incident @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+  @@map("recovery_actions")
+}
+
+// ─────────────────────────────
+// Auth.js required models
+// ─────────────────────────────
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
