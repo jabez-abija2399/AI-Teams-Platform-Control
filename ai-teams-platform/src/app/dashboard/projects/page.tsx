@@ -1,11 +1,11 @@
 import { auth } from '@/lib/auth';
 import { listProjects } from '@/features/projects/services/project.service';
 import { ProjectCard } from '@/features/projects/components/project-card';
-import { EmptyState } from '@/components/ui/empty-state';
 import { PageContainer } from '@/components/layout/page-container';
 import { buttonVariants } from '@/components/ui/button';
-import { FolderKanban, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import Link from 'next/link';
+import { EmptyProjectPrompt } from './empty-project-prompt';
 
 export default async function ProjectsPage() {
   const session = await auth();
@@ -24,11 +24,9 @@ export default async function ProjectsPage() {
       </div>
 
       {projects.length === 0 ? (
-        <EmptyState
-          icon={FolderKanban}
-          title="No projects yet"
-          description="Create your first project to get started."
-        />
+        <div className="py-12">
+          <EmptyProjectPrompt />
+        </div>
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {projects.map((p) => (
