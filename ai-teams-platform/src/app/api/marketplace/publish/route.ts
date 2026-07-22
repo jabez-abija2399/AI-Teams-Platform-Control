@@ -2,11 +2,16 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { auth } from '@/lib/auth';
 import { unauthorizedResponse } from '@/lib/api-response';
-import { install } from '@/features/marketplace/core/marketplace.engine';
+import { publish } from '@/features/marketplace/core/marketplace.engine';
 
 const schema = z.object({
-  itemId: z.string().min(1),
-  organizationId: z.string().min(1),
+  name: z.string().min(1),
+  description: z.string().min(1),
+  type: z.string().min(1),
+  author: z.string().min(1),
+  version: z.string().min(1),
+  payload: z.unknown(),
+  category: z.string().optional(),
 });
 
 export async function POST(request: Request) {
@@ -21,6 +26,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const result = await install(parsed.data.itemId, parsed.data.organizationId);
-  return NextResponse.json(result);
+  const { name, description, type, author, version, payload, category } = parsed.data;
+  const result = await publish(name, description, type, author, version, payload, category);
+  return NextResponse.json(result, { status: result.success ? 201 : 400 });
 }

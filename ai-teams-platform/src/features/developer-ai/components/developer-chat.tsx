@@ -436,9 +436,7 @@ export function DeveloperChat({ projectId, onComplete }: { projectId: string; on
       <div className="flex items-center gap-2">
         <Button onClick={handleRunDeveloper} size="sm" variant="outline">Regenerate</Button>
         <Button
-          onClick={() => {
-            window.location.href = `/dashboard/projects/${projectId}/workspace`;
-          }}
+          onClick={() => router.push(`/dashboard/projects/${projectId}/workspace`)}
           size="sm"
           variant="default"
         >

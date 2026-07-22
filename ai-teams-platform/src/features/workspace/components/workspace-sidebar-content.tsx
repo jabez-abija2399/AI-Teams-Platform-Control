@@ -27,6 +27,10 @@ const AnalyticsPanel = dynamic(
   () => import('@/features/analytics/components/analytics-panel').then((m) => ({ default: m.AnalyticsPanel })),
   { ssr: false },
 );
+const MarketplaceBrowse = dynamic(
+  () => import('@/features/marketplace/components/marketplace-browse').then((m) => ({ default: m.MarketplaceBrowse })),
+  { ssr: false },
+);
 
 export function WorkspaceSidebarContent() {
   const { selectedActivity, currentProjectId } = useWorkspaceStore();
@@ -50,6 +54,8 @@ export function WorkspaceSidebarContent() {
       return <Placeholder label="AI Employees" />;
     case 'projects':
       return <Placeholder label="Projects" />;
+    case 'extensions':
+      return <MarketplaceBrowse />;
     default:
       return <Placeholder label="Coming soon" />;
   }
