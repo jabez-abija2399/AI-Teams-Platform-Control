@@ -290,12 +290,17 @@ export async function implementArchitecture(
               if (!generatedFiles.includes(c.file)) generatedFiles.push(c.file);
             }
 
+            const remainingActive = (buildState.progress.activeTasks ?? batch).filter(
+              (t) => t !== taskDesc && tasks.find((ti) => ti.description === t)?.status === 'running',
+            );
+
             emitBuildEvent(projectId, {
               type: 'task:complete',
               phase: 'generating',
               message: `Completed: ${taskDesc}`,
               completedTasks: completedCount,
               totalTasks: plan.tasks.length,
+              activeTasks: remainingActive,
               tasks: buildState.tasks,
               generatedFiles: [...generatedFiles],
               eta: estimateEta(buildState, completedCount),
@@ -307,12 +312,17 @@ export async function implementArchitecture(
             if (taskInfo) taskInfo.status = 'failed';
             completedCount++;
 
+            const remainingActive = (buildState.progress.activeTasks ?? batch).filter(
+              (t) => t !== taskDesc && tasks.find((ti) => ti.description === t)?.status === 'running',
+            );
+
             emitBuildEvent(projectId, {
               type: 'task:failed',
               phase: 'generating',
               message: `Failed: ${taskDesc} — ${err instanceof Error ? err.message : 'Unknown error'}`,
               completedTasks: completedCount,
               totalTasks: plan.tasks.length,
+              activeTasks: remainingActive,
               tasks: buildState.tasks,
               generatedFiles: [...generatedFiles],
               error: err instanceof Error ? err.message : 'Unknown error',

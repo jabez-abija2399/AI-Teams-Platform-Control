@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -37,6 +38,7 @@ function formatEta(ms: number): string {
 }
 
 export function DeveloperChat({ projectId, onComplete }: { projectId: string; onComplete?: () => void }) {
+  const router = useRouter();
   const [status, setStatus] = useState<DeveloperStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [building, setBuilding] = useState(false);
