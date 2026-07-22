@@ -3,31 +3,55 @@
 import { useEffect, useRef } from 'react';
 import { useExplorerStore } from '@/features/workspace/explorer/stores/explorer.store';
 
+// Singleton: track SSE connections across component instances (e.g. tabs + workspace open)
+const sharedSources = new Map<string, EventSource>();
+const sharedSubs = new Map<string, number>();
+
 export function WorkspaceBuildSync({ projectId }: { projectId: string }) {
   const triggerRefresh = useExplorerStore((s) => s.triggerRefresh);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Subscribe to developer build SSE for auto-refresh on completion
+  // Subscribe to developer build SSE — shared across mounting instances
   useEffect(() => {
-    const source = new EventSource(`/api/ai/developer/stream/${projectId}`);
+    const count = (sharedSubs.get(projectId) ?? 0) + 1;
+    sharedSubs.set(projectId, count);
 
-    source.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        if (data.phase === 'complete') {
-          triggerRefresh();
-          source.close();
+    if (!sharedSources.has(projectId)) {
+      const source = new EventSource(`/api/ai/developer/stream/${projectId}`);
+      sharedSources.set(projectId, source);
+
+      source.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (data.phase === 'complete') {
+            triggerRefresh();
+            source.close();
+            sharedSources.delete(projectId);
+          }
+        } catch {
+          // ignore parse errors
         }
-      } catch {
-        // ignore parse errors
+      };
+
+      source.onerror = () => {
+        source.close();
+        sharedSources.delete(projectId);
+      };
+    }
+
+    return () => {
+      const remaining = (sharedSubs.get(projectId) ?? 1) - 1;
+      if (remaining <= 0) {
+        sharedSubs.delete(projectId);
+        const source = sharedSources.get(projectId);
+        if (source) {
+          source.close();
+          sharedSources.delete(projectId);
+        }
+      } else {
+        sharedSubs.set(projectId, remaining);
       }
     };
-
-    source.onerror = () => {
-      source.close();
-    };
-
-    return () => source.close();
   }, [projectId, triggerRefresh]);
 
   // Fallback: poll build-status for full workflow & missed events

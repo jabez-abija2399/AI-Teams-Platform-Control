@@ -28,17 +28,14 @@ const STATUS_CONFIG: Record<string, { label: string; variant: string; icon: type
   ARCHIVED: { label: 'Archived', variant: 'bg-gray-100 text-gray-800', icon: Clock },
 };
 
-const BUILD_STEPS = ['CEO', 'Architect', 'Developer', 'QA', 'Security', 'Deploy'];
-const BUILD_STEP_INDEX: Record<string, number> = {
-  ceo: 0, architect: 1, developer: 2, qa: 3, security: 4, deploy: 5,
-};
+
 
 export function ProjectTabsClient({ projectId, defaultIdea }: { projectId: string; defaultIdea: string }) {
   const [tab, setTab] = useState('ceo');
   const [ceoOutput, setCeoOutput] = useState<CEOAnalysis | null>(null);
   const [building, setBuilding] = useState(false);
   const [buildStatus, setBuildStatus] = useState<BuildStatus | null>(null);
-  const [currentStep, setCurrentStep] = useState<string | null>(null);
+
 
   const fetchBuildStatus = useCallback(async () => {
     try {
@@ -52,7 +49,8 @@ export function ProjectTabsClient({ projectId, defaultIdea }: { projectId: strin
   }, [projectId]);
 
   useEffect(() => {
-    fetchBuildStatus();
+    const init = setTimeout(fetchBuildStatus, 0);
+    return () => clearTimeout(init);
   }, [fetchBuildStatus]);
 
   function handleDeveloperComplete() {
@@ -109,36 +107,8 @@ export function ProjectTabsClient({ projectId, defaultIdea }: { projectId: strin
       </div>
 
       {building && (
-        <div className="rounded-lg border bg-muted/30 p-3">
-          <div className="mb-2 text-xs font-medium text-muted-foreground">Build Progress</div>
-          <div className="flex items-center gap-1">
-            {BUILD_STEPS.map((step, i) => {
-              const stepKey = Object.entries(BUILD_STEP_INDEX).find(([, v]) => v === i)?.[0];
-              const active = currentStep === stepKey;
-              const done = !!currentStep && (BUILD_STEP_INDEX[currentStep] ?? -1) > i;
-              return (
-                <div key={step} className="flex items-center gap-1">
-                  <div
-                    className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-medium ${
-                      active
-                        ? 'bg-blue-500 text-white animate-pulse'
-                        : done
-                          ? 'bg-green-500 text-white'
-                          : 'bg-muted text-muted-foreground'
-                    }`}
-                  >
-                    {i + 1}
-                  </div>
-                  <span className={`text-xs ${active ? 'font-medium text-foreground' : 'text-muted-foreground'}`}>
-                    {step}
-                  </span>
-                  {i < BUILD_STEPS.length - 1 && (
-                    <div className={`mx-1 h-px w-4 ${done ? 'bg-green-500' : 'bg-muted'}`} />
-                  )}
-                </div>
-              );
-            })}
-          </div>
+        <div className="rounded-lg border bg-muted/30 p-2 text-center text-xs text-muted-foreground">
+          Full build in progress — detailed progress is shown in each AI tab
         </div>
       )}
 

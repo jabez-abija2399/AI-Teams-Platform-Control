@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { EnvironmentManager } from '@/features/deployment/components/environment-manager';
 import { DeploymentList } from '@/features/deployment/components/deployment-list';
 import { DeployDialog } from '@/features/deployment/components/deploy-dialog';
+import { OneClickDeploy } from '@/features/deployment/components/one-click-deploy';
 import { FolderTree, Rocket, Plus } from 'lucide-react';
 
 export function DeploymentPanel({ projectId }: { projectId: string }) {
@@ -13,6 +14,10 @@ export function DeploymentPanel({ projectId }: { projectId: string }) {
 
   return (
     <div className="flex flex-col h-full">
+      <div className="p-3 border-b">
+        <OneClickDeploy projectId={projectId} />
+      </div>
+
       <Tabs defaultValue="deployments" className="flex flex-col h-full">
         <TabsList variant="line" className="w-full justify-start px-4">
           <TabsTrigger value="deployments">
@@ -29,7 +34,7 @@ export function DeploymentPanel({ projectId }: { projectId: string }) {
           <div className="mb-3 flex justify-end">
             <Button size="xs" onClick={() => setDeployOpen(true)}>
               <Plus className="h-3 w-3" />
-              New Deployment
+              Custom Deploy
             </Button>
           </div>
           <DeploymentList projectId={projectId} />
