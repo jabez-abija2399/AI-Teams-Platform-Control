@@ -6,7 +6,7 @@ export interface ActivityItem {
   icon: string;
 }
 
-export type BottomPanelTab = 'terminal' | 'problems' | 'output' | 'logs' | 'tests' | 'preview';
+export type BottomPanelTab = 'terminal' | 'problems' | 'output' | 'logs' | 'tests' | 'preview' | 'review';
 
 export interface OpenTab {
   id: string;

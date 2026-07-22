@@ -5,16 +5,15 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ImplementationViewer } from './implementation-viewer';
-import { Loader2, CheckCircle2, AlertCircle, FileCode2, ClipboardList, XCircle } from 'lucide-react';
+import { Loader2, CheckCircle2, AlertCircle, FileCode2, ClipboardList, XCircle, ExternalLink } from 'lucide-react';
 import type { ImplementationReport } from '@/ai/agents/roles/developer/developer.types';
-import type { BuildEvent, TaskInfo } from '@/ai/agents/roles/developer/developer.types';
+import type { BuildEvent, TaskInfo, TaskStatus } from '@/ai/agents/roles/developer/developer.types';
 
 interface ProgressData {
   phase: 'planning' | 'generating' | 'saving' | 'complete';
   plan?: { tasks: string[]; files: string[]; dependencies: string[]; implementationOrder: string[] };
   completedTasks: number;
   totalTasks: number;
-  currentTask?: string;
   generatedFiles: string[];
   error?: string;
 }
@@ -37,7 +36,7 @@ function formatEta(ms: number): string {
   return `~${mins}m ${seconds % 60}s remaining`;
 }
 
-export function DeveloperChat({ projectId }: { projectId: string }) {
+export function DeveloperChat({ projectId, onComplete }: { projectId: string; onComplete?: () => void }) {
   const [status, setStatus] = useState<DeveloperStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [building, setBuilding] = useState(false);
@@ -47,6 +46,8 @@ export function DeveloperChat({ projectId }: { projectId: string }) {
   const [buildEvent, setBuildEvent] = useState<BuildEvent | null>(null);
   const [tasks, setTasks] = useState<TaskInfo[]>([]);
   const [generatedFiles, setGeneratedFiles] = useState<string[]>([]);
+  const tasksRef = useRef<TaskInfo[]>([]);
+  const taskRunningTimers = useRef<Map<string, number>>(new Map());
   const eventSourceRef = useRef<EventSource | null>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -64,7 +65,17 @@ export function DeveloperChat({ projectId }: { projectId: string }) {
     }
   }, []);
 
-  // Check initial status
+  function effectiveStatus(task: TaskInfo): TaskStatus {
+    if (task.status === 'done') {
+      const startedAt = taskRunningTimers.current.get(task.description);
+      if (startedAt && Date.now() - startedAt < 1500) return 'running';
+    }
+    if (task.status === 'running') {
+      taskRunningTimers.current.set(task.description, Date.now());
+    }
+    return task.status;
+  }
+
   async function checkStatus() {
     try {
       const res = await fetch(`/api/projects/${projectId}/developer-status`);
@@ -97,12 +108,16 @@ export function DeveloperChat({ projectId }: { projectId: string }) {
       try {
         const data = JSON.parse(event.data) as BuildEvent;
         setBuildEvent(data);
-        if (data.tasks) setTasks(data.tasks);
+        if (data.tasks) {
+          tasksRef.current = data.tasks;
+          setTasks(data.tasks);
+        }
         if (data.generatedFiles) setGeneratedFiles(data.generatedFiles);
 
         if (data.phase === 'complete') {
           setBuilding(false);
           source.close();
+          onComplete?.();
           checkStatus();
         }
       } catch {
@@ -113,11 +128,11 @@ export function DeveloperChat({ projectId }: { projectId: string }) {
     source.addEventListener('done', () => {
       setBuilding(false);
       source.close();
+      onComplete?.();
       checkStatus();
     });
 
     source.onerror = () => {
-      // SSE failed — fall back to polling
       source.close();
       startPollingFallback();
     };
@@ -133,6 +148,7 @@ export function DeveloperChat({ projectId }: { projectId: string }) {
           setStatus(json.data);
           if (!json.data.running) {
             setBuilding(false);
+            onComplete?.();
             stopPolling();
           }
         }
@@ -165,6 +181,7 @@ export function DeveloperChat({ projectId }: { projectId: string }) {
     setError(null);
     setBuildEvent(null);
     setTasks([]);
+    tasksRef.current = [];
     setGeneratedFiles([]);
     try {
       const archRes = await fetch(`/api/projects/${projectId}/architect-status`);
@@ -182,7 +199,6 @@ export function DeveloperChat({ projectId }: { projectId: string }) {
       });
       const devJson = await devRes.json();
       if (devJson.success) {
-        // Connect to SSE for real-time updates
         connectSSE();
       } else {
         const errMsg = devJson.error?.message ?? 'Developer AI failed';
@@ -211,11 +227,12 @@ export function DeveloperChat({ projectId }: { projectId: string }) {
 
   // Building state — show real-time progress from SSE
   if (building || buildEvent) {
-    const phase = buildEvent?.phase ?? status?.progress?.phase ?? 'planning';
-    const completed = buildEvent?.completedTasks ?? status?.progress?.completedTasks ?? 0;
-    const total = buildEvent?.totalTasks ?? status?.progress?.totalTasks ?? 0;
-    const fileList = generatedFiles.length > 0 ? generatedFiles : status?.progress?.generatedFiles ?? [];
-    const currentTask = buildEvent?.currentTask ?? status?.progress?.currentTask;
+    const phase = buildEvent?.phase ?? 'planning';
+    const completed = buildEvent?.completedTasks ?? 0;
+    const total = buildEvent?.totalTasks ?? 0;
+    const displayTasks = tasks.length > 0 ? tasks : tasksRef.current;
+    const fileList = generatedFiles;
+    const activeTasks = buildEvent?.activeTasks;
     const eventMessage = buildEvent?.message ?? '';
     const eta = buildEvent?.eta ?? 0;
     const isCancelled = buildEvent?.type === 'cancelled';
@@ -276,21 +293,44 @@ export function DeveloperChat({ projectId }: { projectId: string }) {
           </div>
         )}
 
-        {/* Task list */}
-        {tasks.length > 0 && (
+        {/* Active batch */}
+        {activeTasks && activeTasks.length > 0 && phase === 'generating' && (
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="flex items-center gap-2 text-sm font-medium">
-                <ClipboardList className="h-4 w-4" />
-                Tasks ({tasks.filter((t) => t.status === 'done').length}/{tasks.length} done)
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                Active Batch ({activeTasks.length} task(s))
               </CardTitle>
             </CardHeader>
             <CardContent>
               <ul className="space-y-1">
-                {tasks.map((task, i) => {
-                  const isDone = task.status === 'done';
-                  const isRunning = task.status === 'running';
-                  const isFailed = task.status === 'failed';
+                {activeTasks.map((task, i) => (
+                  <li key={i} className="flex items-center gap-2 text-xs font-mono">
+                    <Loader2 className="h-3 w-3 animate-spin text-blue-500 shrink-0" />
+                    {task}
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Task list */}
+        {displayTasks.length > 0 && (
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-sm font-medium">
+                <ClipboardList className="h-4 w-4" />
+                Tasks ({displayTasks.filter((t) => t.status === 'done').length}/{displayTasks.length} done)
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-1">
+                {displayTasks.map((task, i) => {
+                  const est = effectiveStatus(task);
+                  const isDone = est === 'done';
+                  const isRunning = est === 'running';
+                  const isFailed = est === 'failed';
                   return (
                     <li key={i} className="flex items-start gap-2 text-xs">
                       {isDone ? (
@@ -309,6 +349,12 @@ export function DeveloperChat({ projectId }: { projectId: string }) {
                         'text-muted-foreground/50'
                       }>
                         {task.description}
+                        {isDone && task.fileCount !== undefined && (
+                          <span className="ml-1.5 text-[10px] text-green-400">+{task.fileCount} file(s)</span>
+                        )}
+                        {isFailed && (
+                          <span className="ml-1.5 text-[10px] text-red-400">failed</span>
+                        )}
                       </span>
                     </li>
                   );
@@ -316,13 +362,6 @@ export function DeveloperChat({ projectId }: { projectId: string }) {
               </ul>
             </CardContent>
           </Card>
-        )}
-
-        {/* Current task */}
-        {currentTask && phase === 'generating' && (
-          <div className="rounded-md border border-blue-200 bg-blue-50 p-2 text-xs text-blue-700 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-300">
-            Working on: {currentTask}
-          </div>
         )}
 
         {/* Generated files */}
@@ -394,6 +433,16 @@ export function DeveloperChat({ projectId }: { projectId: string }) {
       )}
       <div className="flex items-center gap-2">
         <Button onClick={handleRunDeveloper} size="sm" variant="outline">Regenerate</Button>
+        <Button
+          onClick={() => {
+            window.location.href = `/dashboard/projects/${projectId}/workspace`;
+          }}
+          size="sm"
+          variant="default"
+        >
+          <ExternalLink className="h-3.5 w-3.5 mr-1" />
+          Open in Workspace
+        </Button>
         <CheckCircle2 className="h-4 w-4 text-green-500" />
         <span className="text-xs text-green-600">Complete</span>
       </div>

@@ -9,9 +9,14 @@ const LivePreview = dynamic(
   () => import('@/features/workspace/preview/components/live-preview').then((m) => ({ default: m.LivePreview })),
   { ssr: false },
 );
+const CodeReviewPanel = dynamic(
+  () => import('@/features/code-review/components/code-review-panel').then((m) => ({ default: m.CodeReviewPanel })),
+  { ssr: false },
+);
 
 const TABS: { id: BottomPanelTab; label: string }[] = [
   { id: 'preview', label: 'Preview' },
+  { id: 'review', label: 'Review' },
   { id: 'terminal', label: 'Terminal' },
   { id: 'problems', label: 'Problems' },
   { id: 'output', label: 'Output' },
@@ -49,6 +54,9 @@ export function BottomPanel() {
       <div className="flex-1 overflow-hidden">
         {activeBottomPanel === 'preview' && currentProjectId && (
           <LivePreview projectId={currentProjectId} />
+        )}
+        {activeBottomPanel === 'review' && currentProjectId && (
+          <CodeReviewPanel projectId={currentProjectId} />
         )}
         {activeBottomPanel === 'terminal' && (
           <div className="p-3 text-xs text-muted-foreground">Terminal integration is not wired yet.</div>

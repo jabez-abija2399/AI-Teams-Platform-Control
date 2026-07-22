@@ -9,6 +9,7 @@ import { ArchitectureChat } from '@/features/architect-ai/components/architectur
 import { DeveloperChat } from '@/features/developer-ai/components/developer-chat';
 import { QAChat } from '@/features/qa-ai/components/qa-chat';
 import { DeploymentPanel } from '@/features/deployment/components/deployment-panel';
+import { WorkspaceBuildSync } from '@/features/workspace/components/workspace-build-sync';
 import { Loader2, Rocket, CheckCircle, XCircle, Clock } from 'lucide-react';
 import type { CEOAnalysis } from '@/ai/agents/roles/ceo/ceo.types';
 
@@ -54,27 +55,10 @@ export function ProjectTabsClient({ projectId, defaultIdea }: { projectId: strin
     fetchBuildStatus();
   }, [fetchBuildStatus]);
 
-  useEffect(() => {
-    if (!building) return;
-    const interval = setInterval(fetchBuildStatus, 3000);
-    return () => clearInterval(interval);
-  }, [building, fetchBuildStatus]);
-
-  useEffect(() => {
-    if (!building) { setCurrentStep(null); return; }
-    const poll = setInterval(async () => {
-      try {
-        const res = await fetch(`/api/projects/${projectId}/build-status`);
-        const json = await res.json();
-        if (json.success && !json.data.running) {
-          setBuilding(false);
-          setBuildStatus(json.data);
-          setCurrentStep(null);
-        }
-      } catch {}
-    }, 2000);
-    return () => clearInterval(poll);
-  }, [building, projectId]);
+  function handleDeveloperComplete() {
+    setBuilding(false);
+    fetchBuildStatus();
+  }
 
   function handleCeoComplete(data: CEOAnalysis) {
     setCeoOutput(data);
@@ -158,6 +142,8 @@ export function ProjectTabsClient({ projectId, defaultIdea }: { projectId: strin
         </div>
       )}
 
+      <WorkspaceBuildSync projectId={projectId} />
+
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList>
           <TabsTrigger value="ceo">CEO AI</TabsTrigger>
@@ -173,7 +159,7 @@ export function ProjectTabsClient({ projectId, defaultIdea }: { projectId: strin
           <ArchitectureChat projectId={projectId} defaultRequirements={ceoOutput?.requirements} onComplete={handleArchitectComplete} />
         </TabsContent>
         <TabsContent value="developer">
-          <DeveloperChat projectId={projectId} />
+          <DeveloperChat projectId={projectId} onComplete={handleDeveloperComplete} />
         </TabsContent>
         <TabsContent value="qa">
           <QAChat projectId={projectId} />
