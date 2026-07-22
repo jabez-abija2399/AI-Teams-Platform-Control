@@ -5,17 +5,20 @@ interface ExplorerState {
   expandedFolders: Set<string>;
   loadedChildren: Record<string, ExplorerNode[]>;
   selectedNodeId: string | null;
+  refreshTrigger: number;
 
   toggleFolder: (folderId: string) => void;
   setChildren: (folderId: string, children: ExplorerNode[]) => void;
   selectNode: (nodeId: string | null) => void;
   isExpanded: (folderId: string) => boolean;
+  triggerRefresh: () => void;
 }
 
 export const useExplorerStore = create<ExplorerState>((set, get) => ({
   expandedFolders: new Set(),
   loadedChildren: {},
   selectedNodeId: null,
+  refreshTrigger: 0,
 
   toggleFolder: (folderId) =>
     set((state) => {
@@ -33,4 +36,6 @@ export const useExplorerStore = create<ExplorerState>((set, get) => ({
   selectNode: (nodeId) => set({ selectedNodeId: nodeId }),
 
   isExpanded: (folderId) => get().expandedFolders.has(folderId),
+
+  triggerRefresh: () => set((state) => ({ refreshTrigger: state.refreshTrigger + 1 })),
 }));

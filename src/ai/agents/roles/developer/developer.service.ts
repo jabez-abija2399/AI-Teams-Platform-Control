@@ -257,7 +257,7 @@ export async function implementArchitecture(
         message: `Executing batch ${layerIdx + 1}/${layers.length} (${batch.length} task(s))`,
         completedTasks: completedCount,
         totalTasks: plan.tasks.length,
-        currentTask: batch[0],
+        activeTasks: batch,
         tasks: buildState.tasks,
         generatedFiles: [...generatedFiles],
       });
@@ -268,17 +268,6 @@ export async function implementArchitecture(
 
           const taskInfo = tasks.find((t) => t.description === taskDesc);
           if (taskInfo) taskInfo.status = 'running';
-
-          emitBuildEvent(projectId, {
-            type: 'task:starting',
-            phase: 'generating',
-            message: `Generating: ${taskDesc}`,
-            completedTasks: completedCount,
-            totalTasks: plan.tasks.length,
-            currentTask: taskDesc,
-            tasks: buildState.tasks,
-            generatedFiles: [...generatedFiles],
-          });
 
           try {
             const changes = await executeWithRetry(
@@ -291,7 +280,10 @@ export async function implementArchitecture(
               signal,
             );
 
-            if (taskInfo) taskInfo.status = 'done';
+            if (taskInfo) {
+              taskInfo.status = 'done';
+              taskInfo.fileCount = changes.length;
+            }
             completedCount++;
 
             for (const c of changes) {
@@ -304,7 +296,6 @@ export async function implementArchitecture(
               message: `Completed: ${taskDesc}`,
               completedTasks: completedCount,
               totalTasks: plan.tasks.length,
-              currentTask: taskDesc,
               tasks: buildState.tasks,
               generatedFiles: [...generatedFiles],
               eta: estimateEta(buildState, completedCount),
@@ -322,7 +313,6 @@ export async function implementArchitecture(
               message: `Failed: ${taskDesc} — ${err instanceof Error ? err.message : 'Unknown error'}`,
               completedTasks: completedCount,
               totalTasks: plan.tasks.length,
-              currentTask: taskDesc,
               tasks: buildState.tasks,
               generatedFiles: [...generatedFiles],
               error: err instanceof Error ? err.message : 'Unknown error',

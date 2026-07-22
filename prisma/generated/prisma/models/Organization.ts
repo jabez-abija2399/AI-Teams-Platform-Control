@@ -188,6 +188,7 @@ export type OrganizationWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Organization"> | Date | string
   owner?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   teams?: Prisma.TeamListRelationFilter
+  projects?: Prisma.ProjectListRelationFilter
   members?: Prisma.MembershipListRelationFilter
   installations?: Prisma.PluginInstallationListRelationFilter
   marketplaceInstallations?: Prisma.MarketplaceInstallationListRelationFilter
@@ -209,6 +210,7 @@ export type OrganizationOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   owner?: Prisma.UserOrderByWithRelationInput
   teams?: Prisma.TeamOrderByRelationAggregateInput
+  projects?: Prisma.ProjectOrderByRelationAggregateInput
   members?: Prisma.MembershipOrderByRelationAggregateInput
   installations?: Prisma.PluginInstallationOrderByRelationAggregateInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationOrderByRelationAggregateInput
@@ -233,6 +235,7 @@ export type OrganizationWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"Organization"> | Date | string
   owner?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   teams?: Prisma.TeamListRelationFilter
+  projects?: Prisma.ProjectListRelationFilter
   members?: Prisma.MembershipListRelationFilter
   installations?: Prisma.PluginInstallationListRelationFilter
   marketplaceInstallations?: Prisma.MarketplaceInstallationListRelationFilter
@@ -277,6 +280,7 @@ export type OrganizationCreateInput = {
   createdAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutOwnedOrgsInput
   teams?: Prisma.TeamCreateNestedManyWithoutOrganizationInput
+  projects?: Prisma.ProjectCreateNestedManyWithoutOrganizationInput
   members?: Prisma.MembershipCreateNestedManyWithoutOrganizationInput
   installations?: Prisma.PluginInstallationCreateNestedManyWithoutOrganizationInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationCreateNestedManyWithoutOrganizationInput
@@ -297,6 +301,7 @@ export type OrganizationUncheckedCreateInput = {
   settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   teams?: Prisma.TeamUncheckedCreateNestedManyWithoutOrganizationInput
+  projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutOrganizationInput
   members?: Prisma.MembershipUncheckedCreateNestedManyWithoutOrganizationInput
   installations?: Prisma.PluginInstallationUncheckedCreateNestedManyWithoutOrganizationInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationUncheckedCreateNestedManyWithoutOrganizationInput
@@ -317,6 +322,7 @@ export type OrganizationUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutOwnedOrgsNestedInput
   teams?: Prisma.TeamUpdateManyWithoutOrganizationNestedInput
+  projects?: Prisma.ProjectUpdateManyWithoutOrganizationNestedInput
   members?: Prisma.MembershipUpdateManyWithoutOrganizationNestedInput
   installations?: Prisma.PluginInstallationUpdateManyWithoutOrganizationNestedInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationUpdateManyWithoutOrganizationNestedInput
@@ -337,6 +343,7 @@ export type OrganizationUncheckedUpdateInput = {
   settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   teams?: Prisma.TeamUncheckedUpdateManyWithoutOrganizationNestedInput
+  projects?: Prisma.ProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   members?: Prisma.MembershipUncheckedUpdateManyWithoutOrganizationNestedInput
   installations?: Prisma.PluginInstallationUncheckedUpdateManyWithoutOrganizationNestedInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -383,6 +390,11 @@ export type OrganizationListRelationFilter = {
 
 export type OrganizationOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
+}
+
+export type OrganizationNullableScalarRelationFilter = {
+  is?: Prisma.OrganizationWhereInput | null
+  isNot?: Prisma.OrganizationWhereInput | null
 }
 
 export type OrganizationCountOrderByAggregateInput = {
@@ -455,6 +467,22 @@ export type OrganizationUncheckedUpdateManyWithoutOwnerNestedInput = {
   update?: Prisma.OrganizationUpdateWithWhereUniqueWithoutOwnerInput | Prisma.OrganizationUpdateWithWhereUniqueWithoutOwnerInput[]
   updateMany?: Prisma.OrganizationUpdateManyWithWhereWithoutOwnerInput | Prisma.OrganizationUpdateManyWithWhereWithoutOwnerInput[]
   deleteMany?: Prisma.OrganizationScalarWhereInput | Prisma.OrganizationScalarWhereInput[]
+}
+
+export type OrganizationCreateNestedOneWithoutProjectsInput = {
+  create?: Prisma.XOR<Prisma.OrganizationCreateWithoutProjectsInput, Prisma.OrganizationUncheckedCreateWithoutProjectsInput>
+  connectOrCreate?: Prisma.OrganizationCreateOrConnectWithoutProjectsInput
+  connect?: Prisma.OrganizationWhereUniqueInput
+}
+
+export type OrganizationUpdateOneWithoutProjectsNestedInput = {
+  create?: Prisma.XOR<Prisma.OrganizationCreateWithoutProjectsInput, Prisma.OrganizationUncheckedCreateWithoutProjectsInput>
+  connectOrCreate?: Prisma.OrganizationCreateOrConnectWithoutProjectsInput
+  upsert?: Prisma.OrganizationUpsertWithoutProjectsInput
+  disconnect?: Prisma.OrganizationWhereInput | boolean
+  delete?: Prisma.OrganizationWhereInput | boolean
+  connect?: Prisma.OrganizationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.OrganizationUpdateToOneWithWhereWithoutProjectsInput, Prisma.OrganizationUpdateWithoutProjectsInput>, Prisma.OrganizationUncheckedUpdateWithoutProjectsInput>
 }
 
 export type OrganizationCreateNestedOneWithoutTeamsInput = {
@@ -618,6 +646,7 @@ export type OrganizationCreateWithoutOwnerInput = {
   settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   teams?: Prisma.TeamCreateNestedManyWithoutOrganizationInput
+  projects?: Prisma.ProjectCreateNestedManyWithoutOrganizationInput
   members?: Prisma.MembershipCreateNestedManyWithoutOrganizationInput
   installations?: Prisma.PluginInstallationCreateNestedManyWithoutOrganizationInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationCreateNestedManyWithoutOrganizationInput
@@ -637,6 +666,7 @@ export type OrganizationUncheckedCreateWithoutOwnerInput = {
   settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   teams?: Prisma.TeamUncheckedCreateNestedManyWithoutOrganizationInput
+  projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutOrganizationInput
   members?: Prisma.MembershipUncheckedCreateNestedManyWithoutOrganizationInput
   installations?: Prisma.PluginInstallationUncheckedCreateNestedManyWithoutOrganizationInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationUncheckedCreateNestedManyWithoutOrganizationInput
@@ -687,6 +717,102 @@ export type OrganizationScalarWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Organization"> | Date | string
 }
 
+export type OrganizationCreateWithoutProjectsInput = {
+  id?: string
+  name: string
+  slug: string
+  settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  owner: Prisma.UserCreateNestedOneWithoutOwnedOrgsInput
+  teams?: Prisma.TeamCreateNestedManyWithoutOrganizationInput
+  members?: Prisma.MembershipCreateNestedManyWithoutOrganizationInput
+  installations?: Prisma.PluginInstallationCreateNestedManyWithoutOrganizationInput
+  marketplaceInstallations?: Prisma.MarketplaceInstallationCreateNestedManyWithoutOrganizationInput
+  customRoles?: Prisma.CustomRoleCreateNestedManyWithoutOrganizationInput
+  policies?: Prisma.PolicyCreateNestedManyWithoutOrganizationInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutOrganizationInput
+  orgSettings?: Prisma.OrganizationSettingsCreateNestedOneWithoutOrganizationInput
+  creditAccount?: Prisma.CreditAccountCreateNestedOneWithoutOrganizationInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutOrganizationInput
+  budgets?: Prisma.BudgetCreateNestedManyWithoutOrganizationInput
+}
+
+export type OrganizationUncheckedCreateWithoutProjectsInput = {
+  id?: string
+  name: string
+  slug: string
+  ownerId: string
+  settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  teams?: Prisma.TeamUncheckedCreateNestedManyWithoutOrganizationInput
+  members?: Prisma.MembershipUncheckedCreateNestedManyWithoutOrganizationInput
+  installations?: Prisma.PluginInstallationUncheckedCreateNestedManyWithoutOrganizationInput
+  marketplaceInstallations?: Prisma.MarketplaceInstallationUncheckedCreateNestedManyWithoutOrganizationInput
+  customRoles?: Prisma.CustomRoleUncheckedCreateNestedManyWithoutOrganizationInput
+  policies?: Prisma.PolicyUncheckedCreateNestedManyWithoutOrganizationInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutOrganizationInput
+  orgSettings?: Prisma.OrganizationSettingsUncheckedCreateNestedOneWithoutOrganizationInput
+  creditAccount?: Prisma.CreditAccountUncheckedCreateNestedOneWithoutOrganizationInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutOrganizationInput
+  budgets?: Prisma.BudgetUncheckedCreateNestedManyWithoutOrganizationInput
+}
+
+export type OrganizationCreateOrConnectWithoutProjectsInput = {
+  where: Prisma.OrganizationWhereUniqueInput
+  create: Prisma.XOR<Prisma.OrganizationCreateWithoutProjectsInput, Prisma.OrganizationUncheckedCreateWithoutProjectsInput>
+}
+
+export type OrganizationUpsertWithoutProjectsInput = {
+  update: Prisma.XOR<Prisma.OrganizationUpdateWithoutProjectsInput, Prisma.OrganizationUncheckedUpdateWithoutProjectsInput>
+  create: Prisma.XOR<Prisma.OrganizationCreateWithoutProjectsInput, Prisma.OrganizationUncheckedCreateWithoutProjectsInput>
+  where?: Prisma.OrganizationWhereInput
+}
+
+export type OrganizationUpdateToOneWithWhereWithoutProjectsInput = {
+  where?: Prisma.OrganizationWhereInput
+  data: Prisma.XOR<Prisma.OrganizationUpdateWithoutProjectsInput, Prisma.OrganizationUncheckedUpdateWithoutProjectsInput>
+}
+
+export type OrganizationUpdateWithoutProjectsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  owner?: Prisma.UserUpdateOneRequiredWithoutOwnedOrgsNestedInput
+  teams?: Prisma.TeamUpdateManyWithoutOrganizationNestedInput
+  members?: Prisma.MembershipUpdateManyWithoutOrganizationNestedInput
+  installations?: Prisma.PluginInstallationUpdateManyWithoutOrganizationNestedInput
+  marketplaceInstallations?: Prisma.MarketplaceInstallationUpdateManyWithoutOrganizationNestedInput
+  customRoles?: Prisma.CustomRoleUpdateManyWithoutOrganizationNestedInput
+  policies?: Prisma.PolicyUpdateManyWithoutOrganizationNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutOrganizationNestedInput
+  orgSettings?: Prisma.OrganizationSettingsUpdateOneWithoutOrganizationNestedInput
+  creditAccount?: Prisma.CreditAccountUpdateOneWithoutOrganizationNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutOrganizationNestedInput
+  budgets?: Prisma.BudgetUpdateManyWithoutOrganizationNestedInput
+}
+
+export type OrganizationUncheckedUpdateWithoutProjectsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  teams?: Prisma.TeamUncheckedUpdateManyWithoutOrganizationNestedInput
+  members?: Prisma.MembershipUncheckedUpdateManyWithoutOrganizationNestedInput
+  installations?: Prisma.PluginInstallationUncheckedUpdateManyWithoutOrganizationNestedInput
+  marketplaceInstallations?: Prisma.MarketplaceInstallationUncheckedUpdateManyWithoutOrganizationNestedInput
+  customRoles?: Prisma.CustomRoleUncheckedUpdateManyWithoutOrganizationNestedInput
+  policies?: Prisma.PolicyUncheckedUpdateManyWithoutOrganizationNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutOrganizationNestedInput
+  orgSettings?: Prisma.OrganizationSettingsUncheckedUpdateOneWithoutOrganizationNestedInput
+  creditAccount?: Prisma.CreditAccountUncheckedUpdateOneWithoutOrganizationNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutOrganizationNestedInput
+  budgets?: Prisma.BudgetUncheckedUpdateManyWithoutOrganizationNestedInput
+}
+
 export type OrganizationCreateWithoutTeamsInput = {
   id?: string
   name: string
@@ -694,6 +820,7 @@ export type OrganizationCreateWithoutTeamsInput = {
   settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutOwnedOrgsInput
+  projects?: Prisma.ProjectCreateNestedManyWithoutOrganizationInput
   members?: Prisma.MembershipCreateNestedManyWithoutOrganizationInput
   installations?: Prisma.PluginInstallationCreateNestedManyWithoutOrganizationInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationCreateNestedManyWithoutOrganizationInput
@@ -713,6 +840,7 @@ export type OrganizationUncheckedCreateWithoutTeamsInput = {
   ownerId: string
   settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
+  projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutOrganizationInput
   members?: Prisma.MembershipUncheckedCreateNestedManyWithoutOrganizationInput
   installations?: Prisma.PluginInstallationUncheckedCreateNestedManyWithoutOrganizationInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationUncheckedCreateNestedManyWithoutOrganizationInput
@@ -748,6 +876,7 @@ export type OrganizationUpdateWithoutTeamsInput = {
   settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutOwnedOrgsNestedInput
+  projects?: Prisma.ProjectUpdateManyWithoutOrganizationNestedInput
   members?: Prisma.MembershipUpdateManyWithoutOrganizationNestedInput
   installations?: Prisma.PluginInstallationUpdateManyWithoutOrganizationNestedInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationUpdateManyWithoutOrganizationNestedInput
@@ -767,6 +896,7 @@ export type OrganizationUncheckedUpdateWithoutTeamsInput = {
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  projects?: Prisma.ProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   members?: Prisma.MembershipUncheckedUpdateManyWithoutOrganizationNestedInput
   installations?: Prisma.PluginInstallationUncheckedUpdateManyWithoutOrganizationNestedInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -787,6 +917,7 @@ export type OrganizationCreateWithoutMembersInput = {
   createdAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutOwnedOrgsInput
   teams?: Prisma.TeamCreateNestedManyWithoutOrganizationInput
+  projects?: Prisma.ProjectCreateNestedManyWithoutOrganizationInput
   installations?: Prisma.PluginInstallationCreateNestedManyWithoutOrganizationInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationCreateNestedManyWithoutOrganizationInput
   customRoles?: Prisma.CustomRoleCreateNestedManyWithoutOrganizationInput
@@ -806,6 +937,7 @@ export type OrganizationUncheckedCreateWithoutMembersInput = {
   settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   teams?: Prisma.TeamUncheckedCreateNestedManyWithoutOrganizationInput
+  projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutOrganizationInput
   installations?: Prisma.PluginInstallationUncheckedCreateNestedManyWithoutOrganizationInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationUncheckedCreateNestedManyWithoutOrganizationInput
   customRoles?: Prisma.CustomRoleUncheckedCreateNestedManyWithoutOrganizationInput
@@ -841,6 +973,7 @@ export type OrganizationUpdateWithoutMembersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutOwnedOrgsNestedInput
   teams?: Prisma.TeamUpdateManyWithoutOrganizationNestedInput
+  projects?: Prisma.ProjectUpdateManyWithoutOrganizationNestedInput
   installations?: Prisma.PluginInstallationUpdateManyWithoutOrganizationNestedInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationUpdateManyWithoutOrganizationNestedInput
   customRoles?: Prisma.CustomRoleUpdateManyWithoutOrganizationNestedInput
@@ -860,6 +993,7 @@ export type OrganizationUncheckedUpdateWithoutMembersInput = {
   settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   teams?: Prisma.TeamUncheckedUpdateManyWithoutOrganizationNestedInput
+  projects?: Prisma.ProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   installations?: Prisma.PluginInstallationUncheckedUpdateManyWithoutOrganizationNestedInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationUncheckedUpdateManyWithoutOrganizationNestedInput
   customRoles?: Prisma.CustomRoleUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -879,6 +1013,7 @@ export type OrganizationCreateWithoutInstallationsInput = {
   createdAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutOwnedOrgsInput
   teams?: Prisma.TeamCreateNestedManyWithoutOrganizationInput
+  projects?: Prisma.ProjectCreateNestedManyWithoutOrganizationInput
   members?: Prisma.MembershipCreateNestedManyWithoutOrganizationInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationCreateNestedManyWithoutOrganizationInput
   customRoles?: Prisma.CustomRoleCreateNestedManyWithoutOrganizationInput
@@ -898,6 +1033,7 @@ export type OrganizationUncheckedCreateWithoutInstallationsInput = {
   settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   teams?: Prisma.TeamUncheckedCreateNestedManyWithoutOrganizationInput
+  projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutOrganizationInput
   members?: Prisma.MembershipUncheckedCreateNestedManyWithoutOrganizationInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationUncheckedCreateNestedManyWithoutOrganizationInput
   customRoles?: Prisma.CustomRoleUncheckedCreateNestedManyWithoutOrganizationInput
@@ -933,6 +1069,7 @@ export type OrganizationUpdateWithoutInstallationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutOwnedOrgsNestedInput
   teams?: Prisma.TeamUpdateManyWithoutOrganizationNestedInput
+  projects?: Prisma.ProjectUpdateManyWithoutOrganizationNestedInput
   members?: Prisma.MembershipUpdateManyWithoutOrganizationNestedInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationUpdateManyWithoutOrganizationNestedInput
   customRoles?: Prisma.CustomRoleUpdateManyWithoutOrganizationNestedInput
@@ -952,6 +1089,7 @@ export type OrganizationUncheckedUpdateWithoutInstallationsInput = {
   settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   teams?: Prisma.TeamUncheckedUpdateManyWithoutOrganizationNestedInput
+  projects?: Prisma.ProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   members?: Prisma.MembershipUncheckedUpdateManyWithoutOrganizationNestedInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationUncheckedUpdateManyWithoutOrganizationNestedInput
   customRoles?: Prisma.CustomRoleUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -971,6 +1109,7 @@ export type OrganizationCreateWithoutOrgSettingsInput = {
   createdAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutOwnedOrgsInput
   teams?: Prisma.TeamCreateNestedManyWithoutOrganizationInput
+  projects?: Prisma.ProjectCreateNestedManyWithoutOrganizationInput
   members?: Prisma.MembershipCreateNestedManyWithoutOrganizationInput
   installations?: Prisma.PluginInstallationCreateNestedManyWithoutOrganizationInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationCreateNestedManyWithoutOrganizationInput
@@ -990,6 +1129,7 @@ export type OrganizationUncheckedCreateWithoutOrgSettingsInput = {
   settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   teams?: Prisma.TeamUncheckedCreateNestedManyWithoutOrganizationInput
+  projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutOrganizationInput
   members?: Prisma.MembershipUncheckedCreateNestedManyWithoutOrganizationInput
   installations?: Prisma.PluginInstallationUncheckedCreateNestedManyWithoutOrganizationInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationUncheckedCreateNestedManyWithoutOrganizationInput
@@ -1025,6 +1165,7 @@ export type OrganizationUpdateWithoutOrgSettingsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutOwnedOrgsNestedInput
   teams?: Prisma.TeamUpdateManyWithoutOrganizationNestedInput
+  projects?: Prisma.ProjectUpdateManyWithoutOrganizationNestedInput
   members?: Prisma.MembershipUpdateManyWithoutOrganizationNestedInput
   installations?: Prisma.PluginInstallationUpdateManyWithoutOrganizationNestedInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationUpdateManyWithoutOrganizationNestedInput
@@ -1044,6 +1185,7 @@ export type OrganizationUncheckedUpdateWithoutOrgSettingsInput = {
   settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   teams?: Prisma.TeamUncheckedUpdateManyWithoutOrganizationNestedInput
+  projects?: Prisma.ProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   members?: Prisma.MembershipUncheckedUpdateManyWithoutOrganizationNestedInput
   installations?: Prisma.PluginInstallationUncheckedUpdateManyWithoutOrganizationNestedInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -1063,6 +1205,7 @@ export type OrganizationCreateWithoutCustomRolesInput = {
   createdAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutOwnedOrgsInput
   teams?: Prisma.TeamCreateNestedManyWithoutOrganizationInput
+  projects?: Prisma.ProjectCreateNestedManyWithoutOrganizationInput
   members?: Prisma.MembershipCreateNestedManyWithoutOrganizationInput
   installations?: Prisma.PluginInstallationCreateNestedManyWithoutOrganizationInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationCreateNestedManyWithoutOrganizationInput
@@ -1082,6 +1225,7 @@ export type OrganizationUncheckedCreateWithoutCustomRolesInput = {
   settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   teams?: Prisma.TeamUncheckedCreateNestedManyWithoutOrganizationInput
+  projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutOrganizationInput
   members?: Prisma.MembershipUncheckedCreateNestedManyWithoutOrganizationInput
   installations?: Prisma.PluginInstallationUncheckedCreateNestedManyWithoutOrganizationInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationUncheckedCreateNestedManyWithoutOrganizationInput
@@ -1117,6 +1261,7 @@ export type OrganizationUpdateWithoutCustomRolesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutOwnedOrgsNestedInput
   teams?: Prisma.TeamUpdateManyWithoutOrganizationNestedInput
+  projects?: Prisma.ProjectUpdateManyWithoutOrganizationNestedInput
   members?: Prisma.MembershipUpdateManyWithoutOrganizationNestedInput
   installations?: Prisma.PluginInstallationUpdateManyWithoutOrganizationNestedInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationUpdateManyWithoutOrganizationNestedInput
@@ -1136,6 +1281,7 @@ export type OrganizationUncheckedUpdateWithoutCustomRolesInput = {
   settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   teams?: Prisma.TeamUncheckedUpdateManyWithoutOrganizationNestedInput
+  projects?: Prisma.ProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   members?: Prisma.MembershipUncheckedUpdateManyWithoutOrganizationNestedInput
   installations?: Prisma.PluginInstallationUncheckedUpdateManyWithoutOrganizationNestedInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -1155,6 +1301,7 @@ export type OrganizationCreateWithoutPoliciesInput = {
   createdAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutOwnedOrgsInput
   teams?: Prisma.TeamCreateNestedManyWithoutOrganizationInput
+  projects?: Prisma.ProjectCreateNestedManyWithoutOrganizationInput
   members?: Prisma.MembershipCreateNestedManyWithoutOrganizationInput
   installations?: Prisma.PluginInstallationCreateNestedManyWithoutOrganizationInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationCreateNestedManyWithoutOrganizationInput
@@ -1174,6 +1321,7 @@ export type OrganizationUncheckedCreateWithoutPoliciesInput = {
   settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   teams?: Prisma.TeamUncheckedCreateNestedManyWithoutOrganizationInput
+  projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutOrganizationInput
   members?: Prisma.MembershipUncheckedCreateNestedManyWithoutOrganizationInput
   installations?: Prisma.PluginInstallationUncheckedCreateNestedManyWithoutOrganizationInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationUncheckedCreateNestedManyWithoutOrganizationInput
@@ -1209,6 +1357,7 @@ export type OrganizationUpdateWithoutPoliciesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutOwnedOrgsNestedInput
   teams?: Prisma.TeamUpdateManyWithoutOrganizationNestedInput
+  projects?: Prisma.ProjectUpdateManyWithoutOrganizationNestedInput
   members?: Prisma.MembershipUpdateManyWithoutOrganizationNestedInput
   installations?: Prisma.PluginInstallationUpdateManyWithoutOrganizationNestedInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationUpdateManyWithoutOrganizationNestedInput
@@ -1228,6 +1377,7 @@ export type OrganizationUncheckedUpdateWithoutPoliciesInput = {
   settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   teams?: Prisma.TeamUncheckedUpdateManyWithoutOrganizationNestedInput
+  projects?: Prisma.ProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   members?: Prisma.MembershipUncheckedUpdateManyWithoutOrganizationNestedInput
   installations?: Prisma.PluginInstallationUncheckedUpdateManyWithoutOrganizationNestedInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -1247,6 +1397,7 @@ export type OrganizationCreateWithoutAuditLogsInput = {
   createdAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutOwnedOrgsInput
   teams?: Prisma.TeamCreateNestedManyWithoutOrganizationInput
+  projects?: Prisma.ProjectCreateNestedManyWithoutOrganizationInput
   members?: Prisma.MembershipCreateNestedManyWithoutOrganizationInput
   installations?: Prisma.PluginInstallationCreateNestedManyWithoutOrganizationInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationCreateNestedManyWithoutOrganizationInput
@@ -1266,6 +1417,7 @@ export type OrganizationUncheckedCreateWithoutAuditLogsInput = {
   settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   teams?: Prisma.TeamUncheckedCreateNestedManyWithoutOrganizationInput
+  projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutOrganizationInput
   members?: Prisma.MembershipUncheckedCreateNestedManyWithoutOrganizationInput
   installations?: Prisma.PluginInstallationUncheckedCreateNestedManyWithoutOrganizationInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationUncheckedCreateNestedManyWithoutOrganizationInput
@@ -1301,6 +1453,7 @@ export type OrganizationUpdateWithoutAuditLogsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutOwnedOrgsNestedInput
   teams?: Prisma.TeamUpdateManyWithoutOrganizationNestedInput
+  projects?: Prisma.ProjectUpdateManyWithoutOrganizationNestedInput
   members?: Prisma.MembershipUpdateManyWithoutOrganizationNestedInput
   installations?: Prisma.PluginInstallationUpdateManyWithoutOrganizationNestedInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationUpdateManyWithoutOrganizationNestedInput
@@ -1320,6 +1473,7 @@ export type OrganizationUncheckedUpdateWithoutAuditLogsInput = {
   settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   teams?: Prisma.TeamUncheckedUpdateManyWithoutOrganizationNestedInput
+  projects?: Prisma.ProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   members?: Prisma.MembershipUncheckedUpdateManyWithoutOrganizationNestedInput
   installations?: Prisma.PluginInstallationUncheckedUpdateManyWithoutOrganizationNestedInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -1339,6 +1493,7 @@ export type OrganizationCreateWithoutCreditAccountInput = {
   createdAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutOwnedOrgsInput
   teams?: Prisma.TeamCreateNestedManyWithoutOrganizationInput
+  projects?: Prisma.ProjectCreateNestedManyWithoutOrganizationInput
   members?: Prisma.MembershipCreateNestedManyWithoutOrganizationInput
   installations?: Prisma.PluginInstallationCreateNestedManyWithoutOrganizationInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationCreateNestedManyWithoutOrganizationInput
@@ -1358,6 +1513,7 @@ export type OrganizationUncheckedCreateWithoutCreditAccountInput = {
   settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   teams?: Prisma.TeamUncheckedCreateNestedManyWithoutOrganizationInput
+  projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutOrganizationInput
   members?: Prisma.MembershipUncheckedCreateNestedManyWithoutOrganizationInput
   installations?: Prisma.PluginInstallationUncheckedCreateNestedManyWithoutOrganizationInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationUncheckedCreateNestedManyWithoutOrganizationInput
@@ -1393,6 +1549,7 @@ export type OrganizationUpdateWithoutCreditAccountInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutOwnedOrgsNestedInput
   teams?: Prisma.TeamUpdateManyWithoutOrganizationNestedInput
+  projects?: Prisma.ProjectUpdateManyWithoutOrganizationNestedInput
   members?: Prisma.MembershipUpdateManyWithoutOrganizationNestedInput
   installations?: Prisma.PluginInstallationUpdateManyWithoutOrganizationNestedInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationUpdateManyWithoutOrganizationNestedInput
@@ -1412,6 +1569,7 @@ export type OrganizationUncheckedUpdateWithoutCreditAccountInput = {
   settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   teams?: Prisma.TeamUncheckedUpdateManyWithoutOrganizationNestedInput
+  projects?: Prisma.ProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   members?: Prisma.MembershipUncheckedUpdateManyWithoutOrganizationNestedInput
   installations?: Prisma.PluginInstallationUncheckedUpdateManyWithoutOrganizationNestedInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -1431,6 +1589,7 @@ export type OrganizationCreateWithoutSubscriptionsInput = {
   createdAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutOwnedOrgsInput
   teams?: Prisma.TeamCreateNestedManyWithoutOrganizationInput
+  projects?: Prisma.ProjectCreateNestedManyWithoutOrganizationInput
   members?: Prisma.MembershipCreateNestedManyWithoutOrganizationInput
   installations?: Prisma.PluginInstallationCreateNestedManyWithoutOrganizationInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationCreateNestedManyWithoutOrganizationInput
@@ -1450,6 +1609,7 @@ export type OrganizationUncheckedCreateWithoutSubscriptionsInput = {
   settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   teams?: Prisma.TeamUncheckedCreateNestedManyWithoutOrganizationInput
+  projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutOrganizationInput
   members?: Prisma.MembershipUncheckedCreateNestedManyWithoutOrganizationInput
   installations?: Prisma.PluginInstallationUncheckedCreateNestedManyWithoutOrganizationInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationUncheckedCreateNestedManyWithoutOrganizationInput
@@ -1485,6 +1645,7 @@ export type OrganizationUpdateWithoutSubscriptionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutOwnedOrgsNestedInput
   teams?: Prisma.TeamUpdateManyWithoutOrganizationNestedInput
+  projects?: Prisma.ProjectUpdateManyWithoutOrganizationNestedInput
   members?: Prisma.MembershipUpdateManyWithoutOrganizationNestedInput
   installations?: Prisma.PluginInstallationUpdateManyWithoutOrganizationNestedInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationUpdateManyWithoutOrganizationNestedInput
@@ -1504,6 +1665,7 @@ export type OrganizationUncheckedUpdateWithoutSubscriptionsInput = {
   settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   teams?: Prisma.TeamUncheckedUpdateManyWithoutOrganizationNestedInput
+  projects?: Prisma.ProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   members?: Prisma.MembershipUncheckedUpdateManyWithoutOrganizationNestedInput
   installations?: Prisma.PluginInstallationUncheckedUpdateManyWithoutOrganizationNestedInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -1523,6 +1685,7 @@ export type OrganizationCreateWithoutBudgetsInput = {
   createdAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutOwnedOrgsInput
   teams?: Prisma.TeamCreateNestedManyWithoutOrganizationInput
+  projects?: Prisma.ProjectCreateNestedManyWithoutOrganizationInput
   members?: Prisma.MembershipCreateNestedManyWithoutOrganizationInput
   installations?: Prisma.PluginInstallationCreateNestedManyWithoutOrganizationInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationCreateNestedManyWithoutOrganizationInput
@@ -1542,6 +1705,7 @@ export type OrganizationUncheckedCreateWithoutBudgetsInput = {
   settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   teams?: Prisma.TeamUncheckedCreateNestedManyWithoutOrganizationInput
+  projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutOrganizationInput
   members?: Prisma.MembershipUncheckedCreateNestedManyWithoutOrganizationInput
   installations?: Prisma.PluginInstallationUncheckedCreateNestedManyWithoutOrganizationInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationUncheckedCreateNestedManyWithoutOrganizationInput
@@ -1577,6 +1741,7 @@ export type OrganizationUpdateWithoutBudgetsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutOwnedOrgsNestedInput
   teams?: Prisma.TeamUpdateManyWithoutOrganizationNestedInput
+  projects?: Prisma.ProjectUpdateManyWithoutOrganizationNestedInput
   members?: Prisma.MembershipUpdateManyWithoutOrganizationNestedInput
   installations?: Prisma.PluginInstallationUpdateManyWithoutOrganizationNestedInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationUpdateManyWithoutOrganizationNestedInput
@@ -1596,6 +1761,7 @@ export type OrganizationUncheckedUpdateWithoutBudgetsInput = {
   settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   teams?: Prisma.TeamUncheckedUpdateManyWithoutOrganizationNestedInput
+  projects?: Prisma.ProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   members?: Prisma.MembershipUncheckedUpdateManyWithoutOrganizationNestedInput
   installations?: Prisma.PluginInstallationUncheckedUpdateManyWithoutOrganizationNestedInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -1615,6 +1781,7 @@ export type OrganizationCreateWithoutMarketplaceInstallationsInput = {
   createdAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutOwnedOrgsInput
   teams?: Prisma.TeamCreateNestedManyWithoutOrganizationInput
+  projects?: Prisma.ProjectCreateNestedManyWithoutOrganizationInput
   members?: Prisma.MembershipCreateNestedManyWithoutOrganizationInput
   installations?: Prisma.PluginInstallationCreateNestedManyWithoutOrganizationInput
   customRoles?: Prisma.CustomRoleCreateNestedManyWithoutOrganizationInput
@@ -1634,6 +1801,7 @@ export type OrganizationUncheckedCreateWithoutMarketplaceInstallationsInput = {
   settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   teams?: Prisma.TeamUncheckedCreateNestedManyWithoutOrganizationInput
+  projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutOrganizationInput
   members?: Prisma.MembershipUncheckedCreateNestedManyWithoutOrganizationInput
   installations?: Prisma.PluginInstallationUncheckedCreateNestedManyWithoutOrganizationInput
   customRoles?: Prisma.CustomRoleUncheckedCreateNestedManyWithoutOrganizationInput
@@ -1669,6 +1837,7 @@ export type OrganizationUpdateWithoutMarketplaceInstallationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutOwnedOrgsNestedInput
   teams?: Prisma.TeamUpdateManyWithoutOrganizationNestedInput
+  projects?: Prisma.ProjectUpdateManyWithoutOrganizationNestedInput
   members?: Prisma.MembershipUpdateManyWithoutOrganizationNestedInput
   installations?: Prisma.PluginInstallationUpdateManyWithoutOrganizationNestedInput
   customRoles?: Prisma.CustomRoleUpdateManyWithoutOrganizationNestedInput
@@ -1688,6 +1857,7 @@ export type OrganizationUncheckedUpdateWithoutMarketplaceInstallationsInput = {
   settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   teams?: Prisma.TeamUncheckedUpdateManyWithoutOrganizationNestedInput
+  projects?: Prisma.ProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   members?: Prisma.MembershipUncheckedUpdateManyWithoutOrganizationNestedInput
   installations?: Prisma.PluginInstallationUncheckedUpdateManyWithoutOrganizationNestedInput
   customRoles?: Prisma.CustomRoleUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -1714,6 +1884,7 @@ export type OrganizationUpdateWithoutOwnerInput = {
   settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   teams?: Prisma.TeamUpdateManyWithoutOrganizationNestedInput
+  projects?: Prisma.ProjectUpdateManyWithoutOrganizationNestedInput
   members?: Prisma.MembershipUpdateManyWithoutOrganizationNestedInput
   installations?: Prisma.PluginInstallationUpdateManyWithoutOrganizationNestedInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationUpdateManyWithoutOrganizationNestedInput
@@ -1733,6 +1904,7 @@ export type OrganizationUncheckedUpdateWithoutOwnerInput = {
   settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   teams?: Prisma.TeamUncheckedUpdateManyWithoutOrganizationNestedInput
+  projects?: Prisma.ProjectUncheckedUpdateManyWithoutOrganizationNestedInput
   members?: Prisma.MembershipUncheckedUpdateManyWithoutOrganizationNestedInput
   installations?: Prisma.PluginInstallationUncheckedUpdateManyWithoutOrganizationNestedInput
   marketplaceInstallations?: Prisma.MarketplaceInstallationUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -1760,6 +1932,7 @@ export type OrganizationUncheckedUpdateManyWithoutOwnerInput = {
 
 export type OrganizationCountOutputType = {
   teams: number
+  projects: number
   members: number
   installations: number
   marketplaceInstallations: number
@@ -1772,6 +1945,7 @@ export type OrganizationCountOutputType = {
 
 export type OrganizationCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   teams?: boolean | OrganizationCountOutputTypeCountTeamsArgs
+  projects?: boolean | OrganizationCountOutputTypeCountProjectsArgs
   members?: boolean | OrganizationCountOutputTypeCountMembersArgs
   installations?: boolean | OrganizationCountOutputTypeCountInstallationsArgs
   marketplaceInstallations?: boolean | OrganizationCountOutputTypeCountMarketplaceInstallationsArgs
@@ -1797,6 +1971,13 @@ export type OrganizationCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types
  */
 export type OrganizationCountOutputTypeCountTeamsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.TeamWhereInput
+}
+
+/**
+ * OrganizationCountOutputType without action
+ */
+export type OrganizationCountOutputTypeCountProjectsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ProjectWhereInput
 }
 
 /**
@@ -1865,6 +2046,7 @@ export type OrganizationSelect<ExtArgs extends runtime.Types.Extensions.Internal
   createdAt?: boolean
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   teams?: boolean | Prisma.Organization$teamsArgs<ExtArgs>
+  projects?: boolean | Prisma.Organization$projectsArgs<ExtArgs>
   members?: boolean | Prisma.Organization$membersArgs<ExtArgs>
   installations?: boolean | Prisma.Organization$installationsArgs<ExtArgs>
   marketplaceInstallations?: boolean | Prisma.Organization$marketplaceInstallationsArgs<ExtArgs>
@@ -1911,6 +2093,7 @@ export type OrganizationOmit<ExtArgs extends runtime.Types.Extensions.InternalAr
 export type OrganizationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   teams?: boolean | Prisma.Organization$teamsArgs<ExtArgs>
+  projects?: boolean | Prisma.Organization$projectsArgs<ExtArgs>
   members?: boolean | Prisma.Organization$membersArgs<ExtArgs>
   installations?: boolean | Prisma.Organization$installationsArgs<ExtArgs>
   marketplaceInstallations?: boolean | Prisma.Organization$marketplaceInstallationsArgs<ExtArgs>
@@ -1935,6 +2118,7 @@ export type $OrganizationPayload<ExtArgs extends runtime.Types.Extensions.Intern
   objects: {
     owner: Prisma.$UserPayload<ExtArgs>
     teams: Prisma.$TeamPayload<ExtArgs>[]
+    projects: Prisma.$ProjectPayload<ExtArgs>[]
     members: Prisma.$MembershipPayload<ExtArgs>[]
     installations: Prisma.$PluginInstallationPayload<ExtArgs>[]
     marketplaceInstallations: Prisma.$MarketplaceInstallationPayload<ExtArgs>[]
@@ -2349,6 +2533,7 @@ export interface Prisma__OrganizationClient<T, Null = never, ExtArgs extends run
   readonly [Symbol.toStringTag]: "PrismaPromise"
   owner<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   teams<T extends Prisma.Organization$teamsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$teamsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TeamPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  projects<T extends Prisma.Organization$projectsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$projectsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   members<T extends Prisma.Organization$membersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$membersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MembershipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   installations<T extends Prisma.Organization$installationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$installationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PluginInstallationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   marketplaceInstallations<T extends Prisma.Organization$marketplaceInstallationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$marketplaceInstallationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MarketplaceInstallationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2816,6 +3001,30 @@ export type Organization$teamsArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.TeamScalarFieldEnum | Prisma.TeamScalarFieldEnum[]
+}
+
+/**
+ * Organization.projects
+ */
+export type Organization$projectsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Project
+   */
+  select?: Prisma.ProjectSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Project
+   */
+  omit?: Prisma.ProjectOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectInclude<ExtArgs> | null
+  where?: Prisma.ProjectWhereInput
+  orderBy?: Prisma.ProjectOrderByWithRelationInput | Prisma.ProjectOrderByWithRelationInput[]
+  cursor?: Prisma.ProjectWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ProjectScalarFieldEnum | Prisma.ProjectScalarFieldEnum[]
 }
 
 /**

@@ -61,7 +61,7 @@ export type DeveloperOutput = z.infer<typeof developerOutputSchema>;
 export interface TaskInfo {
   description: string;
   status: TaskStatus;
-  file?: string;
+  fileCount?: number;
 }
 
 export interface BuildEvent {
@@ -70,7 +70,7 @@ export interface BuildEvent {
   message: string;
   completedTasks: number;
   totalTasks: number;
-  currentTask?: string;
+  activeTasks?: string[];
   tasks?: TaskInfo[];
   generatedFiles?: string[];
   error?: string;

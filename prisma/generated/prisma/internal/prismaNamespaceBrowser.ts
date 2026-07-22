@@ -151,7 +151,8 @@ export const ModelName = {
   RecoveryAction: 'RecoveryAction',
   Account: 'Account',
   Session: 'Session',
-  VerificationToken: 'VerificationToken'
+  VerificationToken: 'VerificationToken',
+  SampleProject: 'SampleProject'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -192,6 +193,7 @@ export const ProjectScalarFieldEnum = {
   color: 'color',
   status: 'status',
   ownerId: 'ownerId',
+  organizationId: 'organizationId',
   favorite: 'favorite',
   lastOpenedAt: 'lastOpenedAt',
   createdAt: 'createdAt',
@@ -562,6 +564,8 @@ export const WorkspacePreferenceScalarFieldEnum = {
   userId: 'userId',
   theme: 'theme',
   layout: 'layout',
+  simpleMode: 'simpleMode',
+  tourCompleted: 'tourCompleted',
   updatedAt: 'updatedAt'
 } as const
 
@@ -1419,6 +1423,19 @@ export const VerificationTokenScalarFieldEnum = {
 } as const
 
 export type VerificationTokenScalarFieldEnum = (typeof VerificationTokenScalarFieldEnum)[keyof typeof VerificationTokenScalarFieldEnum]
+
+
+export const SampleProjectScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  description: 'description',
+  category: 'category',
+  prompt: 'prompt',
+  previewHtml: 'previewHtml',
+  featured: 'featured'
+} as const
+
+export type SampleProjectScalarFieldEnum = (typeof SampleProjectScalarFieldEnum)[keyof typeof SampleProjectScalarFieldEnum]
 
 
 export const SortOrder = {
