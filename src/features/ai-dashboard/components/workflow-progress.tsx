@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { AgentAvatar } from '@/features/onboarding/components/agent-avatar';
 import type { WorkflowProgress } from '@/ai/workflows/core/workflow.types';
 
 interface WorkflowProgressProps {
@@ -68,8 +69,12 @@ export function WorkflowProgressCard({ projectId }: WorkflowProgressProps) {
                       key={`${wf.workflowId}-step-${i}`}
                       className="flex items-center gap-2 text-xs"
                     >
+                      <AgentAvatar role={step.agentRole as 'CEO' | 'ARCHITECT' | 'DEVELOPER' | 'QA'} size="sm" />
+                      <span className="text-muted-foreground">
+                        {step.name}
+                      </span>
                       <span
-                        className={`h-2 w-2 rounded-full ${
+                        className={`ml-auto h-2 w-2 rounded-full ${
                           step.status === 'COMPLETED'
                             ? 'bg-green-500'
                             : step.status === 'RUNNING'
@@ -79,9 +84,6 @@ export function WorkflowProgressCard({ projectId }: WorkflowProgressProps) {
                                 : 'bg-gray-300'
                         }`}
                       />
-                      <span className="text-muted-foreground">
-                        {step.name} ({step.agentRole})
-                      </span>
                     </div>
                   ))}
                 </div>

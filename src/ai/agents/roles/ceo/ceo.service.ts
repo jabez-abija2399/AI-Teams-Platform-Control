@@ -6,9 +6,6 @@ import { ceoAnalysisSchema, type CEOAnalysis } from './ceo.types';
 import type { ApiResult } from '@/types/common.types';
 
 const CEO_ROLE_NAME = 'CEO AI';
-const TOOL_DELAY_MS = 1500;
-
-const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 async function getOrCreateCEOAgentId(): Promise<string> {
   const existing = await prisma.agent.findFirst({ where: { role: 'CEO' } });
@@ -24,10 +21,13 @@ export async function analyzeUserIdea(
   userIdea: string,
 ): Promise<ApiResult<CEOAnalysis>> {
   const agentId = await getOrCreateCEOAgentId();
-  await prisma.agent.update({
-    where: { id: agentId },
-    data: { status: 'WORKING' },
+
+  await prisma.document.deleteMany({ where: { projectId, type: 'CEO_IN_PROGRESS' } });
+  await prisma.document.create({
+    data: { projectId, type: 'CEO_IN_PROGRESS', title: 'CEO Analysis In Progress', content: '{}', author: 'CEO AI' },
   });
+
+  await prisma.agent.update({ where: { id: agentId }, data: { status: 'WORKING' } });
   await logAIEvent('CEO_ANALYSIS_STARTED', { projectId }, agentId);
 
   try {
@@ -38,89 +38,36 @@ export async function analyzeUserIdea(
       : '';
 
     const visionResult = await requirementBuilderTool.execute({
-      userIdea: contextNote ? `${userIdea}\n\n${contextNote}` : userIdea,
-      projectId,
-      agentId,
+      userIdea: contextNote ? `${userIdea}\n\n${contextNote}` : userIdea, projectId, agentId,
     });
     if (!visionResult.success) throw new Error(visionResult.error);
 
-    await delay(TOOL_DELAY_MS);
-
-    const requirementsResult = await featurePlannerTool.execute({
-      vision: visionResult.data,
-      projectId,
-      agentId,
-    });
+    const requirementsResult = await featurePlannerTool.execute({ vision: visionResult.data, projectId, agentId });
     if (!requirementsResult.success) throw new Error(requirementsResult.error);
 
-    await delay(TOOL_DELAY_MS);
-
-    const planResult = await roadmapGeneratorTool.execute({
-      requirements: requirementsResult.data,
-      projectId,
-      agentId,
-    });
+    const planResult = await roadmapGeneratorTool.execute({ requirements: requirementsResult.data, projectId, agentId });
     if (!planResult.success) throw new Error(planResult.error);
 
-    const analysis = ceoAnalysisSchema.parse({
-      vision: visionResult.data,
-      requirements: requirementsResult.data,
-      plan: planResult.data,
-    });
+    const analysis = ceoAnalysisSchema.parse({ vision: visionResult.data, requirements: requirementsResult.data, plan: planResult.data });
 
     await Promise.all([
-      prisma.document.create({
-        data: {
-          projectId,
-          type: 'VISION',
-          title: 'Product Vision',
-          content: JSON.stringify(analysis.vision),
-        },
-      }),
-      prisma.document.create({
-        data: {
-          projectId,
-          type: 'REQUIREMENTS',
-          title: 'Product Requirements',
-          content: JSON.stringify(analysis.requirements),
-        },
-      }),
-      prisma.document.create({
-        data: {
-          projectId,
-          type: 'PLAN',
-          title: 'Development Plan',
-          content: JSON.stringify(analysis.plan),
-        },
-      }),
-      memory.remember({
-        agentId,
-        content: `Project ${projectId}: ${analysis.vision.problem} → ${analysis.vision.solution}`,
-        type: 'PROJECT',
-        metadata: { projectId },
-      }),
+      prisma.document.create({ data: { projectId, type: 'VISION', title: 'Product Vision', content: JSON.stringify(analysis.vision) } }),
+      prisma.document.create({ data: { projectId, type: 'REQUIREMENTS', title: 'Product Requirements', content: JSON.stringify(analysis.requirements) } }),
+      prisma.document.create({ data: { projectId, type: 'PLAN', title: 'Development Plan', content: JSON.stringify(analysis.plan) } }),
+      memory.remember({ agentId, content: `Project ${projectId}: ${analysis.vision.problem} → ${analysis.vision.solution}`, type: 'PROJECT', metadata: { projectId } }),
     ]);
 
-    await prisma.agent.update({
-      where: { id: agentId },
-      data: { status: 'IDLE' },
-    });
+    await prisma.document.deleteMany({ where: { projectId, type: 'CEO_IN_PROGRESS' } });
+
+    await prisma.agent.update({ where: { id: agentId }, data: { status: 'IDLE' } });
     await logAIEvent('CEO_ANALYSIS_COMPLETED', { projectId }, agentId);
 
     return { success: true, data: analysis };
   } catch (err) {
-    await prisma.agent.update({
-      where: { id: agentId },
-      data: { status: 'ERROR' },
-    });
+    await prisma.document.deleteMany({ where: { projectId, type: 'CEO_IN_PROGRESS' } });
+    await prisma.agent.update({ where: { id: agentId }, data: { status: 'ERROR' } });
     await logAIEvent('CEO_ANALYSIS_FAILED', { projectId, error: String(err) }, agentId);
-    return {
-      success: false,
-      error: {
-        message: err instanceof Error ? err.message : 'CEO analysis failed',
-        code: 'AI_ERROR',
-      },
-    };
+    return { success: false, error: { message: err instanceof Error ? err.message : 'CEO analysis failed', code: 'AI_ERROR' } };
   }
 }
 

@@ -54,14 +54,22 @@ export async function aiGenerate(
   const chain = buildProviderChain(providerName);
 
   let lastError: Error | undefined;
+  let currentOptions = { ...options };
 
   for (const { name, provider } of chain) {
     for (let attempt = 0; attempt <= Math.min(MAX_RETRIES, 1); attempt++) {
       try {
-        const response = await provider.generate(options);
+        const response = await provider.generate(currentOptions);
         return response;
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
+        const msg = lastError.message.toLowerCase();
+
+        if (/model_not_found|does not exist|not found|failed: 404/.test(msg)) {
+          currentOptions = { ...currentOptions, model: undefined };
+          attempt = -1;
+          continue;
+        }
 
         if (!isRetryable(error)) break;
 

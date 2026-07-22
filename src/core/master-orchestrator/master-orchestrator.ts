@@ -9,6 +9,12 @@ import {
   executeDeployment,
 } from '@/features/deployment/services/deployment.service';
 import { recordTimelineEvent } from '@/features/ai-workspace/services/timeline.service';
+import {
+  saveCEOSummary,
+  saveArchitectSummary,
+  saveDeveloperSummary,
+  saveQASummary,
+} from '@/features/documentation/services/phase-docs.service';
 
 interface WorkflowResult {
   deploymentId?: string;
@@ -32,6 +38,29 @@ export async function runFullCompanyWorkflow(
 
   const result: WorkflowResult = {};
 
+  await prisma.project.update({
+    where: { id: projectId },
+    data: { status: 'IN_PROGRESS' },
+  });
+
+  const buildDoc = await prisma.document.create({
+    data: {
+      projectId,
+      type: 'BUILD_IN_PROGRESS',
+      title: 'Build In Progress',
+      content: JSON.stringify({ step: 'ceo', message: 'Starting CEO analysis...' }),
+    },
+  });
+
+  const updateBuildDoc = (step: string, message: string) =>
+    prisma.document.update({
+      where: { id: buildDoc.id },
+      data: { content: JSON.stringify({ step, message }) },
+    }).catch(() => {});
+
+  const cleanupBuildDoc = () =>
+    prisma.document.delete({ where: { id: buildDoc.id } }).catch(() => {});
+
   await recordTimelineEvent({
     type: 'workflow.started',
     message: `Full company workflow started for project "${project.name}"`,
@@ -47,6 +76,8 @@ export async function runFullCompanyWorkflow(
 
   const ceoResult = await analyzeUserIdea(projectId, userIdea);
   if (!ceoResult.success) {
+    await prisma.project.update({ where: { id: projectId }, data: { status: 'REVIEW' } });
+    await cleanupBuildDoc();
     await recordTimelineEvent({
       type: 'workflow.failed',
       message: `CEO analysis failed: ${ceoResult.error.message}`,
@@ -68,7 +99,12 @@ export async function runFullCompanyWorkflow(
     metadata: { projectId, step: 'ceo' },
   });
 
+  saveCEOSummary(projectId, ceoResult.data).catch((err) => {
+    console.error('[Orchestrator] Failed to save CEO summary:', err);
+  });
+
   // Step 2: Architecture Design
+  await updateBuildDoc('architect', 'CEO complete. Architect designing architecture...');
   await recordTimelineEvent({
     type: 'workflow.step',
     message: 'Architect designing architecture...',
@@ -80,6 +116,8 @@ export async function runFullCompanyWorkflow(
     ceoResult.data.requirements,
   );
   if (!architectResult.success) {
+    await prisma.project.update({ where: { id: projectId }, data: { status: 'REVIEW' } });
+    await cleanupBuildDoc();
     await recordTimelineEvent({
       type: 'workflow.failed',
       message: `Architecture design failed: ${architectResult.error.message}`,
@@ -101,7 +139,12 @@ export async function runFullCompanyWorkflow(
     metadata: { projectId, step: 'architect' },
   });
 
+  saveArchitectSummary(projectId, architectResult.data).catch((err) => {
+    console.error('[Orchestrator] Failed to save Architect summary:', err);
+  });
+
   // Step 3: Development
+  await updateBuildDoc('developer', 'Architecture complete. Developer implementing...');
   await recordTimelineEvent({
     type: 'workflow.step',
     message: 'Developer implementing architecture...',
@@ -113,6 +156,8 @@ export async function runFullCompanyWorkflow(
     architectResult.data,
   );
   if (!developerResult.success) {
+    await prisma.project.update({ where: { id: projectId }, data: { status: 'REVIEW' } });
+    await cleanupBuildDoc();
     await recordTimelineEvent({
       type: 'workflow.failed',
       message: `Implementation failed: ${developerResult.error.message}`,
@@ -134,7 +179,12 @@ export async function runFullCompanyWorkflow(
     metadata: { projectId, step: 'developer' },
   });
 
+  saveDeveloperSummary(projectId, developerResult.data).catch((err) => {
+    console.error('[Orchestrator] Failed to save Developer summary:', err);
+  });
+
   // Step 4: QA Review
+  await updateBuildDoc('qa', 'Development complete. QA reviewing...');
   await recordTimelineEvent({
     type: 'workflow.step',
     message: 'QA reviewing implementation...',
@@ -146,6 +196,8 @@ export async function runFullCompanyWorkflow(
     developerResult.data,
   );
   if (!qaResult.success) {
+    await prisma.project.update({ where: { id: projectId }, data: { status: 'REVIEW' } });
+    await cleanupBuildDoc();
     await recordTimelineEvent({
       type: 'workflow.failed',
       message: `QA review failed: ${qaResult.error.message}`,
@@ -161,11 +213,17 @@ export async function runFullCompanyWorkflow(
   }
   result.qaResult = qaResult.data;
 
+  saveQASummary(projectId, qaResult.data).catch((err) => {
+    console.error('[Orchestrator] Failed to save QA summary:', err);
+  });
+
   const hasCriticalIssues = qaResult.data.qualityReport.issues.some(
     (issue) => issue.severity === 'CRITICAL',
   );
 
   if (hasCriticalIssues) {
+    await prisma.project.update({ where: { id: projectId }, data: { status: 'REVIEW' } });
+    await cleanupBuildDoc();
     await recordTimelineEvent({
       type: 'workflow.failed',
       message: 'QA found critical issues — blocking deployment',
@@ -187,6 +245,7 @@ export async function runFullCompanyWorkflow(
   });
 
   // Step 5: Security Scan
+  await updateBuildDoc('security', 'QA passed. Running security scan...');
   await recordTimelineEvent({
     type: 'workflow.step',
     message: 'Security scan...',
@@ -200,30 +259,27 @@ export async function runFullCompanyWorkflow(
   });
 
   // Step 6: Deploy
+  await updateBuildDoc('deploy', 'Security passed. Creating deployment...');
   await recordTimelineEvent({
     type: 'workflow.step',
     message: 'Creating deployment...',
     metadata: { projectId, step: 'deploy' },
   });
 
-  const environments = await prisma.environment.findMany({
+  let environments = await prisma.environment.findMany({
     where: { projectId },
     orderBy: { createdAt: 'asc' },
   });
 
   if (environments.length === 0) {
-    await recordTimelineEvent({
-      type: 'workflow.failed',
-      message: 'No environments found for deployment',
-      metadata: { projectId, step: 'deploy' },
-    });
-    return {
-      success: false,
-      error: {
-        message: 'No environments configured for this project. Create an environment before deploying.',
-        code: 'NO_ENVIRONMENT',
+    const defaultEnv = await prisma.environment.create({
+      data: {
+        projectId,
+        name: 'Production',
+        variables: {},
       },
-    };
+    });
+    environments = [defaultEnv];
   }
 
   const targetEnvironment = environments[0]!;
@@ -241,6 +297,7 @@ export async function runFullCompanyWorkflow(
   });
 
   if (!deployResult.success) {
+    await cleanupBuildDoc();
     await recordTimelineEvent({
       type: 'workflow.failed',
       message: `Deployment creation failed: ${deployResult.error.message}`,
@@ -257,6 +314,7 @@ export async function runFullCompanyWorkflow(
 
   const executionResult = await executeDeployment(deployResult.data.id);
   if (!executionResult.success) {
+    await cleanupBuildDoc();
     await recordTimelineEvent({
       type: 'workflow.failed',
       message: `Deployment execution failed: ${executionResult.error.message}`,
@@ -278,6 +336,13 @@ export async function runFullCompanyWorkflow(
     message: `Full company workflow completed successfully. Deployment ${deployResult.data.id} is ${executionResult.data.status}.`,
     metadata: { projectId, deploymentId: deployResult.data.id },
   });
+
+  await prisma.project.update({
+    where: { id: projectId },
+    data: { status: 'COMPLETED' },
+  });
+
+  await cleanupBuildDoc();
 
   return { success: true, data: result };
 }

@@ -1,11 +1,11 @@
 'use client';
 
-import { Bell, LogOut, User, Settings } from 'lucide-react';
+import { LogOut, Settings } from 'lucide-react';
 import Link from 'next/link';
 import { signOut } from 'next-auth/react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
 import { MobileMenu } from '@/components/layout/mobile-menu';
+import { NotificationBell } from '@/components/layout/notification-bell';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -33,9 +33,7 @@ export function Navbar({ userName, userImage }: NavbarProps) {
     <header className="bg-background flex h-14 items-center justify-between border-b px-4 md:px-6">
       <MobileMenu />
       <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" aria-label="Notifications">
-          <Bell className="h-4 w-4" />
-        </Button>
+        <NotificationBell />
         <DropdownMenu>
           <DropdownMenuTrigger
             render={<button className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring" />}

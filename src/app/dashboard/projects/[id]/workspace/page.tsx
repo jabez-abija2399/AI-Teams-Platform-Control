@@ -24,6 +24,7 @@ export default async function WorkspacePage({
         <WorkspaceShell
           projectName={project.name}
           userName={session.user.name ?? 'User'}
+          projectId={id}
           sidebarContent={<WorkspaceSidebarContent />}
           aiPanelContent={
             <div className="p-3 text-xs text-muted-foreground">

@@ -10,8 +10,8 @@ export interface AgentModelConfig {
 }
 
 export const ceoConfig: AgentModelConfig = {
-  preferredProvider: (process.env.CEO_AI_PROVIDER as AIProviderName) ?? 'anthropic',
-  preferredModel: process.env.CEO_AI_MODEL ?? 'claude-sonnet-4-20250514',
+  preferredProvider: (process.env.CEO_AI_PROVIDER as AIProviderName) ?? 'groq',
+  preferredModel: process.env.CEO_AI_MODEL ?? 'llama-3.3-70b-versatile',
   fallbackProvider: 'groq',
   fallbackModel: 'llama-3.3-70b-versatile',
   temperature: 0.6,

@@ -5,9 +5,12 @@ export const CEO_CAPABILITIES = ['PLANNING', 'ANALYSIS', 'DOCUMENTATION'] as con
 export type Priority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
 export type Complexity = 'LOW' | 'MEDIUM' | 'HIGH' | 'VERY_HIGH';
 
-const smartString = z.union([z.string(), z.record(z.string(), z.unknown())]).transform((val) =>
-  typeof val === 'string' ? val : JSON.stringify(val),
-);
+const smartString = z
+  .union([z.string(), z.record(z.string(), z.unknown()), z.array(z.unknown())])
+  .transform((val) => {
+    if (typeof val === 'string') return val;
+    return JSON.stringify(val);
+  });
 
 export const productVisionSchema = z.object({
   problem: smartString.default(''),

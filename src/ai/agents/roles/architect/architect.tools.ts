@@ -100,7 +100,14 @@ export const apiDesignerTool: ITool<
   async execute({ requirements, database, projectId, agentId }): Promise<ToolResult<APISpecification>> {
     try {
       const raw = await aiCall<unknown>(
-        `Requirements: ${JSON.stringify(requirements)}\nDatabase: ${JSON.stringify(database)}\n\nProduce an API specification as JSON with keys: endpoints (array of {path, method, request (optional), response}). Method must be GET, POST, PUT, PATCH, or DELETE. Respond ONLY with valid JSON.`,
+        `Requirements: ${JSON.stringify(requirements)}\nDatabase: ${JSON.stringify(database)}\n\n` +
+        `Produce an API specification as JSON with keys: endpoints (array of objects).\n` +
+        `Each endpoint object MUST have:\n` +
+        `- path: string (e.g. "/api/users")\n` +
+        `- method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE"\n` +
+        `- request: object describing request body (optional, only for POST/PUT/PATCH)\n` +
+        `- response: object describing response shape with field names as keys and type strings as values, e.g. {"id": "string", "name": "string", "createdAt": "string"}. Do NOT use an array for response.\n\n` +
+        `Respond ONLY with valid JSON.`,
         projectId,
         agentId,
       );

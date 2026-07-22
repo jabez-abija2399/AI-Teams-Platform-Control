@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Shield, ShieldCheck, ShieldAlert, ShieldX } from 'lucide-react';
+import { EmptyStateAction } from '@/features/onboarding/components/empty-state-action';
 
 function getScoreColor(score: number) {
   if (score >= 80) return { ring: 'text-green-600', bg: 'bg-green-100', label: 'Good', icon: ShieldCheck };
@@ -12,6 +13,20 @@ function getScoreColor(score: number) {
 export function SecurityScoreCard({ score }: { score: number }) {
   const color = getScoreColor(score);
   const Icon = color.icon;
+
+  if (score === 0) {
+    return (
+      <EmptyStateAction
+        icon={Shield}
+        title="No security scan yet"
+        description="Run a security scan to check your project for vulnerabilities."
+        agentRole="SECURITY"
+        actions={[
+          { label: 'Run Scan', onClick: () => {} },
+        ]}
+      />
+    );
+  }
 
   return (
     <Card>

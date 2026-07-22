@@ -2,9 +2,12 @@ import { z } from 'zod';
 
 export const ARCHITECT_CAPABILITIES = ['ARCHITECTURE', 'PLANNING', 'ANALYSIS'] as const;
 
-const smartString = z.union([z.string(), z.record(z.string(), z.unknown())]).transform((val) =>
-  typeof val === 'string' ? val : JSON.stringify(val),
-);
+const smartString = z
+  .union([z.string(), z.record(z.string(), z.unknown()), z.array(z.unknown())])
+  .transform((val) => {
+    if (typeof val === 'string') return val;
+    return JSON.stringify(val);
+  });
 
 export const technicalArchitectureSchema = z.object({
   frontend: smartString.default('Not specified'),

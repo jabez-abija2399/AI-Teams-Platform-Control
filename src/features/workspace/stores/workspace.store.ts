@@ -10,6 +10,8 @@ interface WorkspaceState {
   selectedActivity: ActivityId;
   activeBottomPanel: BottomPanelTab;
   layout: WorkspaceLayoutPrefs;
+  simpleMode: boolean;
+  tourCompleted: boolean;
 
   setCurrentProject: (projectId: string | null) => void;
   openTab: (tab: OpenTab) => void;
@@ -24,6 +26,8 @@ interface WorkspaceState {
   setSidebarWidth: (width: number) => void;
   setAIPanelWidth: (width: number) => void;
   setBottomPanelHeight: (height: number) => void;
+  toggleSimpleMode: () => void;
+  completeTour: () => void;
 }
 
 export const useWorkspaceStore = create<WorkspaceState>()(
@@ -35,6 +39,8 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       selectedActivity: 'explorer',
       activeBottomPanel: 'terminal',
       layout: DEFAULT_LAYOUT,
+      simpleMode: true,
+      tourCompleted: false,
 
       setCurrentProject: (projectId) =>
         set({ currentProjectId: projectId, openTabs: [], activeTabId: null }),
@@ -85,7 +91,12 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         set((state) => ({ layout: { ...state.layout, aiPanelWidth: width } })),
       setBottomPanelHeight: (height) =>
         set((state) => ({ layout: { ...state.layout, bottomPanelHeight: height } })),
+
+      toggleSimpleMode: () =>
+        set((state) => ({ simpleMode: !state.simpleMode })),
+      completeTour: () =>
+        set({ tourCompleted: true }),
     }),
-    { name: 'workspace-layout', partialize: (state) => ({ layout: state.layout }) },
+    { name: 'workspace-layout', partialize: (state) => ({ layout: state.layout, simpleMode: state.simpleMode, tourCompleted: state.tourCompleted }) },
   ),
 );

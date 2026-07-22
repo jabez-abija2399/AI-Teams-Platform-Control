@@ -19,6 +19,7 @@ export function BottomPanel() {
 
   return (
     <div
+      data-tour="terminal"
       className="flex shrink-0 flex-col border-t bg-card"
       style={{ height: layout.bottomPanelHeight }}
     >

@@ -6,6 +6,7 @@ import type {
 } from '../gateway/ai.types';
 import { aiGenerate, aiStream, aiGenerateStructured } from '../gateway/ai.gateway';
 import { logUsage } from './usage.service';
+import { getCachedResponse, setCachedResponse } from '@/ai/cache/ai-cache.service';
 
 function translateError(raw: string): { message: string; code: string } {
   const lower = raw.toLowerCase();
@@ -39,7 +40,12 @@ export class AIService {
     provider?: AIProviderName,
     metadata?: { agentId?: string; workflowId?: string; taskId?: string; projectId?: string },
   ): Promise<AIResponse> {
+    const cached = getCachedResponse(options);
+    if (cached) return cached;
+
     const response = await aiGenerate(options, provider);
+
+    setCachedResponse(options, response);
 
     await logUsage(
       { provider: response.provider, model: response.model, usage: response.usage },
