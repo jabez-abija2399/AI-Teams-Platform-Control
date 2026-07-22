@@ -17,10 +17,20 @@ const DatabaseAssistant = dynamic(
   () => import('@/features/database-assistant/components/database-assistant').then((m) => ({ default: m.DatabaseAssistant })),
   { ssr: false },
 );
+const PerformanceProfiler = dynamic(
+  () => import('@/features/performance-profiler/components/performance-profiler').then((m) => ({ default: m.PerformanceProfiler })),
+  { ssr: false },
+);
+const WorkflowCanvas = dynamic(
+  () => import('@/features/workflow-builder/components/workflow-canvas').then((m) => ({ default: m.WorkflowCanvas })),
+  { ssr: false },
+);
 
 const TABS: { id: BottomPanelTab; label: string }[] = [
   { id: 'preview', label: 'Preview' },
   { id: 'review', label: 'Review' },
+  { id: 'performance', label: 'Performance' },
+  { id: 'workflow', label: 'Workflow' },
   { id: 'database', label: 'Database' },
   { id: 'terminal', label: 'Terminal' },
   { id: 'problems', label: 'Problems' },
@@ -65,6 +75,12 @@ export function BottomPanel() {
         )}
         {activeBottomPanel === 'database' && currentProjectId && (
           <DatabaseAssistant projectId={currentProjectId} />
+        )}
+        {activeBottomPanel === 'performance' && currentProjectId && (
+          <PerformanceProfiler projectId={currentProjectId} />
+        )}
+        {activeBottomPanel === 'workflow' && currentProjectId && (
+          <WorkflowCanvas projectId={currentProjectId} />
         )}
         {activeBottomPanel === 'terminal' && (
           <div className="p-3 text-xs text-muted-foreground">Terminal integration is not wired yet.</div>

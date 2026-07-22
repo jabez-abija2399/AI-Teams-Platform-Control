@@ -67,18 +67,18 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  projects           Project[]
-  activities         Activity[]
-  accounts           Account[]
-  sessions           Session[]
-  recentProjects     RecentProject[]
-  favoriteProjects   FavoriteProject[]
+  projects            Project[]
+  activities          Activity[]
+  accounts            Account[]
+  sessions            Session[]
+  recentProjects      RecentProject[]
+  favoriteProjects    FavoriteProject[]
   workspacePreference WorkspacePreference?
-  editorPreference   EditorPreference?
-  organizations      Membership[]
-  ownedOrgs          Organization[]
-  notifications      Notification[]
-  marketplaceRatings MarketplaceRating[]
+  editorPreference    EditorPreference?
+  organizations       Membership[]
+  ownedOrgs           Organization[]
+  notifications       Notification[]
+  marketplaceRatings  MarketplaceRating[]
 
   @@index([email])
   @@map("users")
@@ -99,25 +99,26 @@ model Project {
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
-  owner        User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
-  tasks      Task[]
-  documents  Document[]
-  workflows  Workflow[]
-  repository Repository?
-  folders    Folder[]
+  owner          User            @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  organization   Organization?   @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  tasks          Task[]
+  documents      Document[]
+  workflows      Workflow[]
+  repository     Repository?
+  folders        Folder[]
+  gitIntegration GitIntegration?
 
   productDocuments      ProductDocument[]
   architectureDocuments ArchitectureDocument[]
-  developmentTasks     DevelopmentTask[]
-  qualityReports       QualityReport[]
+  developmentTasks      DevelopmentTask[]
+  qualityReports        QualityReport[]
 
-  recentProjects    RecentProject[]
-  favoriteProjects  FavoriteProject[]
-  teamProjects      TeamProject[]
+  recentProjects   RecentProject[]
+  favoriteProjects FavoriteProject[]
+  teamProjects     TeamProject[]
 
   // AI Usage
-  usageLogs       AIUsageLog[]
+  usageLogs AIUsageLog[]
 
   // Quality Engine
   testCases       TestCase[]
@@ -155,6 +156,7 @@ model Project {
   // Prompt 24: Marketplace (no direct relation)
 
   // Prompt 25: AI Learning (uses Agent relation)
+  pullRequests PullRequest[]
 
   @@index([ownerId])
   @@index([organizationId])
@@ -193,17 +195,17 @@ model Agent {
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
 
-  tasks        Task[]
-  memories     Memory[]
+  tasks         Task[]
+  memories      Memory[]
   configuration AgentConfiguration?
   permissions   AgentPermission[]
   usageLogs     AIUsageLog[]
   memberships   Membership[]
 
-  productDocuments     ProductDocument[]
+  productDocuments      ProductDocument[]
   architectureDocuments ArchitectureDocument[]
-  developmentTasks     DevelopmentTask[]
-  qualityReports       QualityReport[]
+  developmentTasks      DevelopmentTask[]
+  qualityReports        QualityReport[]
 
   // Prompt 21: Customer Support
   supportTickets SupportTicket[]
@@ -276,8 +278,8 @@ model Workflow {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  project Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  steps   WorkflowStep[]
+  project          Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  steps            WorkflowStep[]
   approvalRequests ApprovalRequest[]
 
   @@index([projectId])
@@ -285,19 +287,19 @@ model Workflow {
 }
 
 model WorkflowStep {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   workflowId  String
   name        String
   description String
   agentRole   String
-  status      String   @default("PENDING")
+  status      String    @default("PENDING")
   input       String?
   output      String?
   error       String?
   order       Int
   startedAt   DateTime?
   completedAt DateTime?
-  createdAt   DateTime @default(now())
+  createdAt   DateTime  @default(now())
 
   workflow Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
 
@@ -337,28 +339,28 @@ model Message {
 }
 
 model AIProvider {
-  id          String   @id @default(cuid())
-  name        String   @unique
-  baseUrl     String?
+  id           String   @id @default(cuid())
+  name         String   @unique
+  baseUrl      String?
   defaultModel String
-  enabled     Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  enabled      Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  models   AIModel[]
+  models AIModel[]
 
   @@map("ai_providers")
 }
 
 model AIModel {
-  id             String   @id @default(cuid())
-  providerId     String
-  name           String
-  maxTokens      Int      @default(4096)
-  costPer1kInput Float    @default(0)
-  costPer1kOutput Float   @default(0)
-  enabled        Boolean  @default(true)
-  createdAt      DateTime @default(now())
+  id              String   @id @default(cuid())
+  providerId      String
+  name            String
+  maxTokens       Int      @default(4096)
+  costPer1kInput  Float    @default(0)
+  costPer1kOutput Float    @default(0)
+  enabled         Boolean  @default(true)
+  createdAt       DateTime @default(now())
 
   provider AIProvider @relation(fields: [providerId], references: [id], onDelete: Cascade)
 
@@ -392,18 +394,18 @@ model AIUsageLog {
 }
 
 model AgentConfiguration {
-  id                String @id @default(cuid())
-  agentId           String @unique
-  maxConcurrentTasks Int   @default(1)
-  timeoutMs         Int   @default(30000)
-  retryCount        Int   @default(2)
-  customConfig      Json?
+  id                 String @id @default(cuid())
+  agentId            String @unique
+  maxConcurrentTasks Int    @default(1)
+  timeoutMs          Int    @default(30000)
+  retryCount         Int    @default(2)
+  customConfig       Json?
 
   agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
 }
 
 model AgentPermission {
-  id        String @id @default(cuid())
+  id        String   @id @default(cuid())
   agentId   String
   resource  String
   action    String
@@ -438,10 +440,11 @@ model Repository {
   currentBranchId String?
   createdAt       DateTime @default(now())
 
-  project Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  files   File[]
-  branches GitBranch[]
-  gitCommits GitCommit[]
+  project      Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  files        File[]
+  branches     GitBranch[]
+  gitCommits   GitCommit[]
+  pullRequests PullRequest[]
 
   @@map("repositories")
 }
@@ -451,13 +454,13 @@ model Repository {
 // ─────────────────────────────
 
 model ProductDocument {
-  id        String   @id @default(cuid())
-  projectId String
-  agentId   String
-  vision    Json
+  id           String   @id @default(cuid())
+  projectId    String
+  agentId      String
+  vision       Json
   requirements Json
-  plan      Json
-  createdAt DateTime @default(now())
+  plan         Json
+  createdAt    DateTime @default(now())
 
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
   agent   Agent   @relation(fields: [agentId], references: [id], onDelete: Cascade)
@@ -468,14 +471,14 @@ model ProductDocument {
 }
 
 model ArchitectureDocument {
-  id        String   @id @default(cuid())
-  projectId String
-  agentId   String
-  architecture Json
+  id             String   @id @default(cuid())
+  projectId      String
+  agentId        String
+  architecture   Json
   databaseDesign Json
-  apiSpec   Json
-  decisions Json
-  createdAt DateTime @default(now())
+  apiSpec        Json
+  decisions      Json
+  createdAt      DateTime @default(now())
 
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
   agent   Agent   @relation(fields: [agentId], references: [id], onDelete: Cascade)
@@ -505,13 +508,13 @@ model DevelopmentTask {
 }
 
 model CodeGenerationRecord {
-  id       String   @id @default(cuid())
-  taskId   String
-  file     String
-  changeType String
+  id          String   @id @default(cuid())
+  taskId      String
+  file        String
+  changeType  String
   description String
-  code     String @db.Text
-  createdAt DateTime @default(now())
+  code        String   @db.Text
+  createdAt   DateTime @default(now())
 
   task DevelopmentTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
 
@@ -520,14 +523,14 @@ model CodeGenerationRecord {
 }
 
 model QualityReport {
-  id        String   @id @default(cuid())
-  projectId String
-  agentId   String
-  score     Float
-  issues    Json
-  testPlan  Json
+  id              String   @id @default(cuid())
+  projectId       String
+  agentId         String
+  score           Float
+  issues          Json
+  testPlan        Json
   recommendations Json
-  createdAt DateTime @default(now())
+  createdAt       DateTime @default(now())
 
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
   agent   Agent   @relation(fields: [agentId], references: [id], onDelete: Cascade)
@@ -593,10 +596,10 @@ model Folder {
 }
 
 model FileMetadata {
-  id         String   @id @default(cuid())
-  fileId     String   @unique
-  pinned     Boolean  @default(false)
-  isHidden   Boolean  @default(false)
+  id         String    @id @default(cuid())
+  fileId     String    @unique
+  pinned     Boolean   @default(false)
+  isHidden   Boolean   @default(false)
   lastOpened DateTime?
 
   file File @relation(fields: [fileId], references: [id], onDelete: Cascade)
@@ -700,6 +703,54 @@ model GitChange {
 
   @@index([commitId])
   @@map("git_changes")
+}
+
+// ─────────────────────────────
+// GitHub Integration
+// ─────────────────────────────
+
+model GitIntegration {
+  id             String   @id @default(cuid())
+  projectId      String   @unique
+  provider       String   @default("github")
+  accessToken    String   @db.Text
+  refreshToken   String?  @db.Text
+  githubUserId   Int?
+  githubUsername String?
+  repoUrl        String?
+  repoName       String?
+  repoOwner      String?
+  defaultBranch  String   @default("main")
+  connectedAt    DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  project      Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  pullRequests PullRequest[]
+
+  @@index([projectId])
+  @@map("git_integrations")
+}
+
+model PullRequest {
+  id            String    @id @default(cuid())
+  projectId     String
+  integrationId String
+  number        Int
+  title         String
+  body          String?   @db.Text
+  state         String    @default("OPEN")
+  headBranch    String
+  baseBranch    String
+  mergedAt      DateTime?
+  createdAt     DateTime  @default(now())
+
+  project      Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  integration  GitIntegration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+  repository   Repository?    @relation(fields: [repositoryId], references: [id])
+  repositoryId String?
+
+  @@index([projectId])
+  @@map("pull_requests")
 }
 
 // ─────────────────────────────
@@ -816,8 +867,8 @@ model Deployment {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  project     Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  environment Environment       @relation(fields: [environmentId], references: [id], onDelete: Cascade)
+  project     Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  environment Environment      @relation(fields: [environmentId], references: [id], onDelete: Cascade)
   steps       DeploymentStep[]
   logs        DeploymentLog[]
 
@@ -957,19 +1008,19 @@ model Organization {
   settings  Json?
   createdAt DateTime @default(now())
 
-  owner   User         @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  teams   Team[]
-  projects Project[]
-  members Membership[]
-  installations PluginInstallation[]
+  owner                    User                      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  teams                    Team[]
+  projects                 Project[]
+  members                  Membership[]
+  installations            PluginInstallation[]
   marketplaceInstallations MarketplaceInstallation[]
-  customRoles    CustomRole[]
-  policies       Policy[]
-  auditLogs      AuditLog[]
-  orgSettings    OrganizationSettings?
-  creditAccount  CreditAccount?
-  subscriptions  Subscription[]
-  budgets        Budget[]
+  customRoles              CustomRole[]
+  policies                 Policy[]
+  auditLogs                AuditLog[]
+  orgSettings              OrganizationSettings?
+  creditAccount            CreditAccount?
+  subscriptions            Subscription[]
+  budgets                  Budget[]
 
   @@map("organizations")
 }
@@ -1011,10 +1062,10 @@ model Membership {
   role           String
   createdAt      DateTime @default(now())
 
-  organization Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  team         Team?         @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  user         User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  agent        Agent?        @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  organization Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  team         Team?              @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user         User?              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  agent        Agent?             @relation(fields: [agentId], references: [id], onDelete: Cascade)
   permissions  MemberPermission[]
 
   @@index([organizationId])
@@ -1176,7 +1227,7 @@ model SecurityScan {
 }
 
 model SecurityRule {
-  id          String @id @default(cuid())
+  id          String  @id @default(cuid())
   framework   String
   requirement String
   description String?
@@ -1198,6 +1249,7 @@ model ProductStrategy {
   createdAt DateTime @default(now())
 
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
   @@map("product_strategies")
 }
 
@@ -1211,7 +1263,7 @@ model Requirement {
   status      String   @default("IDEA")
   createdAt   DateTime @default(now())
 
-  project Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
   stories UserStory[]
 
   @@index([projectId, status])
@@ -1228,6 +1280,7 @@ model UserStory {
   createdAt     DateTime @default(now())
 
   requirement Requirement @relation(fields: [requirementId], references: [id], onDelete: Cascade)
+
   @@index([requirementId])
   @@map("user_stories")
 }
@@ -1240,6 +1293,7 @@ model Roadmap {
   createdAt  DateTime @default(now())
 
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
   @@map("roadmaps")
 }
 
@@ -1252,6 +1306,7 @@ model ProductDecision {
   createdAt DateTime @default(now())
 
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
   @@map("product_decisions")
 }
 
@@ -1274,15 +1329,16 @@ model DesignSystemConfig {
 }
 
 model DesignComponent {
-  id              String   @id @default(cuid())
-  designSystemId  String
-  name            String
-  category        String
-  code            String
-  documentation   String?
-  createdAt       DateTime @default(now())
+  id             String   @id @default(cuid())
+  designSystemId String
+  name           String
+  category       String
+  code           String
+  documentation  String?
+  createdAt      DateTime @default(now())
 
   designSystem DesignSystemConfig @relation(fields: [designSystemId], references: [id], onDelete: Cascade)
+
   @@index([designSystemId])
   @@map("design_components")
 }
@@ -1295,6 +1351,7 @@ model DesignToken {
   value          String
 
   designSystem DesignSystemConfig @relation(fields: [designSystemId], references: [id], onDelete: Cascade)
+
   @@unique([designSystemId, category, name])
   @@map("design_tokens")
 }
@@ -1310,6 +1367,7 @@ model SupportConversation {
   createdAt  DateTime @default(now())
 
   messages SupportMessage[]
+
   @@map("support_conversations")
 }
 
@@ -1321,6 +1379,7 @@ model SupportMessage {
   createdAt      DateTime @default(now())
 
   conversation SupportConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
   @@index([conversationId])
   @@map("support_messages")
 }
@@ -1354,17 +1413,19 @@ model SupportTicket {
   createdAt       DateTime @default(now())
 
   assignedAgent Agent? @relation(fields: [assignedAgentId], references: [id], onDelete: SetNull)
+
   @@map("support_tickets")
 }
 
 model SentimentResult {
-  id         String  @id @default(cuid())
-  feedbackId String  @unique
+  id         String @id @default(cuid())
+  feedbackId String @unique
   score      Float
   emotion    String
   priority   String
 
   feedback Feedback @relation(fields: [feedbackId], references: [id], onDelete: Cascade)
+
   @@map("sentiment_results")
 }
 
@@ -1378,6 +1439,7 @@ model OrganizationSettings {
   configuration  Json?
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
   @@map("organization_settings")
 }
 
@@ -1389,6 +1451,7 @@ model CustomRole {
   createdAt      DateTime @default(now())
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
   @@unique([organizationId, name])
   @@map("custom_roles")
 }
@@ -1402,6 +1465,7 @@ model Policy {
   createdAt      DateTime @default(now())
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
   @@index([organizationId])
   @@map("policies")
 }
@@ -1416,6 +1480,7 @@ model AuditLog {
   createdAt      DateTime @default(now())
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
   @@index([organizationId, createdAt])
   @@map("audit_logs")
 }
@@ -1432,17 +1497,19 @@ model CreditAccount {
   updatedAt      DateTime @updatedAt
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
   @@map("credit_accounts")
 }
 
 model Plan {
-  id       String @id @default(cuid())
-  name     String @unique
+  id       String   @id @default(cuid())
+  name     String   @unique
   price    Float
   limits   Json
   features String[]
 
   subscriptions Subscription[]
+
   @@map("plans")
 }
 
@@ -1456,6 +1523,7 @@ model Subscription {
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   plan         Plan         @relation(fields: [planId], references: [id])
+
   @@map("subscriptions")
 }
 
@@ -1469,6 +1537,7 @@ model Budget {
   createdAt      DateTime @default(now())
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
   @@index([organizationId])
   @@map("budgets")
 }
@@ -1504,6 +1573,7 @@ model MarketplaceVersion {
   createdAt DateTime @default(now())
 
   item MarketplaceItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
   @@unique([itemId, version])
   @@map("marketplace_versions")
 }
@@ -1518,6 +1588,7 @@ model MarketplaceRating {
 
   item MarketplaceItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
   user User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@unique([itemId, userId])
   @@map("marketplace_ratings")
 }
@@ -1532,6 +1603,7 @@ model MarketplaceInstallation {
 
   item         MarketplaceItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
   organization Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
   @@unique([itemId, organizationId])
   @@map("marketplace_installations")
 }
@@ -1541,14 +1613,15 @@ model MarketplaceInstallation {
 // ─────────────────────────────
 
 model AgentPerformance {
-  id       String   @id @default(cuid())
-  agentId  String
-  taskType String
-  score    Float
-  metrics  Json
+  id        String   @id @default(cuid())
+  agentId   String
+  taskType  String
+  score     Float
+  metrics   Json
   createdAt DateTime @default(now())
 
   agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
   @@index([agentId, taskType])
   @@map("agent_performance")
 }
@@ -1560,6 +1633,7 @@ model AgentSkill {
   level   Float  @default(50)
 
   agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
   @@unique([agentId, skill])
   @@map("agent_skills")
 }
@@ -1573,6 +1647,7 @@ model LearningRecord {
   createdAt  DateTime @default(now())
 
   agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
   @@index([agentId])
   @@map("learning_records")
 }
@@ -1587,6 +1662,7 @@ model Improvement {
   createdAt DateTime @default(now())
 
   agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
   @@index([agentId])
   @@map("improvements")
 }
@@ -1600,6 +1676,7 @@ model Benchmark {
   createdAt DateTime @default(now())
 
   agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
   @@map("benchmarks")
 }
 
@@ -1620,12 +1697,12 @@ model SystemHealth {
 }
 
 model Incident {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   type        String
   severity    String
   description String
-  status      String   @default("OPEN")
-  createdAt   DateTime @default(now())
+  status      String    @default("OPEN")
+  createdAt   DateTime  @default(now())
   resolvedAt  DateTime?
 
   alerts          Alert[]
@@ -1643,6 +1720,7 @@ model Alert {
   createdAt  DateTime @default(now())
 
   incident Incident @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+
   @@map("alerts")
 }
 
@@ -1656,6 +1734,7 @@ model RecoveryAction {
   createdAt        DateTime @default(now())
 
   incident Incident @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+
   @@map("recovery_actions")
 }
 

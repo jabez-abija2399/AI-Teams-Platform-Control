@@ -85,6 +85,8 @@ export const ModelName = {
   GitBranch: 'GitBranch',
   GitCommit: 'GitCommit',
   GitChange: 'GitChange',
+  GitIntegration: 'GitIntegration',
+  PullRequest: 'PullRequest',
   TestCase: 'TestCase',
   TestExecution: 'TestExecution',
   BugReport: 'BugReport',
@@ -613,6 +615,43 @@ export const GitChangeScalarFieldEnum = {
 } as const
 
 export type GitChangeScalarFieldEnum = (typeof GitChangeScalarFieldEnum)[keyof typeof GitChangeScalarFieldEnum]
+
+
+export const GitIntegrationScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  provider: 'provider',
+  accessToken: 'accessToken',
+  refreshToken: 'refreshToken',
+  githubUserId: 'githubUserId',
+  githubUsername: 'githubUsername',
+  repoUrl: 'repoUrl',
+  repoName: 'repoName',
+  repoOwner: 'repoOwner',
+  defaultBranch: 'defaultBranch',
+  connectedAt: 'connectedAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type GitIntegrationScalarFieldEnum = (typeof GitIntegrationScalarFieldEnum)[keyof typeof GitIntegrationScalarFieldEnum]
+
+
+export const PullRequestScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  integrationId: 'integrationId',
+  number: 'number',
+  title: 'title',
+  body: 'body',
+  state: 'state',
+  headBranch: 'headBranch',
+  baseBranch: 'baseBranch',
+  mergedAt: 'mergedAt',
+  createdAt: 'createdAt',
+  repositoryId: 'repositoryId'
+} as const
+
+export type PullRequestScalarFieldEnum = (typeof PullRequestScalarFieldEnum)[keyof typeof PullRequestScalarFieldEnum]
 
 
 export const TestCaseScalarFieldEnum = {

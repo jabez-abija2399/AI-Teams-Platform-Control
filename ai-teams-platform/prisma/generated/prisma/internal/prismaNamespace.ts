@@ -418,6 +418,8 @@ export const ModelName = {
   GitBranch: 'GitBranch',
   GitCommit: 'GitCommit',
   GitChange: 'GitChange',
+  GitIntegration: 'GitIntegration',
+  PullRequest: 'PullRequest',
   TestCase: 'TestCase',
   TestExecution: 'TestExecution',
   BugReport: 'BugReport',
@@ -501,7 +503,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "project" | "task" | "agent" | "activity" | "document" | "documentVersion" | "workflow" | "workflowStep" | "conversation" | "message" | "aIProvider" | "aIModel" | "aIUsageLog" | "agentConfiguration" | "agentPermission" | "aIEventLog" | "repository" | "productDocument" | "architectureDocument" | "developmentTask" | "codeGenerationRecord" | "qualityReport" | "file" | "memory" | "folder" | "fileMetadata" | "favoriteProject" | "recentProject" | "workspacePreference" | "editorPreference" | "gitBranch" | "gitCommit" | "gitChange" | "testCase" | "testExecution" | "bugReport" | "coverageReport" | "knowledgeItem" | "environment" | "deployment" | "deploymentStep" | "deploymentLog" | "release" | "platformEvent" | "metric" | "projectHealth" | "codeReview" | "agentDecision" | "organization" | "team" | "teamProject" | "membership" | "memberPermission" | "comment" | "mention" | "notification" | "plugin" | "pluginInstallation" | "pluginPermission" | "approvalRequest" | "securityIssue" | "securityScan" | "securityRule" | "productStrategy" | "requirement" | "userStory" | "roadmap" | "productDecision" | "designSystemConfig" | "designComponent" | "designToken" | "supportConversation" | "supportMessage" | "feedback" | "supportTicket" | "sentimentResult" | "organizationSettings" | "customRole" | "policy" | "auditLog" | "creditAccount" | "plan" | "subscription" | "budget" | "marketplaceItem" | "marketplaceVersion" | "marketplaceRating" | "marketplaceInstallation" | "agentPerformance" | "agentSkill" | "learningRecord" | "improvement" | "benchmark" | "systemHealth" | "incident" | "alert" | "recoveryAction" | "account" | "session" | "verificationToken" | "sampleProject"
+    modelProps: "user" | "project" | "task" | "agent" | "activity" | "document" | "documentVersion" | "workflow" | "workflowStep" | "conversation" | "message" | "aIProvider" | "aIModel" | "aIUsageLog" | "agentConfiguration" | "agentPermission" | "aIEventLog" | "repository" | "productDocument" | "architectureDocument" | "developmentTask" | "codeGenerationRecord" | "qualityReport" | "file" | "memory" | "folder" | "fileMetadata" | "favoriteProject" | "recentProject" | "workspacePreference" | "editorPreference" | "gitBranch" | "gitCommit" | "gitChange" | "gitIntegration" | "pullRequest" | "testCase" | "testExecution" | "bugReport" | "coverageReport" | "knowledgeItem" | "environment" | "deployment" | "deploymentStep" | "deploymentLog" | "release" | "platformEvent" | "metric" | "projectHealth" | "codeReview" | "agentDecision" | "organization" | "team" | "teamProject" | "membership" | "memberPermission" | "comment" | "mention" | "notification" | "plugin" | "pluginInstallation" | "pluginPermission" | "approvalRequest" | "securityIssue" | "securityScan" | "securityRule" | "productStrategy" | "requirement" | "userStory" | "roadmap" | "productDecision" | "designSystemConfig" | "designComponent" | "designToken" | "supportConversation" | "supportMessage" | "feedback" | "supportTicket" | "sentimentResult" | "organizationSettings" | "customRole" | "policy" | "auditLog" | "creditAccount" | "plan" | "subscription" | "budget" | "marketplaceItem" | "marketplaceVersion" | "marketplaceRating" | "marketplaceInstallation" | "agentPerformance" | "agentSkill" | "learningRecord" | "improvement" | "benchmark" | "systemHealth" | "incident" | "alert" | "recoveryAction" | "account" | "session" | "verificationToken" | "sampleProject"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -3018,6 +3020,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.GitChangeCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.GitChangeCountAggregateOutputType> | number
+        }
+      }
+    }
+    GitIntegration: {
+      payload: Prisma.$GitIntegrationPayload<ExtArgs>
+      fields: Prisma.GitIntegrationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.GitIntegrationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GitIntegrationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.GitIntegrationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GitIntegrationPayload>
+        }
+        findFirst: {
+          args: Prisma.GitIntegrationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GitIntegrationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.GitIntegrationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GitIntegrationPayload>
+        }
+        findMany: {
+          args: Prisma.GitIntegrationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GitIntegrationPayload>[]
+        }
+        create: {
+          args: Prisma.GitIntegrationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GitIntegrationPayload>
+        }
+        createMany: {
+          args: Prisma.GitIntegrationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.GitIntegrationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GitIntegrationPayload>[]
+        }
+        delete: {
+          args: Prisma.GitIntegrationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GitIntegrationPayload>
+        }
+        update: {
+          args: Prisma.GitIntegrationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GitIntegrationPayload>
+        }
+        deleteMany: {
+          args: Prisma.GitIntegrationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.GitIntegrationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.GitIntegrationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GitIntegrationPayload>[]
+        }
+        upsert: {
+          args: Prisma.GitIntegrationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GitIntegrationPayload>
+        }
+        aggregate: {
+          args: Prisma.GitIntegrationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateGitIntegration>
+        }
+        groupBy: {
+          args: Prisma.GitIntegrationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.GitIntegrationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.GitIntegrationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.GitIntegrationCountAggregateOutputType> | number
+        }
+      }
+    }
+    PullRequest: {
+      payload: Prisma.$PullRequestPayload<ExtArgs>
+      fields: Prisma.PullRequestFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PullRequestFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PullRequestPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PullRequestFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PullRequestPayload>
+        }
+        findFirst: {
+          args: Prisma.PullRequestFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PullRequestPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PullRequestFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PullRequestPayload>
+        }
+        findMany: {
+          args: Prisma.PullRequestFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PullRequestPayload>[]
+        }
+        create: {
+          args: Prisma.PullRequestCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PullRequestPayload>
+        }
+        createMany: {
+          args: Prisma.PullRequestCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PullRequestCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PullRequestPayload>[]
+        }
+        delete: {
+          args: Prisma.PullRequestDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PullRequestPayload>
+        }
+        update: {
+          args: Prisma.PullRequestUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PullRequestPayload>
+        }
+        deleteMany: {
+          args: Prisma.PullRequestDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PullRequestUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PullRequestUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PullRequestPayload>[]
+        }
+        upsert: {
+          args: Prisma.PullRequestUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PullRequestPayload>
+        }
+        aggregate: {
+          args: Prisma.PullRequestAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePullRequest>
+        }
+        groupBy: {
+          args: Prisma.PullRequestGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PullRequestGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PullRequestCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PullRequestCountAggregateOutputType> | number
         }
       }
     }
@@ -8536,6 +8686,43 @@ export const GitChangeScalarFieldEnum = {
 export type GitChangeScalarFieldEnum = (typeof GitChangeScalarFieldEnum)[keyof typeof GitChangeScalarFieldEnum]
 
 
+export const GitIntegrationScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  provider: 'provider',
+  accessToken: 'accessToken',
+  refreshToken: 'refreshToken',
+  githubUserId: 'githubUserId',
+  githubUsername: 'githubUsername',
+  repoUrl: 'repoUrl',
+  repoName: 'repoName',
+  repoOwner: 'repoOwner',
+  defaultBranch: 'defaultBranch',
+  connectedAt: 'connectedAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type GitIntegrationScalarFieldEnum = (typeof GitIntegrationScalarFieldEnum)[keyof typeof GitIntegrationScalarFieldEnum]
+
+
+export const PullRequestScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  integrationId: 'integrationId',
+  number: 'number',
+  title: 'title',
+  body: 'body',
+  state: 'state',
+  headBranch: 'headBranch',
+  baseBranch: 'baseBranch',
+  mergedAt: 'mergedAt',
+  createdAt: 'createdAt',
+  repositoryId: 'repositoryId'
+} as const
+
+export type PullRequestScalarFieldEnum = (typeof PullRequestScalarFieldEnum)[keyof typeof PullRequestScalarFieldEnum]
+
+
 export const TestCaseScalarFieldEnum = {
   id: 'id',
   projectId: 'projectId',
@@ -9703,6 +9890,8 @@ export type GlobalOmitConfig = {
   gitBranch?: Prisma.GitBranchOmit
   gitCommit?: Prisma.GitCommitOmit
   gitChange?: Prisma.GitChangeOmit
+  gitIntegration?: Prisma.GitIntegrationOmit
+  pullRequest?: Prisma.PullRequestOmit
   testCase?: Prisma.TestCaseOmit
   testExecution?: Prisma.TestExecutionOmit
   bugReport?: Prisma.BugReportOmit

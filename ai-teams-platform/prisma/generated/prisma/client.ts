@@ -212,6 +212,16 @@ export type GitCommit = Prisma.GitCommitModel
  */
 export type GitChange = Prisma.GitChangeModel
 /**
+ * Model GitIntegration
+ * 
+ */
+export type GitIntegration = Prisma.GitIntegrationModel
+/**
+ * Model PullRequest
+ * 
+ */
+export type PullRequest = Prisma.PullRequestModel
+/**
  * Model TestCase
  * 
  */

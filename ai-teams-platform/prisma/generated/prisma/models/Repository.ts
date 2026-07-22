@@ -194,6 +194,7 @@ export type RepositoryWhereInput = {
   files?: Prisma.FileListRelationFilter
   branches?: Prisma.GitBranchListRelationFilter
   gitCommits?: Prisma.GitCommitListRelationFilter
+  pullRequests?: Prisma.PullRequestListRelationFilter
 }
 
 export type RepositoryOrderByWithRelationInput = {
@@ -207,6 +208,7 @@ export type RepositoryOrderByWithRelationInput = {
   files?: Prisma.FileOrderByRelationAggregateInput
   branches?: Prisma.GitBranchOrderByRelationAggregateInput
   gitCommits?: Prisma.GitCommitOrderByRelationAggregateInput
+  pullRequests?: Prisma.PullRequestOrderByRelationAggregateInput
 }
 
 export type RepositoryWhereUniqueInput = Prisma.AtLeast<{
@@ -223,6 +225,7 @@ export type RepositoryWhereUniqueInput = Prisma.AtLeast<{
   files?: Prisma.FileListRelationFilter
   branches?: Prisma.GitBranchListRelationFilter
   gitCommits?: Prisma.GitCommitListRelationFilter
+  pullRequests?: Prisma.PullRequestListRelationFilter
 }, "id" | "projectId">
 
 export type RepositoryOrderByWithAggregationInput = {
@@ -259,6 +262,7 @@ export type RepositoryCreateInput = {
   files?: Prisma.FileCreateNestedManyWithoutRepositoryInput
   branches?: Prisma.GitBranchCreateNestedManyWithoutRepositoryInput
   gitCommits?: Prisma.GitCommitCreateNestedManyWithoutRepositoryInput
+  pullRequests?: Prisma.PullRequestCreateNestedManyWithoutRepositoryInput
 }
 
 export type RepositoryUncheckedCreateInput = {
@@ -271,6 +275,7 @@ export type RepositoryUncheckedCreateInput = {
   files?: Prisma.FileUncheckedCreateNestedManyWithoutRepositoryInput
   branches?: Prisma.GitBranchUncheckedCreateNestedManyWithoutRepositoryInput
   gitCommits?: Prisma.GitCommitUncheckedCreateNestedManyWithoutRepositoryInput
+  pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutRepositoryInput
 }
 
 export type RepositoryUpdateInput = {
@@ -283,6 +288,7 @@ export type RepositoryUpdateInput = {
   files?: Prisma.FileUpdateManyWithoutRepositoryNestedInput
   branches?: Prisma.GitBranchUpdateManyWithoutRepositoryNestedInput
   gitCommits?: Prisma.GitCommitUpdateManyWithoutRepositoryNestedInput
+  pullRequests?: Prisma.PullRequestUpdateManyWithoutRepositoryNestedInput
 }
 
 export type RepositoryUncheckedUpdateInput = {
@@ -295,6 +301,7 @@ export type RepositoryUncheckedUpdateInput = {
   files?: Prisma.FileUncheckedUpdateManyWithoutRepositoryNestedInput
   branches?: Prisma.GitBranchUncheckedUpdateManyWithoutRepositoryNestedInput
   gitCommits?: Prisma.GitCommitUncheckedUpdateManyWithoutRepositoryNestedInput
+  pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutRepositoryNestedInput
 }
 
 export type RepositoryCreateManyInput = {
@@ -434,6 +441,22 @@ export type RepositoryUpdateOneRequiredWithoutGitCommitsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.RepositoryUpdateToOneWithWhereWithoutGitCommitsInput, Prisma.RepositoryUpdateWithoutGitCommitsInput>, Prisma.RepositoryUncheckedUpdateWithoutGitCommitsInput>
 }
 
+export type RepositoryCreateNestedOneWithoutPullRequestsInput = {
+  create?: Prisma.XOR<Prisma.RepositoryCreateWithoutPullRequestsInput, Prisma.RepositoryUncheckedCreateWithoutPullRequestsInput>
+  connectOrCreate?: Prisma.RepositoryCreateOrConnectWithoutPullRequestsInput
+  connect?: Prisma.RepositoryWhereUniqueInput
+}
+
+export type RepositoryUpdateOneWithoutPullRequestsNestedInput = {
+  create?: Prisma.XOR<Prisma.RepositoryCreateWithoutPullRequestsInput, Prisma.RepositoryUncheckedCreateWithoutPullRequestsInput>
+  connectOrCreate?: Prisma.RepositoryCreateOrConnectWithoutPullRequestsInput
+  upsert?: Prisma.RepositoryUpsertWithoutPullRequestsInput
+  disconnect?: Prisma.RepositoryWhereInput | boolean
+  delete?: Prisma.RepositoryWhereInput | boolean
+  connect?: Prisma.RepositoryWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.RepositoryUpdateToOneWithWhereWithoutPullRequestsInput, Prisma.RepositoryUpdateWithoutPullRequestsInput>, Prisma.RepositoryUncheckedUpdateWithoutPullRequestsInput>
+}
+
 export type RepositoryCreateWithoutProjectInput = {
   id?: string
   provider?: string
@@ -443,6 +466,7 @@ export type RepositoryCreateWithoutProjectInput = {
   files?: Prisma.FileCreateNestedManyWithoutRepositoryInput
   branches?: Prisma.GitBranchCreateNestedManyWithoutRepositoryInput
   gitCommits?: Prisma.GitCommitCreateNestedManyWithoutRepositoryInput
+  pullRequests?: Prisma.PullRequestCreateNestedManyWithoutRepositoryInput
 }
 
 export type RepositoryUncheckedCreateWithoutProjectInput = {
@@ -454,6 +478,7 @@ export type RepositoryUncheckedCreateWithoutProjectInput = {
   files?: Prisma.FileUncheckedCreateNestedManyWithoutRepositoryInput
   branches?: Prisma.GitBranchUncheckedCreateNestedManyWithoutRepositoryInput
   gitCommits?: Prisma.GitCommitUncheckedCreateNestedManyWithoutRepositoryInput
+  pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutRepositoryInput
 }
 
 export type RepositoryCreateOrConnectWithoutProjectInput = {
@@ -481,6 +506,7 @@ export type RepositoryUpdateWithoutProjectInput = {
   files?: Prisma.FileUpdateManyWithoutRepositoryNestedInput
   branches?: Prisma.GitBranchUpdateManyWithoutRepositoryNestedInput
   gitCommits?: Prisma.GitCommitUpdateManyWithoutRepositoryNestedInput
+  pullRequests?: Prisma.PullRequestUpdateManyWithoutRepositoryNestedInput
 }
 
 export type RepositoryUncheckedUpdateWithoutProjectInput = {
@@ -492,6 +518,7 @@ export type RepositoryUncheckedUpdateWithoutProjectInput = {
   files?: Prisma.FileUncheckedUpdateManyWithoutRepositoryNestedInput
   branches?: Prisma.GitBranchUncheckedUpdateManyWithoutRepositoryNestedInput
   gitCommits?: Prisma.GitCommitUncheckedUpdateManyWithoutRepositoryNestedInput
+  pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutRepositoryNestedInput
 }
 
 export type RepositoryCreateWithoutFilesInput = {
@@ -503,6 +530,7 @@ export type RepositoryCreateWithoutFilesInput = {
   project: Prisma.ProjectCreateNestedOneWithoutRepositoryInput
   branches?: Prisma.GitBranchCreateNestedManyWithoutRepositoryInput
   gitCommits?: Prisma.GitCommitCreateNestedManyWithoutRepositoryInput
+  pullRequests?: Prisma.PullRequestCreateNestedManyWithoutRepositoryInput
 }
 
 export type RepositoryUncheckedCreateWithoutFilesInput = {
@@ -514,6 +542,7 @@ export type RepositoryUncheckedCreateWithoutFilesInput = {
   createdAt?: Date | string
   branches?: Prisma.GitBranchUncheckedCreateNestedManyWithoutRepositoryInput
   gitCommits?: Prisma.GitCommitUncheckedCreateNestedManyWithoutRepositoryInput
+  pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutRepositoryInput
 }
 
 export type RepositoryCreateOrConnectWithoutFilesInput = {
@@ -541,6 +570,7 @@ export type RepositoryUpdateWithoutFilesInput = {
   project?: Prisma.ProjectUpdateOneRequiredWithoutRepositoryNestedInput
   branches?: Prisma.GitBranchUpdateManyWithoutRepositoryNestedInput
   gitCommits?: Prisma.GitCommitUpdateManyWithoutRepositoryNestedInput
+  pullRequests?: Prisma.PullRequestUpdateManyWithoutRepositoryNestedInput
 }
 
 export type RepositoryUncheckedUpdateWithoutFilesInput = {
@@ -552,6 +582,7 @@ export type RepositoryUncheckedUpdateWithoutFilesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   branches?: Prisma.GitBranchUncheckedUpdateManyWithoutRepositoryNestedInput
   gitCommits?: Prisma.GitCommitUncheckedUpdateManyWithoutRepositoryNestedInput
+  pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutRepositoryNestedInput
 }
 
 export type RepositoryCreateWithoutBranchesInput = {
@@ -563,6 +594,7 @@ export type RepositoryCreateWithoutBranchesInput = {
   project: Prisma.ProjectCreateNestedOneWithoutRepositoryInput
   files?: Prisma.FileCreateNestedManyWithoutRepositoryInput
   gitCommits?: Prisma.GitCommitCreateNestedManyWithoutRepositoryInput
+  pullRequests?: Prisma.PullRequestCreateNestedManyWithoutRepositoryInput
 }
 
 export type RepositoryUncheckedCreateWithoutBranchesInput = {
@@ -574,6 +606,7 @@ export type RepositoryUncheckedCreateWithoutBranchesInput = {
   createdAt?: Date | string
   files?: Prisma.FileUncheckedCreateNestedManyWithoutRepositoryInput
   gitCommits?: Prisma.GitCommitUncheckedCreateNestedManyWithoutRepositoryInput
+  pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutRepositoryInput
 }
 
 export type RepositoryCreateOrConnectWithoutBranchesInput = {
@@ -601,6 +634,7 @@ export type RepositoryUpdateWithoutBranchesInput = {
   project?: Prisma.ProjectUpdateOneRequiredWithoutRepositoryNestedInput
   files?: Prisma.FileUpdateManyWithoutRepositoryNestedInput
   gitCommits?: Prisma.GitCommitUpdateManyWithoutRepositoryNestedInput
+  pullRequests?: Prisma.PullRequestUpdateManyWithoutRepositoryNestedInput
 }
 
 export type RepositoryUncheckedUpdateWithoutBranchesInput = {
@@ -612,6 +646,7 @@ export type RepositoryUncheckedUpdateWithoutBranchesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   files?: Prisma.FileUncheckedUpdateManyWithoutRepositoryNestedInput
   gitCommits?: Prisma.GitCommitUncheckedUpdateManyWithoutRepositoryNestedInput
+  pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutRepositoryNestedInput
 }
 
 export type RepositoryCreateWithoutGitCommitsInput = {
@@ -623,6 +658,7 @@ export type RepositoryCreateWithoutGitCommitsInput = {
   project: Prisma.ProjectCreateNestedOneWithoutRepositoryInput
   files?: Prisma.FileCreateNestedManyWithoutRepositoryInput
   branches?: Prisma.GitBranchCreateNestedManyWithoutRepositoryInput
+  pullRequests?: Prisma.PullRequestCreateNestedManyWithoutRepositoryInput
 }
 
 export type RepositoryUncheckedCreateWithoutGitCommitsInput = {
@@ -634,6 +670,7 @@ export type RepositoryUncheckedCreateWithoutGitCommitsInput = {
   createdAt?: Date | string
   files?: Prisma.FileUncheckedCreateNestedManyWithoutRepositoryInput
   branches?: Prisma.GitBranchUncheckedCreateNestedManyWithoutRepositoryInput
+  pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutRepositoryInput
 }
 
 export type RepositoryCreateOrConnectWithoutGitCommitsInput = {
@@ -661,6 +698,7 @@ export type RepositoryUpdateWithoutGitCommitsInput = {
   project?: Prisma.ProjectUpdateOneRequiredWithoutRepositoryNestedInput
   files?: Prisma.FileUpdateManyWithoutRepositoryNestedInput
   branches?: Prisma.GitBranchUpdateManyWithoutRepositoryNestedInput
+  pullRequests?: Prisma.PullRequestUpdateManyWithoutRepositoryNestedInput
 }
 
 export type RepositoryUncheckedUpdateWithoutGitCommitsInput = {
@@ -672,6 +710,71 @@ export type RepositoryUncheckedUpdateWithoutGitCommitsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   files?: Prisma.FileUncheckedUpdateManyWithoutRepositoryNestedInput
   branches?: Prisma.GitBranchUncheckedUpdateManyWithoutRepositoryNestedInput
+  pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutRepositoryNestedInput
+}
+
+export type RepositoryCreateWithoutPullRequestsInput = {
+  id?: string
+  provider?: string
+  path: string
+  currentBranchId?: string | null
+  createdAt?: Date | string
+  project: Prisma.ProjectCreateNestedOneWithoutRepositoryInput
+  files?: Prisma.FileCreateNestedManyWithoutRepositoryInput
+  branches?: Prisma.GitBranchCreateNestedManyWithoutRepositoryInput
+  gitCommits?: Prisma.GitCommitCreateNestedManyWithoutRepositoryInput
+}
+
+export type RepositoryUncheckedCreateWithoutPullRequestsInput = {
+  id?: string
+  projectId: string
+  provider?: string
+  path: string
+  currentBranchId?: string | null
+  createdAt?: Date | string
+  files?: Prisma.FileUncheckedCreateNestedManyWithoutRepositoryInput
+  branches?: Prisma.GitBranchUncheckedCreateNestedManyWithoutRepositoryInput
+  gitCommits?: Prisma.GitCommitUncheckedCreateNestedManyWithoutRepositoryInput
+}
+
+export type RepositoryCreateOrConnectWithoutPullRequestsInput = {
+  where: Prisma.RepositoryWhereUniqueInput
+  create: Prisma.XOR<Prisma.RepositoryCreateWithoutPullRequestsInput, Prisma.RepositoryUncheckedCreateWithoutPullRequestsInput>
+}
+
+export type RepositoryUpsertWithoutPullRequestsInput = {
+  update: Prisma.XOR<Prisma.RepositoryUpdateWithoutPullRequestsInput, Prisma.RepositoryUncheckedUpdateWithoutPullRequestsInput>
+  create: Prisma.XOR<Prisma.RepositoryCreateWithoutPullRequestsInput, Prisma.RepositoryUncheckedCreateWithoutPullRequestsInput>
+  where?: Prisma.RepositoryWhereInput
+}
+
+export type RepositoryUpdateToOneWithWhereWithoutPullRequestsInput = {
+  where?: Prisma.RepositoryWhereInput
+  data: Prisma.XOR<Prisma.RepositoryUpdateWithoutPullRequestsInput, Prisma.RepositoryUncheckedUpdateWithoutPullRequestsInput>
+}
+
+export type RepositoryUpdateWithoutPullRequestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.StringFieldUpdateOperationsInput | string
+  path?: Prisma.StringFieldUpdateOperationsInput | string
+  currentBranchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  project?: Prisma.ProjectUpdateOneRequiredWithoutRepositoryNestedInput
+  files?: Prisma.FileUpdateManyWithoutRepositoryNestedInput
+  branches?: Prisma.GitBranchUpdateManyWithoutRepositoryNestedInput
+  gitCommits?: Prisma.GitCommitUpdateManyWithoutRepositoryNestedInput
+}
+
+export type RepositoryUncheckedUpdateWithoutPullRequestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.StringFieldUpdateOperationsInput | string
+  provider?: Prisma.StringFieldUpdateOperationsInput | string
+  path?: Prisma.StringFieldUpdateOperationsInput | string
+  currentBranchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  files?: Prisma.FileUncheckedUpdateManyWithoutRepositoryNestedInput
+  branches?: Prisma.GitBranchUncheckedUpdateManyWithoutRepositoryNestedInput
+  gitCommits?: Prisma.GitCommitUncheckedUpdateManyWithoutRepositoryNestedInput
 }
 
 
@@ -683,12 +786,14 @@ export type RepositoryCountOutputType = {
   files: number
   branches: number
   gitCommits: number
+  pullRequests: number
 }
 
 export type RepositoryCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   files?: boolean | RepositoryCountOutputTypeCountFilesArgs
   branches?: boolean | RepositoryCountOutputTypeCountBranchesArgs
   gitCommits?: boolean | RepositoryCountOutputTypeCountGitCommitsArgs
+  pullRequests?: boolean | RepositoryCountOutputTypeCountPullRequestsArgs
 }
 
 /**
@@ -722,6 +827,13 @@ export type RepositoryCountOutputTypeCountGitCommitsArgs<ExtArgs extends runtime
   where?: Prisma.GitCommitWhereInput
 }
 
+/**
+ * RepositoryCountOutputType without action
+ */
+export type RepositoryCountOutputTypeCountPullRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PullRequestWhereInput
+}
+
 
 export type RepositorySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -734,6 +846,7 @@ export type RepositorySelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   files?: boolean | Prisma.Repository$filesArgs<ExtArgs>
   branches?: boolean | Prisma.Repository$branchesArgs<ExtArgs>
   gitCommits?: boolean | Prisma.Repository$gitCommitsArgs<ExtArgs>
+  pullRequests?: boolean | Prisma.Repository$pullRequestsArgs<ExtArgs>
   _count?: boolean | Prisma.RepositoryCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["repository"]>
 
@@ -772,6 +885,7 @@ export type RepositoryInclude<ExtArgs extends runtime.Types.Extensions.InternalA
   files?: boolean | Prisma.Repository$filesArgs<ExtArgs>
   branches?: boolean | Prisma.Repository$branchesArgs<ExtArgs>
   gitCommits?: boolean | Prisma.Repository$gitCommitsArgs<ExtArgs>
+  pullRequests?: boolean | Prisma.Repository$pullRequestsArgs<ExtArgs>
   _count?: boolean | Prisma.RepositoryCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type RepositoryIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -788,6 +902,7 @@ export type $RepositoryPayload<ExtArgs extends runtime.Types.Extensions.Internal
     files: Prisma.$FilePayload<ExtArgs>[]
     branches: Prisma.$GitBranchPayload<ExtArgs>[]
     gitCommits: Prisma.$GitCommitPayload<ExtArgs>[]
+    pullRequests: Prisma.$PullRequestPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1194,6 +1309,7 @@ export interface Prisma__RepositoryClient<T, Null = never, ExtArgs extends runti
   files<T extends Prisma.Repository$filesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Repository$filesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FilePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   branches<T extends Prisma.Repository$branchesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Repository$branchesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$GitBranchPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   gitCommits<T extends Prisma.Repository$gitCommitsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Repository$gitCommitsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$GitCommitPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  pullRequests<T extends Prisma.Repository$pullRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Repository$pullRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PullRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1699,6 +1815,30 @@ export type Repository$gitCommitsArgs<ExtArgs extends runtime.Types.Extensions.I
   take?: number
   skip?: number
   distinct?: Prisma.GitCommitScalarFieldEnum | Prisma.GitCommitScalarFieldEnum[]
+}
+
+/**
+ * Repository.pullRequests
+ */
+export type Repository$pullRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PullRequest
+   */
+  select?: Prisma.PullRequestSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PullRequest
+   */
+  omit?: Prisma.PullRequestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PullRequestInclude<ExtArgs> | null
+  where?: Prisma.PullRequestWhereInput
+  orderBy?: Prisma.PullRequestOrderByWithRelationInput | Prisma.PullRequestOrderByWithRelationInput[]
+  cursor?: Prisma.PullRequestWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PullRequestScalarFieldEnum | Prisma.PullRequestScalarFieldEnum[]
 }
 
 /**
