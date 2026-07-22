@@ -65,11 +65,16 @@ const TreeLevel = memo(function TreeLevel({
 });
 
 export function ExplorerTree({ projectId }: { projectId: string }) {
-  const { loadRoot, loadedChildren } = useExplorer(projectId);
+  const { loadRoot, loadedChildren, refreshTrigger } = useExplorer(projectId);
 
   useEffect(() => {
     if (!loadedChildren['root']) loadRoot();
   }, [loadRoot, loadedChildren]);
+
+  useEffect(() => {
+    loadRoot();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refreshTrigger]);
 
   return (
     <div className="py-1">

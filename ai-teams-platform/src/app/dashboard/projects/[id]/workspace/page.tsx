@@ -5,6 +5,7 @@ import { WorkspaceShell } from '@/features/workspace/components/workspace-shell'
 import { CommandPaletteProvider } from '@/features/editor';
 import { WorkspaceSidebarContent } from '@/features/workspace/components/workspace-sidebar-content';
 import { ProjectInitializer } from '@/features/workspace/components/project-initializer';
+import { WorkspaceBuildSync } from '@/features/workspace/components/workspace-build-sync';
 import { AssistantChatWrapper } from './assistant-chat-wrapper';
 
 export default async function WorkspacePage({
@@ -22,6 +23,7 @@ export default async function WorkspacePage({
   return (
     <CommandPaletteProvider>
       <ProjectInitializer projectId={id}>
+        <WorkspaceBuildSync projectId={id} />
         <WorkspaceShell
           projectName={project.name}
           userName={session.user.name ?? 'User'}
