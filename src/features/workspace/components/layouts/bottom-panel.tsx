@@ -13,10 +13,15 @@ const CodeReviewPanel = dynamic(
   () => import('@/features/code-review/components/code-review-panel').then((m) => ({ default: m.CodeReviewPanel })),
   { ssr: false },
 );
+const DatabaseAssistant = dynamic(
+  () => import('@/features/database-assistant/components/database-assistant').then((m) => ({ default: m.DatabaseAssistant })),
+  { ssr: false },
+);
 
 const TABS: { id: BottomPanelTab; label: string }[] = [
   { id: 'preview', label: 'Preview' },
   { id: 'review', label: 'Review' },
+  { id: 'database', label: 'Database' },
   { id: 'terminal', label: 'Terminal' },
   { id: 'problems', label: 'Problems' },
   { id: 'output', label: 'Output' },
@@ -57,6 +62,9 @@ export function BottomPanel() {
         )}
         {activeBottomPanel === 'review' && currentProjectId && (
           <CodeReviewPanel projectId={currentProjectId} />
+        )}
+        {activeBottomPanel === 'database' && currentProjectId && (
+          <DatabaseAssistant projectId={currentProjectId} />
         )}
         {activeBottomPanel === 'terminal' && (
           <div className="p-3 text-xs text-muted-foreground">Terminal integration is not wired yet.</div>
