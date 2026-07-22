@@ -7,6 +7,8 @@ import { unauthorizedResponse } from '@/lib/api-response';
 const prefsSchema = z.object({
   theme: z.enum(['light', 'dark', 'system']),
   layout: z.record(z.string(), z.unknown()),
+  simpleMode: z.boolean().optional(),
+  tourCompleted: z.boolean().optional(),
 });
 
 export async function GET() {
@@ -39,11 +41,15 @@ export async function PUT(request: Request) {
     create: {
       userId: session.user.id,
       theme: parsed.data.theme,
+      simpleMode: parsed.data.simpleMode ?? true,
+      tourCompleted: parsed.data.tourCompleted ?? false,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       layout: parsed.data.layout as any,
     },
     update: {
       theme: parsed.data.theme,
+      ...(parsed.data.simpleMode !== undefined && { simpleMode: parsed.data.simpleMode }),
+      ...(parsed.data.tourCompleted !== undefined && { tourCompleted: parsed.data.tourCompleted }),
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       layout: parsed.data.layout as any,
     },

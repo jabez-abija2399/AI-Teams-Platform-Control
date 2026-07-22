@@ -4,9 +4,28 @@ export const DEVELOPER_CAPABILITIES = ['CODING', 'DEBUGGING', 'IMPLEMENTATION'] 
 
 export type ChangeType = 'CREATE' | 'MODIFY' | 'DELETE';
 
-const smartString = z.union([z.string(), z.record(z.string(), z.unknown())]).transform((val) =>
-  typeof val === 'string' ? val : JSON.stringify(val),
-);
+export type TaskStatus = 'pending' | 'running' | 'done' | 'failed';
+export type BuildEventType =
+  | 'planning:analyzing'
+  | 'planning:identifying'
+  | 'planning:ordering'
+  | 'planning:complete'
+  | 'task:starting'
+  | 'task:complete'
+  | 'task:failed'
+  | 'batch:starting'
+  | 'batch:complete'
+  | 'saving'
+  | 'complete'
+  | 'cancelled'
+  | 'error';
+
+const smartString = z
+  .union([z.string(), z.record(z.string(), z.unknown()), z.array(z.unknown())])
+  .transform((val) => {
+    if (typeof val === 'string') return val;
+    return JSON.stringify(val);
+  });
 
 export const developmentPlanSchema = z.object({
   tasks: z.array(smartString).default([]),
@@ -38,3 +57,30 @@ export const developerOutputSchema = z.object({
   report: implementationReportSchema,
 });
 export type DeveloperOutput = z.infer<typeof developerOutputSchema>;
+
+export interface TaskInfo {
+  description: string;
+  status: TaskStatus;
+  file?: string;
+}
+
+export interface BuildEvent {
+  type: BuildEventType;
+  phase: 'planning' | 'generating' | 'saving' | 'complete';
+  message: string;
+  completedTasks: number;
+  totalTasks: number;
+  currentTask?: string;
+  tasks?: TaskInfo[];
+  generatedFiles?: string[];
+  error?: string;
+  eta?: number;
+}
+
+export interface BuildState {
+  controller: AbortController;
+  progress: BuildEvent;
+  tasks: TaskInfo[];
+  generatedFiles: string[];
+  startedAt: number;
+}

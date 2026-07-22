@@ -23,5 +23,23 @@ export async function POST(request: Request) {
   }
 
   const result = await analyzeUserIdea(parsed.data.projectId, parsed.data.userIdea);
-  return toResponse(result);
+
+  let tokensUsed = 0;
+  try {
+    const { prisma } = await import('@/lib/prisma');
+    const latestUsage = await prisma.aIUsageLog.findFirst({
+      where: { projectId: parsed.data.projectId },
+      orderBy: { createdAt: 'desc' },
+    });
+    tokensUsed = latestUsage?.totalTokens ?? 0;
+  } catch {
+    // non-critical
+  }
+
+  if (!result.success) return toResponse(result);
+
+  return NextResponse.json({
+    success: true,
+    data: { ...result.data, _tokensUsed: tokensUsed },
+  });
 }

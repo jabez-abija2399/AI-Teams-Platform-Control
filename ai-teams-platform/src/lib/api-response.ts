@@ -7,6 +7,8 @@ const ERROR_STATUS: Record<string, number> = {
   UNAUTHORIZED: 401,
   FORBIDDEN: 403,
   EMAIL_TAKEN: 409,
+  CONFLICT: 409,
+  INVALID_STATE: 409,
   RATE_LIMITED: 429,
 };
 

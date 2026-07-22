@@ -5,7 +5,13 @@ import { OnboardingFlow } from '@/features/onboarding/components/onboarding-flow
 import { APP_NAME } from '@/config/constants';
 
 export default async function HomePage() {
-  const session = await auth();
+  let session = null;
+  try {
+    session = await auth();
+  } catch {
+    // Stale or corrupted JWT cookie — treat as logged out.
+    // The browser will get a fresh session on next login.
+  }
 
   return (
     <div className="min-h-screen">

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { AgentAvatar } from '@/features/onboarding/components/agent-avatar';
 import { fetchAgentSummaries } from '@/app/dashboard/ai-teams/actions';
 import type { AgentSummaryData } from '@/app/dashboard/ai-teams/actions';
 
@@ -39,9 +40,12 @@ export function AgentOverview() {
                 key={agent.id}
                 className="flex items-center justify-between rounded-lg border p-3"
               >
-                <div>
-                  <p className="font-medium">{agent.name}</p>
-                  <p className="text-muted-foreground text-xs">{agent.role}</p>
+                <div className="flex items-center gap-2.5">
+                  <AgentAvatar role={agent.role as 'CEO' | 'ARCHITECT' | 'DEVELOPER' | 'QA'} size="sm" />
+                  <div>
+                    <p className="font-medium">{agent.name}</p>
+                    <p className="text-muted-foreground text-xs">{agent.role}</p>
+                  </div>
                 </div>
                 <Badge
                   variant="secondary"

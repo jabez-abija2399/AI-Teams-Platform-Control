@@ -5,9 +5,12 @@ export const QA_CAPABILITIES = ['TESTING', 'ANALYSIS'] as const;
 export type TestType = 'UNIT' | 'INTEGRATION' | 'E2E';
 export type Severity = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 
-const smartString = z.union([z.string(), z.record(z.string(), z.unknown())]).transform((val) =>
-  typeof val === 'string' ? val : JSON.stringify(val),
-);
+const smartString = z
+  .union([z.string(), z.record(z.string(), z.unknown()), z.array(z.unknown())])
+  .transform((val) => {
+    if (typeof val === 'string') return val;
+    return JSON.stringify(val);
+  });
 
 export const testCaseSchema = z.object({
   name: smartString.default('Test case'),

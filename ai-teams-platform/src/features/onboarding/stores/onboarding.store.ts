@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-type OnboardingStep = 'idea' | 'watching' | 'ready';
+type OnboardingStep = 'idea' | 'watching' | 'build-prompt' | 'ready';
 
 interface OnboardingState {
   step: OnboardingStep;

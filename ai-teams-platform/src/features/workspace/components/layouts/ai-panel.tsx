@@ -20,6 +20,7 @@ export function AIPanel({ children }: { children: React.ReactNode }) {
 
   return (
     <div
+      data-tour="ai-panel"
       className="relative flex shrink-0 flex-col border-l bg-card"
       style={{ width: layout.aiPanelWidth }}
     >

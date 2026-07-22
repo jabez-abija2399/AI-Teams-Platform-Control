@@ -6,13 +6,14 @@ import { DocTree } from './doc-tree';
 import { DocEditor } from './doc-editor';
 import { DocList } from './doc-list';
 import { KnowledgePanel } from './knowledge-panel';
+import { EmptyStateAction } from '@/features/onboarding/components/empty-state-action';
 import {
   useDocuments,
   useDocument,
   useCreateDocument,
   useUpdateDocument,
 } from '../hooks/use-documents';
-import { TreePine, List, BookOpen } from 'lucide-react';
+import { TreePine, List, BookOpen, FileText } from 'lucide-react';
 
 export function DocumentationPanel({ projectId }: { projectId: string }) {
   const [selectedDocId, setSelectedDocId] = useState<string | null>(null);
@@ -83,12 +84,24 @@ export function DocumentationPanel({ projectId }: { projectId: string }) {
           </TabsList>
 
           <TabsContent value="tree" className="flex-1 overflow-auto">
-            <DocTree
-              documents={documents ?? []}
-              selectedDocId={selectedDocId}
-              onSelectDoc={setSelectedDocId}
-              onCreateDoc={handleCreateDoc}
-            />
+            {(documents ?? []).length === 0 ? (
+              <EmptyStateAction
+                icon={FileText}
+                title="No documentation yet"
+                description="Create your first document to start building project knowledge."
+                agentRole="DOCUMENTATION"
+                actions={[
+                  { label: 'Create Document', onClick: () => handleCreateDoc('guide') },
+                ]}
+              />
+            ) : (
+              <DocTree
+                documents={documents ?? []}
+                selectedDocId={selectedDocId}
+                onSelectDoc={setSelectedDocId}
+                onCreateDoc={handleCreateDoc}
+              />
+            )}
           </TabsContent>
 
           <TabsContent value="list" className="flex-1 overflow-auto p-4">

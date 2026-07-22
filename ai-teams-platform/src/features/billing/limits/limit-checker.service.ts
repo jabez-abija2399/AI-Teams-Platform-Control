@@ -64,3 +64,41 @@ export async function checkUsageLimit(
     },
   };
 }
+
+export async function getUsagePercent(
+  organizationId: string,
+): Promise<{ percentUsed: number; limitReached: boolean }> {
+  const subscription = await prisma.subscription.findUnique({
+    where: { organizationId },
+    include: { plan: true },
+  });
+
+  if (!subscription || !subscription.plan) {
+    return { percentUsed: 0, limitReached: false };
+  }
+
+  const limits = subscription.plan.limits as Record<string, unknown>;
+  const usageLimit = typeof limits.usageLimit === 'number' ? limits.usageLimit : 0;
+  if (usageLimit === 0) return { percentUsed: 0, limitReached: false };
+
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  const usage = await prisma.aIUsageLog.aggregate({
+    where: {
+      createdAt: { gte: startOfMonth },
+      project: {
+        teamProjects: {
+          some: {
+            team: { organizationId },
+          },
+        },
+      },
+    },
+    _sum: { costUsd: true },
+  });
+
+  const usageThisMonth = usage._sum.costUsd ?? 0;
+  const percentUsed = Math.min(100, Math.round((usageThisMonth / usageLimit) * 100));
+  return { percentUsed, limitReached: percentUsed >= 100 };
+}

@@ -16,7 +16,7 @@ const requestSchema = z.object({
     changes: z.array(
       z.object({
         file: z.string(),
-        changeType: z.enum(['CREATE', 'MODIFY', 'DELETE']),
+        changeType: z.string().transform((v) => v.toUpperCase() as 'CREATE' | 'MODIFY' | 'DELETE'),
         description: z.string(),
         code: z.string(),
       }),
@@ -37,8 +37,9 @@ export async function POST(request: Request) {
   const body = await request.json();
   const parsed = requestSchema.safeParse(body);
   if (!parsed.success) {
+    const details = parsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('; ');
     return NextResponse.json(
-      { success: false, error: { message: 'Invalid request', code: 'VALIDATION_ERROR' } },
+      { success: false, error: { message: `Invalid request: ${details}`, code: 'VALIDATION_ERROR' } },
       { status: 400 },
     );
   }

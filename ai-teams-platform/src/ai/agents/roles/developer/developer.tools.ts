@@ -44,7 +44,7 @@ function normalizeEnums(obj: any): any {
 }
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
-async function aiCall<T>(prompt: string, projectId?: string, agentId?: string): Promise<T> {
+async function aiCall<T>(prompt: string, projectId?: string, agentId?: string, signal?: AbortSignal): Promise<T> {
   const result = await generate(
     {
       model: developerConfig.preferredModel,
@@ -56,26 +56,31 @@ async function aiCall<T>(prompt: string, projectId?: string, agentId?: string): 
     },
     { projectId, agentId },
   );
+  if (signal?.aborted) throw new Error('BUILD_CANCELLED');
   if (!result.success) throw new Error(result.error.message);
   return extractJson(result.data.content) as T;
 }
 
 export const codeGeneratorTool: ITool<
-  { architecture: ArchitectAnalysis; task: string; projectId?: string; agentId?: string },
+  { architecture: ArchitectAnalysis; task: string; projectId?: string; agentId?: string; signal?: AbortSignal },
   CodeChange[]
 > = {
   name: 'code_generator',
   description: 'Generates implementation code for a task given the technical architecture.',
-  async execute({ architecture, task, projectId, agentId }): Promise<ToolResult<CodeChange[]>> {
+  async execute({ architecture, task, projectId, agentId, signal }): Promise<ToolResult<CodeChange[]>> {
     try {
       const raw = await aiCall<{ changes: unknown[] }>(
         `Architecture: ${JSON.stringify(architecture)}\nTask: ${task}\n\nProduce code changes as JSON: { changes: [{ file, changeType, description, code }] }. changeType must be CREATE, MODIFY, or DELETE. Respond ONLY with valid JSON.`,
         projectId,
         agentId,
+        signal,
       );
       const data = raw.changes.map((c) => codeChangeSchema.parse(normalizeEnums(c)));
       return { success: true, data };
     } catch (err) {
+      if (err instanceof Error && err.message === 'BUILD_CANCELLED') {
+        return { success: false, error: 'BUILD_CANCELLED' };
+      }
       return {
         success: false,
         error: err instanceof Error ? err.message : 'Code generator failed',
@@ -84,19 +89,23 @@ export const codeGeneratorTool: ITool<
   },
 };
 
-export const developmentPlannerTool: ITool<{ architecture: ArchitectAnalysis; projectId?: string; agentId?: string }, DeveloperPlan> = {
+export const developmentPlannerTool: ITool<{ architecture: ArchitectAnalysis; projectId?: string; agentId?: string; signal?: AbortSignal }, DeveloperPlan> = {
   name: 'development_planner',
   description: 'Breaks architecture into an ordered implementation plan.',
-  async execute({ architecture, projectId, agentId }): Promise<ToolResult<DeveloperPlan>> {
+  async execute({ architecture, projectId, agentId, signal }): Promise<ToolResult<DeveloperPlan>> {
     try {
       const raw = await aiCall<unknown>(
         `Architecture: ${JSON.stringify(architecture)}\n\nProduce a development plan as JSON with keys: tasks (array of strings), files (array of strings), dependencies (array of strings), implementationOrder (array of strings). Respond ONLY with valid JSON.`,
         projectId,
         agentId,
+        signal,
       );
       const data = developmentPlanSchema.parse(normalizeEnums(raw));
       return { success: true, data };
     } catch (err) {
+      if (err instanceof Error && err.message === 'BUILD_CANCELLED') {
+        return { success: false, error: 'BUILD_CANCELLED' };
+      }
       return {
         success: false,
         error: err instanceof Error ? err.message : 'Development planning failed',
