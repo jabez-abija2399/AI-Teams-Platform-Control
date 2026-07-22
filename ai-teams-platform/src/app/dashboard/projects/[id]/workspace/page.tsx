@@ -5,6 +5,7 @@ import { WorkspaceShell } from '@/features/workspace/components/workspace-shell'
 import { CommandPaletteProvider } from '@/features/editor';
 import { WorkspaceSidebarContent } from '@/features/workspace/components/workspace-sidebar-content';
 import { ProjectInitializer } from '@/features/workspace/components/project-initializer';
+import { AssistantChatWrapper } from './assistant-chat-wrapper';
 
 export default async function WorkspacePage({
   params,
@@ -26,11 +27,7 @@ export default async function WorkspacePage({
           userName={session.user.name ?? 'User'}
           projectId={id}
           sidebarContent={<WorkspaceSidebarContent />}
-          aiPanelContent={
-            <div className="p-3 text-xs text-muted-foreground">
-              AI panel coming in Prompt 4
-            </div>
-          }
+          aiPanelContent={<AssistantChatWrapper projectId={id} />}
         />
       </ProjectInitializer>
     </CommandPaletteProvider>
