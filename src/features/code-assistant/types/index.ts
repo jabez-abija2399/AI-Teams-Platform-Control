@@ -7,9 +7,9 @@ export interface CodeAssistantMessage {
 }
 
 export interface CodeContext {
-  fileName: string;
-  language: string;
-  content: string;
+  fileName?: string;
+  language?: string;
+  content?: string;
   selectedText?: string;
   cursorLine?: number;
   cursorColumn?: number;

@@ -29,9 +29,14 @@ export function AIPanel({ children }: { children: React.ReactNode }) {
         className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-ring/50"
       />
       <div className="flex h-9 items-center justify-between border-b px-3">
-        <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          AI Team
-        </span>
+        <div className="flex items-center gap-1.5">
+          <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            AI Team
+          </span>
+          <kbd className="rounded border bg-muted px-1 py-0.5 text-[9px] text-muted-foreground">
+            Ctrl+L
+          </kbd>
+        </div>
         <Button variant="ghost" size="icon" className="h-6 w-6" onClick={toggleAIPanel}>
           <PanelRightClose className="h-3.5 w-3.5" />
         </Button>
