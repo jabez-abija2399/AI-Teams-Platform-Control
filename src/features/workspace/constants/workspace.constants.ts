@@ -6,6 +6,7 @@ export const ACTIVITY_ITEMS: ActivityItem[] = [
   { id: 'ai-employees', label: 'AI Employees', icon: 'Bot' },
   { id: 'projects', label: 'Projects', icon: 'FolderKanban' },
   { id: 'git', label: 'Git', icon: 'GitBranch' },
+  { id: 'github', label: 'GitHub', icon: 'Github' },
   { id: 'quality', label: 'Quality', icon: 'ShieldCheck' },
   { id: 'documentation', label: 'Documentation', icon: 'BookOpen' },
   { id: 'deployment', label: 'Deployment', icon: 'Rocket' },

@@ -31,6 +31,10 @@ const MarketplaceBrowse = dynamic(
   () => import('@/features/marketplace/components/marketplace-browse').then((m) => ({ default: m.MarketplaceBrowse })),
   { ssr: false },
 );
+const GitHubIntegration = dynamic(
+  () => import('@/features/git-integration/components/github-integration').then((m) => ({ default: m.GitHubIntegration })),
+  { ssr: false },
+);
 
 export function WorkspaceSidebarContent() {
   const { selectedActivity, currentProjectId } = useWorkspaceStore();
@@ -40,6 +44,8 @@ export function WorkspaceSidebarContent() {
       return currentProjectId ? <ExplorerTree projectId={currentProjectId} /> : <Placeholder label="Select a project" />;
     case 'git':
       return currentProjectId ? <GitPanel projectId={currentProjectId} /> : <Placeholder label="Select a project" />;
+    case 'github':
+      return currentProjectId ? <GitHubIntegration projectId={currentProjectId} /> : <Placeholder label="Select a project" />;
     case 'quality':
       return currentProjectId ? <QualityPanel projectId={currentProjectId} /> : <Placeholder label="Select a project" />;
     case 'documentation':

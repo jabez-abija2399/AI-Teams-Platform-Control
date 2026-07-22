@@ -253,6 +253,7 @@ export type ProjectWhereInput = {
   workflows?: Prisma.WorkflowListRelationFilter
   repository?: Prisma.XOR<Prisma.RepositoryNullableScalarRelationFilter, Prisma.RepositoryWhereInput> | null
   folders?: Prisma.FolderListRelationFilter
+  gitIntegration?: Prisma.XOR<Prisma.GitIntegrationNullableScalarRelationFilter, Prisma.GitIntegrationWhereInput> | null
   productDocuments?: Prisma.ProductDocumentListRelationFilter
   architectureDocuments?: Prisma.ArchitectureDocumentListRelationFilter
   developmentTasks?: Prisma.DevelopmentTaskListRelationFilter
@@ -279,6 +280,7 @@ export type ProjectWhereInput = {
   productDecisions?: Prisma.ProductDecisionListRelationFilter
   designSystemConfig?: Prisma.XOR<Prisma.DesignSystemConfigNullableScalarRelationFilter, Prisma.DesignSystemConfigWhereInput> | null
   feedback?: Prisma.FeedbackListRelationFilter
+  pullRequests?: Prisma.PullRequestListRelationFilter
 }
 
 export type ProjectOrderByWithRelationInput = {
@@ -302,6 +304,7 @@ export type ProjectOrderByWithRelationInput = {
   workflows?: Prisma.WorkflowOrderByRelationAggregateInput
   repository?: Prisma.RepositoryOrderByWithRelationInput
   folders?: Prisma.FolderOrderByRelationAggregateInput
+  gitIntegration?: Prisma.GitIntegrationOrderByWithRelationInput
   productDocuments?: Prisma.ProductDocumentOrderByRelationAggregateInput
   architectureDocuments?: Prisma.ArchitectureDocumentOrderByRelationAggregateInput
   developmentTasks?: Prisma.DevelopmentTaskOrderByRelationAggregateInput
@@ -328,6 +331,7 @@ export type ProjectOrderByWithRelationInput = {
   productDecisions?: Prisma.ProductDecisionOrderByRelationAggregateInput
   designSystemConfig?: Prisma.DesignSystemConfigOrderByWithRelationInput
   feedback?: Prisma.FeedbackOrderByRelationAggregateInput
+  pullRequests?: Prisma.PullRequestOrderByRelationAggregateInput
 }
 
 export type ProjectWhereUniqueInput = Prisma.AtLeast<{
@@ -354,6 +358,7 @@ export type ProjectWhereUniqueInput = Prisma.AtLeast<{
   workflows?: Prisma.WorkflowListRelationFilter
   repository?: Prisma.XOR<Prisma.RepositoryNullableScalarRelationFilter, Prisma.RepositoryWhereInput> | null
   folders?: Prisma.FolderListRelationFilter
+  gitIntegration?: Prisma.XOR<Prisma.GitIntegrationNullableScalarRelationFilter, Prisma.GitIntegrationWhereInput> | null
   productDocuments?: Prisma.ProductDocumentListRelationFilter
   architectureDocuments?: Prisma.ArchitectureDocumentListRelationFilter
   developmentTasks?: Prisma.DevelopmentTaskListRelationFilter
@@ -380,6 +385,7 @@ export type ProjectWhereUniqueInput = Prisma.AtLeast<{
   productDecisions?: Prisma.ProductDecisionListRelationFilter
   designSystemConfig?: Prisma.XOR<Prisma.DesignSystemConfigNullableScalarRelationFilter, Prisma.DesignSystemConfigWhereInput> | null
   feedback?: Prisma.FeedbackListRelationFilter
+  pullRequests?: Prisma.PullRequestListRelationFilter
 }, "id" | "slug">
 
 export type ProjectOrderByWithAggregationInput = {
@@ -439,6 +445,7 @@ export type ProjectCreateInput = {
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -465,6 +472,7 @@ export type ProjectCreateInput = {
   productDecisions?: Prisma.ProductDecisionCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateInput = {
@@ -486,6 +494,7 @@ export type ProjectUncheckedCreateInput = {
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -512,6 +521,7 @@ export type ProjectUncheckedCreateInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUpdateInput = {
@@ -533,6 +543,7 @@ export type ProjectUpdateInput = {
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -559,6 +570,7 @@ export type ProjectUpdateInput = {
   productDecisions?: Prisma.ProductDecisionUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateInput = {
@@ -580,6 +592,7 @@ export type ProjectUncheckedUpdateInput = {
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -606,6 +619,7 @@ export type ProjectUncheckedUpdateInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateManyInput = {
@@ -946,6 +960,34 @@ export type ProjectUpdateOneRequiredWithoutRecentProjectsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ProjectUpdateToOneWithWhereWithoutRecentProjectsInput, Prisma.ProjectUpdateWithoutRecentProjectsInput>, Prisma.ProjectUncheckedUpdateWithoutRecentProjectsInput>
 }
 
+export type ProjectCreateNestedOneWithoutGitIntegrationInput = {
+  create?: Prisma.XOR<Prisma.ProjectCreateWithoutGitIntegrationInput, Prisma.ProjectUncheckedCreateWithoutGitIntegrationInput>
+  connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutGitIntegrationInput
+  connect?: Prisma.ProjectWhereUniqueInput
+}
+
+export type ProjectUpdateOneRequiredWithoutGitIntegrationNestedInput = {
+  create?: Prisma.XOR<Prisma.ProjectCreateWithoutGitIntegrationInput, Prisma.ProjectUncheckedCreateWithoutGitIntegrationInput>
+  connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutGitIntegrationInput
+  upsert?: Prisma.ProjectUpsertWithoutGitIntegrationInput
+  connect?: Prisma.ProjectWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProjectUpdateToOneWithWhereWithoutGitIntegrationInput, Prisma.ProjectUpdateWithoutGitIntegrationInput>, Prisma.ProjectUncheckedUpdateWithoutGitIntegrationInput>
+}
+
+export type ProjectCreateNestedOneWithoutPullRequestsInput = {
+  create?: Prisma.XOR<Prisma.ProjectCreateWithoutPullRequestsInput, Prisma.ProjectUncheckedCreateWithoutPullRequestsInput>
+  connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutPullRequestsInput
+  connect?: Prisma.ProjectWhereUniqueInput
+}
+
+export type ProjectUpdateOneRequiredWithoutPullRequestsNestedInput = {
+  create?: Prisma.XOR<Prisma.ProjectCreateWithoutPullRequestsInput, Prisma.ProjectUncheckedCreateWithoutPullRequestsInput>
+  connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutPullRequestsInput
+  upsert?: Prisma.ProjectUpsertWithoutPullRequestsInput
+  connect?: Prisma.ProjectWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProjectUpdateToOneWithWhereWithoutPullRequestsInput, Prisma.ProjectUpdateWithoutPullRequestsInput>, Prisma.ProjectUncheckedUpdateWithoutPullRequestsInput>
+}
+
 export type ProjectCreateNestedOneWithoutTestCasesInput = {
   create?: Prisma.XOR<Prisma.ProjectCreateWithoutTestCasesInput, Prisma.ProjectUncheckedCreateWithoutTestCasesInput>
   connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutTestCasesInput
@@ -1272,6 +1314,7 @@ export type ProjectCreateWithoutOwnerInput = {
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -1298,6 +1341,7 @@ export type ProjectCreateWithoutOwnerInput = {
   productDecisions?: Prisma.ProductDecisionCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutOwnerInput = {
@@ -1318,6 +1362,7 @@ export type ProjectUncheckedCreateWithoutOwnerInput = {
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -1344,6 +1389,7 @@ export type ProjectUncheckedCreateWithoutOwnerInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutOwnerInput = {
@@ -1409,6 +1455,7 @@ export type ProjectCreateWithoutTasksInput = {
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -1435,6 +1482,7 @@ export type ProjectCreateWithoutTasksInput = {
   productDecisions?: Prisma.ProductDecisionCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutTasksInput = {
@@ -1455,6 +1503,7 @@ export type ProjectUncheckedCreateWithoutTasksInput = {
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -1481,6 +1530,7 @@ export type ProjectUncheckedCreateWithoutTasksInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutTasksInput = {
@@ -1517,6 +1567,7 @@ export type ProjectUpdateWithoutTasksInput = {
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -1543,6 +1594,7 @@ export type ProjectUpdateWithoutTasksInput = {
   productDecisions?: Prisma.ProductDecisionUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutTasksInput = {
@@ -1563,6 +1615,7 @@ export type ProjectUncheckedUpdateWithoutTasksInput = {
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -1589,6 +1642,7 @@ export type ProjectUncheckedUpdateWithoutTasksInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutDocumentsInput = {
@@ -1609,6 +1663,7 @@ export type ProjectCreateWithoutDocumentsInput = {
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -1635,6 +1690,7 @@ export type ProjectCreateWithoutDocumentsInput = {
   productDecisions?: Prisma.ProductDecisionCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutDocumentsInput = {
@@ -1655,6 +1711,7 @@ export type ProjectUncheckedCreateWithoutDocumentsInput = {
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -1681,6 +1738,7 @@ export type ProjectUncheckedCreateWithoutDocumentsInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutDocumentsInput = {
@@ -1717,6 +1775,7 @@ export type ProjectUpdateWithoutDocumentsInput = {
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -1743,6 +1802,7 @@ export type ProjectUpdateWithoutDocumentsInput = {
   productDecisions?: Prisma.ProductDecisionUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutDocumentsInput = {
@@ -1763,6 +1823,7 @@ export type ProjectUncheckedUpdateWithoutDocumentsInput = {
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -1789,6 +1850,7 @@ export type ProjectUncheckedUpdateWithoutDocumentsInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutWorkflowsInput = {
@@ -1809,6 +1871,7 @@ export type ProjectCreateWithoutWorkflowsInput = {
   documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -1835,6 +1898,7 @@ export type ProjectCreateWithoutWorkflowsInput = {
   productDecisions?: Prisma.ProductDecisionCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutWorkflowsInput = {
@@ -1855,6 +1919,7 @@ export type ProjectUncheckedCreateWithoutWorkflowsInput = {
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -1881,6 +1946,7 @@ export type ProjectUncheckedCreateWithoutWorkflowsInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutWorkflowsInput = {
@@ -1917,6 +1983,7 @@ export type ProjectUpdateWithoutWorkflowsInput = {
   documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -1943,6 +2010,7 @@ export type ProjectUpdateWithoutWorkflowsInput = {
   productDecisions?: Prisma.ProductDecisionUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutWorkflowsInput = {
@@ -1963,6 +2031,7 @@ export type ProjectUncheckedUpdateWithoutWorkflowsInput = {
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -1989,6 +2058,7 @@ export type ProjectUncheckedUpdateWithoutWorkflowsInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutUsageLogsInput = {
@@ -2010,6 +2080,7 @@ export type ProjectCreateWithoutUsageLogsInput = {
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -2035,6 +2106,7 @@ export type ProjectCreateWithoutUsageLogsInput = {
   productDecisions?: Prisma.ProductDecisionCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutUsageLogsInput = {
@@ -2056,6 +2128,7 @@ export type ProjectUncheckedCreateWithoutUsageLogsInput = {
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -2081,6 +2154,7 @@ export type ProjectUncheckedCreateWithoutUsageLogsInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutUsageLogsInput = {
@@ -2118,6 +2192,7 @@ export type ProjectUpdateWithoutUsageLogsInput = {
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -2143,6 +2218,7 @@ export type ProjectUpdateWithoutUsageLogsInput = {
   productDecisions?: Prisma.ProductDecisionUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutUsageLogsInput = {
@@ -2164,6 +2240,7 @@ export type ProjectUncheckedUpdateWithoutUsageLogsInput = {
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -2189,6 +2266,7 @@ export type ProjectUncheckedUpdateWithoutUsageLogsInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutRepositoryInput = {
@@ -2209,6 +2287,7 @@ export type ProjectCreateWithoutRepositoryInput = {
   documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -2235,6 +2314,7 @@ export type ProjectCreateWithoutRepositoryInput = {
   productDecisions?: Prisma.ProductDecisionCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutRepositoryInput = {
@@ -2255,6 +2335,7 @@ export type ProjectUncheckedCreateWithoutRepositoryInput = {
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -2281,6 +2362,7 @@ export type ProjectUncheckedCreateWithoutRepositoryInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutRepositoryInput = {
@@ -2317,6 +2399,7 @@ export type ProjectUpdateWithoutRepositoryInput = {
   documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -2343,6 +2426,7 @@ export type ProjectUpdateWithoutRepositoryInput = {
   productDecisions?: Prisma.ProductDecisionUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutRepositoryInput = {
@@ -2363,6 +2447,7 @@ export type ProjectUncheckedUpdateWithoutRepositoryInput = {
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -2389,6 +2474,7 @@ export type ProjectUncheckedUpdateWithoutRepositoryInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutProductDocumentsInput = {
@@ -2410,6 +2496,7 @@ export type ProjectCreateWithoutProductDocumentsInput = {
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
   qualityReports?: Prisma.QualityReportCreateNestedManyWithoutProjectInput
@@ -2435,6 +2522,7 @@ export type ProjectCreateWithoutProductDocumentsInput = {
   productDecisions?: Prisma.ProductDecisionCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutProductDocumentsInput = {
@@ -2456,6 +2544,7 @@ export type ProjectUncheckedCreateWithoutProductDocumentsInput = {
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
   qualityReports?: Prisma.QualityReportUncheckedCreateNestedManyWithoutProjectInput
@@ -2481,6 +2570,7 @@ export type ProjectUncheckedCreateWithoutProductDocumentsInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutProductDocumentsInput = {
@@ -2518,6 +2608,7 @@ export type ProjectUpdateWithoutProductDocumentsInput = {
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
   qualityReports?: Prisma.QualityReportUpdateManyWithoutProjectNestedInput
@@ -2543,6 +2634,7 @@ export type ProjectUpdateWithoutProductDocumentsInput = {
   productDecisions?: Prisma.ProductDecisionUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutProductDocumentsInput = {
@@ -2564,6 +2656,7 @@ export type ProjectUncheckedUpdateWithoutProductDocumentsInput = {
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
   qualityReports?: Prisma.QualityReportUncheckedUpdateManyWithoutProjectNestedInput
@@ -2589,6 +2682,7 @@ export type ProjectUncheckedUpdateWithoutProductDocumentsInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutArchitectureDocumentsInput = {
@@ -2610,6 +2704,7 @@ export type ProjectCreateWithoutArchitectureDocumentsInput = {
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
   qualityReports?: Prisma.QualityReportCreateNestedManyWithoutProjectInput
@@ -2635,6 +2730,7 @@ export type ProjectCreateWithoutArchitectureDocumentsInput = {
   productDecisions?: Prisma.ProductDecisionCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutArchitectureDocumentsInput = {
@@ -2656,6 +2752,7 @@ export type ProjectUncheckedCreateWithoutArchitectureDocumentsInput = {
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
   qualityReports?: Prisma.QualityReportUncheckedCreateNestedManyWithoutProjectInput
@@ -2681,6 +2778,7 @@ export type ProjectUncheckedCreateWithoutArchitectureDocumentsInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutArchitectureDocumentsInput = {
@@ -2718,6 +2816,7 @@ export type ProjectUpdateWithoutArchitectureDocumentsInput = {
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
   qualityReports?: Prisma.QualityReportUpdateManyWithoutProjectNestedInput
@@ -2743,6 +2842,7 @@ export type ProjectUpdateWithoutArchitectureDocumentsInput = {
   productDecisions?: Prisma.ProductDecisionUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutArchitectureDocumentsInput = {
@@ -2764,6 +2864,7 @@ export type ProjectUncheckedUpdateWithoutArchitectureDocumentsInput = {
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
   qualityReports?: Prisma.QualityReportUncheckedUpdateManyWithoutProjectNestedInput
@@ -2789,6 +2890,7 @@ export type ProjectUncheckedUpdateWithoutArchitectureDocumentsInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutDevelopmentTasksInput = {
@@ -2810,6 +2912,7 @@ export type ProjectCreateWithoutDevelopmentTasksInput = {
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   qualityReports?: Prisma.QualityReportCreateNestedManyWithoutProjectInput
@@ -2835,6 +2938,7 @@ export type ProjectCreateWithoutDevelopmentTasksInput = {
   productDecisions?: Prisma.ProductDecisionCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutDevelopmentTasksInput = {
@@ -2856,6 +2960,7 @@ export type ProjectUncheckedCreateWithoutDevelopmentTasksInput = {
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   qualityReports?: Prisma.QualityReportUncheckedCreateNestedManyWithoutProjectInput
@@ -2881,6 +2986,7 @@ export type ProjectUncheckedCreateWithoutDevelopmentTasksInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutDevelopmentTasksInput = {
@@ -2918,6 +3024,7 @@ export type ProjectUpdateWithoutDevelopmentTasksInput = {
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   qualityReports?: Prisma.QualityReportUpdateManyWithoutProjectNestedInput
@@ -2943,6 +3050,7 @@ export type ProjectUpdateWithoutDevelopmentTasksInput = {
   productDecisions?: Prisma.ProductDecisionUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutDevelopmentTasksInput = {
@@ -2964,6 +3072,7 @@ export type ProjectUncheckedUpdateWithoutDevelopmentTasksInput = {
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   qualityReports?: Prisma.QualityReportUncheckedUpdateManyWithoutProjectNestedInput
@@ -2989,6 +3098,7 @@ export type ProjectUncheckedUpdateWithoutDevelopmentTasksInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutQualityReportsInput = {
@@ -3010,6 +3120,7 @@ export type ProjectCreateWithoutQualityReportsInput = {
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -3035,6 +3146,7 @@ export type ProjectCreateWithoutQualityReportsInput = {
   productDecisions?: Prisma.ProductDecisionCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutQualityReportsInput = {
@@ -3056,6 +3168,7 @@ export type ProjectUncheckedCreateWithoutQualityReportsInput = {
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -3081,6 +3194,7 @@ export type ProjectUncheckedCreateWithoutQualityReportsInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutQualityReportsInput = {
@@ -3118,6 +3232,7 @@ export type ProjectUpdateWithoutQualityReportsInput = {
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -3143,6 +3258,7 @@ export type ProjectUpdateWithoutQualityReportsInput = {
   productDecisions?: Prisma.ProductDecisionUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutQualityReportsInput = {
@@ -3164,6 +3280,7 @@ export type ProjectUncheckedUpdateWithoutQualityReportsInput = {
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -3189,6 +3306,7 @@ export type ProjectUncheckedUpdateWithoutQualityReportsInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutFoldersInput = {
@@ -3209,6 +3327,7 @@ export type ProjectCreateWithoutFoldersInput = {
   documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -3235,6 +3354,7 @@ export type ProjectCreateWithoutFoldersInput = {
   productDecisions?: Prisma.ProductDecisionCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutFoldersInput = {
@@ -3255,6 +3375,7 @@ export type ProjectUncheckedCreateWithoutFoldersInput = {
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -3281,6 +3402,7 @@ export type ProjectUncheckedCreateWithoutFoldersInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutFoldersInput = {
@@ -3317,6 +3439,7 @@ export type ProjectUpdateWithoutFoldersInput = {
   documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -3343,6 +3466,7 @@ export type ProjectUpdateWithoutFoldersInput = {
   productDecisions?: Prisma.ProductDecisionUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutFoldersInput = {
@@ -3363,6 +3487,7 @@ export type ProjectUncheckedUpdateWithoutFoldersInput = {
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -3389,6 +3514,7 @@ export type ProjectUncheckedUpdateWithoutFoldersInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutFavoriteProjectsInput = {
@@ -3410,6 +3536,7 @@ export type ProjectCreateWithoutFavoriteProjectsInput = {
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -3435,6 +3562,7 @@ export type ProjectCreateWithoutFavoriteProjectsInput = {
   productDecisions?: Prisma.ProductDecisionCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutFavoriteProjectsInput = {
@@ -3456,6 +3584,7 @@ export type ProjectUncheckedCreateWithoutFavoriteProjectsInput = {
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -3481,6 +3610,7 @@ export type ProjectUncheckedCreateWithoutFavoriteProjectsInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutFavoriteProjectsInput = {
@@ -3518,6 +3648,7 @@ export type ProjectUpdateWithoutFavoriteProjectsInput = {
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -3543,6 +3674,7 @@ export type ProjectUpdateWithoutFavoriteProjectsInput = {
   productDecisions?: Prisma.ProductDecisionUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutFavoriteProjectsInput = {
@@ -3564,6 +3696,7 @@ export type ProjectUncheckedUpdateWithoutFavoriteProjectsInput = {
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -3589,6 +3722,7 @@ export type ProjectUncheckedUpdateWithoutFavoriteProjectsInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutRecentProjectsInput = {
@@ -3610,6 +3744,7 @@ export type ProjectCreateWithoutRecentProjectsInput = {
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -3635,6 +3770,7 @@ export type ProjectCreateWithoutRecentProjectsInput = {
   productDecisions?: Prisma.ProductDecisionCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutRecentProjectsInput = {
@@ -3656,6 +3792,7 @@ export type ProjectUncheckedCreateWithoutRecentProjectsInput = {
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -3681,6 +3818,7 @@ export type ProjectUncheckedCreateWithoutRecentProjectsInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutRecentProjectsInput = {
@@ -3718,6 +3856,7 @@ export type ProjectUpdateWithoutRecentProjectsInput = {
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -3743,9 +3882,218 @@ export type ProjectUpdateWithoutRecentProjectsInput = {
   productDecisions?: Prisma.ProductDecisionUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutRecentProjectsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tasks?: Prisma.TaskUncheckedUpdateManyWithoutProjectNestedInput
+  documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
+  workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
+  repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
+  folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
+  productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
+  architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
+  developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
+  qualityReports?: Prisma.QualityReportUncheckedUpdateManyWithoutProjectNestedInput
+  favoriteProjects?: Prisma.FavoriteProjectUncheckedUpdateManyWithoutProjectNestedInput
+  teamProjects?: Prisma.TeamProjectUncheckedUpdateManyWithoutProjectNestedInput
+  usageLogs?: Prisma.AIUsageLogUncheckedUpdateManyWithoutProjectNestedInput
+  testCases?: Prisma.TestCaseUncheckedUpdateManyWithoutProjectNestedInput
+  bugReports?: Prisma.BugReportUncheckedUpdateManyWithoutProjectNestedInput
+  coverageReports?: Prisma.CoverageReportUncheckedUpdateManyWithoutProjectNestedInput
+  knowledgeItems?: Prisma.KnowledgeItemUncheckedUpdateManyWithoutProjectNestedInput
+  environments?: Prisma.EnvironmentUncheckedUpdateManyWithoutProjectNestedInput
+  deployments?: Prisma.DeploymentUncheckedUpdateManyWithoutProjectNestedInput
+  releases?: Prisma.ReleaseUncheckedUpdateManyWithoutProjectNestedInput
+  platformEvents?: Prisma.PlatformEventUncheckedUpdateManyWithoutProjectNestedInput
+  metrics?: Prisma.MetricUncheckedUpdateManyWithoutProjectNestedInput
+  projectHealth?: Prisma.ProjectHealthUncheckedUpdateOneWithoutProjectNestedInput
+  securityIssues?: Prisma.SecurityIssueUncheckedUpdateManyWithoutProjectNestedInput
+  securityScans?: Prisma.SecurityScanUncheckedUpdateManyWithoutProjectNestedInput
+  productStrategies?: Prisma.ProductStrategyUncheckedUpdateManyWithoutProjectNestedInput
+  requirements?: Prisma.RequirementUncheckedUpdateManyWithoutProjectNestedInput
+  roadmaps?: Prisma.RoadmapUncheckedUpdateManyWithoutProjectNestedInput
+  productDecisions?: Prisma.ProductDecisionUncheckedUpdateManyWithoutProjectNestedInput
+  designSystemConfig?: Prisma.DesignSystemConfigUncheckedUpdateOneWithoutProjectNestedInput
+  feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutProjectNestedInput
+}
+
+export type ProjectCreateWithoutGitIntegrationInput = {
+  id?: string
+  name: string
+  slug?: string | null
+  description?: string | null
+  icon?: string | null
+  color?: string | null
+  status?: $Enums.ProjectStatus
+  favorite?: boolean
+  lastOpenedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  owner: Prisma.UserCreateNestedOneWithoutProjectsInput
+  organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
+  tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
+  documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
+  workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
+  repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
+  folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
+  productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
+  architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
+  developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
+  qualityReports?: Prisma.QualityReportCreateNestedManyWithoutProjectInput
+  recentProjects?: Prisma.RecentProjectCreateNestedManyWithoutProjectInput
+  favoriteProjects?: Prisma.FavoriteProjectCreateNestedManyWithoutProjectInput
+  teamProjects?: Prisma.TeamProjectCreateNestedManyWithoutProjectInput
+  usageLogs?: Prisma.AIUsageLogCreateNestedManyWithoutProjectInput
+  testCases?: Prisma.TestCaseCreateNestedManyWithoutProjectInput
+  bugReports?: Prisma.BugReportCreateNestedManyWithoutProjectInput
+  coverageReports?: Prisma.CoverageReportCreateNestedManyWithoutProjectInput
+  knowledgeItems?: Prisma.KnowledgeItemCreateNestedManyWithoutProjectInput
+  environments?: Prisma.EnvironmentCreateNestedManyWithoutProjectInput
+  deployments?: Prisma.DeploymentCreateNestedManyWithoutProjectInput
+  releases?: Prisma.ReleaseCreateNestedManyWithoutProjectInput
+  platformEvents?: Prisma.PlatformEventCreateNestedManyWithoutProjectInput
+  metrics?: Prisma.MetricCreateNestedManyWithoutProjectInput
+  projectHealth?: Prisma.ProjectHealthCreateNestedOneWithoutProjectInput
+  securityIssues?: Prisma.SecurityIssueCreateNestedManyWithoutProjectInput
+  securityScans?: Prisma.SecurityScanCreateNestedManyWithoutProjectInput
+  productStrategies?: Prisma.ProductStrategyCreateNestedManyWithoutProjectInput
+  requirements?: Prisma.RequirementCreateNestedManyWithoutProjectInput
+  roadmaps?: Prisma.RoadmapCreateNestedManyWithoutProjectInput
+  productDecisions?: Prisma.ProductDecisionCreateNestedManyWithoutProjectInput
+  designSystemConfig?: Prisma.DesignSystemConfigCreateNestedOneWithoutProjectInput
+  feedback?: Prisma.FeedbackCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestCreateNestedManyWithoutProjectInput
+}
+
+export type ProjectUncheckedCreateWithoutGitIntegrationInput = {
+  id?: string
+  name: string
+  slug?: string | null
+  description?: string | null
+  icon?: string | null
+  color?: string | null
+  status?: $Enums.ProjectStatus
+  ownerId: string
+  organizationId?: string | null
+  favorite?: boolean
+  lastOpenedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutProjectInput
+  documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
+  workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
+  repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
+  folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
+  productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
+  architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
+  developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
+  qualityReports?: Prisma.QualityReportUncheckedCreateNestedManyWithoutProjectInput
+  recentProjects?: Prisma.RecentProjectUncheckedCreateNestedManyWithoutProjectInput
+  favoriteProjects?: Prisma.FavoriteProjectUncheckedCreateNestedManyWithoutProjectInput
+  teamProjects?: Prisma.TeamProjectUncheckedCreateNestedManyWithoutProjectInput
+  usageLogs?: Prisma.AIUsageLogUncheckedCreateNestedManyWithoutProjectInput
+  testCases?: Prisma.TestCaseUncheckedCreateNestedManyWithoutProjectInput
+  bugReports?: Prisma.BugReportUncheckedCreateNestedManyWithoutProjectInput
+  coverageReports?: Prisma.CoverageReportUncheckedCreateNestedManyWithoutProjectInput
+  knowledgeItems?: Prisma.KnowledgeItemUncheckedCreateNestedManyWithoutProjectInput
+  environments?: Prisma.EnvironmentUncheckedCreateNestedManyWithoutProjectInput
+  deployments?: Prisma.DeploymentUncheckedCreateNestedManyWithoutProjectInput
+  releases?: Prisma.ReleaseUncheckedCreateNestedManyWithoutProjectInput
+  platformEvents?: Prisma.PlatformEventUncheckedCreateNestedManyWithoutProjectInput
+  metrics?: Prisma.MetricUncheckedCreateNestedManyWithoutProjectInput
+  projectHealth?: Prisma.ProjectHealthUncheckedCreateNestedOneWithoutProjectInput
+  securityIssues?: Prisma.SecurityIssueUncheckedCreateNestedManyWithoutProjectInput
+  securityScans?: Prisma.SecurityScanUncheckedCreateNestedManyWithoutProjectInput
+  productStrategies?: Prisma.ProductStrategyUncheckedCreateNestedManyWithoutProjectInput
+  requirements?: Prisma.RequirementUncheckedCreateNestedManyWithoutProjectInput
+  roadmaps?: Prisma.RoadmapUncheckedCreateNestedManyWithoutProjectInput
+  productDecisions?: Prisma.ProductDecisionUncheckedCreateNestedManyWithoutProjectInput
+  designSystemConfig?: Prisma.DesignSystemConfigUncheckedCreateNestedOneWithoutProjectInput
+  feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutProjectInput
+}
+
+export type ProjectCreateOrConnectWithoutGitIntegrationInput = {
+  where: Prisma.ProjectWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProjectCreateWithoutGitIntegrationInput, Prisma.ProjectUncheckedCreateWithoutGitIntegrationInput>
+}
+
+export type ProjectUpsertWithoutGitIntegrationInput = {
+  update: Prisma.XOR<Prisma.ProjectUpdateWithoutGitIntegrationInput, Prisma.ProjectUncheckedUpdateWithoutGitIntegrationInput>
+  create: Prisma.XOR<Prisma.ProjectCreateWithoutGitIntegrationInput, Prisma.ProjectUncheckedCreateWithoutGitIntegrationInput>
+  where?: Prisma.ProjectWhereInput
+}
+
+export type ProjectUpdateToOneWithWhereWithoutGitIntegrationInput = {
+  where?: Prisma.ProjectWhereInput
+  data: Prisma.XOR<Prisma.ProjectUpdateWithoutGitIntegrationInput, Prisma.ProjectUncheckedUpdateWithoutGitIntegrationInput>
+}
+
+export type ProjectUpdateWithoutGitIntegrationInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+  favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
+  organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
+  tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
+  documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
+  workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
+  repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
+  folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
+  productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
+  architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
+  developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
+  qualityReports?: Prisma.QualityReportUpdateManyWithoutProjectNestedInput
+  recentProjects?: Prisma.RecentProjectUpdateManyWithoutProjectNestedInput
+  favoriteProjects?: Prisma.FavoriteProjectUpdateManyWithoutProjectNestedInput
+  teamProjects?: Prisma.TeamProjectUpdateManyWithoutProjectNestedInput
+  usageLogs?: Prisma.AIUsageLogUpdateManyWithoutProjectNestedInput
+  testCases?: Prisma.TestCaseUpdateManyWithoutProjectNestedInput
+  bugReports?: Prisma.BugReportUpdateManyWithoutProjectNestedInput
+  coverageReports?: Prisma.CoverageReportUpdateManyWithoutProjectNestedInput
+  knowledgeItems?: Prisma.KnowledgeItemUpdateManyWithoutProjectNestedInput
+  environments?: Prisma.EnvironmentUpdateManyWithoutProjectNestedInput
+  deployments?: Prisma.DeploymentUpdateManyWithoutProjectNestedInput
+  releases?: Prisma.ReleaseUpdateManyWithoutProjectNestedInput
+  platformEvents?: Prisma.PlatformEventUpdateManyWithoutProjectNestedInput
+  metrics?: Prisma.MetricUpdateManyWithoutProjectNestedInput
+  projectHealth?: Prisma.ProjectHealthUpdateOneWithoutProjectNestedInput
+  securityIssues?: Prisma.SecurityIssueUpdateManyWithoutProjectNestedInput
+  securityScans?: Prisma.SecurityScanUpdateManyWithoutProjectNestedInput
+  productStrategies?: Prisma.ProductStrategyUpdateManyWithoutProjectNestedInput
+  requirements?: Prisma.RequirementUpdateManyWithoutProjectNestedInput
+  roadmaps?: Prisma.RoadmapUpdateManyWithoutProjectNestedInput
+  productDecisions?: Prisma.ProductDecisionUpdateManyWithoutProjectNestedInput
+  designSystemConfig?: Prisma.DesignSystemConfigUpdateOneWithoutProjectNestedInput
+  feedback?: Prisma.FeedbackUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUpdateManyWithoutProjectNestedInput
+}
+
+export type ProjectUncheckedUpdateWithoutGitIntegrationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3768,6 +4116,216 @@ export type ProjectUncheckedUpdateWithoutRecentProjectsInput = {
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
   qualityReports?: Prisma.QualityReportUncheckedUpdateManyWithoutProjectNestedInput
+  recentProjects?: Prisma.RecentProjectUncheckedUpdateManyWithoutProjectNestedInput
+  favoriteProjects?: Prisma.FavoriteProjectUncheckedUpdateManyWithoutProjectNestedInput
+  teamProjects?: Prisma.TeamProjectUncheckedUpdateManyWithoutProjectNestedInput
+  usageLogs?: Prisma.AIUsageLogUncheckedUpdateManyWithoutProjectNestedInput
+  testCases?: Prisma.TestCaseUncheckedUpdateManyWithoutProjectNestedInput
+  bugReports?: Prisma.BugReportUncheckedUpdateManyWithoutProjectNestedInput
+  coverageReports?: Prisma.CoverageReportUncheckedUpdateManyWithoutProjectNestedInput
+  knowledgeItems?: Prisma.KnowledgeItemUncheckedUpdateManyWithoutProjectNestedInput
+  environments?: Prisma.EnvironmentUncheckedUpdateManyWithoutProjectNestedInput
+  deployments?: Prisma.DeploymentUncheckedUpdateManyWithoutProjectNestedInput
+  releases?: Prisma.ReleaseUncheckedUpdateManyWithoutProjectNestedInput
+  platformEvents?: Prisma.PlatformEventUncheckedUpdateManyWithoutProjectNestedInput
+  metrics?: Prisma.MetricUncheckedUpdateManyWithoutProjectNestedInput
+  projectHealth?: Prisma.ProjectHealthUncheckedUpdateOneWithoutProjectNestedInput
+  securityIssues?: Prisma.SecurityIssueUncheckedUpdateManyWithoutProjectNestedInput
+  securityScans?: Prisma.SecurityScanUncheckedUpdateManyWithoutProjectNestedInput
+  productStrategies?: Prisma.ProductStrategyUncheckedUpdateManyWithoutProjectNestedInput
+  requirements?: Prisma.RequirementUncheckedUpdateManyWithoutProjectNestedInput
+  roadmaps?: Prisma.RoadmapUncheckedUpdateManyWithoutProjectNestedInput
+  productDecisions?: Prisma.ProductDecisionUncheckedUpdateManyWithoutProjectNestedInput
+  designSystemConfig?: Prisma.DesignSystemConfigUncheckedUpdateOneWithoutProjectNestedInput
+  feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutProjectNestedInput
+}
+
+export type ProjectCreateWithoutPullRequestsInput = {
+  id?: string
+  name: string
+  slug?: string | null
+  description?: string | null
+  icon?: string | null
+  color?: string | null
+  status?: $Enums.ProjectStatus
+  favorite?: boolean
+  lastOpenedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  owner: Prisma.UserCreateNestedOneWithoutProjectsInput
+  organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
+  tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
+  documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
+  workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
+  repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
+  folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
+  productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
+  architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
+  developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
+  qualityReports?: Prisma.QualityReportCreateNestedManyWithoutProjectInput
+  recentProjects?: Prisma.RecentProjectCreateNestedManyWithoutProjectInput
+  favoriteProjects?: Prisma.FavoriteProjectCreateNestedManyWithoutProjectInput
+  teamProjects?: Prisma.TeamProjectCreateNestedManyWithoutProjectInput
+  usageLogs?: Prisma.AIUsageLogCreateNestedManyWithoutProjectInput
+  testCases?: Prisma.TestCaseCreateNestedManyWithoutProjectInput
+  bugReports?: Prisma.BugReportCreateNestedManyWithoutProjectInput
+  coverageReports?: Prisma.CoverageReportCreateNestedManyWithoutProjectInput
+  knowledgeItems?: Prisma.KnowledgeItemCreateNestedManyWithoutProjectInput
+  environments?: Prisma.EnvironmentCreateNestedManyWithoutProjectInput
+  deployments?: Prisma.DeploymentCreateNestedManyWithoutProjectInput
+  releases?: Prisma.ReleaseCreateNestedManyWithoutProjectInput
+  platformEvents?: Prisma.PlatformEventCreateNestedManyWithoutProjectInput
+  metrics?: Prisma.MetricCreateNestedManyWithoutProjectInput
+  projectHealth?: Prisma.ProjectHealthCreateNestedOneWithoutProjectInput
+  securityIssues?: Prisma.SecurityIssueCreateNestedManyWithoutProjectInput
+  securityScans?: Prisma.SecurityScanCreateNestedManyWithoutProjectInput
+  productStrategies?: Prisma.ProductStrategyCreateNestedManyWithoutProjectInput
+  requirements?: Prisma.RequirementCreateNestedManyWithoutProjectInput
+  roadmaps?: Prisma.RoadmapCreateNestedManyWithoutProjectInput
+  productDecisions?: Prisma.ProductDecisionCreateNestedManyWithoutProjectInput
+  designSystemConfig?: Prisma.DesignSystemConfigCreateNestedOneWithoutProjectInput
+  feedback?: Prisma.FeedbackCreateNestedManyWithoutProjectInput
+}
+
+export type ProjectUncheckedCreateWithoutPullRequestsInput = {
+  id?: string
+  name: string
+  slug?: string | null
+  description?: string | null
+  icon?: string | null
+  color?: string | null
+  status?: $Enums.ProjectStatus
+  ownerId: string
+  organizationId?: string | null
+  favorite?: boolean
+  lastOpenedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutProjectInput
+  documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
+  workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
+  repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
+  folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
+  productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
+  architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
+  developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
+  qualityReports?: Prisma.QualityReportUncheckedCreateNestedManyWithoutProjectInput
+  recentProjects?: Prisma.RecentProjectUncheckedCreateNestedManyWithoutProjectInput
+  favoriteProjects?: Prisma.FavoriteProjectUncheckedCreateNestedManyWithoutProjectInput
+  teamProjects?: Prisma.TeamProjectUncheckedCreateNestedManyWithoutProjectInput
+  usageLogs?: Prisma.AIUsageLogUncheckedCreateNestedManyWithoutProjectInput
+  testCases?: Prisma.TestCaseUncheckedCreateNestedManyWithoutProjectInput
+  bugReports?: Prisma.BugReportUncheckedCreateNestedManyWithoutProjectInput
+  coverageReports?: Prisma.CoverageReportUncheckedCreateNestedManyWithoutProjectInput
+  knowledgeItems?: Prisma.KnowledgeItemUncheckedCreateNestedManyWithoutProjectInput
+  environments?: Prisma.EnvironmentUncheckedCreateNestedManyWithoutProjectInput
+  deployments?: Prisma.DeploymentUncheckedCreateNestedManyWithoutProjectInput
+  releases?: Prisma.ReleaseUncheckedCreateNestedManyWithoutProjectInput
+  platformEvents?: Prisma.PlatformEventUncheckedCreateNestedManyWithoutProjectInput
+  metrics?: Prisma.MetricUncheckedCreateNestedManyWithoutProjectInput
+  projectHealth?: Prisma.ProjectHealthUncheckedCreateNestedOneWithoutProjectInput
+  securityIssues?: Prisma.SecurityIssueUncheckedCreateNestedManyWithoutProjectInput
+  securityScans?: Prisma.SecurityScanUncheckedCreateNestedManyWithoutProjectInput
+  productStrategies?: Prisma.ProductStrategyUncheckedCreateNestedManyWithoutProjectInput
+  requirements?: Prisma.RequirementUncheckedCreateNestedManyWithoutProjectInput
+  roadmaps?: Prisma.RoadmapUncheckedCreateNestedManyWithoutProjectInput
+  productDecisions?: Prisma.ProductDecisionUncheckedCreateNestedManyWithoutProjectInput
+  designSystemConfig?: Prisma.DesignSystemConfigUncheckedCreateNestedOneWithoutProjectInput
+  feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProjectInput
+}
+
+export type ProjectCreateOrConnectWithoutPullRequestsInput = {
+  where: Prisma.ProjectWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProjectCreateWithoutPullRequestsInput, Prisma.ProjectUncheckedCreateWithoutPullRequestsInput>
+}
+
+export type ProjectUpsertWithoutPullRequestsInput = {
+  update: Prisma.XOR<Prisma.ProjectUpdateWithoutPullRequestsInput, Prisma.ProjectUncheckedUpdateWithoutPullRequestsInput>
+  create: Prisma.XOR<Prisma.ProjectCreateWithoutPullRequestsInput, Prisma.ProjectUncheckedCreateWithoutPullRequestsInput>
+  where?: Prisma.ProjectWhereInput
+}
+
+export type ProjectUpdateToOneWithWhereWithoutPullRequestsInput = {
+  where?: Prisma.ProjectWhereInput
+  data: Prisma.XOR<Prisma.ProjectUpdateWithoutPullRequestsInput, Prisma.ProjectUncheckedUpdateWithoutPullRequestsInput>
+}
+
+export type ProjectUpdateWithoutPullRequestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+  favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
+  organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
+  tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
+  documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
+  workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
+  repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
+  folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
+  productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
+  architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
+  developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
+  qualityReports?: Prisma.QualityReportUpdateManyWithoutProjectNestedInput
+  recentProjects?: Prisma.RecentProjectUpdateManyWithoutProjectNestedInput
+  favoriteProjects?: Prisma.FavoriteProjectUpdateManyWithoutProjectNestedInput
+  teamProjects?: Prisma.TeamProjectUpdateManyWithoutProjectNestedInput
+  usageLogs?: Prisma.AIUsageLogUpdateManyWithoutProjectNestedInput
+  testCases?: Prisma.TestCaseUpdateManyWithoutProjectNestedInput
+  bugReports?: Prisma.BugReportUpdateManyWithoutProjectNestedInput
+  coverageReports?: Prisma.CoverageReportUpdateManyWithoutProjectNestedInput
+  knowledgeItems?: Prisma.KnowledgeItemUpdateManyWithoutProjectNestedInput
+  environments?: Prisma.EnvironmentUpdateManyWithoutProjectNestedInput
+  deployments?: Prisma.DeploymentUpdateManyWithoutProjectNestedInput
+  releases?: Prisma.ReleaseUpdateManyWithoutProjectNestedInput
+  platformEvents?: Prisma.PlatformEventUpdateManyWithoutProjectNestedInput
+  metrics?: Prisma.MetricUpdateManyWithoutProjectNestedInput
+  projectHealth?: Prisma.ProjectHealthUpdateOneWithoutProjectNestedInput
+  securityIssues?: Prisma.SecurityIssueUpdateManyWithoutProjectNestedInput
+  securityScans?: Prisma.SecurityScanUpdateManyWithoutProjectNestedInput
+  productStrategies?: Prisma.ProductStrategyUpdateManyWithoutProjectNestedInput
+  requirements?: Prisma.RequirementUpdateManyWithoutProjectNestedInput
+  roadmaps?: Prisma.RoadmapUpdateManyWithoutProjectNestedInput
+  productDecisions?: Prisma.ProductDecisionUpdateManyWithoutProjectNestedInput
+  designSystemConfig?: Prisma.DesignSystemConfigUpdateOneWithoutProjectNestedInput
+  feedback?: Prisma.FeedbackUpdateManyWithoutProjectNestedInput
+}
+
+export type ProjectUncheckedUpdateWithoutPullRequestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tasks?: Prisma.TaskUncheckedUpdateManyWithoutProjectNestedInput
+  documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
+  workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
+  repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
+  folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
+  productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
+  architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
+  developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
+  qualityReports?: Prisma.QualityReportUncheckedUpdateManyWithoutProjectNestedInput
+  recentProjects?: Prisma.RecentProjectUncheckedUpdateManyWithoutProjectNestedInput
   favoriteProjects?: Prisma.FavoriteProjectUncheckedUpdateManyWithoutProjectNestedInput
   teamProjects?: Prisma.TeamProjectUncheckedUpdateManyWithoutProjectNestedInput
   usageLogs?: Prisma.AIUsageLogUncheckedUpdateManyWithoutProjectNestedInput
@@ -3810,6 +4368,7 @@ export type ProjectCreateWithoutTestCasesInput = {
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -3835,6 +4394,7 @@ export type ProjectCreateWithoutTestCasesInput = {
   productDecisions?: Prisma.ProductDecisionCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutTestCasesInput = {
@@ -3856,6 +4416,7 @@ export type ProjectUncheckedCreateWithoutTestCasesInput = {
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -3881,6 +4442,7 @@ export type ProjectUncheckedCreateWithoutTestCasesInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutTestCasesInput = {
@@ -3918,6 +4480,7 @@ export type ProjectUpdateWithoutTestCasesInput = {
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -3943,6 +4506,7 @@ export type ProjectUpdateWithoutTestCasesInput = {
   productDecisions?: Prisma.ProductDecisionUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutTestCasesInput = {
@@ -3964,6 +4528,7 @@ export type ProjectUncheckedUpdateWithoutTestCasesInput = {
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -3989,6 +4554,7 @@ export type ProjectUncheckedUpdateWithoutTestCasesInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutBugReportsInput = {
@@ -4010,6 +4576,7 @@ export type ProjectCreateWithoutBugReportsInput = {
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -4035,6 +4602,7 @@ export type ProjectCreateWithoutBugReportsInput = {
   productDecisions?: Prisma.ProductDecisionCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutBugReportsInput = {
@@ -4056,6 +4624,7 @@ export type ProjectUncheckedCreateWithoutBugReportsInput = {
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -4081,6 +4650,7 @@ export type ProjectUncheckedCreateWithoutBugReportsInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutBugReportsInput = {
@@ -4118,6 +4688,7 @@ export type ProjectUpdateWithoutBugReportsInput = {
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -4143,6 +4714,7 @@ export type ProjectUpdateWithoutBugReportsInput = {
   productDecisions?: Prisma.ProductDecisionUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutBugReportsInput = {
@@ -4164,6 +4736,7 @@ export type ProjectUncheckedUpdateWithoutBugReportsInput = {
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -4189,6 +4762,7 @@ export type ProjectUncheckedUpdateWithoutBugReportsInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutCoverageReportsInput = {
@@ -4210,6 +4784,7 @@ export type ProjectCreateWithoutCoverageReportsInput = {
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -4235,6 +4810,7 @@ export type ProjectCreateWithoutCoverageReportsInput = {
   productDecisions?: Prisma.ProductDecisionCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutCoverageReportsInput = {
@@ -4256,6 +4832,7 @@ export type ProjectUncheckedCreateWithoutCoverageReportsInput = {
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -4281,6 +4858,7 @@ export type ProjectUncheckedCreateWithoutCoverageReportsInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutCoverageReportsInput = {
@@ -4318,6 +4896,7 @@ export type ProjectUpdateWithoutCoverageReportsInput = {
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -4343,6 +4922,7 @@ export type ProjectUpdateWithoutCoverageReportsInput = {
   productDecisions?: Prisma.ProductDecisionUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutCoverageReportsInput = {
@@ -4364,6 +4944,7 @@ export type ProjectUncheckedUpdateWithoutCoverageReportsInput = {
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -4389,6 +4970,7 @@ export type ProjectUncheckedUpdateWithoutCoverageReportsInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutKnowledgeItemsInput = {
@@ -4410,6 +4992,7 @@ export type ProjectCreateWithoutKnowledgeItemsInput = {
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -4435,6 +5018,7 @@ export type ProjectCreateWithoutKnowledgeItemsInput = {
   productDecisions?: Prisma.ProductDecisionCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutKnowledgeItemsInput = {
@@ -4456,6 +5040,7 @@ export type ProjectUncheckedCreateWithoutKnowledgeItemsInput = {
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -4481,6 +5066,7 @@ export type ProjectUncheckedCreateWithoutKnowledgeItemsInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutKnowledgeItemsInput = {
@@ -4518,6 +5104,7 @@ export type ProjectUpdateWithoutKnowledgeItemsInput = {
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -4543,6 +5130,7 @@ export type ProjectUpdateWithoutKnowledgeItemsInput = {
   productDecisions?: Prisma.ProductDecisionUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutKnowledgeItemsInput = {
@@ -4564,6 +5152,7 @@ export type ProjectUncheckedUpdateWithoutKnowledgeItemsInput = {
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -4589,6 +5178,7 @@ export type ProjectUncheckedUpdateWithoutKnowledgeItemsInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutEnvironmentsInput = {
@@ -4610,6 +5200,7 @@ export type ProjectCreateWithoutEnvironmentsInput = {
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -4635,6 +5226,7 @@ export type ProjectCreateWithoutEnvironmentsInput = {
   productDecisions?: Prisma.ProductDecisionCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutEnvironmentsInput = {
@@ -4656,6 +5248,7 @@ export type ProjectUncheckedCreateWithoutEnvironmentsInput = {
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -4681,6 +5274,7 @@ export type ProjectUncheckedCreateWithoutEnvironmentsInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutEnvironmentsInput = {
@@ -4718,6 +5312,7 @@ export type ProjectUpdateWithoutEnvironmentsInput = {
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -4743,6 +5338,7 @@ export type ProjectUpdateWithoutEnvironmentsInput = {
   productDecisions?: Prisma.ProductDecisionUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutEnvironmentsInput = {
@@ -4764,6 +5360,7 @@ export type ProjectUncheckedUpdateWithoutEnvironmentsInput = {
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -4789,6 +5386,7 @@ export type ProjectUncheckedUpdateWithoutEnvironmentsInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutDeploymentsInput = {
@@ -4810,6 +5408,7 @@ export type ProjectCreateWithoutDeploymentsInput = {
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -4835,6 +5434,7 @@ export type ProjectCreateWithoutDeploymentsInput = {
   productDecisions?: Prisma.ProductDecisionCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutDeploymentsInput = {
@@ -4856,6 +5456,7 @@ export type ProjectUncheckedCreateWithoutDeploymentsInput = {
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -4881,6 +5482,7 @@ export type ProjectUncheckedCreateWithoutDeploymentsInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutDeploymentsInput = {
@@ -4918,6 +5520,7 @@ export type ProjectUpdateWithoutDeploymentsInput = {
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -4943,6 +5546,7 @@ export type ProjectUpdateWithoutDeploymentsInput = {
   productDecisions?: Prisma.ProductDecisionUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutDeploymentsInput = {
@@ -4964,6 +5568,7 @@ export type ProjectUncheckedUpdateWithoutDeploymentsInput = {
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -4989,6 +5594,7 @@ export type ProjectUncheckedUpdateWithoutDeploymentsInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutReleasesInput = {
@@ -5010,6 +5616,7 @@ export type ProjectCreateWithoutReleasesInput = {
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -5035,6 +5642,7 @@ export type ProjectCreateWithoutReleasesInput = {
   productDecisions?: Prisma.ProductDecisionCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutReleasesInput = {
@@ -5056,6 +5664,7 @@ export type ProjectUncheckedCreateWithoutReleasesInput = {
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -5081,6 +5690,7 @@ export type ProjectUncheckedCreateWithoutReleasesInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutReleasesInput = {
@@ -5118,6 +5728,7 @@ export type ProjectUpdateWithoutReleasesInput = {
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -5143,6 +5754,7 @@ export type ProjectUpdateWithoutReleasesInput = {
   productDecisions?: Prisma.ProductDecisionUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutReleasesInput = {
@@ -5164,6 +5776,7 @@ export type ProjectUncheckedUpdateWithoutReleasesInput = {
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -5189,6 +5802,7 @@ export type ProjectUncheckedUpdateWithoutReleasesInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutPlatformEventsInput = {
@@ -5210,6 +5824,7 @@ export type ProjectCreateWithoutPlatformEventsInput = {
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -5235,6 +5850,7 @@ export type ProjectCreateWithoutPlatformEventsInput = {
   productDecisions?: Prisma.ProductDecisionCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutPlatformEventsInput = {
@@ -5256,6 +5872,7 @@ export type ProjectUncheckedCreateWithoutPlatformEventsInput = {
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -5281,6 +5898,7 @@ export type ProjectUncheckedCreateWithoutPlatformEventsInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutPlatformEventsInput = {
@@ -5318,6 +5936,7 @@ export type ProjectUpdateWithoutPlatformEventsInput = {
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -5343,6 +5962,7 @@ export type ProjectUpdateWithoutPlatformEventsInput = {
   productDecisions?: Prisma.ProductDecisionUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutPlatformEventsInput = {
@@ -5364,6 +5984,7 @@ export type ProjectUncheckedUpdateWithoutPlatformEventsInput = {
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -5389,6 +6010,7 @@ export type ProjectUncheckedUpdateWithoutPlatformEventsInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutMetricsInput = {
@@ -5410,6 +6032,7 @@ export type ProjectCreateWithoutMetricsInput = {
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -5435,6 +6058,7 @@ export type ProjectCreateWithoutMetricsInput = {
   productDecisions?: Prisma.ProductDecisionCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutMetricsInput = {
@@ -5456,6 +6080,7 @@ export type ProjectUncheckedCreateWithoutMetricsInput = {
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -5481,6 +6106,7 @@ export type ProjectUncheckedCreateWithoutMetricsInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutMetricsInput = {
@@ -5518,6 +6144,7 @@ export type ProjectUpdateWithoutMetricsInput = {
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -5543,6 +6170,7 @@ export type ProjectUpdateWithoutMetricsInput = {
   productDecisions?: Prisma.ProductDecisionUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutMetricsInput = {
@@ -5564,6 +6192,7 @@ export type ProjectUncheckedUpdateWithoutMetricsInput = {
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -5589,6 +6218,7 @@ export type ProjectUncheckedUpdateWithoutMetricsInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutProjectHealthInput = {
@@ -5610,6 +6240,7 @@ export type ProjectCreateWithoutProjectHealthInput = {
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -5635,6 +6266,7 @@ export type ProjectCreateWithoutProjectHealthInput = {
   productDecisions?: Prisma.ProductDecisionCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutProjectHealthInput = {
@@ -5656,6 +6288,7 @@ export type ProjectUncheckedCreateWithoutProjectHealthInput = {
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -5681,6 +6314,7 @@ export type ProjectUncheckedCreateWithoutProjectHealthInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutProjectHealthInput = {
@@ -5718,6 +6352,7 @@ export type ProjectUpdateWithoutProjectHealthInput = {
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -5743,6 +6378,7 @@ export type ProjectUpdateWithoutProjectHealthInput = {
   productDecisions?: Prisma.ProductDecisionUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutProjectHealthInput = {
@@ -5764,6 +6400,7 @@ export type ProjectUncheckedUpdateWithoutProjectHealthInput = {
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -5789,6 +6426,7 @@ export type ProjectUncheckedUpdateWithoutProjectHealthInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutOrganizationInput = {
@@ -5809,6 +6447,7 @@ export type ProjectCreateWithoutOrganizationInput = {
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -5835,6 +6474,7 @@ export type ProjectCreateWithoutOrganizationInput = {
   productDecisions?: Prisma.ProductDecisionCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutOrganizationInput = {
@@ -5855,6 +6495,7 @@ export type ProjectUncheckedCreateWithoutOrganizationInput = {
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -5881,6 +6522,7 @@ export type ProjectUncheckedCreateWithoutOrganizationInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutOrganizationInput = {
@@ -5928,6 +6570,7 @@ export type ProjectCreateWithoutTeamProjectsInput = {
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -5953,6 +6596,7 @@ export type ProjectCreateWithoutTeamProjectsInput = {
   productDecisions?: Prisma.ProductDecisionCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutTeamProjectsInput = {
@@ -5974,6 +6618,7 @@ export type ProjectUncheckedCreateWithoutTeamProjectsInput = {
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -5999,6 +6644,7 @@ export type ProjectUncheckedCreateWithoutTeamProjectsInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutTeamProjectsInput = {
@@ -6036,6 +6682,7 @@ export type ProjectUpdateWithoutTeamProjectsInput = {
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -6061,6 +6708,7 @@ export type ProjectUpdateWithoutTeamProjectsInput = {
   productDecisions?: Prisma.ProductDecisionUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutTeamProjectsInput = {
@@ -6082,6 +6730,7 @@ export type ProjectUncheckedUpdateWithoutTeamProjectsInput = {
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -6107,6 +6756,7 @@ export type ProjectUncheckedUpdateWithoutTeamProjectsInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutSecurityIssuesInput = {
@@ -6128,6 +6778,7 @@ export type ProjectCreateWithoutSecurityIssuesInput = {
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -6153,6 +6804,7 @@ export type ProjectCreateWithoutSecurityIssuesInput = {
   productDecisions?: Prisma.ProductDecisionCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutSecurityIssuesInput = {
@@ -6174,6 +6826,7 @@ export type ProjectUncheckedCreateWithoutSecurityIssuesInput = {
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -6199,6 +6852,7 @@ export type ProjectUncheckedCreateWithoutSecurityIssuesInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutSecurityIssuesInput = {
@@ -6236,6 +6890,7 @@ export type ProjectUpdateWithoutSecurityIssuesInput = {
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -6261,6 +6916,7 @@ export type ProjectUpdateWithoutSecurityIssuesInput = {
   productDecisions?: Prisma.ProductDecisionUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutSecurityIssuesInput = {
@@ -6282,6 +6938,7 @@ export type ProjectUncheckedUpdateWithoutSecurityIssuesInput = {
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -6307,6 +6964,7 @@ export type ProjectUncheckedUpdateWithoutSecurityIssuesInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutSecurityScansInput = {
@@ -6328,6 +6986,7 @@ export type ProjectCreateWithoutSecurityScansInput = {
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -6353,6 +7012,7 @@ export type ProjectCreateWithoutSecurityScansInput = {
   productDecisions?: Prisma.ProductDecisionCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutSecurityScansInput = {
@@ -6374,6 +7034,7 @@ export type ProjectUncheckedCreateWithoutSecurityScansInput = {
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -6399,6 +7060,7 @@ export type ProjectUncheckedCreateWithoutSecurityScansInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutSecurityScansInput = {
@@ -6436,6 +7098,7 @@ export type ProjectUpdateWithoutSecurityScansInput = {
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -6461,6 +7124,7 @@ export type ProjectUpdateWithoutSecurityScansInput = {
   productDecisions?: Prisma.ProductDecisionUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutSecurityScansInput = {
@@ -6482,6 +7146,7 @@ export type ProjectUncheckedUpdateWithoutSecurityScansInput = {
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -6507,6 +7172,7 @@ export type ProjectUncheckedUpdateWithoutSecurityScansInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutProductStrategiesInput = {
@@ -6528,6 +7194,7 @@ export type ProjectCreateWithoutProductStrategiesInput = {
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -6553,6 +7220,7 @@ export type ProjectCreateWithoutProductStrategiesInput = {
   productDecisions?: Prisma.ProductDecisionCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutProductStrategiesInput = {
@@ -6574,6 +7242,7 @@ export type ProjectUncheckedCreateWithoutProductStrategiesInput = {
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -6599,6 +7268,7 @@ export type ProjectUncheckedCreateWithoutProductStrategiesInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutProductStrategiesInput = {
@@ -6636,6 +7306,7 @@ export type ProjectUpdateWithoutProductStrategiesInput = {
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -6661,6 +7332,7 @@ export type ProjectUpdateWithoutProductStrategiesInput = {
   productDecisions?: Prisma.ProductDecisionUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutProductStrategiesInput = {
@@ -6682,6 +7354,7 @@ export type ProjectUncheckedUpdateWithoutProductStrategiesInput = {
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -6707,6 +7380,7 @@ export type ProjectUncheckedUpdateWithoutProductStrategiesInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutRequirementsInput = {
@@ -6728,6 +7402,7 @@ export type ProjectCreateWithoutRequirementsInput = {
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -6753,6 +7428,7 @@ export type ProjectCreateWithoutRequirementsInput = {
   productDecisions?: Prisma.ProductDecisionCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutRequirementsInput = {
@@ -6774,6 +7450,7 @@ export type ProjectUncheckedCreateWithoutRequirementsInput = {
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -6799,6 +7476,7 @@ export type ProjectUncheckedCreateWithoutRequirementsInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutRequirementsInput = {
@@ -6836,6 +7514,7 @@ export type ProjectUpdateWithoutRequirementsInput = {
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -6861,6 +7540,7 @@ export type ProjectUpdateWithoutRequirementsInput = {
   productDecisions?: Prisma.ProductDecisionUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutRequirementsInput = {
@@ -6882,6 +7562,7 @@ export type ProjectUncheckedUpdateWithoutRequirementsInput = {
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -6907,6 +7588,7 @@ export type ProjectUncheckedUpdateWithoutRequirementsInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutRoadmapsInput = {
@@ -6928,6 +7610,7 @@ export type ProjectCreateWithoutRoadmapsInput = {
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -6953,6 +7636,7 @@ export type ProjectCreateWithoutRoadmapsInput = {
   productDecisions?: Prisma.ProductDecisionCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutRoadmapsInput = {
@@ -6974,6 +7658,7 @@ export type ProjectUncheckedCreateWithoutRoadmapsInput = {
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -6999,6 +7684,7 @@ export type ProjectUncheckedCreateWithoutRoadmapsInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutRoadmapsInput = {
@@ -7036,6 +7722,7 @@ export type ProjectUpdateWithoutRoadmapsInput = {
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -7061,6 +7748,7 @@ export type ProjectUpdateWithoutRoadmapsInput = {
   productDecisions?: Prisma.ProductDecisionUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutRoadmapsInput = {
@@ -7082,6 +7770,7 @@ export type ProjectUncheckedUpdateWithoutRoadmapsInput = {
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -7107,6 +7796,7 @@ export type ProjectUncheckedUpdateWithoutRoadmapsInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutProductDecisionsInput = {
@@ -7128,6 +7818,7 @@ export type ProjectCreateWithoutProductDecisionsInput = {
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -7153,6 +7844,7 @@ export type ProjectCreateWithoutProductDecisionsInput = {
   roadmaps?: Prisma.RoadmapCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutProductDecisionsInput = {
@@ -7174,6 +7866,7 @@ export type ProjectUncheckedCreateWithoutProductDecisionsInput = {
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -7199,6 +7892,7 @@ export type ProjectUncheckedCreateWithoutProductDecisionsInput = {
   roadmaps?: Prisma.RoadmapUncheckedCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedCreateNestedOneWithoutProjectInput
   feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutProductDecisionsInput = {
@@ -7236,6 +7930,7 @@ export type ProjectUpdateWithoutProductDecisionsInput = {
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -7261,6 +7956,7 @@ export type ProjectUpdateWithoutProductDecisionsInput = {
   roadmaps?: Prisma.RoadmapUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutProductDecisionsInput = {
@@ -7282,6 +7978,7 @@ export type ProjectUncheckedUpdateWithoutProductDecisionsInput = {
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -7307,6 +8004,7 @@ export type ProjectUncheckedUpdateWithoutProductDecisionsInput = {
   roadmaps?: Prisma.RoadmapUncheckedUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutDesignSystemConfigInput = {
@@ -7328,6 +8026,7 @@ export type ProjectCreateWithoutDesignSystemConfigInput = {
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -7353,6 +8052,7 @@ export type ProjectCreateWithoutDesignSystemConfigInput = {
   roadmaps?: Prisma.RoadmapCreateNestedManyWithoutProjectInput
   productDecisions?: Prisma.ProductDecisionCreateNestedManyWithoutProjectInput
   feedback?: Prisma.FeedbackCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutDesignSystemConfigInput = {
@@ -7374,6 +8074,7 @@ export type ProjectUncheckedCreateWithoutDesignSystemConfigInput = {
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -7399,6 +8100,7 @@ export type ProjectUncheckedCreateWithoutDesignSystemConfigInput = {
   roadmaps?: Prisma.RoadmapUncheckedCreateNestedManyWithoutProjectInput
   productDecisions?: Prisma.ProductDecisionUncheckedCreateNestedManyWithoutProjectInput
   feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutDesignSystemConfigInput = {
@@ -7436,6 +8138,7 @@ export type ProjectUpdateWithoutDesignSystemConfigInput = {
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -7461,6 +8164,7 @@ export type ProjectUpdateWithoutDesignSystemConfigInput = {
   roadmaps?: Prisma.RoadmapUpdateManyWithoutProjectNestedInput
   productDecisions?: Prisma.ProductDecisionUpdateManyWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutDesignSystemConfigInput = {
@@ -7482,6 +8186,7 @@ export type ProjectUncheckedUpdateWithoutDesignSystemConfigInput = {
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -7507,6 +8212,7 @@ export type ProjectUncheckedUpdateWithoutDesignSystemConfigInput = {
   roadmaps?: Prisma.RoadmapUncheckedUpdateManyWithoutProjectNestedInput
   productDecisions?: Prisma.ProductDecisionUncheckedUpdateManyWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutFeedbackInput = {
@@ -7528,6 +8234,7 @@ export type ProjectCreateWithoutFeedbackInput = {
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -7553,6 +8260,7 @@ export type ProjectCreateWithoutFeedbackInput = {
   roadmaps?: Prisma.RoadmapCreateNestedManyWithoutProjectInput
   productDecisions?: Prisma.ProductDecisionCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigCreateNestedOneWithoutProjectInput
+  pullRequests?: Prisma.PullRequestCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutFeedbackInput = {
@@ -7574,6 +8282,7 @@ export type ProjectUncheckedCreateWithoutFeedbackInput = {
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -7599,6 +8308,7 @@ export type ProjectUncheckedCreateWithoutFeedbackInput = {
   roadmaps?: Prisma.RoadmapUncheckedCreateNestedManyWithoutProjectInput
   productDecisions?: Prisma.ProductDecisionUncheckedCreateNestedManyWithoutProjectInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedCreateNestedOneWithoutProjectInput
+  pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutFeedbackInput = {
@@ -7636,6 +8346,7 @@ export type ProjectUpdateWithoutFeedbackInput = {
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -7661,6 +8372,7 @@ export type ProjectUpdateWithoutFeedbackInput = {
   roadmaps?: Prisma.RoadmapUpdateManyWithoutProjectNestedInput
   productDecisions?: Prisma.ProductDecisionUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUpdateOneWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutFeedbackInput = {
@@ -7682,6 +8394,7 @@ export type ProjectUncheckedUpdateWithoutFeedbackInput = {
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -7707,6 +8420,7 @@ export type ProjectUncheckedUpdateWithoutFeedbackInput = {
   roadmaps?: Prisma.RoadmapUncheckedUpdateManyWithoutProjectNestedInput
   productDecisions?: Prisma.ProductDecisionUncheckedUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedUpdateOneWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateManyOwnerInput = {
@@ -7742,6 +8456,7 @@ export type ProjectUpdateWithoutOwnerInput = {
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -7768,6 +8483,7 @@ export type ProjectUpdateWithoutOwnerInput = {
   productDecisions?: Prisma.ProductDecisionUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutOwnerInput = {
@@ -7788,6 +8504,7 @@ export type ProjectUncheckedUpdateWithoutOwnerInput = {
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -7814,6 +8531,7 @@ export type ProjectUncheckedUpdateWithoutOwnerInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateManyWithoutOwnerInput = {
@@ -7864,6 +8582,7 @@ export type ProjectUpdateWithoutOrganizationInput = {
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -7890,6 +8609,7 @@ export type ProjectUpdateWithoutOrganizationInput = {
   productDecisions?: Prisma.ProductDecisionUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutOrganizationInput = {
@@ -7910,6 +8630,7 @@ export type ProjectUncheckedUpdateWithoutOrganizationInput = {
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -7936,6 +8657,7 @@ export type ProjectUncheckedUpdateWithoutOrganizationInput = {
   productDecisions?: Prisma.ProductDecisionUncheckedUpdateManyWithoutProjectNestedInput
   designSystemConfig?: Prisma.DesignSystemConfigUncheckedUpdateOneWithoutProjectNestedInput
   feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateManyWithoutOrganizationInput = {
@@ -7987,6 +8709,7 @@ export type ProjectCountOutputType = {
   roadmaps: number
   productDecisions: number
   feedback: number
+  pullRequests: number
 }
 
 export type ProjectCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -8018,6 +8741,7 @@ export type ProjectCountOutputTypeSelect<ExtArgs extends runtime.Types.Extension
   roadmaps?: boolean | ProjectCountOutputTypeCountRoadmapsArgs
   productDecisions?: boolean | ProjectCountOutputTypeCountProductDecisionsArgs
   feedback?: boolean | ProjectCountOutputTypeCountFeedbackArgs
+  pullRequests?: boolean | ProjectCountOutputTypeCountPullRequestsArgs
 }
 
 /**
@@ -8226,6 +8950,13 @@ export type ProjectCountOutputTypeCountFeedbackArgs<ExtArgs extends runtime.Type
   where?: Prisma.FeedbackWhereInput
 }
 
+/**
+ * ProjectCountOutputType without action
+ */
+export type ProjectCountOutputTypeCountPullRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PullRequestWhereInput
+}
+
 
 export type ProjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -8248,6 +8979,7 @@ export type ProjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   workflows?: boolean | Prisma.Project$workflowsArgs<ExtArgs>
   repository?: boolean | Prisma.Project$repositoryArgs<ExtArgs>
   folders?: boolean | Prisma.Project$foldersArgs<ExtArgs>
+  gitIntegration?: boolean | Prisma.Project$gitIntegrationArgs<ExtArgs>
   productDocuments?: boolean | Prisma.Project$productDocumentsArgs<ExtArgs>
   architectureDocuments?: boolean | Prisma.Project$architectureDocumentsArgs<ExtArgs>
   developmentTasks?: boolean | Prisma.Project$developmentTasksArgs<ExtArgs>
@@ -8274,6 +9006,7 @@ export type ProjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   productDecisions?: boolean | Prisma.Project$productDecisionsArgs<ExtArgs>
   designSystemConfig?: boolean | Prisma.Project$designSystemConfigArgs<ExtArgs>
   feedback?: boolean | Prisma.Project$feedbackArgs<ExtArgs>
+  pullRequests?: boolean | Prisma.Project$pullRequestsArgs<ExtArgs>
   _count?: boolean | Prisma.ProjectCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["project"]>
 
@@ -8338,6 +9071,7 @@ export type ProjectInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   workflows?: boolean | Prisma.Project$workflowsArgs<ExtArgs>
   repository?: boolean | Prisma.Project$repositoryArgs<ExtArgs>
   folders?: boolean | Prisma.Project$foldersArgs<ExtArgs>
+  gitIntegration?: boolean | Prisma.Project$gitIntegrationArgs<ExtArgs>
   productDocuments?: boolean | Prisma.Project$productDocumentsArgs<ExtArgs>
   architectureDocuments?: boolean | Prisma.Project$architectureDocumentsArgs<ExtArgs>
   developmentTasks?: boolean | Prisma.Project$developmentTasksArgs<ExtArgs>
@@ -8364,6 +9098,7 @@ export type ProjectInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   productDecisions?: boolean | Prisma.Project$productDecisionsArgs<ExtArgs>
   designSystemConfig?: boolean | Prisma.Project$designSystemConfigArgs<ExtArgs>
   feedback?: boolean | Prisma.Project$feedbackArgs<ExtArgs>
+  pullRequests?: boolean | Prisma.Project$pullRequestsArgs<ExtArgs>
   _count?: boolean | Prisma.ProjectCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ProjectIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -8385,6 +9120,7 @@ export type $ProjectPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     workflows: Prisma.$WorkflowPayload<ExtArgs>[]
     repository: Prisma.$RepositoryPayload<ExtArgs> | null
     folders: Prisma.$FolderPayload<ExtArgs>[]
+    gitIntegration: Prisma.$GitIntegrationPayload<ExtArgs> | null
     productDocuments: Prisma.$ProductDocumentPayload<ExtArgs>[]
     architectureDocuments: Prisma.$ArchitectureDocumentPayload<ExtArgs>[]
     developmentTasks: Prisma.$DevelopmentTaskPayload<ExtArgs>[]
@@ -8411,6 +9147,7 @@ export type $ProjectPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     productDecisions: Prisma.$ProductDecisionPayload<ExtArgs>[]
     designSystemConfig: Prisma.$DesignSystemConfigPayload<ExtArgs> | null
     feedback: Prisma.$FeedbackPayload<ExtArgs>[]
+    pullRequests: Prisma.$PullRequestPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -8827,6 +9564,7 @@ export interface Prisma__ProjectClient<T, Null = never, ExtArgs extends runtime.
   workflows<T extends Prisma.Project$workflowsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$workflowsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WorkflowPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   repository<T extends Prisma.Project$repositoryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$repositoryArgs<ExtArgs>>): Prisma.Prisma__RepositoryClient<runtime.Types.Result.GetResult<Prisma.$RepositoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   folders<T extends Prisma.Project$foldersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$foldersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FolderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  gitIntegration<T extends Prisma.Project$gitIntegrationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$gitIntegrationArgs<ExtArgs>>): Prisma.Prisma__GitIntegrationClient<runtime.Types.Result.GetResult<Prisma.$GitIntegrationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   productDocuments<T extends Prisma.Project$productDocumentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$productDocumentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProductDocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   architectureDocuments<T extends Prisma.Project$architectureDocumentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$architectureDocumentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ArchitectureDocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   developmentTasks<T extends Prisma.Project$developmentTasksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$developmentTasksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DevelopmentTaskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -8853,6 +9591,7 @@ export interface Prisma__ProjectClient<T, Null = never, ExtArgs extends runtime.
   productDecisions<T extends Prisma.Project$productDecisionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$productDecisionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProductDecisionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   designSystemConfig<T extends Prisma.Project$designSystemConfigArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$designSystemConfigArgs<ExtArgs>>): Prisma.Prisma__DesignSystemConfigClient<runtime.Types.Result.GetResult<Prisma.$DesignSystemConfigPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   feedback<T extends Prisma.Project$feedbackArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$feedbackArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FeedbackPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  pullRequests<T extends Prisma.Project$pullRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$pullRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PullRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -9427,6 +10166,25 @@ export type Project$foldersArgs<ExtArgs extends runtime.Types.Extensions.Interna
   take?: number
   skip?: number
   distinct?: Prisma.FolderScalarFieldEnum | Prisma.FolderScalarFieldEnum[]
+}
+
+/**
+ * Project.gitIntegration
+ */
+export type Project$gitIntegrationArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the GitIntegration
+   */
+  select?: Prisma.GitIntegrationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the GitIntegration
+   */
+  omit?: Prisma.GitIntegrationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.GitIntegrationInclude<ExtArgs> | null
+  where?: Prisma.GitIntegrationWhereInput
 }
 
 /**
@@ -10041,6 +10799,30 @@ export type Project$feedbackArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   distinct?: Prisma.FeedbackScalarFieldEnum | Prisma.FeedbackScalarFieldEnum[]
+}
+
+/**
+ * Project.pullRequests
+ */
+export type Project$pullRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PullRequest
+   */
+  select?: Prisma.PullRequestSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PullRequest
+   */
+  omit?: Prisma.PullRequestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PullRequestInclude<ExtArgs> | null
+  where?: Prisma.PullRequestWhereInput
+  orderBy?: Prisma.PullRequestOrderByWithRelationInput | Prisma.PullRequestOrderByWithRelationInput[]
+  cursor?: Prisma.PullRequestWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PullRequestScalarFieldEnum | Prisma.PullRequestScalarFieldEnum[]
 }
 
 /**
