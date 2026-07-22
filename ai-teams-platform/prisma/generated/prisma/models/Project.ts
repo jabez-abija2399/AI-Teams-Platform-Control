@@ -33,6 +33,7 @@ export type ProjectMinAggregateOutputType = {
   color: string | null
   status: $Enums.ProjectStatus | null
   ownerId: string | null
+  organizationId: string | null
   favorite: boolean | null
   lastOpenedAt: Date | null
   createdAt: Date | null
@@ -48,6 +49,7 @@ export type ProjectMaxAggregateOutputType = {
   color: string | null
   status: $Enums.ProjectStatus | null
   ownerId: string | null
+  organizationId: string | null
   favorite: boolean | null
   lastOpenedAt: Date | null
   createdAt: Date | null
@@ -63,6 +65,7 @@ export type ProjectCountAggregateOutputType = {
   color: number
   status: number
   ownerId: number
+  organizationId: number
   favorite: number
   lastOpenedAt: number
   createdAt: number
@@ -80,6 +83,7 @@ export type ProjectMinAggregateInputType = {
   color?: true
   status?: true
   ownerId?: true
+  organizationId?: true
   favorite?: true
   lastOpenedAt?: true
   createdAt?: true
@@ -95,6 +99,7 @@ export type ProjectMaxAggregateInputType = {
   color?: true
   status?: true
   ownerId?: true
+  organizationId?: true
   favorite?: true
   lastOpenedAt?: true
   createdAt?: true
@@ -110,6 +115,7 @@ export type ProjectCountAggregateInputType = {
   color?: true
   status?: true
   ownerId?: true
+  organizationId?: true
   favorite?: true
   lastOpenedAt?: true
   createdAt?: true
@@ -198,6 +204,7 @@ export type ProjectGroupByOutputType = {
   color: string | null
   status: $Enums.ProjectStatus
   ownerId: string
+  organizationId: string | null
   favorite: boolean
   lastOpenedAt: Date | null
   createdAt: Date
@@ -234,11 +241,13 @@ export type ProjectWhereInput = {
   color?: Prisma.StringNullableFilter<"Project"> | string | null
   status?: Prisma.EnumProjectStatusFilter<"Project"> | $Enums.ProjectStatus
   ownerId?: Prisma.StringFilter<"Project"> | string
+  organizationId?: Prisma.StringNullableFilter<"Project"> | string | null
   favorite?: Prisma.BoolFilter<"Project"> | boolean
   lastOpenedAt?: Prisma.DateTimeNullableFilter<"Project"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Project"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Project"> | Date | string
   owner?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  organization?: Prisma.XOR<Prisma.OrganizationNullableScalarRelationFilter, Prisma.OrganizationWhereInput> | null
   tasks?: Prisma.TaskListRelationFilter
   documents?: Prisma.DocumentListRelationFilter
   workflows?: Prisma.WorkflowListRelationFilter
@@ -281,11 +290,13 @@ export type ProjectOrderByWithRelationInput = {
   color?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
+  organizationId?: Prisma.SortOrderInput | Prisma.SortOrder
   favorite?: Prisma.SortOrder
   lastOpenedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   owner?: Prisma.UserOrderByWithRelationInput
+  organization?: Prisma.OrganizationOrderByWithRelationInput
   tasks?: Prisma.TaskOrderByRelationAggregateInput
   documents?: Prisma.DocumentOrderByRelationAggregateInput
   workflows?: Prisma.WorkflowOrderByRelationAggregateInput
@@ -331,11 +342,13 @@ export type ProjectWhereUniqueInput = Prisma.AtLeast<{
   color?: Prisma.StringNullableFilter<"Project"> | string | null
   status?: Prisma.EnumProjectStatusFilter<"Project"> | $Enums.ProjectStatus
   ownerId?: Prisma.StringFilter<"Project"> | string
+  organizationId?: Prisma.StringNullableFilter<"Project"> | string | null
   favorite?: Prisma.BoolFilter<"Project"> | boolean
   lastOpenedAt?: Prisma.DateTimeNullableFilter<"Project"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Project"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Project"> | Date | string
   owner?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  organization?: Prisma.XOR<Prisma.OrganizationNullableScalarRelationFilter, Prisma.OrganizationWhereInput> | null
   tasks?: Prisma.TaskListRelationFilter
   documents?: Prisma.DocumentListRelationFilter
   workflows?: Prisma.WorkflowListRelationFilter
@@ -378,6 +391,7 @@ export type ProjectOrderByWithAggregationInput = {
   color?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
+  organizationId?: Prisma.SortOrderInput | Prisma.SortOrder
   favorite?: Prisma.SortOrder
   lastOpenedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -399,6 +413,7 @@ export type ProjectScalarWhereWithAggregatesInput = {
   color?: Prisma.StringNullableWithAggregatesFilter<"Project"> | string | null
   status?: Prisma.EnumProjectStatusWithAggregatesFilter<"Project"> | $Enums.ProjectStatus
   ownerId?: Prisma.StringWithAggregatesFilter<"Project"> | string
+  organizationId?: Prisma.StringNullableWithAggregatesFilter<"Project"> | string | null
   favorite?: Prisma.BoolWithAggregatesFilter<"Project"> | boolean
   lastOpenedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Project"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Project"> | Date | string
@@ -418,6 +433,7 @@ export type ProjectCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
+  organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
@@ -460,6 +476,7 @@ export type ProjectUncheckedCreateInput = {
   color?: string | null
   status?: $Enums.ProjectStatus
   ownerId: string
+  organizationId?: string | null
   favorite?: boolean
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
@@ -510,6 +527,7 @@ export type ProjectUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
+  organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
@@ -552,6 +570,7 @@ export type ProjectUncheckedUpdateInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -598,6 +617,7 @@ export type ProjectCreateManyInput = {
   color?: string | null
   status?: $Enums.ProjectStatus
   ownerId: string
+  organizationId?: string | null
   favorite?: boolean
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
@@ -627,6 +647,7 @@ export type ProjectUncheckedUpdateManyInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -652,6 +673,7 @@ export type ProjectCountOrderByAggregateInput = {
   color?: Prisma.SortOrder
   status?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
+  organizationId?: Prisma.SortOrder
   favorite?: Prisma.SortOrder
   lastOpenedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -667,6 +689,7 @@ export type ProjectMaxOrderByAggregateInput = {
   color?: Prisma.SortOrder
   status?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
+  organizationId?: Prisma.SortOrder
   favorite?: Prisma.SortOrder
   lastOpenedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -682,6 +705,7 @@ export type ProjectMinOrderByAggregateInput = {
   color?: Prisma.SortOrder
   status?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
+  organizationId?: Prisma.SortOrder
   favorite?: Prisma.SortOrder
   lastOpenedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -1062,6 +1086,48 @@ export type ProjectUpdateOneRequiredWithoutProjectHealthNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ProjectUpdateToOneWithWhereWithoutProjectHealthInput, Prisma.ProjectUpdateWithoutProjectHealthInput>, Prisma.ProjectUncheckedUpdateWithoutProjectHealthInput>
 }
 
+export type ProjectCreateNestedManyWithoutOrganizationInput = {
+  create?: Prisma.XOR<Prisma.ProjectCreateWithoutOrganizationInput, Prisma.ProjectUncheckedCreateWithoutOrganizationInput> | Prisma.ProjectCreateWithoutOrganizationInput[] | Prisma.ProjectUncheckedCreateWithoutOrganizationInput[]
+  connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutOrganizationInput | Prisma.ProjectCreateOrConnectWithoutOrganizationInput[]
+  createMany?: Prisma.ProjectCreateManyOrganizationInputEnvelope
+  connect?: Prisma.ProjectWhereUniqueInput | Prisma.ProjectWhereUniqueInput[]
+}
+
+export type ProjectUncheckedCreateNestedManyWithoutOrganizationInput = {
+  create?: Prisma.XOR<Prisma.ProjectCreateWithoutOrganizationInput, Prisma.ProjectUncheckedCreateWithoutOrganizationInput> | Prisma.ProjectCreateWithoutOrganizationInput[] | Prisma.ProjectUncheckedCreateWithoutOrganizationInput[]
+  connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutOrganizationInput | Prisma.ProjectCreateOrConnectWithoutOrganizationInput[]
+  createMany?: Prisma.ProjectCreateManyOrganizationInputEnvelope
+  connect?: Prisma.ProjectWhereUniqueInput | Prisma.ProjectWhereUniqueInput[]
+}
+
+export type ProjectUpdateManyWithoutOrganizationNestedInput = {
+  create?: Prisma.XOR<Prisma.ProjectCreateWithoutOrganizationInput, Prisma.ProjectUncheckedCreateWithoutOrganizationInput> | Prisma.ProjectCreateWithoutOrganizationInput[] | Prisma.ProjectUncheckedCreateWithoutOrganizationInput[]
+  connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutOrganizationInput | Prisma.ProjectCreateOrConnectWithoutOrganizationInput[]
+  upsert?: Prisma.ProjectUpsertWithWhereUniqueWithoutOrganizationInput | Prisma.ProjectUpsertWithWhereUniqueWithoutOrganizationInput[]
+  createMany?: Prisma.ProjectCreateManyOrganizationInputEnvelope
+  set?: Prisma.ProjectWhereUniqueInput | Prisma.ProjectWhereUniqueInput[]
+  disconnect?: Prisma.ProjectWhereUniqueInput | Prisma.ProjectWhereUniqueInput[]
+  delete?: Prisma.ProjectWhereUniqueInput | Prisma.ProjectWhereUniqueInput[]
+  connect?: Prisma.ProjectWhereUniqueInput | Prisma.ProjectWhereUniqueInput[]
+  update?: Prisma.ProjectUpdateWithWhereUniqueWithoutOrganizationInput | Prisma.ProjectUpdateWithWhereUniqueWithoutOrganizationInput[]
+  updateMany?: Prisma.ProjectUpdateManyWithWhereWithoutOrganizationInput | Prisma.ProjectUpdateManyWithWhereWithoutOrganizationInput[]
+  deleteMany?: Prisma.ProjectScalarWhereInput | Prisma.ProjectScalarWhereInput[]
+}
+
+export type ProjectUncheckedUpdateManyWithoutOrganizationNestedInput = {
+  create?: Prisma.XOR<Prisma.ProjectCreateWithoutOrganizationInput, Prisma.ProjectUncheckedCreateWithoutOrganizationInput> | Prisma.ProjectCreateWithoutOrganizationInput[] | Prisma.ProjectUncheckedCreateWithoutOrganizationInput[]
+  connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutOrganizationInput | Prisma.ProjectCreateOrConnectWithoutOrganizationInput[]
+  upsert?: Prisma.ProjectUpsertWithWhereUniqueWithoutOrganizationInput | Prisma.ProjectUpsertWithWhereUniqueWithoutOrganizationInput[]
+  createMany?: Prisma.ProjectCreateManyOrganizationInputEnvelope
+  set?: Prisma.ProjectWhereUniqueInput | Prisma.ProjectWhereUniqueInput[]
+  disconnect?: Prisma.ProjectWhereUniqueInput | Prisma.ProjectWhereUniqueInput[]
+  delete?: Prisma.ProjectWhereUniqueInput | Prisma.ProjectWhereUniqueInput[]
+  connect?: Prisma.ProjectWhereUniqueInput | Prisma.ProjectWhereUniqueInput[]
+  update?: Prisma.ProjectUpdateWithWhereUniqueWithoutOrganizationInput | Prisma.ProjectUpdateWithWhereUniqueWithoutOrganizationInput[]
+  updateMany?: Prisma.ProjectUpdateManyWithWhereWithoutOrganizationInput | Prisma.ProjectUpdateManyWithWhereWithoutOrganizationInput[]
+  deleteMany?: Prisma.ProjectScalarWhereInput | Prisma.ProjectScalarWhereInput[]
+}
+
 export type ProjectCreateNestedOneWithoutTeamProjectsInput = {
   create?: Prisma.XOR<Prisma.ProjectCreateWithoutTeamProjectsInput, Prisma.ProjectUncheckedCreateWithoutTeamProjectsInput>
   connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutTeamProjectsInput
@@ -1200,6 +1266,7 @@ export type ProjectCreateWithoutOwnerInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
@@ -1241,6 +1308,7 @@ export type ProjectUncheckedCreateWithoutOwnerInput = {
   icon?: string | null
   color?: string | null
   status?: $Enums.ProjectStatus
+  organizationId?: string | null
   favorite?: boolean
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
@@ -1316,6 +1384,7 @@ export type ProjectScalarWhereInput = {
   color?: Prisma.StringNullableFilter<"Project"> | string | null
   status?: Prisma.EnumProjectStatusFilter<"Project"> | $Enums.ProjectStatus
   ownerId?: Prisma.StringFilter<"Project"> | string
+  organizationId?: Prisma.StringNullableFilter<"Project"> | string | null
   favorite?: Prisma.BoolFilter<"Project"> | boolean
   lastOpenedAt?: Prisma.DateTimeNullableFilter<"Project"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Project"> | Date | string
@@ -1335,6 +1404,7 @@ export type ProjectCreateWithoutTasksInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
+  organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
@@ -1376,6 +1446,7 @@ export type ProjectUncheckedCreateWithoutTasksInput = {
   color?: string | null
   status?: $Enums.ProjectStatus
   ownerId: string
+  organizationId?: string | null
   favorite?: boolean
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
@@ -1441,6 +1512,7 @@ export type ProjectUpdateWithoutTasksInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
+  organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
@@ -1482,6 +1554,7 @@ export type ProjectUncheckedUpdateWithoutTasksInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1531,6 +1604,7 @@ export type ProjectCreateWithoutDocumentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
+  organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
@@ -1572,6 +1646,7 @@ export type ProjectUncheckedCreateWithoutDocumentsInput = {
   color?: string | null
   status?: $Enums.ProjectStatus
   ownerId: string
+  organizationId?: string | null
   favorite?: boolean
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
@@ -1637,6 +1712,7 @@ export type ProjectUpdateWithoutDocumentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
+  organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
@@ -1678,6 +1754,7 @@ export type ProjectUncheckedUpdateWithoutDocumentsInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1727,6 +1804,7 @@ export type ProjectCreateWithoutWorkflowsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
+  organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
@@ -1768,6 +1846,7 @@ export type ProjectUncheckedCreateWithoutWorkflowsInput = {
   color?: string | null
   status?: $Enums.ProjectStatus
   ownerId: string
+  organizationId?: string | null
   favorite?: boolean
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
@@ -1833,6 +1912,7 @@ export type ProjectUpdateWithoutWorkflowsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
+  organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
@@ -1874,6 +1954,7 @@ export type ProjectUncheckedUpdateWithoutWorkflowsInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1923,6 +2004,7 @@ export type ProjectCreateWithoutUsageLogsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
+  organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
@@ -1964,6 +2046,7 @@ export type ProjectUncheckedCreateWithoutUsageLogsInput = {
   color?: string | null
   status?: $Enums.ProjectStatus
   ownerId: string
+  organizationId?: string | null
   favorite?: boolean
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
@@ -2029,6 +2112,7 @@ export type ProjectUpdateWithoutUsageLogsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
+  organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
@@ -2070,6 +2154,7 @@ export type ProjectUncheckedUpdateWithoutUsageLogsInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2119,6 +2204,7 @@ export type ProjectCreateWithoutRepositoryInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
+  organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
@@ -2160,6 +2246,7 @@ export type ProjectUncheckedCreateWithoutRepositoryInput = {
   color?: string | null
   status?: $Enums.ProjectStatus
   ownerId: string
+  organizationId?: string | null
   favorite?: boolean
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
@@ -2225,6 +2312,7 @@ export type ProjectUpdateWithoutRepositoryInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
+  organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
@@ -2266,6 +2354,7 @@ export type ProjectUncheckedUpdateWithoutRepositoryInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2315,6 +2404,7 @@ export type ProjectCreateWithoutProductDocumentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
+  organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
@@ -2356,6 +2446,7 @@ export type ProjectUncheckedCreateWithoutProductDocumentsInput = {
   color?: string | null
   status?: $Enums.ProjectStatus
   ownerId: string
+  organizationId?: string | null
   favorite?: boolean
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
@@ -2421,6 +2512,7 @@ export type ProjectUpdateWithoutProductDocumentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
+  organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
@@ -2462,6 +2554,7 @@ export type ProjectUncheckedUpdateWithoutProductDocumentsInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2511,6 +2604,7 @@ export type ProjectCreateWithoutArchitectureDocumentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
+  organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
@@ -2552,6 +2646,7 @@ export type ProjectUncheckedCreateWithoutArchitectureDocumentsInput = {
   color?: string | null
   status?: $Enums.ProjectStatus
   ownerId: string
+  organizationId?: string | null
   favorite?: boolean
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
@@ -2617,6 +2712,7 @@ export type ProjectUpdateWithoutArchitectureDocumentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
+  organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
@@ -2658,6 +2754,7 @@ export type ProjectUncheckedUpdateWithoutArchitectureDocumentsInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2707,6 +2804,7 @@ export type ProjectCreateWithoutDevelopmentTasksInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
+  organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
@@ -2748,6 +2846,7 @@ export type ProjectUncheckedCreateWithoutDevelopmentTasksInput = {
   color?: string | null
   status?: $Enums.ProjectStatus
   ownerId: string
+  organizationId?: string | null
   favorite?: boolean
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
@@ -2813,6 +2912,7 @@ export type ProjectUpdateWithoutDevelopmentTasksInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
+  organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
@@ -2854,6 +2954,7 @@ export type ProjectUncheckedUpdateWithoutDevelopmentTasksInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2903,6 +3004,7 @@ export type ProjectCreateWithoutQualityReportsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
+  organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
@@ -2944,6 +3046,7 @@ export type ProjectUncheckedCreateWithoutQualityReportsInput = {
   color?: string | null
   status?: $Enums.ProjectStatus
   ownerId: string
+  organizationId?: string | null
   favorite?: boolean
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
@@ -3009,6 +3112,7 @@ export type ProjectUpdateWithoutQualityReportsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
+  organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
@@ -3050,6 +3154,7 @@ export type ProjectUncheckedUpdateWithoutQualityReportsInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -3099,6 +3204,7 @@ export type ProjectCreateWithoutFoldersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
+  organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
@@ -3140,6 +3246,7 @@ export type ProjectUncheckedCreateWithoutFoldersInput = {
   color?: string | null
   status?: $Enums.ProjectStatus
   ownerId: string
+  organizationId?: string | null
   favorite?: boolean
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
@@ -3205,6 +3312,7 @@ export type ProjectUpdateWithoutFoldersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
+  organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
@@ -3246,6 +3354,7 @@ export type ProjectUncheckedUpdateWithoutFoldersInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -3295,6 +3404,7 @@ export type ProjectCreateWithoutFavoriteProjectsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
+  organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
@@ -3336,6 +3446,7 @@ export type ProjectUncheckedCreateWithoutFavoriteProjectsInput = {
   color?: string | null
   status?: $Enums.ProjectStatus
   ownerId: string
+  organizationId?: string | null
   favorite?: boolean
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
@@ -3401,6 +3512,7 @@ export type ProjectUpdateWithoutFavoriteProjectsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
+  organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
@@ -3442,6 +3554,7 @@ export type ProjectUncheckedUpdateWithoutFavoriteProjectsInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -3491,6 +3604,7 @@ export type ProjectCreateWithoutRecentProjectsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
+  organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
@@ -3532,6 +3646,7 @@ export type ProjectUncheckedCreateWithoutRecentProjectsInput = {
   color?: string | null
   status?: $Enums.ProjectStatus
   ownerId: string
+  organizationId?: string | null
   favorite?: boolean
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
@@ -3597,6 +3712,7 @@ export type ProjectUpdateWithoutRecentProjectsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
+  organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
@@ -3638,6 +3754,7 @@ export type ProjectUncheckedUpdateWithoutRecentProjectsInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -3687,6 +3804,7 @@ export type ProjectCreateWithoutTestCasesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
+  organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
@@ -3728,6 +3846,7 @@ export type ProjectUncheckedCreateWithoutTestCasesInput = {
   color?: string | null
   status?: $Enums.ProjectStatus
   ownerId: string
+  organizationId?: string | null
   favorite?: boolean
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
@@ -3793,6 +3912,7 @@ export type ProjectUpdateWithoutTestCasesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
+  organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
@@ -3834,6 +3954,7 @@ export type ProjectUncheckedUpdateWithoutTestCasesInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -3883,6 +4004,7 @@ export type ProjectCreateWithoutBugReportsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
+  organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
@@ -3924,6 +4046,7 @@ export type ProjectUncheckedCreateWithoutBugReportsInput = {
   color?: string | null
   status?: $Enums.ProjectStatus
   ownerId: string
+  organizationId?: string | null
   favorite?: boolean
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
@@ -3989,6 +4112,7 @@ export type ProjectUpdateWithoutBugReportsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
+  organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
@@ -4030,6 +4154,7 @@ export type ProjectUncheckedUpdateWithoutBugReportsInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -4079,6 +4204,7 @@ export type ProjectCreateWithoutCoverageReportsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
+  organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
@@ -4120,6 +4246,7 @@ export type ProjectUncheckedCreateWithoutCoverageReportsInput = {
   color?: string | null
   status?: $Enums.ProjectStatus
   ownerId: string
+  organizationId?: string | null
   favorite?: boolean
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
@@ -4185,6 +4312,7 @@ export type ProjectUpdateWithoutCoverageReportsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
+  organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
@@ -4226,6 +4354,7 @@ export type ProjectUncheckedUpdateWithoutCoverageReportsInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -4275,6 +4404,7 @@ export type ProjectCreateWithoutKnowledgeItemsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
+  organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
@@ -4316,6 +4446,7 @@ export type ProjectUncheckedCreateWithoutKnowledgeItemsInput = {
   color?: string | null
   status?: $Enums.ProjectStatus
   ownerId: string
+  organizationId?: string | null
   favorite?: boolean
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
@@ -4381,6 +4512,7 @@ export type ProjectUpdateWithoutKnowledgeItemsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
+  organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
@@ -4422,6 +4554,7 @@ export type ProjectUncheckedUpdateWithoutKnowledgeItemsInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -4471,6 +4604,7 @@ export type ProjectCreateWithoutEnvironmentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
+  organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
@@ -4512,6 +4646,7 @@ export type ProjectUncheckedCreateWithoutEnvironmentsInput = {
   color?: string | null
   status?: $Enums.ProjectStatus
   ownerId: string
+  organizationId?: string | null
   favorite?: boolean
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
@@ -4577,6 +4712,7 @@ export type ProjectUpdateWithoutEnvironmentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
+  organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
@@ -4618,6 +4754,7 @@ export type ProjectUncheckedUpdateWithoutEnvironmentsInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -4667,6 +4804,7 @@ export type ProjectCreateWithoutDeploymentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
+  organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
@@ -4708,6 +4846,7 @@ export type ProjectUncheckedCreateWithoutDeploymentsInput = {
   color?: string | null
   status?: $Enums.ProjectStatus
   ownerId: string
+  organizationId?: string | null
   favorite?: boolean
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
@@ -4773,6 +4912,7 @@ export type ProjectUpdateWithoutDeploymentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
+  organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
@@ -4814,6 +4954,7 @@ export type ProjectUncheckedUpdateWithoutDeploymentsInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -4863,6 +5004,7 @@ export type ProjectCreateWithoutReleasesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
+  organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
@@ -4904,6 +5046,7 @@ export type ProjectUncheckedCreateWithoutReleasesInput = {
   color?: string | null
   status?: $Enums.ProjectStatus
   ownerId: string
+  organizationId?: string | null
   favorite?: boolean
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
@@ -4969,6 +5112,7 @@ export type ProjectUpdateWithoutReleasesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
+  organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
@@ -5010,6 +5154,7 @@ export type ProjectUncheckedUpdateWithoutReleasesInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -5059,6 +5204,7 @@ export type ProjectCreateWithoutPlatformEventsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
+  organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
@@ -5100,6 +5246,7 @@ export type ProjectUncheckedCreateWithoutPlatformEventsInput = {
   color?: string | null
   status?: $Enums.ProjectStatus
   ownerId: string
+  organizationId?: string | null
   favorite?: boolean
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
@@ -5165,6 +5312,7 @@ export type ProjectUpdateWithoutPlatformEventsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
+  organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
@@ -5206,6 +5354,7 @@ export type ProjectUncheckedUpdateWithoutPlatformEventsInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -5255,6 +5404,7 @@ export type ProjectCreateWithoutMetricsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
+  organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
@@ -5296,6 +5446,7 @@ export type ProjectUncheckedCreateWithoutMetricsInput = {
   color?: string | null
   status?: $Enums.ProjectStatus
   ownerId: string
+  organizationId?: string | null
   favorite?: boolean
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
@@ -5361,6 +5512,7 @@ export type ProjectUpdateWithoutMetricsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
+  organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
@@ -5402,6 +5554,7 @@ export type ProjectUncheckedUpdateWithoutMetricsInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -5451,6 +5604,7 @@ export type ProjectCreateWithoutProjectHealthInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
+  organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
@@ -5492,6 +5646,7 @@ export type ProjectUncheckedCreateWithoutProjectHealthInput = {
   color?: string | null
   status?: $Enums.ProjectStatus
   ownerId: string
+  organizationId?: string | null
   favorite?: boolean
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
@@ -5557,6 +5712,7 @@ export type ProjectUpdateWithoutProjectHealthInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
+  organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
@@ -5598,6 +5754,7 @@ export type ProjectUncheckedUpdateWithoutProjectHealthInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -5634,6 +5791,124 @@ export type ProjectUncheckedUpdateWithoutProjectHealthInput = {
   feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProjectNestedInput
 }
 
+export type ProjectCreateWithoutOrganizationInput = {
+  id?: string
+  name: string
+  slug?: string | null
+  description?: string | null
+  icon?: string | null
+  color?: string | null
+  status?: $Enums.ProjectStatus
+  favorite?: boolean
+  lastOpenedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  owner: Prisma.UserCreateNestedOneWithoutProjectsInput
+  tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
+  documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
+  workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
+  repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
+  folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
+  productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
+  architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
+  developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
+  qualityReports?: Prisma.QualityReportCreateNestedManyWithoutProjectInput
+  recentProjects?: Prisma.RecentProjectCreateNestedManyWithoutProjectInput
+  favoriteProjects?: Prisma.FavoriteProjectCreateNestedManyWithoutProjectInput
+  teamProjects?: Prisma.TeamProjectCreateNestedManyWithoutProjectInput
+  usageLogs?: Prisma.AIUsageLogCreateNestedManyWithoutProjectInput
+  testCases?: Prisma.TestCaseCreateNestedManyWithoutProjectInput
+  bugReports?: Prisma.BugReportCreateNestedManyWithoutProjectInput
+  coverageReports?: Prisma.CoverageReportCreateNestedManyWithoutProjectInput
+  knowledgeItems?: Prisma.KnowledgeItemCreateNestedManyWithoutProjectInput
+  environments?: Prisma.EnvironmentCreateNestedManyWithoutProjectInput
+  deployments?: Prisma.DeploymentCreateNestedManyWithoutProjectInput
+  releases?: Prisma.ReleaseCreateNestedManyWithoutProjectInput
+  platformEvents?: Prisma.PlatformEventCreateNestedManyWithoutProjectInput
+  metrics?: Prisma.MetricCreateNestedManyWithoutProjectInput
+  projectHealth?: Prisma.ProjectHealthCreateNestedOneWithoutProjectInput
+  securityIssues?: Prisma.SecurityIssueCreateNestedManyWithoutProjectInput
+  securityScans?: Prisma.SecurityScanCreateNestedManyWithoutProjectInput
+  productStrategies?: Prisma.ProductStrategyCreateNestedManyWithoutProjectInput
+  requirements?: Prisma.RequirementCreateNestedManyWithoutProjectInput
+  roadmaps?: Prisma.RoadmapCreateNestedManyWithoutProjectInput
+  productDecisions?: Prisma.ProductDecisionCreateNestedManyWithoutProjectInput
+  designSystemConfig?: Prisma.DesignSystemConfigCreateNestedOneWithoutProjectInput
+  feedback?: Prisma.FeedbackCreateNestedManyWithoutProjectInput
+}
+
+export type ProjectUncheckedCreateWithoutOrganizationInput = {
+  id?: string
+  name: string
+  slug?: string | null
+  description?: string | null
+  icon?: string | null
+  color?: string | null
+  status?: $Enums.ProjectStatus
+  ownerId: string
+  favorite?: boolean
+  lastOpenedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutProjectInput
+  documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
+  workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
+  repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
+  folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
+  productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
+  architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
+  developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
+  qualityReports?: Prisma.QualityReportUncheckedCreateNestedManyWithoutProjectInput
+  recentProjects?: Prisma.RecentProjectUncheckedCreateNestedManyWithoutProjectInput
+  favoriteProjects?: Prisma.FavoriteProjectUncheckedCreateNestedManyWithoutProjectInput
+  teamProjects?: Prisma.TeamProjectUncheckedCreateNestedManyWithoutProjectInput
+  usageLogs?: Prisma.AIUsageLogUncheckedCreateNestedManyWithoutProjectInput
+  testCases?: Prisma.TestCaseUncheckedCreateNestedManyWithoutProjectInput
+  bugReports?: Prisma.BugReportUncheckedCreateNestedManyWithoutProjectInput
+  coverageReports?: Prisma.CoverageReportUncheckedCreateNestedManyWithoutProjectInput
+  knowledgeItems?: Prisma.KnowledgeItemUncheckedCreateNestedManyWithoutProjectInput
+  environments?: Prisma.EnvironmentUncheckedCreateNestedManyWithoutProjectInput
+  deployments?: Prisma.DeploymentUncheckedCreateNestedManyWithoutProjectInput
+  releases?: Prisma.ReleaseUncheckedCreateNestedManyWithoutProjectInput
+  platformEvents?: Prisma.PlatformEventUncheckedCreateNestedManyWithoutProjectInput
+  metrics?: Prisma.MetricUncheckedCreateNestedManyWithoutProjectInput
+  projectHealth?: Prisma.ProjectHealthUncheckedCreateNestedOneWithoutProjectInput
+  securityIssues?: Prisma.SecurityIssueUncheckedCreateNestedManyWithoutProjectInput
+  securityScans?: Prisma.SecurityScanUncheckedCreateNestedManyWithoutProjectInput
+  productStrategies?: Prisma.ProductStrategyUncheckedCreateNestedManyWithoutProjectInput
+  requirements?: Prisma.RequirementUncheckedCreateNestedManyWithoutProjectInput
+  roadmaps?: Prisma.RoadmapUncheckedCreateNestedManyWithoutProjectInput
+  productDecisions?: Prisma.ProductDecisionUncheckedCreateNestedManyWithoutProjectInput
+  designSystemConfig?: Prisma.DesignSystemConfigUncheckedCreateNestedOneWithoutProjectInput
+  feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProjectInput
+}
+
+export type ProjectCreateOrConnectWithoutOrganizationInput = {
+  where: Prisma.ProjectWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProjectCreateWithoutOrganizationInput, Prisma.ProjectUncheckedCreateWithoutOrganizationInput>
+}
+
+export type ProjectCreateManyOrganizationInputEnvelope = {
+  data: Prisma.ProjectCreateManyOrganizationInput | Prisma.ProjectCreateManyOrganizationInput[]
+  skipDuplicates?: boolean
+}
+
+export type ProjectUpsertWithWhereUniqueWithoutOrganizationInput = {
+  where: Prisma.ProjectWhereUniqueInput
+  update: Prisma.XOR<Prisma.ProjectUpdateWithoutOrganizationInput, Prisma.ProjectUncheckedUpdateWithoutOrganizationInput>
+  create: Prisma.XOR<Prisma.ProjectCreateWithoutOrganizationInput, Prisma.ProjectUncheckedCreateWithoutOrganizationInput>
+}
+
+export type ProjectUpdateWithWhereUniqueWithoutOrganizationInput = {
+  where: Prisma.ProjectWhereUniqueInput
+  data: Prisma.XOR<Prisma.ProjectUpdateWithoutOrganizationInput, Prisma.ProjectUncheckedUpdateWithoutOrganizationInput>
+}
+
+export type ProjectUpdateManyWithWhereWithoutOrganizationInput = {
+  where: Prisma.ProjectScalarWhereInput
+  data: Prisma.XOR<Prisma.ProjectUpdateManyMutationInput, Prisma.ProjectUncheckedUpdateManyWithoutOrganizationInput>
+}
+
 export type ProjectCreateWithoutTeamProjectsInput = {
   id?: string
   name: string
@@ -5647,6 +5922,7 @@ export type ProjectCreateWithoutTeamProjectsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
+  organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
@@ -5688,6 +5964,7 @@ export type ProjectUncheckedCreateWithoutTeamProjectsInput = {
   color?: string | null
   status?: $Enums.ProjectStatus
   ownerId: string
+  organizationId?: string | null
   favorite?: boolean
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
@@ -5753,6 +6030,7 @@ export type ProjectUpdateWithoutTeamProjectsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
+  organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
@@ -5794,6 +6072,7 @@ export type ProjectUncheckedUpdateWithoutTeamProjectsInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -5843,6 +6122,7 @@ export type ProjectCreateWithoutSecurityIssuesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
+  organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
@@ -5884,6 +6164,7 @@ export type ProjectUncheckedCreateWithoutSecurityIssuesInput = {
   color?: string | null
   status?: $Enums.ProjectStatus
   ownerId: string
+  organizationId?: string | null
   favorite?: boolean
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
@@ -5949,6 +6230,7 @@ export type ProjectUpdateWithoutSecurityIssuesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
+  organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
@@ -5990,6 +6272,7 @@ export type ProjectUncheckedUpdateWithoutSecurityIssuesInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -6039,6 +6322,7 @@ export type ProjectCreateWithoutSecurityScansInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
+  organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
@@ -6080,6 +6364,7 @@ export type ProjectUncheckedCreateWithoutSecurityScansInput = {
   color?: string | null
   status?: $Enums.ProjectStatus
   ownerId: string
+  organizationId?: string | null
   favorite?: boolean
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
@@ -6145,6 +6430,7 @@ export type ProjectUpdateWithoutSecurityScansInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
+  organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
@@ -6186,6 +6472,7 @@ export type ProjectUncheckedUpdateWithoutSecurityScansInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -6235,6 +6522,7 @@ export type ProjectCreateWithoutProductStrategiesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
+  organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
@@ -6276,6 +6564,7 @@ export type ProjectUncheckedCreateWithoutProductStrategiesInput = {
   color?: string | null
   status?: $Enums.ProjectStatus
   ownerId: string
+  organizationId?: string | null
   favorite?: boolean
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
@@ -6341,6 +6630,7 @@ export type ProjectUpdateWithoutProductStrategiesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
+  organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
@@ -6382,6 +6672,7 @@ export type ProjectUncheckedUpdateWithoutProductStrategiesInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -6431,6 +6722,7 @@ export type ProjectCreateWithoutRequirementsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
+  organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
@@ -6472,6 +6764,7 @@ export type ProjectUncheckedCreateWithoutRequirementsInput = {
   color?: string | null
   status?: $Enums.ProjectStatus
   ownerId: string
+  organizationId?: string | null
   favorite?: boolean
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
@@ -6537,6 +6830,7 @@ export type ProjectUpdateWithoutRequirementsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
+  organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
@@ -6578,6 +6872,7 @@ export type ProjectUncheckedUpdateWithoutRequirementsInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -6627,6 +6922,7 @@ export type ProjectCreateWithoutRoadmapsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
+  organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
@@ -6668,6 +6964,7 @@ export type ProjectUncheckedCreateWithoutRoadmapsInput = {
   color?: string | null
   status?: $Enums.ProjectStatus
   ownerId: string
+  organizationId?: string | null
   favorite?: boolean
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
@@ -6733,6 +7030,7 @@ export type ProjectUpdateWithoutRoadmapsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
+  organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
@@ -6774,6 +7072,7 @@ export type ProjectUncheckedUpdateWithoutRoadmapsInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -6823,6 +7122,7 @@ export type ProjectCreateWithoutProductDecisionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
+  organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
@@ -6864,6 +7164,7 @@ export type ProjectUncheckedCreateWithoutProductDecisionsInput = {
   color?: string | null
   status?: $Enums.ProjectStatus
   ownerId: string
+  organizationId?: string | null
   favorite?: boolean
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
@@ -6929,6 +7230,7 @@ export type ProjectUpdateWithoutProductDecisionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
+  organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
@@ -6970,6 +7272,7 @@ export type ProjectUncheckedUpdateWithoutProductDecisionsInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -7019,6 +7322,7 @@ export type ProjectCreateWithoutDesignSystemConfigInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
+  organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
@@ -7060,6 +7364,7 @@ export type ProjectUncheckedCreateWithoutDesignSystemConfigInput = {
   color?: string | null
   status?: $Enums.ProjectStatus
   ownerId: string
+  organizationId?: string | null
   favorite?: boolean
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
@@ -7125,6 +7430,7 @@ export type ProjectUpdateWithoutDesignSystemConfigInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
+  organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
@@ -7166,6 +7472,7 @@ export type ProjectUncheckedUpdateWithoutDesignSystemConfigInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -7215,6 +7522,7 @@ export type ProjectCreateWithoutFeedbackInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
+  organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
@@ -7256,6 +7564,7 @@ export type ProjectUncheckedCreateWithoutFeedbackInput = {
   color?: string | null
   status?: $Enums.ProjectStatus
   ownerId: string
+  organizationId?: string | null
   favorite?: boolean
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
@@ -7321,6 +7630,7 @@ export type ProjectUpdateWithoutFeedbackInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
+  organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
@@ -7362,6 +7672,7 @@ export type ProjectUncheckedUpdateWithoutFeedbackInput = {
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -7406,6 +7717,7 @@ export type ProjectCreateManyOwnerInput = {
   icon?: string | null
   color?: string | null
   status?: $Enums.ProjectStatus
+  organizationId?: string | null
   favorite?: boolean
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
@@ -7424,6 +7736,7 @@ export type ProjectUpdateWithoutOwnerInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
@@ -7465,6 +7778,7 @@ export type ProjectUncheckedUpdateWithoutOwnerInput = {
   icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -7510,6 +7824,129 @@ export type ProjectUncheckedUpdateManyWithoutOwnerInput = {
   icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ProjectCreateManyOrganizationInput = {
+  id?: string
+  name: string
+  slug?: string | null
+  description?: string | null
+  icon?: string | null
+  color?: string | null
+  status?: $Enums.ProjectStatus
+  ownerId: string
+  favorite?: boolean
+  lastOpenedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type ProjectUpdateWithoutOrganizationInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+  favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
+  tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
+  documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
+  workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
+  repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
+  folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
+  productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
+  architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
+  developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
+  qualityReports?: Prisma.QualityReportUpdateManyWithoutProjectNestedInput
+  recentProjects?: Prisma.RecentProjectUpdateManyWithoutProjectNestedInput
+  favoriteProjects?: Prisma.FavoriteProjectUpdateManyWithoutProjectNestedInput
+  teamProjects?: Prisma.TeamProjectUpdateManyWithoutProjectNestedInput
+  usageLogs?: Prisma.AIUsageLogUpdateManyWithoutProjectNestedInput
+  testCases?: Prisma.TestCaseUpdateManyWithoutProjectNestedInput
+  bugReports?: Prisma.BugReportUpdateManyWithoutProjectNestedInput
+  coverageReports?: Prisma.CoverageReportUpdateManyWithoutProjectNestedInput
+  knowledgeItems?: Prisma.KnowledgeItemUpdateManyWithoutProjectNestedInput
+  environments?: Prisma.EnvironmentUpdateManyWithoutProjectNestedInput
+  deployments?: Prisma.DeploymentUpdateManyWithoutProjectNestedInput
+  releases?: Prisma.ReleaseUpdateManyWithoutProjectNestedInput
+  platformEvents?: Prisma.PlatformEventUpdateManyWithoutProjectNestedInput
+  metrics?: Prisma.MetricUpdateManyWithoutProjectNestedInput
+  projectHealth?: Prisma.ProjectHealthUpdateOneWithoutProjectNestedInput
+  securityIssues?: Prisma.SecurityIssueUpdateManyWithoutProjectNestedInput
+  securityScans?: Prisma.SecurityScanUpdateManyWithoutProjectNestedInput
+  productStrategies?: Prisma.ProductStrategyUpdateManyWithoutProjectNestedInput
+  requirements?: Prisma.RequirementUpdateManyWithoutProjectNestedInput
+  roadmaps?: Prisma.RoadmapUpdateManyWithoutProjectNestedInput
+  productDecisions?: Prisma.ProductDecisionUpdateManyWithoutProjectNestedInput
+  designSystemConfig?: Prisma.DesignSystemConfigUpdateOneWithoutProjectNestedInput
+  feedback?: Prisma.FeedbackUpdateManyWithoutProjectNestedInput
+}
+
+export type ProjectUncheckedUpdateWithoutOrganizationInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tasks?: Prisma.TaskUncheckedUpdateManyWithoutProjectNestedInput
+  documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
+  workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
+  repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
+  folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
+  productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
+  architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
+  developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
+  qualityReports?: Prisma.QualityReportUncheckedUpdateManyWithoutProjectNestedInput
+  recentProjects?: Prisma.RecentProjectUncheckedUpdateManyWithoutProjectNestedInput
+  favoriteProjects?: Prisma.FavoriteProjectUncheckedUpdateManyWithoutProjectNestedInput
+  teamProjects?: Prisma.TeamProjectUncheckedUpdateManyWithoutProjectNestedInput
+  usageLogs?: Prisma.AIUsageLogUncheckedUpdateManyWithoutProjectNestedInput
+  testCases?: Prisma.TestCaseUncheckedUpdateManyWithoutProjectNestedInput
+  bugReports?: Prisma.BugReportUncheckedUpdateManyWithoutProjectNestedInput
+  coverageReports?: Prisma.CoverageReportUncheckedUpdateManyWithoutProjectNestedInput
+  knowledgeItems?: Prisma.KnowledgeItemUncheckedUpdateManyWithoutProjectNestedInput
+  environments?: Prisma.EnvironmentUncheckedUpdateManyWithoutProjectNestedInput
+  deployments?: Prisma.DeploymentUncheckedUpdateManyWithoutProjectNestedInput
+  releases?: Prisma.ReleaseUncheckedUpdateManyWithoutProjectNestedInput
+  platformEvents?: Prisma.PlatformEventUncheckedUpdateManyWithoutProjectNestedInput
+  metrics?: Prisma.MetricUncheckedUpdateManyWithoutProjectNestedInput
+  projectHealth?: Prisma.ProjectHealthUncheckedUpdateOneWithoutProjectNestedInput
+  securityIssues?: Prisma.SecurityIssueUncheckedUpdateManyWithoutProjectNestedInput
+  securityScans?: Prisma.SecurityScanUncheckedUpdateManyWithoutProjectNestedInput
+  productStrategies?: Prisma.ProductStrategyUncheckedUpdateManyWithoutProjectNestedInput
+  requirements?: Prisma.RequirementUncheckedUpdateManyWithoutProjectNestedInput
+  roadmaps?: Prisma.RoadmapUncheckedUpdateManyWithoutProjectNestedInput
+  productDecisions?: Prisma.ProductDecisionUncheckedUpdateManyWithoutProjectNestedInput
+  designSystemConfig?: Prisma.DesignSystemConfigUncheckedUpdateOneWithoutProjectNestedInput
+  feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProjectNestedInput
+}
+
+export type ProjectUncheckedUpdateManyWithoutOrganizationInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -7799,11 +8236,13 @@ export type ProjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   color?: boolean
   status?: boolean
   ownerId?: boolean
+  organizationId?: boolean
   favorite?: boolean
   lastOpenedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  organization?: boolean | Prisma.Project$organizationArgs<ExtArgs>
   tasks?: boolean | Prisma.Project$tasksArgs<ExtArgs>
   documents?: boolean | Prisma.Project$documentsArgs<ExtArgs>
   workflows?: boolean | Prisma.Project$workflowsArgs<ExtArgs>
@@ -7847,11 +8286,13 @@ export type ProjectSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   color?: boolean
   status?: boolean
   ownerId?: boolean
+  organizationId?: boolean
   favorite?: boolean
   lastOpenedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  organization?: boolean | Prisma.Project$organizationArgs<ExtArgs>
 }, ExtArgs["result"]["project"]>
 
 export type ProjectSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -7863,11 +8304,13 @@ export type ProjectSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   color?: boolean
   status?: boolean
   ownerId?: boolean
+  organizationId?: boolean
   favorite?: boolean
   lastOpenedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  organization?: boolean | Prisma.Project$organizationArgs<ExtArgs>
 }, ExtArgs["result"]["project"]>
 
 export type ProjectSelectScalar = {
@@ -7879,15 +8322,17 @@ export type ProjectSelectScalar = {
   color?: boolean
   status?: boolean
   ownerId?: boolean
+  organizationId?: boolean
   favorite?: boolean
   lastOpenedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ProjectOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "description" | "icon" | "color" | "status" | "ownerId" | "favorite" | "lastOpenedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["project"]>
+export type ProjectOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "description" | "icon" | "color" | "status" | "ownerId" | "organizationId" | "favorite" | "lastOpenedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["project"]>
 export type ProjectInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  organization?: boolean | Prisma.Project$organizationArgs<ExtArgs>
   tasks?: boolean | Prisma.Project$tasksArgs<ExtArgs>
   documents?: boolean | Prisma.Project$documentsArgs<ExtArgs>
   workflows?: boolean | Prisma.Project$workflowsArgs<ExtArgs>
@@ -7923,15 +8368,18 @@ export type ProjectInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
 }
 export type ProjectIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  organization?: boolean | Prisma.Project$organizationArgs<ExtArgs>
 }
 export type ProjectIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  organization?: boolean | Prisma.Project$organizationArgs<ExtArgs>
 }
 
 export type $ProjectPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Project"
   objects: {
     owner: Prisma.$UserPayload<ExtArgs>
+    organization: Prisma.$OrganizationPayload<ExtArgs> | null
     tasks: Prisma.$TaskPayload<ExtArgs>[]
     documents: Prisma.$DocumentPayload<ExtArgs>[]
     workflows: Prisma.$WorkflowPayload<ExtArgs>[]
@@ -7973,6 +8421,7 @@ export type $ProjectPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     color: string | null
     status: $Enums.ProjectStatus
     ownerId: string
+    organizationId: string | null
     favorite: boolean
     lastOpenedAt: Date | null
     createdAt: Date
@@ -8372,6 +8821,7 @@ readonly fields: ProjectFieldRefs;
 export interface Prisma__ProjectClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   owner<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  organization<T extends Prisma.Project$organizationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$organizationArgs<ExtArgs>>): Prisma.Prisma__OrganizationClient<runtime.Types.Result.GetResult<Prisma.$OrganizationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   tasks<T extends Prisma.Project$tasksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$tasksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TaskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   documents<T extends Prisma.Project$documentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$documentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   workflows<T extends Prisma.Project$workflowsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$workflowsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WorkflowPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -8440,6 +8890,7 @@ export interface ProjectFieldRefs {
   readonly color: Prisma.FieldRef<"Project", 'String'>
   readonly status: Prisma.FieldRef<"Project", 'ProjectStatus'>
   readonly ownerId: Prisma.FieldRef<"Project", 'String'>
+  readonly organizationId: Prisma.FieldRef<"Project", 'String'>
   readonly favorite: Prisma.FieldRef<"Project", 'Boolean'>
   readonly lastOpenedAt: Prisma.FieldRef<"Project", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Project", 'DateTime'>
@@ -8842,6 +9293,25 @@ export type ProjectDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Limit how many Projects to delete.
    */
   limit?: number
+}
+
+/**
+ * Project.organization
+ */
+export type Project$organizationArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Organization
+   */
+  select?: Prisma.OrganizationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Organization
+   */
+  omit?: Prisma.OrganizationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.OrganizationInclude<ExtArgs> | null
+  where?: Prisma.OrganizationWhereInput
 }
 
 /**

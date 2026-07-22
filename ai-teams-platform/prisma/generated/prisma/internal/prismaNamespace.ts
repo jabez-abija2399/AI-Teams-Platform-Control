@@ -484,7 +484,8 @@ export const ModelName = {
   RecoveryAction: 'RecoveryAction',
   Account: 'Account',
   Session: 'Session',
-  VerificationToken: 'VerificationToken'
+  VerificationToken: 'VerificationToken',
+  SampleProject: 'SampleProject'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -500,7 +501,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "project" | "task" | "agent" | "activity" | "document" | "documentVersion" | "workflow" | "workflowStep" | "conversation" | "message" | "aIProvider" | "aIModel" | "aIUsageLog" | "agentConfiguration" | "agentPermission" | "aIEventLog" | "repository" | "productDocument" | "architectureDocument" | "developmentTask" | "codeGenerationRecord" | "qualityReport" | "file" | "memory" | "folder" | "fileMetadata" | "favoriteProject" | "recentProject" | "workspacePreference" | "editorPreference" | "gitBranch" | "gitCommit" | "gitChange" | "testCase" | "testExecution" | "bugReport" | "coverageReport" | "knowledgeItem" | "environment" | "deployment" | "deploymentStep" | "deploymentLog" | "release" | "platformEvent" | "metric" | "projectHealth" | "codeReview" | "agentDecision" | "organization" | "team" | "teamProject" | "membership" | "memberPermission" | "comment" | "mention" | "notification" | "plugin" | "pluginInstallation" | "pluginPermission" | "approvalRequest" | "securityIssue" | "securityScan" | "securityRule" | "productStrategy" | "requirement" | "userStory" | "roadmap" | "productDecision" | "designSystemConfig" | "designComponent" | "designToken" | "supportConversation" | "supportMessage" | "feedback" | "supportTicket" | "sentimentResult" | "organizationSettings" | "customRole" | "policy" | "auditLog" | "creditAccount" | "plan" | "subscription" | "budget" | "marketplaceItem" | "marketplaceVersion" | "marketplaceRating" | "marketplaceInstallation" | "agentPerformance" | "agentSkill" | "learningRecord" | "improvement" | "benchmark" | "systemHealth" | "incident" | "alert" | "recoveryAction" | "account" | "session" | "verificationToken"
+    modelProps: "user" | "project" | "task" | "agent" | "activity" | "document" | "documentVersion" | "workflow" | "workflowStep" | "conversation" | "message" | "aIProvider" | "aIModel" | "aIUsageLog" | "agentConfiguration" | "agentPermission" | "aIEventLog" | "repository" | "productDocument" | "architectureDocument" | "developmentTask" | "codeGenerationRecord" | "qualityReport" | "file" | "memory" | "folder" | "fileMetadata" | "favoriteProject" | "recentProject" | "workspacePreference" | "editorPreference" | "gitBranch" | "gitCommit" | "gitChange" | "testCase" | "testExecution" | "bugReport" | "coverageReport" | "knowledgeItem" | "environment" | "deployment" | "deploymentStep" | "deploymentLog" | "release" | "platformEvent" | "metric" | "projectHealth" | "codeReview" | "agentDecision" | "organization" | "team" | "teamProject" | "membership" | "memberPermission" | "comment" | "mention" | "notification" | "plugin" | "pluginInstallation" | "pluginPermission" | "approvalRequest" | "securityIssue" | "securityScan" | "securityRule" | "productStrategy" | "requirement" | "userStory" | "roadmap" | "productDecision" | "designSystemConfig" | "designComponent" | "designToken" | "supportConversation" | "supportMessage" | "feedback" | "supportTicket" | "sentimentResult" | "organizationSettings" | "customRole" | "policy" | "auditLog" | "creditAccount" | "plan" | "subscription" | "budget" | "marketplaceItem" | "marketplaceVersion" | "marketplaceRating" | "marketplaceInstallation" | "agentPerformance" | "agentSkill" | "learningRecord" | "improvement" | "benchmark" | "systemHealth" | "incident" | "alert" | "recoveryAction" | "account" | "session" | "verificationToken" | "sampleProject"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -7978,6 +7979,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    SampleProject: {
+      payload: Prisma.$SampleProjectPayload<ExtArgs>
+      fields: Prisma.SampleProjectFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SampleProjectFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SampleProjectPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SampleProjectFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SampleProjectPayload>
+        }
+        findFirst: {
+          args: Prisma.SampleProjectFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SampleProjectPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SampleProjectFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SampleProjectPayload>
+        }
+        findMany: {
+          args: Prisma.SampleProjectFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SampleProjectPayload>[]
+        }
+        create: {
+          args: Prisma.SampleProjectCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SampleProjectPayload>
+        }
+        createMany: {
+          args: Prisma.SampleProjectCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SampleProjectCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SampleProjectPayload>[]
+        }
+        delete: {
+          args: Prisma.SampleProjectDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SampleProjectPayload>
+        }
+        update: {
+          args: Prisma.SampleProjectUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SampleProjectPayload>
+        }
+        deleteMany: {
+          args: Prisma.SampleProjectDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SampleProjectUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SampleProjectUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SampleProjectPayload>[]
+        }
+        upsert: {
+          args: Prisma.SampleProjectUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SampleProjectPayload>
+        }
+        aggregate: {
+          args: Prisma.SampleProjectAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSampleProject>
+        }
+        groupBy: {
+          args: Prisma.SampleProjectGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SampleProjectGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SampleProjectCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SampleProjectCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -8039,6 +8114,7 @@ export const ProjectScalarFieldEnum = {
   color: 'color',
   status: 'status',
   ownerId: 'ownerId',
+  organizationId: 'organizationId',
   favorite: 'favorite',
   lastOpenedAt: 'lastOpenedAt',
   createdAt: 'createdAt',
@@ -8409,6 +8485,8 @@ export const WorkspacePreferenceScalarFieldEnum = {
   userId: 'userId',
   theme: 'theme',
   layout: 'layout',
+  simpleMode: 'simpleMode',
+  tourCompleted: 'tourCompleted',
   updatedAt: 'updatedAt'
 } as const
 
@@ -9268,6 +9346,19 @@ export const VerificationTokenScalarFieldEnum = {
 export type VerificationTokenScalarFieldEnum = (typeof VerificationTokenScalarFieldEnum)[keyof typeof VerificationTokenScalarFieldEnum]
 
 
+export const SampleProjectScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  description: 'description',
+  category: 'category',
+  prompt: 'prompt',
+  previewHtml: 'previewHtml',
+  featured: 'featured'
+} as const
+
+export type SampleProjectScalarFieldEnum = (typeof SampleProjectScalarFieldEnum)[keyof typeof SampleProjectScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -9679,6 +9770,7 @@ export type GlobalOmitConfig = {
   account?: Prisma.AccountOmit
   session?: Prisma.SessionOmit
   verificationToken?: Prisma.VerificationTokenOmit
+  sampleProject?: Prisma.SampleProjectOmit
 }
 
 /* Types for Logging */

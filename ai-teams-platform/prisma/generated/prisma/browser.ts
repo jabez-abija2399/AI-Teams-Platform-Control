@@ -522,3 +522,8 @@ export type Session = Prisma.SessionModel
  * 
  */
 export type VerificationToken = Prisma.VerificationTokenModel
+/**
+ * Model SampleProject
+ * 
+ */
+export type SampleProject = Prisma.SampleProjectModel

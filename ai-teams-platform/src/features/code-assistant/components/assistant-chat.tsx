@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Loading } from '@/components/ui/loading';
 import { Send, Copy, Check, Sparkles, Trash2 } from 'lucide-react';
+import { useToast } from '@/components/ui/toast';
 import { useCodeAssistant } from '../hooks/use-assistant';
 import type { CodeAssistantMessage, CodeContext } from '../types';
 
@@ -20,6 +21,7 @@ export function AssistantChat({ projectId, context, onApplyCode }: AssistantChat
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const mutation = useCodeAssistant();
+  const { addToast } = useToast();
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -67,6 +69,7 @@ export function AssistantChat({ projectId, context, onApplyCode }: AssistantChat
       };
       setMessages((prev) => [...prev, assistantMsg]);
     } catch {
+      addToast({ type: 'error', title: 'AI request failed', description: 'Please try again.' });
       const errorMsg: CodeAssistantMessage = {
         id: crypto.randomUUID(),
         role: 'assistant',

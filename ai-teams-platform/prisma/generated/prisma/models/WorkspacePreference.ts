@@ -28,6 +28,8 @@ export type WorkspacePreferenceMinAggregateOutputType = {
   id: string | null
   userId: string | null
   theme: string | null
+  simpleMode: boolean | null
+  tourCompleted: boolean | null
   updatedAt: Date | null
 }
 
@@ -35,6 +37,8 @@ export type WorkspacePreferenceMaxAggregateOutputType = {
   id: string | null
   userId: string | null
   theme: string | null
+  simpleMode: boolean | null
+  tourCompleted: boolean | null
   updatedAt: Date | null
 }
 
@@ -43,6 +47,8 @@ export type WorkspacePreferenceCountAggregateOutputType = {
   userId: number
   theme: number
   layout: number
+  simpleMode: number
+  tourCompleted: number
   updatedAt: number
   _all: number
 }
@@ -52,6 +58,8 @@ export type WorkspacePreferenceMinAggregateInputType = {
   id?: true
   userId?: true
   theme?: true
+  simpleMode?: true
+  tourCompleted?: true
   updatedAt?: true
 }
 
@@ -59,6 +67,8 @@ export type WorkspacePreferenceMaxAggregateInputType = {
   id?: true
   userId?: true
   theme?: true
+  simpleMode?: true
+  tourCompleted?: true
   updatedAt?: true
 }
 
@@ -67,6 +77,8 @@ export type WorkspacePreferenceCountAggregateInputType = {
   userId?: true
   theme?: true
   layout?: true
+  simpleMode?: true
+  tourCompleted?: true
   updatedAt?: true
   _all?: true
 }
@@ -148,6 +160,8 @@ export type WorkspacePreferenceGroupByOutputType = {
   userId: string
   theme: string
   layout: runtime.JsonValue
+  simpleMode: boolean
+  tourCompleted: boolean
   updatedAt: Date
   _count: WorkspacePreferenceCountAggregateOutputType | null
   _min: WorkspacePreferenceMinAggregateOutputType | null
@@ -177,6 +191,8 @@ export type WorkspacePreferenceWhereInput = {
   userId?: Prisma.StringFilter<"WorkspacePreference"> | string
   theme?: Prisma.StringFilter<"WorkspacePreference"> | string
   layout?: Prisma.JsonFilter<"WorkspacePreference">
+  simpleMode?: Prisma.BoolFilter<"WorkspacePreference"> | boolean
+  tourCompleted?: Prisma.BoolFilter<"WorkspacePreference"> | boolean
   updatedAt?: Prisma.DateTimeFilter<"WorkspacePreference"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
@@ -186,6 +202,8 @@ export type WorkspacePreferenceOrderByWithRelationInput = {
   userId?: Prisma.SortOrder
   theme?: Prisma.SortOrder
   layout?: Prisma.SortOrder
+  simpleMode?: Prisma.SortOrder
+  tourCompleted?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
 }
@@ -198,6 +216,8 @@ export type WorkspacePreferenceWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.WorkspacePreferenceWhereInput | Prisma.WorkspacePreferenceWhereInput[]
   theme?: Prisma.StringFilter<"WorkspacePreference"> | string
   layout?: Prisma.JsonFilter<"WorkspacePreference">
+  simpleMode?: Prisma.BoolFilter<"WorkspacePreference"> | boolean
+  tourCompleted?: Prisma.BoolFilter<"WorkspacePreference"> | boolean
   updatedAt?: Prisma.DateTimeFilter<"WorkspacePreference"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id" | "userId">
@@ -207,6 +227,8 @@ export type WorkspacePreferenceOrderByWithAggregationInput = {
   userId?: Prisma.SortOrder
   theme?: Prisma.SortOrder
   layout?: Prisma.SortOrder
+  simpleMode?: Prisma.SortOrder
+  tourCompleted?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.WorkspacePreferenceCountOrderByAggregateInput
   _max?: Prisma.WorkspacePreferenceMaxOrderByAggregateInput
@@ -221,6 +243,8 @@ export type WorkspacePreferenceScalarWhereWithAggregatesInput = {
   userId?: Prisma.StringWithAggregatesFilter<"WorkspacePreference"> | string
   theme?: Prisma.StringWithAggregatesFilter<"WorkspacePreference"> | string
   layout?: Prisma.JsonWithAggregatesFilter<"WorkspacePreference">
+  simpleMode?: Prisma.BoolWithAggregatesFilter<"WorkspacePreference"> | boolean
+  tourCompleted?: Prisma.BoolWithAggregatesFilter<"WorkspacePreference"> | boolean
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"WorkspacePreference"> | Date | string
 }
 
@@ -228,6 +252,8 @@ export type WorkspacePreferenceCreateInput = {
   id?: string
   theme?: string
   layout: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  simpleMode?: boolean
+  tourCompleted?: boolean
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutWorkspacePreferenceInput
 }
@@ -237,6 +263,8 @@ export type WorkspacePreferenceUncheckedCreateInput = {
   userId: string
   theme?: string
   layout: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  simpleMode?: boolean
+  tourCompleted?: boolean
   updatedAt?: Date | string
 }
 
@@ -244,6 +272,8 @@ export type WorkspacePreferenceUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   theme?: Prisma.StringFieldUpdateOperationsInput | string
   layout?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  simpleMode?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  tourCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutWorkspacePreferenceNestedInput
 }
@@ -253,6 +283,8 @@ export type WorkspacePreferenceUncheckedUpdateInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   theme?: Prisma.StringFieldUpdateOperationsInput | string
   layout?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  simpleMode?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  tourCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -261,6 +293,8 @@ export type WorkspacePreferenceCreateManyInput = {
   userId: string
   theme?: string
   layout: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  simpleMode?: boolean
+  tourCompleted?: boolean
   updatedAt?: Date | string
 }
 
@@ -268,6 +302,8 @@ export type WorkspacePreferenceUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   theme?: Prisma.StringFieldUpdateOperationsInput | string
   layout?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  simpleMode?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  tourCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -276,6 +312,8 @@ export type WorkspacePreferenceUncheckedUpdateManyInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   theme?: Prisma.StringFieldUpdateOperationsInput | string
   layout?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  simpleMode?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  tourCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -289,6 +327,8 @@ export type WorkspacePreferenceCountOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   theme?: Prisma.SortOrder
   layout?: Prisma.SortOrder
+  simpleMode?: Prisma.SortOrder
+  tourCompleted?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
@@ -296,6 +336,8 @@ export type WorkspacePreferenceMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   theme?: Prisma.SortOrder
+  simpleMode?: Prisma.SortOrder
+  tourCompleted?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
@@ -303,6 +345,8 @@ export type WorkspacePreferenceMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   theme?: Prisma.SortOrder
+  simpleMode?: Prisma.SortOrder
+  tourCompleted?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
@@ -342,6 +386,8 @@ export type WorkspacePreferenceCreateWithoutUserInput = {
   id?: string
   theme?: string
   layout: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  simpleMode?: boolean
+  tourCompleted?: boolean
   updatedAt?: Date | string
 }
 
@@ -349,6 +395,8 @@ export type WorkspacePreferenceUncheckedCreateWithoutUserInput = {
   id?: string
   theme?: string
   layout: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  simpleMode?: boolean
+  tourCompleted?: boolean
   updatedAt?: Date | string
 }
 
@@ -372,6 +420,8 @@ export type WorkspacePreferenceUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   theme?: Prisma.StringFieldUpdateOperationsInput | string
   layout?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  simpleMode?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  tourCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -379,6 +429,8 @@ export type WorkspacePreferenceUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   theme?: Prisma.StringFieldUpdateOperationsInput | string
   layout?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  simpleMode?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  tourCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -389,6 +441,8 @@ export type WorkspacePreferenceSelect<ExtArgs extends runtime.Types.Extensions.I
   userId?: boolean
   theme?: boolean
   layout?: boolean
+  simpleMode?: boolean
+  tourCompleted?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["workspacePreference"]>
@@ -398,6 +452,8 @@ export type WorkspacePreferenceSelectCreateManyAndReturn<ExtArgs extends runtime
   userId?: boolean
   theme?: boolean
   layout?: boolean
+  simpleMode?: boolean
+  tourCompleted?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["workspacePreference"]>
@@ -407,6 +463,8 @@ export type WorkspacePreferenceSelectUpdateManyAndReturn<ExtArgs extends runtime
   userId?: boolean
   theme?: boolean
   layout?: boolean
+  simpleMode?: boolean
+  tourCompleted?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["workspacePreference"]>
@@ -416,10 +474,12 @@ export type WorkspacePreferenceSelectScalar = {
   userId?: boolean
   theme?: boolean
   layout?: boolean
+  simpleMode?: boolean
+  tourCompleted?: boolean
   updatedAt?: boolean
 }
 
-export type WorkspacePreferenceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "theme" | "layout" | "updatedAt", ExtArgs["result"]["workspacePreference"]>
+export type WorkspacePreferenceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "theme" | "layout" | "simpleMode" | "tourCompleted" | "updatedAt", ExtArgs["result"]["workspacePreference"]>
 export type WorkspacePreferenceInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -440,6 +500,8 @@ export type $WorkspacePreferencePayload<ExtArgs extends runtime.Types.Extensions
     userId: string
     theme: string
     layout: runtime.JsonValue
+    simpleMode: boolean
+    tourCompleted: boolean
     updatedAt: Date
   }, ExtArgs["result"]["workspacePreference"]>
   composites: {}
@@ -869,6 +931,8 @@ export interface WorkspacePreferenceFieldRefs {
   readonly userId: Prisma.FieldRef<"WorkspacePreference", 'String'>
   readonly theme: Prisma.FieldRef<"WorkspacePreference", 'String'>
   readonly layout: Prisma.FieldRef<"WorkspacePreference", 'Json'>
+  readonly simpleMode: Prisma.FieldRef<"WorkspacePreference", 'Boolean'>
+  readonly tourCompleted: Prisma.FieldRef<"WorkspacePreference", 'Boolean'>
   readonly updatedAt: Prisma.FieldRef<"WorkspacePreference", 'DateTime'>
 }
     
