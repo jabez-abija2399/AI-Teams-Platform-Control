@@ -1,11 +1,17 @@
-import type { AIGenerateOptions, AIResponse, AIStreamChunk, AIProviderName } from './ai.types';
+import type { AIGenerateOptions, AIResponse, AIStreamChunk, AIProviderName, ModelRoute } from './ai.types';
 import { getFirstAvailableProvider, getOrCreateProvider } from '../providers/provider.factory';
 import { getAvailableProviders } from '../providers/provider.registry';
 import { MAX_RETRIES } from './ai.constants';
+import { extractJson } from '@/ai/utils/extract-json';
 
 function isRetryable(err: unknown): boolean {
   const msg = err instanceof Error ? err.message : String(err);
   return /429|rate.?limit|too many request|500|502|503|service.?unavailable|timeout|etimedout|econnrefused|econnreset|network|fetch.*fail/i.test(msg);
+}
+
+function isModelNotFound(err: unknown): boolean {
+  const msg = err instanceof Error ? err.message : String(err);
+  return /model_not_found|does not exist|not found|failed: 404/.test(msg);
 }
 
 function getRetryDelay(attempt: number): number {
@@ -50,6 +56,61 @@ function buildProviderChain(preferred?: AIProviderName): Array<{ name: AIProvide
 export async function aiGenerate(
   options: AIGenerateOptions,
   providerName?: AIProviderName,
+  routes?: ModelRoute[],
+): Promise<AIResponse> {
+  if (routes && routes.length > 0) {
+    return aiGenerateWithRoutes(options, routes);
+  }
+
+  return aiGenerateWithFallback(options, providerName);
+}
+
+async function aiGenerateWithRoutes(
+  options: AIGenerateOptions,
+  routes: ModelRoute[],
+): Promise<AIResponse> {
+  let lastError: Error | undefined;
+  let currentOptions = { ...options };
+
+  for (const { provider: providerName, model } of routes) {
+    let provider;
+    try {
+      provider = getOrCreateProvider(providerName);
+      if (!provider.isAvailable()) continue;
+    } catch {
+      continue;
+    }
+
+    currentOptions = { ...currentOptions, model };
+
+    for (let attempt = 0; attempt <= Math.min(MAX_RETRIES, 1); attempt++) {
+      try {
+        const response = await provider.generate(currentOptions);
+        return response;
+      } catch (error) {
+        lastError = error instanceof Error ? error : new Error(String(error));
+
+        if (isModelNotFound(error)) {
+          currentOptions = { ...currentOptions, model: undefined };
+          attempt = -1;
+          continue;
+        }
+
+        if (!isRetryable(error)) break;
+
+        if (attempt < MAX_RETRIES) {
+          await sleep(getRetryDelay(attempt));
+        }
+      }
+    }
+  }
+
+  throw lastError ?? new Error('AI generation failed across all routes');
+}
+
+async function aiGenerateWithFallback(
+  options: AIGenerateOptions,
+  providerName?: AIProviderName,
 ): Promise<AIResponse> {
   const chain = buildProviderChain(providerName);
 
@@ -78,6 +139,8 @@ export async function aiGenerate(
         }
       }
     }
+
+    if (providerName && name === providerName) break;
   }
 
   throw lastError ?? new Error('AI generation failed across all providers');
@@ -107,16 +170,6 @@ export async function aiGenerateStructured<T>(
   providerName?: AIProviderName,
 ): Promise<{ data: T; response: AIResponse }> {
   const response = await aiGenerate(options, providerName);
-
-  try {
-    const parsed = schema.parse(JSON.parse(response.content));
-    return { data: parsed, response };
-  } catch {
-    const jsonMatch = response.content.match(/```json\s*([\s\S]*?)```/);
-    if (jsonMatch?.[1]) {
-      const parsed = schema.parse(JSON.parse(jsonMatch[1]));
-      return { data: parsed, response };
-    }
-    throw new Error('Failed to parse AI response as structured data');
-  }
+  const parsed = schema.parse(extractJson(response.content));
+  return { data: parsed as T, response };
 }
