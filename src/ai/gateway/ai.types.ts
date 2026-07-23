@@ -66,6 +66,11 @@ export const AIProviderConfigSchema = z.object({
 });
 export type AIProviderConfig = z.infer<typeof AIProviderConfigSchema>;
 
+export interface ModelRoute {
+  provider: AIProviderName;
+  model: string;
+}
+
 export interface AIProviderAdapter {
   readonly name: string;
   readonly isConfigured: boolean;
