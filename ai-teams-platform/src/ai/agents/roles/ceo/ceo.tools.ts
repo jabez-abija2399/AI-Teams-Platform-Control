@@ -1,5 +1,5 @@
 import type { ITool, ToolResult } from '@/ai/agents/tools/tool.interface';
-import { generate } from '@/ai/services/ai.service';
+import { aiCall } from '@/ai/agents/core/ai-call';
 import { ceoConfig } from './ceo.config';
 import { CEO_SYSTEM_PROMPT } from './ceo.prompt';
 import {
@@ -10,22 +10,6 @@ import {
   type ProductRequirement,
   type DevelopmentPlan,
 } from './ceo.types';
-
-function extractJson(text: string): unknown {
-  const jsonMatch = text.match(/```json\s*([\s\S]*?)```/);
-  if (jsonMatch?.[1]) return JSON.parse(jsonMatch[1]);
-  const firstBrace = text.indexOf('{');
-  const lastBrace = text.lastIndexOf('}');
-  if (firstBrace !== -1 && lastBrace > firstBrace) {
-    return JSON.parse(text.slice(firstBrace, lastBrace + 1));
-  }
-  const firstBracket = text.indexOf('[');
-  const lastBracket = text.lastIndexOf(']');
-  if (firstBracket !== -1 && lastBracket > firstBracket) {
-    try { return JSON.parse(text.slice(firstBracket, lastBracket + 1)); } catch { /* continue */ }
-  }
-  return JSON.parse(text);
-}
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 function normalizeEnums(obj: any): any {
@@ -45,22 +29,6 @@ function normalizeEnums(obj: any): any {
 }
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
-async function aiCall<T>(prompt: string, systemPrompt: string, projectId?: string, agentId?: string): Promise<T> {
-  const result = await generate(
-    {
-      model: ceoConfig.preferredModel,
-      systemPrompt,
-      messages: [{ role: 'user', content: prompt }],
-      temperature: ceoConfig.temperature,
-      maxTokens: ceoConfig.maxTokens,
-      provider: ceoConfig.preferredProvider,
-    },
-    { projectId, agentId },
-  );
-  if (!result.success) throw new Error(result.error.message);
-  return extractJson(result.data.content) as T;
-}
-
 export const requirementBuilderTool: ITool<{ userIdea: string; projectId?: string; agentId?: string }, ProductVision> = {
   name: 'requirement_builder',
   description:
@@ -68,8 +36,10 @@ export const requirementBuilderTool: ITool<{ userIdea: string; projectId?: strin
   async execute({ userIdea, projectId, agentId }): Promise<ToolResult<ProductVision>> {
     try {
       const raw = await aiCall<unknown>(
-        `User idea: "${userIdea}"\n\nProduce a product vision as JSON with keys: problem, solution, targetUsers (array), businessGoal. Respond ONLY with valid JSON.`,
+        `User idea: "${userIdea}"\n\nProduce a product vision as JSON with keys: problem (string), solution (string), targetUsers (array of strings), businessGoal (string). Each field MUST be a non-empty value. Do NOT include any extra keys. Respond ONLY with valid JSON.`,
         CEO_SYSTEM_PROMPT,
+        'CEO',
+        ceoConfig,
         projectId,
         agentId,
       );
@@ -92,6 +62,8 @@ export const featurePlannerTool: ITool<{ vision: ProductVision; projectId?: stri
       const raw = await aiCall<unknown>(
         `Product vision: ${JSON.stringify(vision)}\n\nProduce product requirements as JSON with keys: features (array of {name, description}), userStories (array of {as, iWant, soThat, priority}), priorities (array of strings), constraints (array of strings). Respond ONLY with valid JSON.`,
         CEO_SYSTEM_PROMPT,
+        'CEO',
+        ceoConfig,
         projectId,
         agentId,
       );
@@ -112,8 +84,10 @@ export const roadmapGeneratorTool: ITool<{ requirements: ProductRequirement; pro
   async execute({ requirements, projectId, agentId }): Promise<ToolResult<DevelopmentPlan>> {
     try {
       const raw = await aiCall<unknown>(
-        `Requirements: ${JSON.stringify(requirements)}\n\nProduce a phased development plan as JSON.\nYou MUST include ALL of these top-level keys:\n- "phases": array of objects with "name" (string), "goal" (string), "tasks" (array of strings)\n- "tasks": flat array of strings (all tasks across all phases)\n- "estimatedComplexity": one of "LOW", "MEDIUM", "HIGH", "VERY_HIGH"\n\nExample format:\n{"phases":[{"name":"Phase 1","goal":"...","tasks":["..."]}],"tasks":["..."],"estimatedComplexity":"MEDIUM"}\n\nRespond ONLY with valid JSON, no markdown.`,
+        `Requirements: ${JSON.stringify(requirements)}\n\nProduce a phased development plan as JSON.\nYou MUST include ALL of these top-level keys:\n- "phases": array of objects with "name" (string), "goal" (string), "tasks" (array of strings)\n- "tasks": flat array of strings (all tasks across all phases)\n- "estimatedComplexity": one of "LOW", "MEDIUM", "HIGH", "VERY_HIGH"\n- "qualityScore": object with "completeness" (1-10), "clarity" (1-10), "feasibility" (1-10), "overall" (1-10), "verdict" ("APPROVED"/"NEEDS_REVISION"/"REJECTED")\n\nExample format:\n{"phases":[{"name":"Phase 1","goal":"...","tasks":["..."]}],"tasks":["..."],"estimatedComplexity":"MEDIUM","qualityScore":{"completeness":8,"clarity":7,"feasibility":8,"overall":8,"verdict":"APPROVED"}}\n\nRespond ONLY with valid JSON, no markdown.`,
         CEO_SYSTEM_PROMPT,
+        'CEO',
+        ceoConfig,
         projectId,
         agentId,
       );

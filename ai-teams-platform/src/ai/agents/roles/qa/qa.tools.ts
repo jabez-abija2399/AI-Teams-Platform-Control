@@ -1,25 +1,9 @@
 import type { ITool, ToolResult } from '@/ai/agents/tools/tool.interface';
-import { generate } from '@/ai/services/ai.service';
+import { aiCall } from '@/ai/agents/core/ai-call';
 import { qaConfig } from './qa.config';
 import { QA_SYSTEM_PROMPT } from './qa.prompt';
 import { testPlanSchema, bugReportSchema, type TestPlan, type BugReport } from './qa.types';
 import type { DeveloperOutput } from '@/ai/agents/roles/developer/developer.types';
-
-function extractJson(text: string): unknown {
-  const jsonMatch = text.match(/```json\s*([\s\S]*?)```/);
-  if (jsonMatch?.[1]) return JSON.parse(jsonMatch[1]);
-  const firstBrace = text.indexOf('{');
-  const lastBrace = text.lastIndexOf('}');
-  if (firstBrace !== -1 && lastBrace > firstBrace) {
-    return JSON.parse(text.slice(firstBrace, lastBrace + 1));
-  }
-  const firstBracket = text.indexOf('[');
-  const lastBracket = text.lastIndexOf(']');
-  if (firstBracket !== -1 && lastBracket > firstBracket) {
-    try { return JSON.parse(text.slice(firstBracket, lastBracket + 1)); } catch { /* continue */ }
-  }
-  return JSON.parse(text);
-}
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 function normalizeEnums(obj: any): any {
@@ -39,22 +23,6 @@ function normalizeEnums(obj: any): any {
 }
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
-async function aiCall<T>(prompt: string, projectId?: string, agentId?: string): Promise<T> {
-  const result = await generate(
-    {
-      model: qaConfig.preferredModel,
-      systemPrompt: QA_SYSTEM_PROMPT,
-      messages: [{ role: 'user', content: prompt }],
-      temperature: qaConfig.temperature,
-      maxTokens: qaConfig.maxTokens,
-      provider: qaConfig.preferredProvider,
-    },
-    { projectId, agentId },
-  );
-  if (!result.success) throw new Error(result.error.message);
-  return extractJson(result.data.content) as T;
-}
-
 export const testGeneratorTool: ITool<{ implementation: DeveloperOutput; projectId?: string; agentId?: string }, TestPlan> = {
   name: 'test_generator',
   description: 'Generates unit and integration test cases for an implementation.',
@@ -62,6 +30,9 @@ export const testGeneratorTool: ITool<{ implementation: DeveloperOutput; project
     try {
       const raw = await aiCall<unknown>(
         `Implementation: ${JSON.stringify(implementation)}\n\nProduce a test plan as JSON with keys: tests (array of {name, type, steps}), coverage (string), strategy (string). type must be UNIT, INTEGRATION, or E2E. Respond ONLY with valid JSON.`,
+        QA_SYSTEM_PROMPT,
+        'QA',
+        qaConfig,
         projectId,
         agentId,
       );
@@ -84,6 +55,9 @@ export const bugAnalyzerTool: ITool<{ implementation: DeveloperOutput; projectId
     try {
       const raw = await aiCall<{ bugs: unknown[] }>(
         `Implementation: ${JSON.stringify(implementation)}\n\nFind bugs. Return JSON: { bugs: [{ severity, description, location, solution }] }. severity must be LOW, MEDIUM, HIGH, or CRITICAL. Respond ONLY with valid JSON.`,
+        QA_SYSTEM_PROMPT,
+        'QA',
+        qaConfig,
         projectId,
         agentId,
       );
