@@ -48,7 +48,7 @@ export async function analyzeUserIdea(
     const planResult = await roadmapGeneratorTool.execute({ requirements: requirementsResult.data, projectId, agentId });
     if (!planResult.success) throw new Error(planResult.error);
 
-    const analysis = ceoAnalysisSchema.parse({ vision: visionResult.data, requirements: requirementsResult.data, plan: planResult.data });
+    const analysis = ceoAnalysisSchema.parse({ vision: visionResult.data, requirements: requirementsResult.data, plan: planResult.data, qualityScore: planResult.data.qualityScore });
 
     await Promise.all([
       prisma.document.create({ data: { projectId, type: 'VISION', title: 'Product Vision', content: JSON.stringify(analysis.vision) } }),
