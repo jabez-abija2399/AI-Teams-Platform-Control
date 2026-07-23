@@ -1,19 +1,14 @@
-import type { AIProviderName } from '@/ai/gateway/ai.types';
+import type { ModelRoute } from '@/ai/gateway/ai.types';
+import { envModels } from '@/ai/agents/core/model-routes';
 
 export interface AgentModelConfig {
-  preferredProvider: AIProviderName;
-  preferredModel: string;
-  fallbackProvider: AIProviderName;
-  fallbackModel: string;
+  models: ModelRoute[];
   temperature: number;
   maxTokens: number;
 }
 
 export const ceoConfig: AgentModelConfig = {
-  preferredProvider: (process.env.CEO_AI_PROVIDER as AIProviderName) ?? 'groq',
-  preferredModel: process.env.CEO_AI_MODEL ?? 'llama-3.3-70b-versatile',
-  fallbackProvider: 'groq',
-  fallbackModel: 'llama-3.3-70b-versatile',
+  models: envModels('CEO'),
   temperature: 0.6,
-  maxTokens: 3000,
+  maxTokens: 4000,
 };
