@@ -1,30 +1,19 @@
 import type { ITool, ToolResult } from '@/ai/agents/tools/tool.interface';
-import { generate } from '@/ai/services/ai.service';
+import { aiCall } from '@/ai/agents/core/ai-call';
 import { developerConfig } from './developer.config';
 import { DEVELOPER_SYSTEM_PROMPT } from './developer.prompt';
 import {
   developmentPlanSchema,
   codeChangeSchema,
+  implementationReportSchema,
   type DeveloperPlan,
   type CodeChange,
+  type ImplementationReport,
 } from './developer.types';
 import type { ArchitectAnalysis } from '@/ai/agents/roles/architect/architect.types';
-
-function extractJson(text: string): unknown {
-  const jsonMatch = text.match(/```json\s*([\s\S]*?)```/);
-  if (jsonMatch?.[1]) return JSON.parse(jsonMatch[1]);
-  const firstBrace = text.indexOf('{');
-  const lastBrace = text.lastIndexOf('}');
-  if (firstBrace !== -1 && lastBrace > firstBrace) {
-    return JSON.parse(text.slice(firstBrace, lastBrace + 1));
-  }
-  const firstBracket = text.indexOf('[');
-  const lastBracket = text.lastIndexOf(']');
-  if (firstBracket !== -1 && lastBracket > firstBracket) {
-    try { return JSON.parse(text.slice(firstBracket, lastBracket + 1)); } catch { /* continue */ }
-  }
-  return JSON.parse(text);
-}
+import type { ProductRequirement } from '@/ai/agents/roles/ceo/ceo.types';
+import { readFileTool, writeFileTool, listDirectoryTool } from '@/ai/agents/tools/file-system.tool';
+import { runCommandTool } from '@/ai/agents/tools/shell.tool';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 function normalizeEnums(obj: any): any {
@@ -44,36 +33,22 @@ function normalizeEnums(obj: any): any {
 }
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
-async function aiCall<T>(prompt: string, projectId?: string, agentId?: string, signal?: AbortSignal): Promise<T> {
-  const result = await generate(
-    {
-      model: developerConfig.preferredModel,
-      systemPrompt: DEVELOPER_SYSTEM_PROMPT,
-      messages: [{ role: 'user', content: prompt }],
-      temperature: developerConfig.temperature,
-      maxTokens: developerConfig.maxTokens,
-      provider: developerConfig.preferredProvider,
-    },
-    { projectId, agentId },
-  );
-  if (signal?.aborted) throw new Error('BUILD_CANCELLED');
-  if (!result.success) throw new Error(result.error.message);
-  return extractJson(result.data.content) as T;
-}
-
 export const codeGeneratorTool: ITool<
-  { architecture: ArchitectAnalysis; task: string; projectId?: string; agentId?: string; signal?: AbortSignal },
+  { architecture: ArchitectAnalysis; task: string; projectId?: string; agentId?: string; signal?: AbortSignal; requirements?: ProductRequirement },
   CodeChange[]
 > = {
   name: 'code_generator',
   description: 'Generates implementation code for a task given the technical architecture.',
-  async execute({ architecture, task, projectId, agentId, signal }): Promise<ToolResult<CodeChange[]>> {
+  async execute({ architecture, task, projectId, agentId, signal, requirements }): Promise<ToolResult<CodeChange[]>> {
     try {
+      const context = `Architecture: ${JSON.stringify(architecture)}${requirements ? `\nRequirements: ${JSON.stringify(requirements)}` : ''}\nTask: ${task}\n\nScope rule: Only generate files for layers that are active. If backend is "None" or "Deferred", do NOT create any backend files (no server code, no app.js, no API routes, etc.).\n\nProduce code changes as JSON: { changes: [{ file, changeType, description, code }] }. changeType must be CREATE, MODIFY, or DELETE. Respond ONLY with valid JSON.`;
       const raw = await aiCall<{ changes: unknown[] }>(
-        `Architecture: ${JSON.stringify(architecture)}\nTask: ${task}\n\nProduce code changes as JSON: { changes: [{ file, changeType, description, code }] }. changeType must be CREATE, MODIFY, or DELETE. Respond ONLY with valid JSON.`,
+        context,
+        DEVELOPER_SYSTEM_PROMPT,
+        'DEVELOPER',
+        developerConfig,
         projectId,
         agentId,
-        signal,
       );
       const data = raw.changes.map((c) => codeChangeSchema.parse(normalizeEnums(c)));
       return { success: true, data };
@@ -89,16 +64,19 @@ export const codeGeneratorTool: ITool<
   },
 };
 
-export const developmentPlannerTool: ITool<{ architecture: ArchitectAnalysis; projectId?: string; agentId?: string; signal?: AbortSignal }, DeveloperPlan> = {
+export const developmentPlannerTool: ITool<{ architecture: ArchitectAnalysis; projectId?: string; agentId?: string; signal?: AbortSignal; requirements?: ProductRequirement }, DeveloperPlan> = {
   name: 'development_planner',
   description: 'Breaks architecture into an ordered implementation plan.',
-  async execute({ architecture, projectId, agentId, signal }): Promise<ToolResult<DeveloperPlan>> {
+  async execute({ architecture, projectId, agentId, signal, requirements }): Promise<ToolResult<DeveloperPlan>> {
     try {
+      const context = `Architecture: ${JSON.stringify(architecture)}${requirements ? `\nRequirements: ${JSON.stringify(requirements)}` : ''}\n\nScope rule: Only generate files for layers that are actually active. If a layer (backend, database, etc.) says "None" or "Deferred", do NOT include tasks or files for that layer.\n\nProduce a development plan as JSON with keys: tasks (array of strings), files (array of strings), dependencies (array of strings), implementationOrder (array of strings). Respond ONLY with valid JSON.`;
       const raw = await aiCall<unknown>(
-        `Architecture: ${JSON.stringify(architecture)}\n\nProduce a development plan as JSON with keys: tasks (array of strings), files (array of strings), dependencies (array of strings), implementationOrder (array of strings). Respond ONLY with valid JSON.`,
+        context,
+        DEVELOPER_SYSTEM_PROMPT,
+        'DEVELOPER',
+        developerConfig,
         projectId,
         agentId,
-        signal,
       );
       const data = developmentPlanSchema.parse(normalizeEnums(raw));
       return { success: true, data };
@@ -113,3 +91,5 @@ export const developmentPlannerTool: ITool<{ architecture: ArchitectAnalysis; pr
     }
   },
 };
+
+export { readFileTool, writeFileTool, listDirectoryTool, runCommandTool };
