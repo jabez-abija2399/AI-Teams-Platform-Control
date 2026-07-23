@@ -3,6 +3,7 @@ import type {
   AIResponse,
   AIStreamChunk,
   AIProviderName,
+  ModelRoute,
 } from '../gateway/ai.types';
 import { aiGenerate, aiStream, aiGenerateStructured } from '../gateway/ai.gateway';
 import { logUsage } from './usage.service';
@@ -19,7 +20,10 @@ function translateError(raw: string): { message: string; code: string } {
   if (/403|forbidden|access.?denied/.test(lower)) {
     return { message: 'AI service access denied. Please check your API key permissions.', code: 'ACCESS_DENIED' };
   }
-  if (/quota|billing|limit.*exceeded/.test(lower)) {
+  if (/402|payment|billing|insufficient_credit/.test(lower)) {
+    return { message: 'AI provider requires payment or additional credits. Please check your account.', code: 'PAYMENT_REQUIRED' };
+  }
+  if (/quota|limit.*exceeded/.test(lower)) {
     return { message: 'AI usage quota reached. Please check your billing or try again tomorrow.', code: 'QUOTA_EXCEEDED' };
   }
   if (/timeout|etimedout|timed.?out/.test(lower)) {
@@ -39,11 +43,12 @@ export class AIService {
     options: AIGenerateOptions,
     provider?: AIProviderName,
     metadata?: { agentId?: string; workflowId?: string; taskId?: string; projectId?: string },
+    routes?: ModelRoute[],
   ): Promise<AIResponse> {
     const cached = getCachedResponse(options);
     if (cached) return cached;
 
-    const response = await aiGenerate(options, provider);
+    const response = await aiGenerate(options, provider, routes);
 
     setCachedResponse(options, response);
 
@@ -107,7 +112,7 @@ export function getAIService(): AIService {
 }
 
 export async function generate(
-  options: AIGenerateOptions & { systemPrompt?: string; provider?: AIProviderName },
+  options: AIGenerateOptions & { systemPrompt?: string; provider?: AIProviderName; routes?: ModelRoute[] },
   metadata?: { agentId?: string; workflowId?: string; taskId?: string; projectId?: string },
 ): Promise<
   { success: true; data: AIResponse } | { success: false; error: { message: string; code: string } }
@@ -117,7 +122,7 @@ export async function generate(
     const messages = options.systemPrompt
       ? [{ role: 'system' as const, content: options.systemPrompt }, ...options.messages]
       : options.messages;
-    const response = await ai.generate({ ...options, messages }, options.provider, metadata);
+    const response = await ai.generate({ ...options, messages }, options.provider, metadata, options.routes);
     return { success: true, data: response };
   } catch (err) {
     const raw = err instanceof Error ? err.message : String(err);
