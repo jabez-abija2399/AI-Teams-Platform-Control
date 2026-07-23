@@ -1,11 +1,8 @@
 import type { AgentModelConfig } from '@/ai/agents/roles/ceo/ceo.config';
+import { envModels } from '@/ai/agents/core/model-routes';
 
 export const qaConfig: AgentModelConfig = {
-  preferredProvider:
-    (process.env.QA_AI_PROVIDER as AgentModelConfig['preferredProvider']) ?? 'gemini',
-  preferredModel: process.env.QA_AI_MODEL ?? 'gemini-2.0-flash',
-  fallbackProvider: 'groq',
-  fallbackModel: 'llama-3.3-70b-versatile',
+  models: envModels('QA'),
   temperature: 0.2,
-  maxTokens: 4000,
+  maxTokens: 4096,
 };
