@@ -4,6 +4,12 @@ import bcrypt from 'bcryptjs';
 import { loginSchema } from '@/features/auth/schemas/auth.schema';
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  logger: {
+    error(error: any) {
+      if (error?.name === 'JWTSessionError' || (typeof error === 'string' && error.includes('JWTSessionError'))) return;
+      console.error(error);
+    },
+  },
   session: { strategy: 'jwt' },
   trustHost: true,
   pages: { signIn: '/login' },

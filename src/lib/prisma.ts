@@ -1,4 +1,9 @@
-import 'server-only';
+// Conditionally require server-only when running inside Next.js server
+if (process.env.NEXT_RUNTIME) {
+  try {
+    require('server-only');
+  } catch {}
+}
 import { PrismaClient } from '../../prisma/generated/prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import pg from 'pg';
