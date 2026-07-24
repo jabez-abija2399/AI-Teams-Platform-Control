@@ -26,7 +26,13 @@ const WorkflowCanvas = dynamic(
   { ssr: false },
 );
 
+const PipelineBoard = dynamic(
+  () => import('@/features/workspace/pipeline/components/pipeline-board').then((m) => ({ default: m.PipelineBoard })),
+  { ssr: false },
+);
+
 const TABS: { id: BottomPanelTab; label: string }[] = [
+  { id: 'pipeline', label: 'Pipeline' },
   { id: 'preview', label: 'Preview' },
   { id: 'review', label: 'Review' },
   { id: 'performance', label: 'Performance' },
@@ -47,19 +53,19 @@ export function BottomPanel() {
   return (
     <div
       data-tour="terminal"
-      className="flex shrink-0 flex-col border-t bg-card"
+      className="flex shrink-0 flex-col border-t bg-card text-card-foreground select-none z-10"
       style={{ height: layout.bottomPanelHeight }}
     >
-      <div className="flex h-8 items-center gap-1 border-b px-2">
+      <div className="flex h-8 items-center gap-1 border-b px-2 bg-muted/40 overflow-x-auto">
         {TABS.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setBottomPanel(tab.id)}
             className={cn(
-              'rounded px-2 py-1 text-xs font-medium',
+              'rounded px-2.5 py-1 text-xs font-medium transition-colors',
               activeBottomPanel === tab.id
-                ? 'bg-secondary text-foreground'
-                : 'text-muted-foreground hover:text-foreground',
+                ? 'bg-background text-foreground font-semibold shadow-xs border'
+                : 'text-muted-foreground hover:bg-secondary/60 hover:text-foreground',
             )}
           >
             {tab.label}
@@ -67,6 +73,9 @@ export function BottomPanel() {
         ))}
       </div>
       <div className="flex-1 overflow-hidden">
+        {activeBottomPanel === 'pipeline' && currentProjectId && (
+          <PipelineBoard projectId={currentProjectId} />
+        )}
         {activeBottomPanel === 'preview' && currentProjectId && (
           <LivePreview projectId={currentProjectId} />
         )}

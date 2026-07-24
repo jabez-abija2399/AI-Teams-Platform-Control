@@ -67,7 +67,7 @@ export function LivePreviewStatic({ projectId }: { projectId: string }) {
       </div>
       <iframe
         srcDoc={preview.html}
-        sandbox="allow-scripts"
+        sandbox="allow-scripts allow-same-origin"
         className="flex-1 border-0 bg-white"
         title="Live preview"
       />

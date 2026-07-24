@@ -1,4 +1,4 @@
-export type ActivityId = 'explorer' | 'search' | 'ai-employees' | 'projects' | 'git' | 'github' | 'quality' | 'documentation' | 'deployment' | 'analytics' | 'extensions' | 'settings';
+export type ActivityId = 'explorer' | 'preview' | 'search' | 'ai-employees' | 'git' | 'github' | 'quality' | 'documentation' | 'deployment' | 'analytics' | 'extensions' | 'settings';
 
 export interface ActivityItem {
   id: ActivityId;
@@ -6,7 +6,7 @@ export interface ActivityItem {
   icon: string;
 }
 
-export type BottomPanelTab = 'terminal' | 'problems' | 'output' | 'logs' | 'tests' | 'preview' | 'review' | 'database' | 'performance' | 'workflow';
+export type BottomPanelTab = 'terminal' | 'problems' | 'output' | 'logs' | 'tests' | 'preview' | 'review' | 'database' | 'performance' | 'workflow' | 'pipeline';
 
 export interface OpenTab {
   id: string;

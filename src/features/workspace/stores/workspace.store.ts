@@ -9,6 +9,7 @@ interface WorkspaceState {
   activeTabId: string | null;
   selectedActivity: ActivityId;
   activeBottomPanel: BottomPanelTab;
+  activeAgentTab: string;
   layout: WorkspaceLayoutPrefs;
   simpleMode: boolean;
   tourCompleted: boolean;
@@ -19,6 +20,7 @@ interface WorkspaceState {
   setActiveTab: (tabId: string | null) => void;
   markTabDirty: (tabId: string, isDirty: boolean) => void;
   setActivity: (activity: ActivityId) => void;
+  setActiveAgentTab: (tab: string) => void;
   setBottomPanel: (panel: BottomPanelTab) => void;
   toggleSidebar: () => void;
   toggleAIPanel: () => void;
@@ -36,8 +38,9 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       currentProjectId: null,
       openTabs: [],
       activeTabId: null,
-      selectedActivity: 'explorer',
+      selectedActivity: 'ai-employees',
       activeBottomPanel: 'terminal',
+      activeAgentTab: 'ceo',
       layout: DEFAULT_LAYOUT,
       simpleMode: true,
       tourCompleted: false,
@@ -70,6 +73,7 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         })),
 
       setActivity: (activity) => set({ selectedActivity: activity }),
+      setActiveAgentTab: (tab) => set({ activeAgentTab: tab }),
       setBottomPanel: (panel) => set({ activeBottomPanel: panel }),
 
       toggleSidebar: () =>

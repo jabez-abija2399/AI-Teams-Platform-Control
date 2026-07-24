@@ -70,30 +70,38 @@ const TreeLevel = memo(function TreeLevel({
 
 export function ExplorerTree({ projectId }: { projectId: string }) {
   const { loadRoot, loadedChildren, refreshTrigger } = useExplorer(projectId);
+  const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const refreshCountRef = useRef(0);
+  const hasLoaded = useRef(false);
 
   useEffect(() => {
-    if (!loadedChildren['root']) loadRoot();
-  }, [loadRoot, loadedChildren]);
+    setLoading(true);
+    loadRoot().finally(() => setLoading(false));
+  }, [projectId, loadRoot]);
 
   useEffect(() => {
     refreshCountRef.current++;
     if (refreshCountRef.current > 1) {
       setRefreshing(true);
       loadRoot().finally(() => setRefreshing(false));
-    } else {
-      loadRoot();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refreshTrigger]);
 
+  const rootNodes = loadedChildren['root'] ?? [];
+
   return (
     <div className="py-1">
-      {refreshing && (
-        <div className="flex items-center gap-2 px-2 pb-2 text-[10px] text-muted-foreground">
+      {(loading || refreshing) && (
+        <div className="flex items-center gap-2 px-3 py-2 text-[10px] text-muted-foreground">
           <Loader2 className="h-3 w-3 animate-spin" />
-          Refreshing...
+          {loading ? 'Loading files...' : 'Refreshing...'}
+        </div>
+      )}
+      {!loading && rootNodes.length === 0 && (
+        <div className="px-3 py-4 text-[11px] text-muted-foreground text-center">
+          No files found. Run a build to generate files.
         </div>
       )}
       <TreeLevel projectId={projectId} folderKey="root" depth={0} refreshing={refreshing} />

@@ -6,6 +6,9 @@ import { Button } from '@/components/ui/button';
 import { TopNav } from './top-nav';
 import { ActivityBar } from './activity-bar';
 import { SidebarPanel } from './sidebar-panel';
+import { EditorArea } from './editor-area';
+import { BottomPanel } from './bottom-panel';
+import { AIPanel } from './ai-panel';
 import { StatusBar } from './status-bar';
 import { SimpleTechnicalToggle } from '@/features/onboarding/components/simple-technical-toggle';
 import { SpotlightTour } from '@/features/onboarding/components/spotlight-tour';
@@ -83,7 +86,11 @@ export function SimpleWorkspaceView({
         <div className="flex flex-1 overflow-hidden">
           <ActivityBar />
           <SidebarPanel>{sidebarContent}</SidebarPanel>
-          <div className="flex-1 overflow-y-auto">{aiPanelContent}</div>
+          <div className="flex flex-1 flex-col overflow-hidden">
+            <EditorArea />
+            <BottomPanel />
+          </div>
+          <AIPanel>{aiPanelContent}</AIPanel>
         </div>
       )}
       <StatusBar />

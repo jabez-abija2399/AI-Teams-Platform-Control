@@ -2,11 +2,11 @@ import type { ActivityItem, WorkspaceLayoutPrefs } from '../types/workspace.type
 
 export const ACTIVITY_ITEMS: ActivityItem[] = [
   { id: 'explorer', label: 'Explorer', icon: 'Files' },
+  { id: 'preview', label: 'Live Preview', icon: 'Eye' },
   { id: 'search', label: 'Search', icon: 'Search' },
   { id: 'ai-employees', label: 'AI Employees', icon: 'Bot' },
-  { id: 'projects', label: 'Projects', icon: 'FolderKanban' },
   { id: 'git', label: 'Git', icon: 'GitBranch' },
-  { id: 'github', label: 'GitHub', icon: 'Github' },
+  { id: 'github', label: 'GitHub', icon: 'GitPullRequest' },
   { id: 'quality', label: 'Quality', icon: 'ShieldCheck' },
   { id: 'documentation', label: 'Documentation', icon: 'BookOpen' },
   { id: 'deployment', label: 'Deployment', icon: 'Rocket' },

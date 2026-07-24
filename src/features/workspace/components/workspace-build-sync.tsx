@@ -55,22 +55,37 @@ export function WorkspaceBuildSync({ projectId }: { projectId: string }) {
   }, [projectId, triggerRefresh]);
 
   // Fallback: poll build-status for full workflow & missed events
+  // Stops automatically when project reaches a terminal state or after 60 attempts (~5min)
   useEffect(() => {
     if (pollRef.current) return;
 
+    let attempts = 0;
+    const MAX_ATTEMPTS = 60;
+    const TERMINAL_STATES = new Set(['COMPLETED', 'ARCHIVED', 'REVIEW']);
+
     const check = async () => {
+      attempts++;
       try {
         const res = await fetch(`/api/projects/${projectId}/build-status`);
         const json = await res.json();
-        if (json.success && json.data.projectStatus === 'COMPLETED') {
-          triggerRefresh();
-          if (pollRef.current) {
-            clearInterval(pollRef.current);
-            pollRef.current = null;
+        if (json.success) {
+          const status: string = json.data.projectStatus;
+          if (TERMINAL_STATES.has(status) || !json.data.running) {
+            triggerRefresh();
+            if (pollRef.current) {
+              clearInterval(pollRef.current);
+              pollRef.current = null;
+            }
+            return;
           }
         }
       } catch {
         // ignore
+      }
+
+      if (attempts >= MAX_ATTEMPTS && pollRef.current) {
+        clearInterval(pollRef.current);
+        pollRef.current = null;
       }
     };
 
