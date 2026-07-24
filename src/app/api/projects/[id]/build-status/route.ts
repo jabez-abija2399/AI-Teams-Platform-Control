@@ -1,23 +1,13 @@
 import { NextResponse } from 'next/server';
-import { z } from 'zod';
-import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { unauthorizedResponse } from '@/lib/api-response';
+import type { PipelineState } from '@/features/workspace/pipeline/types/pipeline.types';
 
-const schema = z.object({ projectId: z.string() });
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
 
-export async function GET(request: Request) {
-  const session = await auth();
-  if (!session?.user?.id) return unauthorizedResponse();
-
-  const url = new URL(request.url);
-  const projectId = url.searchParams.get('projectId');
-  if (!projectId) {
-    return NextResponse.json(
-      { success: false, error: { message: 'projectId required', code: 'VALIDATION_ERROR' } },
-      { status: 400 },
-    );
-  }
+  const { id: projectId } = await params;
 
   const project = await prisma.project.findFirst({ where: { id: projectId } });
   if (!project) {
@@ -28,11 +18,21 @@ export async function GET(request: Request) {
   }
 
   const inProgressDoc = await prisma.document.findFirst({
-    where: {
-      projectId,
-      type: 'BUILD_IN_PROGRESS',
-    },
+    where: { projectId, type: 'BUILD_IN_PROGRESS' },
+    orderBy: { createdAt: 'desc' },
   });
+
+  let pipeline: PipelineState | null = null;
+  if (inProgressDoc) {
+    try {
+      const parsed = JSON.parse(inProgressDoc.content);
+      if (parsed.steps && Array.isArray(parsed.steps)) {
+        pipeline = parsed as PipelineState;
+      }
+    } catch {
+      // malformed document — ignore
+    }
+  }
 
   const hasDeployment = await prisma.deployment.findFirst({
     where: { projectId },
@@ -44,6 +44,7 @@ export async function GET(request: Request) {
     data: {
       projectStatus: project.status,
       running: !!inProgressDoc,
+      pipeline,
       hasDeployment: !!hasDeployment,
       deploymentStatus: hasDeployment?.status ?? null,
     },

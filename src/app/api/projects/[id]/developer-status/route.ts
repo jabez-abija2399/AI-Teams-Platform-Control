@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { getBuildState } from '@/ai/agents/roles/developer/developer.service';
 
@@ -8,10 +7,6 @@ interface Params {
 }
 
 export async function GET(_request: Request, { params }: Params) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ success: false, error: { message: 'Unauthorized', code: 'UNAUTHORIZED' } }, { status: 401 });
-  }
 
   const { id } = await params;
 

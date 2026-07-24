@@ -26,7 +26,10 @@ export async function GET(_request: Request, { params }: Params) {
       try {
         const analysis = { vision: JSON.parse(vision.content), requirements: JSON.parse(requirements.content), plan: JSON.parse(plan.content) };
         return NextResponse.json({ success: true, data: { exists: true, running: false, analysis } });
-      } catch { /* fall through */ }
+      } catch (err) {
+        console.error('[CEO Status] Failed to parse documents:', err);
+        return NextResponse.json({ success: false, error: { message: 'Analysis documents exist but are corrupted', code: 'PARSE_ERROR' } }, { status: 500 });
+      }
     }
   }
 

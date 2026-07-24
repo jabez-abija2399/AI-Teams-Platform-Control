@@ -7,9 +7,15 @@ import {
   createDeployment,
   executeDeployment,
 } from '@/features/deployment/services/deployment.service';
+import { triggerProductionDeploy } from '@/lib/deployments/deployment-service';
 
-const schema = z.object({
+const deploySchema = z.object({
   provider: z.string().optional().default('vercel'),
+  token: z.string().optional(),
+  projectName: z.string().optional(),
+  teamId: z.string().optional(),
+  envVars: z.record(z.string(), z.string()).optional().default({}),
+  files: z.record(z.string(), z.string()).optional().default({}),
 });
 
 interface Params {
@@ -22,9 +28,29 @@ export async function POST(request: Request, { params }: Params) {
 
   const { id: projectId } = await params;
   const body = await request.json().catch(() => ({}));
-  const parsed = schema.safeParse(body);
-  const provider = parsed.success ? parsed.data.provider : 'vercel';
+  const parsed = deploySchema.safeParse(body);
+  const data = parsed.success ? parsed.data : { provider: 'vercel', envVars: {}, files: {} };
+  const providerUpper = data.provider.toUpperCase();
 
+  // If token is provided or provider is Cloud provider, use triggerProductionDeploy
+  if (data.token && (providerUpper === 'VERCEL' || providerUpper === 'NETLIFY' || providerUpper === 'CLOUDFLARE')) {
+    const result = await triggerProductionDeploy({
+      projectId,
+      projectName: data.projectName || `project-${projectId}`,
+      provider: providerUpper as any,
+      token: data.token,
+      teamId: data.teamId,
+      envVars: data.envVars || {},
+      files: data.files || {},
+    });
+
+    return NextResponse.json({
+      success: result.status !== 'ERROR',
+      data: result,
+    });
+  }
+
+  // Standard deployment workflow
   let environments = await prisma.environment.findMany({
     where: { projectId },
     orderBy: { createdAt: 'asc' },
@@ -42,7 +68,7 @@ export async function POST(request: Request, { params }: Params) {
   const deployResult = await createDeployment({
     projectId,
     environmentId: targetEnvironment.id,
-    provider,
+    provider: data.provider,
     steps: [
       { name: 'Install dependencies' },
       { name: 'Build project' },

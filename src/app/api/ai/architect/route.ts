@@ -2,23 +2,13 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { toResponse, unauthorizedResponse } from '@/lib/api-response';
 import { designArchitecture } from '@/ai/agents/roles/architect/architect.service';
+import { prisma } from '@/lib/prisma';
+import { productRequirementSchema } from '@/ai/agents/roles/ceo/ceo.types';
 import { z } from 'zod';
 
 const requestSchema = z.object({
   projectId: z.string(),
-  requirements: z.object({
-    features: z.array(z.object({ name: z.string(), description: z.string() })),
-    userStories: z.array(
-      z.object({
-        as: z.string(),
-        iWant: z.string(),
-        soThat: z.string(),
-        priority: z.enum(['LOW', 'MEDIUM', 'HIGH', 'URGENT']),
-      }),
-    ),
-    priorities: z.array(z.string()),
-    constraints: z.array(z.string()),
-  }),
+  requirements: productRequirementSchema.optional(),
 });
 
 export async function POST(request: Request) {
@@ -34,11 +24,32 @@ export async function POST(request: Request) {
     );
   }
 
-  const result = await designArchitecture(parsed.data.projectId, parsed.data.requirements);
+  let requirements = parsed.data.requirements;
+  if (!requirements) {
+    const reqDoc = await prisma.document.findFirst({
+      where: { projectId: parsed.data.projectId, type: 'REQUIREMENTS' },
+      orderBy: { createdAt: 'desc' },
+    });
+    if (!reqDoc) {
+      return NextResponse.json(
+        { success: false, error: { message: 'No requirements found. Run CEO AI first.', code: 'PREREQUISITE_MISSING' } },
+        { status: 400 },
+      );
+    }
+    try {
+      requirements = productRequirementSchema.parse(JSON.parse(reqDoc.content));
+    } catch {
+      return NextResponse.json(
+        { success: false, error: { message: 'Stored requirements are malformed.', code: 'DATA_ERROR' } },
+        { status: 500 },
+      );
+    }
+  }
+
+  const result = await designArchitecture(parsed.data.projectId, requirements);
 
   let tokensUsed = 0;
   try {
-    const { prisma } = await import('@/lib/prisma');
     const latestUsage = await prisma.aIUsageLog.findFirst({
       where: { projectId: parsed.data.projectId },
       orderBy: { createdAt: 'desc' },
