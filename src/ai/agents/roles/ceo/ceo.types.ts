@@ -35,6 +35,16 @@ export const productRequirementSchema = z.object({
 });
 export type ProductRequirement = z.infer<typeof productRequirementSchema>;
 
+export const qualityScoreSchema = z.object({
+  completeness: z.number().min(1).max(10),
+  clarity: z.number().min(1).max(10),
+  feasibility: z.number().min(1).max(10),
+  overall: z.number().min(1).max(10),
+  verdict: z.enum(['APPROVED', 'NEEDS_REVISION', 'REJECTED']),
+  notes: z.string().optional(),
+});
+export type QualityScore = z.infer<typeof qualityScoreSchema>;
+
 export const developmentPhaseSchema = z.object({
   name: smartString.default('Phase 1'),
   goal: smartString.default('Implement features'),
@@ -45,6 +55,7 @@ export const developmentPlanSchema = z.object({
   phases: z.array(developmentPhaseSchema).default([]),
   tasks: z.array(smartString).default([]),
   estimatedComplexity: smartString.default('MEDIUM'),
+  qualityScore: qualityScoreSchema.optional(),
 });
 export type DevelopmentPlan = z.infer<typeof developmentPlanSchema>;
 
@@ -52,5 +63,6 @@ export const ceoAnalysisSchema = z.object({
   vision: productVisionSchema,
   requirements: productRequirementSchema,
   plan: developmentPlanSchema,
+  qualityScore: qualityScoreSchema.optional(),
 });
 export type CEOAnalysis = z.infer<typeof ceoAnalysisSchema>;

@@ -33,10 +33,21 @@ export const bugReportSchema = z.object({
 });
 export type BugReport = z.infer<typeof bugReportSchema>;
 
+export const qualityScoreSchema = z.object({
+  thoroughness: z.number().min(1).max(10),
+  accuracy: z.number().min(1).max(10),
+  overall: z.number().min(1).max(10),
+  verdict: z.enum(['APPROVED', 'NEEDS_REVISION', 'REJECTED']),
+  notes: z.string().optional(),
+});
+export type QualityScore = z.infer<typeof qualityScoreSchema>;
+
 export const qualityReportSchema = z.object({
   score: z.number().default(0),
   issues: z.array(bugReportSchema).default([]),
   recommendations: z.array(smartString).default([]),
+  verdict: z.enum(['APPROVED', 'NEEDS_REVISION', 'REJECTED']).default('NEEDS_REVISION'),
+  qualityScore: qualityScoreSchema.optional(),
 });
 export type QualityReport = z.infer<typeof qualityReportSchema>;
 

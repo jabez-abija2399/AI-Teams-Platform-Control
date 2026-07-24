@@ -1,3 +1,4 @@
+import { prisma } from '@/lib/prisma';
 import type { AgentRole } from '../core/agent.types';
 
 export interface MemoryFilter {
@@ -17,64 +18,104 @@ export interface MemoryRecord {
   createdAt: Date;
 }
 
-const memoryStore: MemoryRecord[] = [];
+function encodeType(type: string): string {
+  return `[@type:${type}]`;
+}
+
+function decodeContent(raw: string): { type: 'episodic' | 'semantic' | 'procedural'; content: string; } {
+  const match = raw.match(/^\[@type:(\w+)\](.*)/s);
+  if (match && match[1] && match[2]) {
+    const t = match[1] as 'episodic' | 'semantic' | 'procedural';
+    return { type: t, content: match[2].trim() };
+  }
+  return { type: 'episodic', content: raw };
+}
 
 export async function storeMemory(
   record: Omit<MemoryRecord, 'id' | 'createdAt'>,
 ): Promise<MemoryRecord> {
-  const entry: MemoryRecord = {
-    ...record,
-    id: crypto.randomUUID(),
-    createdAt: new Date(),
+  const encoded = `${encodeType(record.type)} ${record.content}`;
+  const created = await prisma.memory.create({
+    data: {
+      agentId: record.agentId,
+      content: encoded,
+      importance: record.type === 'episodic' ? 'LOW' : record.type === 'semantic' ? 'MEDIUM' : 'HIGH',
+    },
+  });
+  return {
+    id: created.id,
+    agentId: created.agentId,
+    content: record.content,
+    type: decodeContent(created.content).type,
+    createdAt: created.createdAt,
   };
-  memoryStore.push(entry);
-  return entry;
 }
 
 export async function searchMemory(filter: MemoryFilter): Promise<MemoryRecord[]> {
-  let results = [...memoryStore];
+  const where: Record<string, unknown> = {};
+  if (filter.agentId) where.agentId = filter.agentId;
 
-  if (filter.agentId) {
-    results = results.filter((r) => r.agentId === filter.agentId);
-  }
+  const results = await prisma.memory.findMany({
+    where,
+    orderBy: { createdAt: 'desc' },
+    take: filter.limit ?? 10,
+  });
+
+  let mapped = results.map((r) => {
+    const decoded = decodeContent(r.content);
+    return {
+      id: r.id,
+      agentId: r.agentId,
+      content: decoded.content,
+      type: decoded.type,
+      createdAt: r.createdAt,
+    };
+  });
+
   if (filter.type) {
-    results = results.filter((r) => r.type === filter.type);
+    mapped = mapped.filter((r) => r.type === filter.type);
   }
+
   if (filter.search) {
-    const query = filter.search.toLowerCase();
-    results = results.filter((r) => r.content.toLowerCase().includes(query));
+    const q = filter.search.toLowerCase();
+    mapped = mapped.filter((r) => r.content.toLowerCase().includes(q));
   }
 
-  results.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-
-  if (filter.limit) {
-    results = results.slice(0, filter.limit);
-  }
-
-  return results;
+  return mapped;
 }
 
 export async function getMemoryById(id: string): Promise<MemoryRecord | undefined> {
-  return memoryStore.find((r) => r.id === id);
+  const record = await prisma.memory.findUnique({ where: { id } });
+  if (!record) return undefined;
+  const decoded = decodeContent(record.content);
+  return {
+    id: record.id,
+    agentId: record.agentId,
+    content: decoded.content,
+    type: decoded.type,
+    createdAt: record.createdAt,
+  };
 }
 
 export async function deleteMemory(id: string): Promise<boolean> {
-  const index = memoryStore.findIndex((r) => r.id === id);
-  if (index === -1) return false;
-  memoryStore.splice(index, 1);
-  return true;
+  try {
+    await prisma.memory.delete({ where: { id } });
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export async function getMemoryStats(agentId?: string): Promise<{
   total: number;
   byType: Record<string, number>;
 }> {
-  const filtered = agentId ? memoryStore.filter((r) => r.agentId === agentId) : memoryStore;
-
+  const where = agentId ? { agentId } : {};
+  const results = await prisma.memory.findMany({ where });
   const byType: Record<string, number> = {};
-  for (const record of filtered) {
-    byType[record.type] = (byType[record.type] ?? 0) + 1;
+  for (const r of results) {
+    const decoded = decodeContent(r.content);
+    byType[decoded.type] = (byType[decoded.type] ?? 0) + 1;
   }
-
-  return { total: filtered.length, byType };
+  return { total: results.length, byType };
 }

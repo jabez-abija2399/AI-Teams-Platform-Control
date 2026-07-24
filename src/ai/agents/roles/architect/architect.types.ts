@@ -51,10 +51,23 @@ export const technologyDecisionSchema = z.object({
 });
 export type TechnologyDecision = z.infer<typeof technologyDecisionSchema>;
 
+export const qualityScoreSchema = z.object({
+  completeness: z.number().min(1).max(10),
+  technicalAccuracy: z.number().min(1).max(10),
+  scalability: z.number().min(1).max(10),
+  security: z.number().min(1).max(10),
+  maintainability: z.number().min(1).max(10),
+  overall: z.number().min(1).max(10),
+  verdict: z.enum(['APPROVED', 'NEEDS_REVISION', 'REJECTED']),
+  notes: z.string().optional(),
+});
+export type QualityScore = z.infer<typeof qualityScoreSchema>;
+
 export const architectAnalysisSchema = z.object({
   architecture: technicalArchitectureSchema,
   database: databaseDesignSchema,
   api: apiSpecificationSchema,
   decisions: z.array(technologyDecisionSchema).default([]),
+  qualityScore: qualityScoreSchema.optional(),
 });
 export type ArchitectAnalysis = z.infer<typeof architectAnalysisSchema>;

@@ -30,7 +30,7 @@ function getProviderConfig(): AIServiceConfig {
       },
       gemini: {
         apiKey: process.env.GEMINI_API_KEY,
-        defaultModel: 'gemini-2.0-flash',
+        defaultModel: 'gemini-3.5-flash-lite',
         enabled: !!process.env.GEMINI_API_KEY,
       },
       groq: {

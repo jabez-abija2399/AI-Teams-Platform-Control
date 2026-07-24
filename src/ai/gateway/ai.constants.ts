@@ -23,6 +23,12 @@ export const AI_MODELS = {
     },
   },
   gemini: {
+    'gemini-3.5-flash-lite': {
+      name: 'gemini-3.5-flash-lite',
+      maxTokens: 1_048_576,
+      costPer1kInput: 0,
+      costPer1kOutput: 0,
+    },
     'gemini-2.0-flash': {
       name: 'gemini-2.0-flash',
       maxTokens: 1_048_576,

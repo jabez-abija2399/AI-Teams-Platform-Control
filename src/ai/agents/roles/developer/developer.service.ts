@@ -4,8 +4,10 @@ import { getMemoryManager } from '@/ai/agents/memory/memory.manager';
 import { logAIEvent } from '@/ai/monitoring/ai.logger';
 import { developerOutputSchema, type DeveloperOutput, type BuildEvent, type BuildState, type TaskInfo, type TaskStatus, type CodeChange } from './developer.types';
 import type { ArchitectAnalysis } from '@/ai/agents/roles/architect/architect.types';
+import type { ProductRequirement } from '@/ai/agents/roles/ceo/ceo.types';
 import type { ApiResult } from '@/types/common.types';
 import { syncFilesToWorkspace } from '@/features/workspace/explorer/services/workspace-sync.service';
+import { aiBuildQueue } from '@/lib/queues/ai-build.queue';
 import { EventEmitter } from 'events';
 
 const MAX_RETRIES_PER_TASK = 3;
@@ -142,6 +144,7 @@ async function executeWithRetry(
 export async function implementArchitecture(
   projectId: string,
   architecture: ArchitectAnalysis,
+  requirements?: ProductRequirement,
 ): Promise<ApiResult<DeveloperOutput>> {
   const controller = new AbortController();
   const signal = controller.signal;
@@ -200,7 +203,7 @@ export async function implementArchitecture(
       completedTasks: 0, totalTasks: 0,
     });
 
-    const planResult = await developmentPlannerTool.execute({ architecture, projectId, agentId, signal });
+    const planResult = await developmentPlannerTool.execute({ architecture, projectId, agentId, signal, requirements });
     if (!planResult.success) throw new Error(planResult.error);
 
     if (signal.aborted) throw new Error('BUILD_CANCELLED');
@@ -271,7 +274,7 @@ export async function implementArchitecture(
 
           try {
             const changes = await executeWithRetry(
-              () => codeGeneratorTool.execute({ architecture, task: taskDesc, projectId, agentId, signal })
+              () => codeGeneratorTool.execute({ architecture, task: taskDesc, projectId, agentId, signal, requirements })
                 .then((r) => {
                   if (!r.success) throw new Error(r.error);
                   return r.data!;
@@ -398,7 +401,7 @@ export async function implementArchitecture(
 
     await prisma.document.deleteMany({ where: { projectId, type: 'DEVELOPMENT_IN_PROGRESS' } });
 
-    // Sync to workspace (fire and forget)
+    // Sync to workspace
     const filesForWorkspace = allChanges
       .filter((c) => c.changeType === 'CREATE' || c.changeType === 'MODIFY')
       .map((c) => ({
@@ -407,9 +410,16 @@ export async function implementArchitecture(
         language: getLanguageFromPath(c.file),
       }));
 
-    syncFilesToWorkspace(projectId, filesForWorkspace).catch((err) =>
-      console.error('[Developer] Workspace sync failed:', err),
-    );
+    try {
+      await syncFilesToWorkspace(projectId, filesForWorkspace);
+      await aiBuildQueue.add(`build-${projectId}-${Date.now()}`, {
+        projectId,
+        userPrompt: 'Developer AI Code Build',
+        filesToGenerate: filesForWorkspace.map((f) => ({ path: f.path, content: f.content })),
+      });
+    } catch (err) {
+      console.error('[Developer] Workspace sync or BullMQ enqueue failed:', err);
+    }
 
     await prisma.agent.update({ where: { id: agentId }, data: { status: 'IDLE' } });
     await logAIEvent('DEVELOPER_IMPLEMENTATION_COMPLETED', { projectId }, agentId);

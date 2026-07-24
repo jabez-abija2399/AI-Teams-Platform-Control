@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const AgentRoleSchema = z.enum(['CEO', 'ARCHITECT', 'DEVELOPER', 'QA', 'UI_UX', 'DEVOPS', 'DOCUMENTATION', 'SECURITY', 'OPERATIONS']);
+export const AgentRoleSchema = z.enum(['CEO', 'ARCHITECT', 'DEVELOPER', 'QA', 'PRODUCT_MANAGER', 'REVIEWER', 'UI_UX', 'DEVOPS', 'DOCUMENTATION', 'SECURITY', 'OPERATIONS']);
 export type AgentRole = z.infer<typeof AgentRoleSchema>;
 
 export const AgentStatusSchema = z.enum([

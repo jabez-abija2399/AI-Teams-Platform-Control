@@ -10,6 +10,8 @@ import { DocumentationAgent } from '../roles/documentation.agent';
 import { SecurityAgent } from '../roles/security/security.agent';
 import { DesignAgent } from '../roles/ui-ux/design.agent';
 import { OperationsAgent } from '../roles/operations/operations.agent';
+import { ProductManagerAgent } from '../roles/product-manager/product-manager.agent';
+import { ReviewerAgent } from '../roles/reviewer/reviewer.agent';
 
 const BLOCKED_ROLES: AgentRole[] = [];
 
@@ -18,6 +20,8 @@ const agentClasses: Record<string, new (name?: string) => IAgent> = {
   ARCHITECT: ArchitectAgent,
   DEVELOPER: DeveloperAgent,
   QA: QAAgent,
+  PRODUCT_MANAGER: ProductManagerAgent,
+  REVIEWER: ReviewerAgent,
   UI_UX: DesignAgent,
   DEVOPS: DevOpsAgent,
   DOCUMENTATION: DocumentationAgent,
@@ -28,7 +32,7 @@ const agentClasses: Record<string, new (name?: string) => IAgent> = {
 export function createAgent(role: AgentRole, name?: string): IAgent {
   if (BLOCKED_ROLES.includes(role)) {
     throw new ProviderNotFoundError(
-      `Agent role "${role}" is not yet implemented. Only CEO, ARCHITECT, DEVELOPER, QA are available.`,
+      `Agent role "${role}" is not yet implemented.`,
     );
   }
 

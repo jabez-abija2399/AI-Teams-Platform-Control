@@ -51,10 +51,22 @@ export const implementationReportSchema = z.object({
 });
 export type ImplementationReport = z.infer<typeof implementationReportSchema>;
 
+export const qualityScoreSchema = z.object({
+  completeness: z.number().min(1).max(10),
+  typeSafety: z.number().min(1).max(10),
+  errorHandling: z.number().min(1).max(10),
+  consistency: z.number().min(1).max(10),
+  overall: z.number().min(1).max(10),
+  verdict: z.enum(['APPROVED', 'NEEDS_REVISION', 'REJECTED']),
+  notes: z.string().optional(),
+});
+export type QualityScore = z.infer<typeof qualityScoreSchema>;
+
 export const developerOutputSchema = z.object({
   plan: developmentPlanSchema,
   changes: z.array(codeChangeSchema),
   report: implementationReportSchema,
+  qualityScore: qualityScoreSchema.optional(),
 });
 export type DeveloperOutput = z.infer<typeof developerOutputSchema>;
 
