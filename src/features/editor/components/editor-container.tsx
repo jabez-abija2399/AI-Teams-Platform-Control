@@ -10,9 +10,15 @@ import type { MonacoEditorHandle } from './monaco-editor';
 import { EditorToolbar } from './editor-toolbar';
 import { LanguageSelector } from './language-selector';
 import { CommandPalette } from './command-palette';
+import dynamic from 'next/dynamic';
 import { useEditor } from '../hooks/use-editor';
 import { useCommandPaletteActions } from '../hooks/use-command-palette-actions';
 import { detectLanguage } from '../utils/language-detector';
+
+const LivePreview = dynamic(
+  () => import('@/features/workspace/preview/components/live-preview').then((m) => ({ default: m.LivePreview })),
+  { ssr: false },
+);
 
 export function EditorContainer() {
   const { openTabs, activeTabId, setActiveTab, closeTab } = useWorkspaceStore();
@@ -107,6 +113,17 @@ export function EditorContainer() {
 
   const content = activeState?.content ?? '';
 
+  const { currentProjectId } = useWorkspaceStore();
+  const [showPreview, setShowPreview] = useState(false);
+
+  useEffect(() => {
+    function handleToggle() {
+      setShowPreview((prev) => !prev);
+    }
+    window.addEventListener('toggle-workspace-preview', handleToggle);
+    return () => window.removeEventListener('toggle-workspace-preview', handleToggle);
+  }, []);
+
   return (
     <div className="flex flex-1 flex-col overflow-hidden bg-background">
       <CommandPalette />
@@ -147,32 +164,68 @@ export function EditorContainer() {
           onUndo={handleUndo}
           onRedo={handleRedo}
           isDirty={activeState.isDirty}
+          showPreview={showPreview}
+          onTogglePreview={() => setShowPreview((prev) => !prev)}
         />
       )}
 
-      <div className="flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden">
         {isLoading ? (
-          <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
-            Loading file…
+          <div className="flex h-full flex-col gap-3 bg-[#1e1e1e] p-6 w-full">
+            <div className="flex items-center gap-2 pb-2">
+              <div className="h-2.5 w-2.5 animate-pulse rounded-full bg-neutral-600" />
+              <div className="h-3 w-48 animate-pulse rounded bg-neutral-700/50" />
+            </div>
+            {Array.from({ length: 20 }).map((_, i) => (
+              <div
+                key={i}
+                className="h-3 animate-pulse rounded bg-neutral-700/50"
+                style={{ width: `${30 + Math.random() * 65}%` }}
+              />
+            ))}
           </div>
-        ) : activeTabId && activeState ? (
-          <MonacoEditorWrapper
-            ref={editorRef}
-            filePath={openTabs.find((t) => t.id === activeTabId)?.path ?? ''}
-            value={content}
-            language={activeLanguage}
-            preferences={preferences}
-            onChange={(val) => activeTabId && handleContentChange(activeTabId, val)}
-            onCursorChange={(line, col) => activeTabId && updateCursorPosition(activeTabId, line, col)}
-            onSave={handleSave}
-          />
         ) : (
-          <EmptyState
-            icon={FileText}
-            title="No file open"
-            description="Select a file from the explorer to start editing."
-            className="h-full border-0"
-          />
+          <div className="flex flex-1 overflow-hidden w-full">
+            {activeTabId && activeState ? (
+              <div className={cn('h-full flex-1 overflow-hidden', showPreview && 'w-1/2')}>
+                <MonacoEditorWrapper
+                  ref={editorRef}
+                  filePath={openTabs.find((t) => t.id === activeTabId)?.path ?? ''}
+                  value={content}
+                  language={activeLanguage}
+                  preferences={preferences}
+                  onChange={(val) => activeTabId && handleContentChange(activeTabId, val)}
+                  onCursorChange={(line, col) => activeTabId && updateCursorPosition(activeTabId, line, col)}
+                  onSave={handleSave}
+                />
+              </div>
+            ) : !showPreview ? (
+              <div className="flex flex-col items-center justify-center flex-1 h-full bg-background p-6">
+                <EmptyState
+                  icon={FileText}
+                  title="No file open"
+                  description="Select a file from the explorer or launch live preview."
+                  className="border-0 mb-4"
+                />
+                <button
+                  onClick={() => setShowPreview(true)}
+                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-semibold flex items-center gap-2 shadow-lg transition-all"
+                >
+                  <span>▶ Launch & Preview Application</span>
+                </button>
+              </div>
+            ) : null}
+
+            {showPreview && currentProjectId && (
+              <div className={cn('h-full border-l border-border overflow-hidden bg-background', activeTabId ? 'w-1/2' : 'w-full')}>
+                <LivePreview
+                  projectId={currentProjectId}
+                  code={content}
+                  filePath={openTabs.find((t) => t.id === activeTabId)?.path}
+                />
+              </div>
+            )}
+          </div>
         )}
       </div>
 

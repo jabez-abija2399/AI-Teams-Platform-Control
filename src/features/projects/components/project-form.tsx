@@ -46,7 +46,7 @@ export function ProjectForm() {
       return;
     }
     toast.success('Project created');
-    router.push(`${ROUTES.projects}/${result.data.id}`);
+    router.push(`${ROUTES.projects}/${result.data.id}/workspace`);
     router.refresh();
   }
 

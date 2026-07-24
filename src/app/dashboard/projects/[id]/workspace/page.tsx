@@ -1,5 +1,5 @@
-import { notFound } from 'next/navigation';
-import { auth } from '@/lib/auth';
+import { redirect, notFound } from 'next/navigation';
+import { getAuthSession } from '@/lib/session-helper';
 import { getProject } from '@/features/projects/services/project.service';
 import { WorkspaceShell } from '@/features/workspace/components/workspace-shell';
 import { CommandPaletteProvider } from '@/features/editor';
@@ -14,8 +14,8 @@ export default async function WorkspacePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const session = await auth();
-  if (!session?.user?.id) notFound();
+  const session = await getAuthSession();
+  if (!session?.user?.id) redirect('/login');
 
   const project = await getProject(id, session.user.id);
   if (!project) notFound();

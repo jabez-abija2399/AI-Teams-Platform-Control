@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { ThinkingSteps } from '@/features/onboarding/components/thinking-steps';
 import { UsageNote } from '@/features/billing/components/usage-note';
@@ -16,6 +16,7 @@ interface ArchitectureChatProps {
   projectId: string;
   defaultRequirements?: ProductRequirement;
   onComplete?: () => void;
+  autoRun?: boolean;
 }
 
 const DESIGN_STEPS = [
@@ -25,7 +26,7 @@ const DESIGN_STEPS = [
   { label: 'Defining API contracts' },
 ];
 
-export function ArchitectureChat({ projectId, defaultRequirements, onComplete }: ArchitectureChatProps) {
+export function ArchitectureChat({ projectId, defaultRequirements, onComplete, autoRun }: ArchitectureChatProps) {
   const [requirements, setRequirements] = useState(defaultRequirements ? JSON.stringify(defaultRequirements.features) : '');
   const [loading, setLoading] = useState(true);
   const [output, setOutput] = useState<ArchitectAnalysis | null>(null);
@@ -33,6 +34,7 @@ export function ArchitectureChat({ projectId, defaultRequirements, onComplete }:
   const [error, setError] = useState<string | null>(null);
   const [running, setRunning] = useState(false);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const autoRunDone = useRef(false);
 
   async function checkStatus() {
     const res = await fetch(`/api/projects/${projectId}/architect-status`);
@@ -73,7 +75,7 @@ export function ArchitectureChat({ projectId, defaultRequirements, onComplete }:
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [running]);
 
-  async function handleDesign() {
+  const handleDesign = useCallback(async () => {
     const reqs = defaultRequirements ?? { features: [{ name: 'Core Feature', description: requirements }], userStories: [], priorities: [], constraints: [] };
     setRunning(true);
     setLoading(true);
@@ -101,7 +103,8 @@ export function ArchitectureChat({ projectId, defaultRequirements, onComplete }:
       setRunning(false);
       setLoading(false);
     }
-  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projectId, requirements, defaultRequirements, onComplete]);
 
   useEffect(() => {
     if (loading && !output && !running && defaultRequirements) {
@@ -109,6 +112,15 @@ export function ArchitectureChat({ projectId, defaultRequirements, onComplete }:
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [defaultRequirements]);
+
+  // Auto-run when prerequisites are met and no existing output
+  useEffect(() => {
+    if (autoRun && defaultRequirements && !loading && !output && !running && !error && !autoRunDone.current) {
+      autoRunDone.current = true;
+      handleDesign();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoRun, defaultRequirements, loading, output, running, error]);
 
   if (running) {
     return (
@@ -136,7 +148,7 @@ export function ArchitectureChat({ projectId, defaultRequirements, onComplete }:
 
   return (
     <div className="space-y-4">
-      {!loading && !output && (
+      {!loading && !output && !autoRun && (
         <div className="flex gap-2">
           <input value={requirements} onChange={(e) => setRequirements(e.target.value)} placeholder="Describe what to build..." className="bg-background flex-1 rounded-md border px-3 py-2 text-sm" />
           <Button onClick={handleDesign} disabled={running || !requirements.trim()}>Design</Button>

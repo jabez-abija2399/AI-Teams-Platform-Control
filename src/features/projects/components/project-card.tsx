@@ -15,7 +15,7 @@ const STATUS_VARIANT: Record<string, 'default' | 'secondary' | 'outline'> = {
 
 export function ProjectCard({ project }: { project: Project }) {
   return (
-    <Link href={`${ROUTES.projects}/${project.id}`}>
+    <Link href={`${ROUTES.projects}/${project.id}/workspace`}>
       <Card className="hover:border-foreground/20 transition-colors">
         <CardHeader className="flex flex-row items-start justify-between space-y-0">
           <CardTitle className="text-sm font-medium">{project.name}</CardTitle>

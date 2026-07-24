@@ -1,6 +1,5 @@
 import { prisma } from '@/lib/prisma';
-
-type AgentRole = 'CEO' | 'ARCHITECT' | 'DEVELOPER' | 'QA' | 'UI_UX' | 'DEVOPS' | 'DOCUMENTATION' | 'SECURITY' | 'OPERATIONS';
+import type { AgentRole } from '@/ai/agents/core/agent.types';
 
 export interface PermissionAuditFinding {
   type: 'EXCESS_PERMISSION' | 'MISSING_PERMISSION' | 'OVERRIDED_DEFAULT';
@@ -98,6 +97,25 @@ const ROLE_DEFAULTS: Record<AgentRole, RoleDefaults> = {
       code: ['read'],
       security: ['read', 'create', 'update', 'delete'],
       audit: ['read', 'create'],
+    },
+  },
+  PRODUCT_MANAGER: {
+    allowedResources: ['project', 'task', 'requirement'],
+    deniedResources: ['code', 'database', 'deployment', 'budget', 'billing'],
+    defaultActions: {
+      project: ['read', 'update'],
+      task: ['read', 'create', 'update'],
+      requirement: ['read', 'create', 'update', 'delete'],
+    },
+  },
+  REVIEWER: {
+    allowedResources: ['project', 'task', 'review', 'code'],
+    deniedResources: ['budget', 'billing', 'deployment'],
+    defaultActions: {
+      project: ['read'],
+      task: ['read'],
+      review: ['read', 'create', 'update'],
+      code: ['read'],
     },
   },
   OPERATIONS: {

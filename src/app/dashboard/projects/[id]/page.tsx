@@ -1,14 +1,14 @@
-import { notFound } from 'next/navigation';
-import { auth } from '@/lib/auth';
+import { redirect, notFound } from 'next/navigation';
+import { getAuthSession } from '@/lib/session-helper';
 import { getProject } from '@/features/projects/services/project.service';
 import { ProjectDetails } from '@/features/projects/components/project-details';
 import { ProjectTabsClient } from './project-tabs-client';
 
 export default async function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const session = await auth();
+  const session = await getAuthSession();
 
-  if (!session?.user?.id) notFound();
+  if (!session?.user?.id) redirect('/login');
 
   let project;
   try {

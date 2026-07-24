@@ -6,7 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ImplementationViewer } from './implementation-viewer';
+import { useWorkspaceStore } from '@/features/workspace/stores/workspace.store';
 import { Loader2, CheckCircle2, AlertCircle, FileCode2, ClipboardList, XCircle, ExternalLink } from 'lucide-react';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import type { ImplementationReport } from '@/ai/agents/roles/developer/developer.types';
 import type { BuildEvent, TaskInfo, TaskStatus } from '@/ai/agents/roles/developer/developer.types';
 
@@ -37,9 +39,32 @@ function formatEta(ms: number): string {
   return `~${mins}m ${seconds % 60}s remaining`;
 }
 
-export function DeveloperChat({ projectId, onComplete }: { projectId: string; onComplete?: () => void }) {
+interface DeveloperChatProps {
+  projectId: string;
+  onComplete?: () => void;
+  autoRun?: boolean;
+}
+
+export function DeveloperChat({ projectId, onComplete, autoRun }: DeveloperChatProps) {
   const router = useRouter();
   const [status, setStatus] = useState<DeveloperStatus | null>(null);
+
+  const store = useWorkspaceStore();
+
+  async function openFile(filePath: string) {
+    try {
+      const res = await fetch(`/api/projects/${projectId}/explorer?path=${encodeURIComponent(filePath)}`);
+      const json = await res.json();
+      const files = json.success?.data ?? json.success;
+      if (files?.[0]) {
+        const file = files[0];
+        store.openTab({ id: file.id, path: file.path, title: file.path.split('/').pop() ?? file.path, isDirty: false });
+        store.setActivity('explorer');
+      }
+    } catch {
+      // ignore
+    }
+  }
   const [loading, setLoading] = useState(true);
   const [building, setBuilding] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -52,6 +77,7 @@ export function DeveloperChat({ projectId, onComplete }: { projectId: string; on
   const taskRunningTimers = useRef<Map<string, number>>(new Map());
   const eventSourceRef = useRef<EventSource | null>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const autoRunDone = useRef(false);
 
   const closeEventSource = useCallback(() => {
     if (eventSourceRef.current) {
@@ -178,7 +204,7 @@ export function DeveloperChat({ projectId, onComplete }: { projectId: string; on
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [building]);
 
-  async function handleRunDeveloper() {
+  const handleRunDeveloper = useCallback(async () => {
     setBuilding(true);
     setError(null);
     setBuildEvent(null);
@@ -197,7 +223,7 @@ export function DeveloperChat({ projectId, onComplete }: { projectId: string; on
       const devRes = await fetch('/api/ai/developer', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ projectId, architecture: archJson.data.analysis }),
+        body: JSON.stringify({ projectId }),
       });
       const devJson = await devRes.json();
       if (devJson.success) {
@@ -211,7 +237,8 @@ export function DeveloperChat({ projectId, onComplete }: { projectId: string; on
       setError('Network error');
       setBuilding(false);
     }
-  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projectId, onComplete]);
 
   async function handleCancel() {
     try {
@@ -223,8 +250,17 @@ export function DeveloperChat({ projectId, onComplete }: { projectId: string; on
     }
   }
 
+  // Auto-run when autoRun is true, architecture exists, and no developer output exists
+  useEffect(() => {
+    if (autoRun && !loading && status && !status.exists && !status.running && !building && !error && !autoRunDone.current) {
+      autoRunDone.current = true;
+      handleRunDeveloper();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoRun, loading, status, building, error]);
+
   if (loading) {
-    return <p className="text-muted-foreground text-sm">Loading developer output...</p>;
+    return <LoadingSpinner label="Loading developer output..." className="py-8" />;
   }
 
   // Building state — show real-time progress from SSE
@@ -378,7 +414,7 @@ export function DeveloperChat({ projectId, onComplete }: { projectId: string; on
             <CardContent>
               <div className="flex flex-wrap gap-1">
                 {fileList.map((f) => (
-                  <Badge key={f} variant="outline" className="font-mono text-[10px]">{f}</Badge>
+                  <Badge key={f} variant="outline" className="cursor-pointer font-mono text-[10px] hover:bg-accent" onClick={() => openFile(f)}>{f}</Badge>
                 ))}
               </div>
             </CardContent>
@@ -426,7 +462,7 @@ export function DeveloperChat({ projectId, onComplete }: { projectId: string; on
             <ul className="space-y-1">
               {status.files.map((file) => (
                 <li key={file} className="text-muted-foreground flex items-center gap-2 text-xs">
-                  <Badge variant="outline" className="font-mono">{file}</Badge>
+                  <Badge variant="outline" className="cursor-pointer font-mono hover:bg-accent" onClick={() => openFile(file)}>{file}</Badge>
                 </li>
               ))}
             </ul>

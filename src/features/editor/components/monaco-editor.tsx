@@ -30,11 +30,14 @@ export interface MonacoEditorHandle {
 
 function EditorSkeleton() {
   return (
-    <div className="flex h-full items-center justify-center bg-[#1e1e1e]">
-      <div className="flex flex-col items-center gap-3">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-neutral-600 border-t-neutral-300" />
-        <span className="text-xs text-neutral-500">Loading editor…</span>
-      </div>
+    <div className="flex h-full flex-col gap-3 bg-[#1e1e1e] p-6">
+      {Array.from({ length: 20 }).map((_, i) => (
+        <div
+          key={i}
+          className="h-3 animate-pulse rounded bg-neutral-700/50"
+          style={{ width: `${30 + Math.random() * 65}%` }}
+        />
+      ))}
     </div>
   );
 }

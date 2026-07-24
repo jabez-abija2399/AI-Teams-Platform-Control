@@ -6,6 +6,7 @@ import { QualityScore } from './quality-score';
 import { BugList } from './bug-list';
 import { TestReport } from './test-report';
 import { Loader2, AlertCircle } from 'lucide-react';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import type { BugReport, TestPlan } from '@/ai/agents/roles/qa/qa.types';
 
 interface QAStatus {
@@ -101,7 +102,7 @@ export function QAChat({ projectId }: { projectId: string }) {
   }
 
   if (loading) {
-    return <p className="text-muted-foreground text-sm">Loading QA results...</p>;
+    return <LoadingSpinner label="Loading QA results..." className="py-8" />;
   }
 
   if (status?.running || building) {

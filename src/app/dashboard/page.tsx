@@ -1,5 +1,5 @@
-import { notFound } from 'next/navigation';
-import { auth } from '@/lib/auth';
+import { redirect } from 'next/navigation';
+import { getAuthSession } from '@/lib/session-helper';
 import {
   getDashboardStats,
   getRecentProjects,
@@ -13,8 +13,8 @@ import { PageContainer } from '@/components/layout/page-container';
 import { FolderKanban, ListTodo, Rocket } from 'lucide-react';
 
 export default async function DashboardPage() {
-  const session = await auth();
-  if (!session?.user?.id) notFound();
+  const session = await getAuthSession();
+  if (!session?.user?.id) redirect('/login');
   const userId = session.user.id;
 
   const [stats, recentProjects] = await Promise.all([

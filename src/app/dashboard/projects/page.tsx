@@ -1,15 +1,21 @@
-import { auth } from '@/lib/auth';
+import { getAuthSession } from '@/lib/session-helper';
 import { listProjects } from '@/features/projects/services/project.service';
 import { ProjectCard } from '@/features/projects/components/project-card';
 import { PageContainer } from '@/components/layout/page-container';
 import { buttonVariants } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { EmptyProjectPrompt } from './empty-project-prompt';
 
 export default async function ProjectsPage() {
-  const session = await auth();
-  const projects = await listProjects(session!.user!.id as string);
+  const session = await getAuthSession();
+
+  if (!session?.user?.id) {
+    redirect('/login');
+  }
+
+  const projects = await listProjects(session.user.id);
 
   return (
     <PageContainer>

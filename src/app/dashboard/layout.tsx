@@ -1,19 +1,17 @@
 import { redirect } from 'next/navigation';
-import { auth } from '@/lib/auth';
-import { Sidebar } from '@/components/layout/sidebar';
-import { Navbar } from '@/components/layout/navbar';
+import { getAuthSession } from '@/lib/session-helper';
+import { DashboardLayoutClient } from './dashboard-layout-client';
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const session = await auth();
+  const session = await getAuthSession();
   if (!session?.user) redirect('/login');
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      <Sidebar />
-      <div className="flex flex-1 flex-col overflow-hidden">
-        <Navbar userName={session.user.name ?? 'User'} userImage={session.user.image} />
-        <main className="bg-muted/30 flex-1 overflow-y-auto p-6">{children}</main>
-      </div>
-    </div>
+    <DashboardLayoutClient
+      userName={session.user.name ?? 'User'}
+      userImage={session.user.image}
+    >
+      {children}
+    </DashboardLayoutClient>
   );
 }

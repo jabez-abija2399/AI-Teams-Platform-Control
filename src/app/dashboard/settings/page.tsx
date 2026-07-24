@@ -1,12 +1,17 @@
-import { auth } from '@/lib/auth';
+import { getAuthSession } from '@/lib/session-helper';
 import { getUserProfile } from '@/features/auth/services/user.service';
 import { ProfileForm } from '@/features/settings/components/profile-form';
 import { PageContainer } from '@/components/layout/page-container';
-import { notFound } from 'next/navigation';
+import { redirect, notFound } from 'next/navigation';
 
 export default async function SettingsPage() {
-  const session = await auth();
-  const profile = await getUserProfile(session!.user!.id as string);
+  const session = await getAuthSession();
+
+  if (!session?.user?.id) {
+    redirect('/login');
+  }
+
+  const profile = await getUserProfile(session.user.id);
   if (!profile) notFound();
 
   return (
