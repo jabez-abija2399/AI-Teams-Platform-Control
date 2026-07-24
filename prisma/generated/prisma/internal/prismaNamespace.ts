@@ -487,7 +487,10 @@ export const ModelName = {
   Account: 'Account',
   Session: 'Session',
   VerificationToken: 'VerificationToken',
-  SampleProject: 'SampleProject'
+  SampleProject: 'SampleProject',
+  ProjectSnapshot: 'ProjectSnapshot',
+  AgentSession: 'AgentSession',
+  ChatMessage: 'ChatMessage'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -503,7 +506,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "project" | "task" | "agent" | "activity" | "document" | "documentVersion" | "workflow" | "workflowStep" | "conversation" | "message" | "aIProvider" | "aIModel" | "aIUsageLog" | "agentConfiguration" | "agentPermission" | "aIEventLog" | "repository" | "productDocument" | "architectureDocument" | "developmentTask" | "codeGenerationRecord" | "qualityReport" | "file" | "memory" | "folder" | "fileMetadata" | "favoriteProject" | "recentProject" | "workspacePreference" | "editorPreference" | "gitBranch" | "gitCommit" | "gitChange" | "gitIntegration" | "pullRequest" | "testCase" | "testExecution" | "bugReport" | "coverageReport" | "knowledgeItem" | "environment" | "deployment" | "deploymentStep" | "deploymentLog" | "release" | "platformEvent" | "metric" | "projectHealth" | "codeReview" | "agentDecision" | "organization" | "team" | "teamProject" | "membership" | "memberPermission" | "comment" | "mention" | "notification" | "plugin" | "pluginInstallation" | "pluginPermission" | "approvalRequest" | "securityIssue" | "securityScan" | "securityRule" | "productStrategy" | "requirement" | "userStory" | "roadmap" | "productDecision" | "designSystemConfig" | "designComponent" | "designToken" | "supportConversation" | "supportMessage" | "feedback" | "supportTicket" | "sentimentResult" | "organizationSettings" | "customRole" | "policy" | "auditLog" | "creditAccount" | "plan" | "subscription" | "budget" | "marketplaceItem" | "marketplaceVersion" | "marketplaceRating" | "marketplaceInstallation" | "agentPerformance" | "agentSkill" | "learningRecord" | "improvement" | "benchmark" | "systemHealth" | "incident" | "alert" | "recoveryAction" | "account" | "session" | "verificationToken" | "sampleProject"
+    modelProps: "user" | "project" | "task" | "agent" | "activity" | "document" | "documentVersion" | "workflow" | "workflowStep" | "conversation" | "message" | "aIProvider" | "aIModel" | "aIUsageLog" | "agentConfiguration" | "agentPermission" | "aIEventLog" | "repository" | "productDocument" | "architectureDocument" | "developmentTask" | "codeGenerationRecord" | "qualityReport" | "file" | "memory" | "folder" | "fileMetadata" | "favoriteProject" | "recentProject" | "workspacePreference" | "editorPreference" | "gitBranch" | "gitCommit" | "gitChange" | "gitIntegration" | "pullRequest" | "testCase" | "testExecution" | "bugReport" | "coverageReport" | "knowledgeItem" | "environment" | "deployment" | "deploymentStep" | "deploymentLog" | "release" | "platformEvent" | "metric" | "projectHealth" | "codeReview" | "agentDecision" | "organization" | "team" | "teamProject" | "membership" | "memberPermission" | "comment" | "mention" | "notification" | "plugin" | "pluginInstallation" | "pluginPermission" | "approvalRequest" | "securityIssue" | "securityScan" | "securityRule" | "productStrategy" | "requirement" | "userStory" | "roadmap" | "productDecision" | "designSystemConfig" | "designComponent" | "designToken" | "supportConversation" | "supportMessage" | "feedback" | "supportTicket" | "sentimentResult" | "organizationSettings" | "customRole" | "policy" | "auditLog" | "creditAccount" | "plan" | "subscription" | "budget" | "marketplaceItem" | "marketplaceVersion" | "marketplaceRating" | "marketplaceInstallation" | "agentPerformance" | "agentSkill" | "learningRecord" | "improvement" | "benchmark" | "systemHealth" | "incident" | "alert" | "recoveryAction" | "account" | "session" | "verificationToken" | "sampleProject" | "projectSnapshot" | "agentSession" | "chatMessage"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -8203,6 +8206,228 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ProjectSnapshot: {
+      payload: Prisma.$ProjectSnapshotPayload<ExtArgs>
+      fields: Prisma.ProjectSnapshotFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ProjectSnapshotFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectSnapshotPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ProjectSnapshotFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectSnapshotPayload>
+        }
+        findFirst: {
+          args: Prisma.ProjectSnapshotFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectSnapshotPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ProjectSnapshotFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectSnapshotPayload>
+        }
+        findMany: {
+          args: Prisma.ProjectSnapshotFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectSnapshotPayload>[]
+        }
+        create: {
+          args: Prisma.ProjectSnapshotCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectSnapshotPayload>
+        }
+        createMany: {
+          args: Prisma.ProjectSnapshotCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ProjectSnapshotCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectSnapshotPayload>[]
+        }
+        delete: {
+          args: Prisma.ProjectSnapshotDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectSnapshotPayload>
+        }
+        update: {
+          args: Prisma.ProjectSnapshotUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectSnapshotPayload>
+        }
+        deleteMany: {
+          args: Prisma.ProjectSnapshotDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ProjectSnapshotUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ProjectSnapshotUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectSnapshotPayload>[]
+        }
+        upsert: {
+          args: Prisma.ProjectSnapshotUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectSnapshotPayload>
+        }
+        aggregate: {
+          args: Prisma.ProjectSnapshotAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateProjectSnapshot>
+        }
+        groupBy: {
+          args: Prisma.ProjectSnapshotGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProjectSnapshotGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ProjectSnapshotCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProjectSnapshotCountAggregateOutputType> | number
+        }
+      }
+    }
+    AgentSession: {
+      payload: Prisma.$AgentSessionPayload<ExtArgs>
+      fields: Prisma.AgentSessionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AgentSessionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentSessionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AgentSessionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentSessionPayload>
+        }
+        findFirst: {
+          args: Prisma.AgentSessionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentSessionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AgentSessionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentSessionPayload>
+        }
+        findMany: {
+          args: Prisma.AgentSessionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentSessionPayload>[]
+        }
+        create: {
+          args: Prisma.AgentSessionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentSessionPayload>
+        }
+        createMany: {
+          args: Prisma.AgentSessionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AgentSessionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentSessionPayload>[]
+        }
+        delete: {
+          args: Prisma.AgentSessionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentSessionPayload>
+        }
+        update: {
+          args: Prisma.AgentSessionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentSessionPayload>
+        }
+        deleteMany: {
+          args: Prisma.AgentSessionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AgentSessionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AgentSessionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentSessionPayload>[]
+        }
+        upsert: {
+          args: Prisma.AgentSessionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentSessionPayload>
+        }
+        aggregate: {
+          args: Prisma.AgentSessionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAgentSession>
+        }
+        groupBy: {
+          args: Prisma.AgentSessionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AgentSessionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AgentSessionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AgentSessionCountAggregateOutputType> | number
+        }
+      }
+    }
+    ChatMessage: {
+      payload: Prisma.$ChatMessagePayload<ExtArgs>
+      fields: Prisma.ChatMessageFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ChatMessageFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatMessagePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ChatMessageFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatMessagePayload>
+        }
+        findFirst: {
+          args: Prisma.ChatMessageFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatMessagePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ChatMessageFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatMessagePayload>
+        }
+        findMany: {
+          args: Prisma.ChatMessageFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatMessagePayload>[]
+        }
+        create: {
+          args: Prisma.ChatMessageCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatMessagePayload>
+        }
+        createMany: {
+          args: Prisma.ChatMessageCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ChatMessageCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatMessagePayload>[]
+        }
+        delete: {
+          args: Prisma.ChatMessageDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatMessagePayload>
+        }
+        update: {
+          args: Prisma.ChatMessageUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatMessagePayload>
+        }
+        deleteMany: {
+          args: Prisma.ChatMessageDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ChatMessageUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ChatMessageUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatMessagePayload>[]
+        }
+        upsert: {
+          args: Prisma.ChatMessageUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChatMessagePayload>
+        }
+        aggregate: {
+          args: Prisma.ChatMessageAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateChatMessage>
+        }
+        groupBy: {
+          args: Prisma.ChatMessageGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ChatMessageGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ChatMessageCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ChatMessageCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -8268,7 +8493,8 @@ export const ProjectScalarFieldEnum = {
   favorite: 'favorite',
   lastOpenedAt: 'lastOpenedAt',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  githubRepoUrl: 'githubRepoUrl'
 } as const
 
 export type ProjectScalarFieldEnum = (typeof ProjectScalarFieldEnum)[keyof typeof ProjectScalarFieldEnum]
@@ -9546,6 +9772,42 @@ export const SampleProjectScalarFieldEnum = {
 export type SampleProjectScalarFieldEnum = (typeof SampleProjectScalarFieldEnum)[keyof typeof SampleProjectScalarFieldEnum]
 
 
+export const ProjectSnapshotScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  commitMessage: 'commitMessage',
+  versionNumber: 'versionNumber',
+  fileMap: 'fileMap',
+  createdAt: 'createdAt'
+} as const
+
+export type ProjectSnapshotScalarFieldEnum = (typeof ProjectSnapshotScalarFieldEnum)[keyof typeof ProjectSnapshotScalarFieldEnum]
+
+
+export const AgentSessionScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  status: 'status',
+  userPrompt: 'userPrompt',
+  astGraphSnapshot: 'astGraphSnapshot',
+  createdAt: 'createdAt'
+} as const
+
+export type AgentSessionScalarFieldEnum = (typeof AgentSessionScalarFieldEnum)[keyof typeof AgentSessionScalarFieldEnum]
+
+
+export const ChatMessageScalarFieldEnum = {
+  id: 'id',
+  sessionId: 'sessionId',
+  role: 'role',
+  content: 'content',
+  metadata: 'metadata',
+  createdAt: 'createdAt'
+} as const
+
+export type ChatMessageScalarFieldEnum = (typeof ChatMessageScalarFieldEnum)[keyof typeof ChatMessageScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -9960,6 +10222,9 @@ export type GlobalOmitConfig = {
   session?: Prisma.SessionOmit
   verificationToken?: Prisma.VerificationTokenOmit
   sampleProject?: Prisma.SampleProjectOmit
+  projectSnapshot?: Prisma.ProjectSnapshotOmit
+  agentSession?: Prisma.AgentSessionOmit
+  chatMessage?: Prisma.ChatMessageOmit
 }
 
 /* Types for Logging */

@@ -154,7 +154,10 @@ export const ModelName = {
   Account: 'Account',
   Session: 'Session',
   VerificationToken: 'VerificationToken',
-  SampleProject: 'SampleProject'
+  SampleProject: 'SampleProject',
+  ProjectSnapshot: 'ProjectSnapshot',
+  AgentSession: 'AgentSession',
+  ChatMessage: 'ChatMessage'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -199,7 +202,8 @@ export const ProjectScalarFieldEnum = {
   favorite: 'favorite',
   lastOpenedAt: 'lastOpenedAt',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  githubRepoUrl: 'githubRepoUrl'
 } as const
 
 export type ProjectScalarFieldEnum = (typeof ProjectScalarFieldEnum)[keyof typeof ProjectScalarFieldEnum]
@@ -1475,6 +1479,42 @@ export const SampleProjectScalarFieldEnum = {
 } as const
 
 export type SampleProjectScalarFieldEnum = (typeof SampleProjectScalarFieldEnum)[keyof typeof SampleProjectScalarFieldEnum]
+
+
+export const ProjectSnapshotScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  commitMessage: 'commitMessage',
+  versionNumber: 'versionNumber',
+  fileMap: 'fileMap',
+  createdAt: 'createdAt'
+} as const
+
+export type ProjectSnapshotScalarFieldEnum = (typeof ProjectSnapshotScalarFieldEnum)[keyof typeof ProjectSnapshotScalarFieldEnum]
+
+
+export const AgentSessionScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  status: 'status',
+  userPrompt: 'userPrompt',
+  astGraphSnapshot: 'astGraphSnapshot',
+  createdAt: 'createdAt'
+} as const
+
+export type AgentSessionScalarFieldEnum = (typeof AgentSessionScalarFieldEnum)[keyof typeof AgentSessionScalarFieldEnum]
+
+
+export const ChatMessageScalarFieldEnum = {
+  id: 'id',
+  sessionId: 'sessionId',
+  role: 'role',
+  content: 'content',
+  metadata: 'metadata',
+  createdAt: 'createdAt'
+} as const
+
+export type ChatMessageScalarFieldEnum = (typeof ChatMessageScalarFieldEnum)[keyof typeof ChatMessageScalarFieldEnum]
 
 
 export const SortOrder = {

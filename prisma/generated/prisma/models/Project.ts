@@ -38,6 +38,7 @@ export type ProjectMinAggregateOutputType = {
   lastOpenedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
+  githubRepoUrl: string | null
 }
 
 export type ProjectMaxAggregateOutputType = {
@@ -54,6 +55,7 @@ export type ProjectMaxAggregateOutputType = {
   lastOpenedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
+  githubRepoUrl: string | null
 }
 
 export type ProjectCountAggregateOutputType = {
@@ -70,6 +72,7 @@ export type ProjectCountAggregateOutputType = {
   lastOpenedAt: number
   createdAt: number
   updatedAt: number
+  githubRepoUrl: number
   _all: number
 }
 
@@ -88,6 +91,7 @@ export type ProjectMinAggregateInputType = {
   lastOpenedAt?: true
   createdAt?: true
   updatedAt?: true
+  githubRepoUrl?: true
 }
 
 export type ProjectMaxAggregateInputType = {
@@ -104,6 +108,7 @@ export type ProjectMaxAggregateInputType = {
   lastOpenedAt?: true
   createdAt?: true
   updatedAt?: true
+  githubRepoUrl?: true
 }
 
 export type ProjectCountAggregateInputType = {
@@ -120,6 +125,7 @@ export type ProjectCountAggregateInputType = {
   lastOpenedAt?: true
   createdAt?: true
   updatedAt?: true
+  githubRepoUrl?: true
   _all?: true
 }
 
@@ -209,6 +215,7 @@ export type ProjectGroupByOutputType = {
   lastOpenedAt: Date | null
   createdAt: Date
   updatedAt: Date
+  githubRepoUrl: string | null
   _count: ProjectCountAggregateOutputType | null
   _min: ProjectMinAggregateOutputType | null
   _max: ProjectMaxAggregateOutputType | null
@@ -246,6 +253,7 @@ export type ProjectWhereInput = {
   lastOpenedAt?: Prisma.DateTimeNullableFilter<"Project"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Project"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Project"> | Date | string
+  githubRepoUrl?: Prisma.StringNullableFilter<"Project"> | string | null
   owner?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   organization?: Prisma.XOR<Prisma.OrganizationNullableScalarRelationFilter, Prisma.OrganizationWhereInput> | null
   tasks?: Prisma.TaskListRelationFilter
@@ -254,6 +262,8 @@ export type ProjectWhereInput = {
   repository?: Prisma.XOR<Prisma.RepositoryNullableScalarRelationFilter, Prisma.RepositoryWhereInput> | null
   folders?: Prisma.FolderListRelationFilter
   gitIntegration?: Prisma.XOR<Prisma.GitIntegrationNullableScalarRelationFilter, Prisma.GitIntegrationWhereInput> | null
+  snapshots?: Prisma.ProjectSnapshotListRelationFilter
+  agentSessions?: Prisma.AgentSessionListRelationFilter
   productDocuments?: Prisma.ProductDocumentListRelationFilter
   architectureDocuments?: Prisma.ArchitectureDocumentListRelationFilter
   developmentTasks?: Prisma.DevelopmentTaskListRelationFilter
@@ -297,6 +307,7 @@ export type ProjectOrderByWithRelationInput = {
   lastOpenedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  githubRepoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   owner?: Prisma.UserOrderByWithRelationInput
   organization?: Prisma.OrganizationOrderByWithRelationInput
   tasks?: Prisma.TaskOrderByRelationAggregateInput
@@ -305,6 +316,8 @@ export type ProjectOrderByWithRelationInput = {
   repository?: Prisma.RepositoryOrderByWithRelationInput
   folders?: Prisma.FolderOrderByRelationAggregateInput
   gitIntegration?: Prisma.GitIntegrationOrderByWithRelationInput
+  snapshots?: Prisma.ProjectSnapshotOrderByRelationAggregateInput
+  agentSessions?: Prisma.AgentSessionOrderByRelationAggregateInput
   productDocuments?: Prisma.ProductDocumentOrderByRelationAggregateInput
   architectureDocuments?: Prisma.ArchitectureDocumentOrderByRelationAggregateInput
   developmentTasks?: Prisma.DevelopmentTaskOrderByRelationAggregateInput
@@ -351,6 +364,7 @@ export type ProjectWhereUniqueInput = Prisma.AtLeast<{
   lastOpenedAt?: Prisma.DateTimeNullableFilter<"Project"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Project"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Project"> | Date | string
+  githubRepoUrl?: Prisma.StringNullableFilter<"Project"> | string | null
   owner?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   organization?: Prisma.XOR<Prisma.OrganizationNullableScalarRelationFilter, Prisma.OrganizationWhereInput> | null
   tasks?: Prisma.TaskListRelationFilter
@@ -359,6 +373,8 @@ export type ProjectWhereUniqueInput = Prisma.AtLeast<{
   repository?: Prisma.XOR<Prisma.RepositoryNullableScalarRelationFilter, Prisma.RepositoryWhereInput> | null
   folders?: Prisma.FolderListRelationFilter
   gitIntegration?: Prisma.XOR<Prisma.GitIntegrationNullableScalarRelationFilter, Prisma.GitIntegrationWhereInput> | null
+  snapshots?: Prisma.ProjectSnapshotListRelationFilter
+  agentSessions?: Prisma.AgentSessionListRelationFilter
   productDocuments?: Prisma.ProductDocumentListRelationFilter
   architectureDocuments?: Prisma.ArchitectureDocumentListRelationFilter
   developmentTasks?: Prisma.DevelopmentTaskListRelationFilter
@@ -402,6 +418,7 @@ export type ProjectOrderByWithAggregationInput = {
   lastOpenedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  githubRepoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.ProjectCountOrderByAggregateInput
   _max?: Prisma.ProjectMaxOrderByAggregateInput
   _min?: Prisma.ProjectMinOrderByAggregateInput
@@ -424,6 +441,7 @@ export type ProjectScalarWhereWithAggregatesInput = {
   lastOpenedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Project"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Project"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Project"> | Date | string
+  githubRepoUrl?: Prisma.StringNullableWithAggregatesFilter<"Project"> | string | null
 }
 
 export type ProjectCreateInput = {
@@ -438,6 +456,7 @@ export type ProjectCreateInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
   organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
@@ -446,6 +465,8 @@ export type ProjectCreateInput = {
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -489,12 +510,15 @@ export type ProjectUncheckedCreateInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionUncheckedCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -536,6 +560,7 @@ export type ProjectUpdateInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
   organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
@@ -544,6 +569,8 @@ export type ProjectUpdateInput = {
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -587,12 +614,15 @@ export type ProjectUncheckedUpdateInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUncheckedUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -636,6 +666,7 @@ export type ProjectCreateManyInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
 }
 
 export type ProjectUpdateManyMutationInput = {
@@ -650,6 +681,7 @@ export type ProjectUpdateManyMutationInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ProjectUncheckedUpdateManyInput = {
@@ -666,6 +698,7 @@ export type ProjectUncheckedUpdateManyInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ProjectListRelationFilter = {
@@ -692,6 +725,7 @@ export type ProjectCountOrderByAggregateInput = {
   lastOpenedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  githubRepoUrl?: Prisma.SortOrder
 }
 
 export type ProjectMaxOrderByAggregateInput = {
@@ -708,6 +742,7 @@ export type ProjectMaxOrderByAggregateInput = {
   lastOpenedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  githubRepoUrl?: Prisma.SortOrder
 }
 
 export type ProjectMinOrderByAggregateInput = {
@@ -724,6 +759,7 @@ export type ProjectMinOrderByAggregateInput = {
   lastOpenedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  githubRepoUrl?: Prisma.SortOrder
 }
 
 export type ProjectScalarRelationFilter = {
@@ -1296,6 +1332,34 @@ export type ProjectUpdateOneRequiredWithoutFeedbackNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ProjectUpdateToOneWithWhereWithoutFeedbackInput, Prisma.ProjectUpdateWithoutFeedbackInput>, Prisma.ProjectUncheckedUpdateWithoutFeedbackInput>
 }
 
+export type ProjectCreateNestedOneWithoutSnapshotsInput = {
+  create?: Prisma.XOR<Prisma.ProjectCreateWithoutSnapshotsInput, Prisma.ProjectUncheckedCreateWithoutSnapshotsInput>
+  connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutSnapshotsInput
+  connect?: Prisma.ProjectWhereUniqueInput
+}
+
+export type ProjectUpdateOneRequiredWithoutSnapshotsNestedInput = {
+  create?: Prisma.XOR<Prisma.ProjectCreateWithoutSnapshotsInput, Prisma.ProjectUncheckedCreateWithoutSnapshotsInput>
+  connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutSnapshotsInput
+  upsert?: Prisma.ProjectUpsertWithoutSnapshotsInput
+  connect?: Prisma.ProjectWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProjectUpdateToOneWithWhereWithoutSnapshotsInput, Prisma.ProjectUpdateWithoutSnapshotsInput>, Prisma.ProjectUncheckedUpdateWithoutSnapshotsInput>
+}
+
+export type ProjectCreateNestedOneWithoutAgentSessionsInput = {
+  create?: Prisma.XOR<Prisma.ProjectCreateWithoutAgentSessionsInput, Prisma.ProjectUncheckedCreateWithoutAgentSessionsInput>
+  connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutAgentSessionsInput
+  connect?: Prisma.ProjectWhereUniqueInput
+}
+
+export type ProjectUpdateOneRequiredWithoutAgentSessionsNestedInput = {
+  create?: Prisma.XOR<Prisma.ProjectCreateWithoutAgentSessionsInput, Prisma.ProjectUncheckedCreateWithoutAgentSessionsInput>
+  connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutAgentSessionsInput
+  upsert?: Prisma.ProjectUpsertWithoutAgentSessionsInput
+  connect?: Prisma.ProjectWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProjectUpdateToOneWithWhereWithoutAgentSessionsInput, Prisma.ProjectUpdateWithoutAgentSessionsInput>, Prisma.ProjectUncheckedUpdateWithoutAgentSessionsInput>
+}
+
 export type ProjectCreateWithoutOwnerInput = {
   id?: string
   name: string
@@ -1308,6 +1372,7 @@ export type ProjectCreateWithoutOwnerInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
@@ -1315,6 +1380,8 @@ export type ProjectCreateWithoutOwnerInput = {
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -1357,12 +1424,15 @@ export type ProjectUncheckedCreateWithoutOwnerInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionUncheckedCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -1435,6 +1505,7 @@ export type ProjectScalarWhereInput = {
   lastOpenedAt?: Prisma.DateTimeNullableFilter<"Project"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Project"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Project"> | Date | string
+  githubRepoUrl?: Prisma.StringNullableFilter<"Project"> | string | null
 }
 
 export type ProjectCreateWithoutTasksInput = {
@@ -1449,6 +1520,7 @@ export type ProjectCreateWithoutTasksInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
   organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
@@ -1456,6 +1528,8 @@ export type ProjectCreateWithoutTasksInput = {
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -1499,11 +1573,14 @@ export type ProjectUncheckedCreateWithoutTasksInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionUncheckedCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -1561,6 +1638,7 @@ export type ProjectUpdateWithoutTasksInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
   organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
@@ -1568,6 +1646,8 @@ export type ProjectUpdateWithoutTasksInput = {
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -1611,11 +1691,14 @@ export type ProjectUncheckedUpdateWithoutTasksInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUncheckedUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -1657,6 +1740,7 @@ export type ProjectCreateWithoutDocumentsInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
   organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
@@ -1664,6 +1748,8 @@ export type ProjectCreateWithoutDocumentsInput = {
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -1707,11 +1793,14 @@ export type ProjectUncheckedCreateWithoutDocumentsInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionUncheckedCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -1769,6 +1858,7 @@ export type ProjectUpdateWithoutDocumentsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
   organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
@@ -1776,6 +1866,8 @@ export type ProjectUpdateWithoutDocumentsInput = {
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -1819,11 +1911,14 @@ export type ProjectUncheckedUpdateWithoutDocumentsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUncheckedUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -1865,6 +1960,7 @@ export type ProjectCreateWithoutWorkflowsInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
   organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
@@ -1872,6 +1968,8 @@ export type ProjectCreateWithoutWorkflowsInput = {
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -1915,11 +2013,14 @@ export type ProjectUncheckedCreateWithoutWorkflowsInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionUncheckedCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -1977,6 +2078,7 @@ export type ProjectUpdateWithoutWorkflowsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
   organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
@@ -1984,6 +2086,8 @@ export type ProjectUpdateWithoutWorkflowsInput = {
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -2027,11 +2131,14 @@ export type ProjectUncheckedUpdateWithoutWorkflowsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUncheckedUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -2073,6 +2180,7 @@ export type ProjectCreateWithoutUsageLogsInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
   organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
@@ -2081,6 +2189,8 @@ export type ProjectCreateWithoutUsageLogsInput = {
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -2123,12 +2233,15 @@ export type ProjectUncheckedCreateWithoutUsageLogsInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionUncheckedCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -2185,6 +2298,7 @@ export type ProjectUpdateWithoutUsageLogsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
   organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
@@ -2193,6 +2307,8 @@ export type ProjectUpdateWithoutUsageLogsInput = {
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -2235,12 +2351,15 @@ export type ProjectUncheckedUpdateWithoutUsageLogsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUncheckedUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -2281,6 +2400,7 @@ export type ProjectCreateWithoutRepositoryInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
   organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
@@ -2288,6 +2408,8 @@ export type ProjectCreateWithoutRepositoryInput = {
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -2331,11 +2453,14 @@ export type ProjectUncheckedCreateWithoutRepositoryInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionUncheckedCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -2393,6 +2518,7 @@ export type ProjectUpdateWithoutRepositoryInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
   organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
@@ -2400,6 +2526,8 @@ export type ProjectUpdateWithoutRepositoryInput = {
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -2443,11 +2571,14 @@ export type ProjectUncheckedUpdateWithoutRepositoryInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUncheckedUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -2489,6 +2620,7 @@ export type ProjectCreateWithoutProductDocumentsInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
   organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
@@ -2497,6 +2629,8 @@ export type ProjectCreateWithoutProductDocumentsInput = {
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
   qualityReports?: Prisma.QualityReportCreateNestedManyWithoutProjectInput
@@ -2539,12 +2673,15 @@ export type ProjectUncheckedCreateWithoutProductDocumentsInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
   qualityReports?: Prisma.QualityReportUncheckedCreateNestedManyWithoutProjectInput
@@ -2601,6 +2738,7 @@ export type ProjectUpdateWithoutProductDocumentsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
   organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
@@ -2609,6 +2747,8 @@ export type ProjectUpdateWithoutProductDocumentsInput = {
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
   qualityReports?: Prisma.QualityReportUpdateManyWithoutProjectNestedInput
@@ -2651,12 +2791,15 @@ export type ProjectUncheckedUpdateWithoutProductDocumentsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
   qualityReports?: Prisma.QualityReportUncheckedUpdateManyWithoutProjectNestedInput
@@ -2697,6 +2840,7 @@ export type ProjectCreateWithoutArchitectureDocumentsInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
   organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
@@ -2705,6 +2849,8 @@ export type ProjectCreateWithoutArchitectureDocumentsInput = {
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
   qualityReports?: Prisma.QualityReportCreateNestedManyWithoutProjectInput
@@ -2747,12 +2893,15 @@ export type ProjectUncheckedCreateWithoutArchitectureDocumentsInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionUncheckedCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
   qualityReports?: Prisma.QualityReportUncheckedCreateNestedManyWithoutProjectInput
@@ -2809,6 +2958,7 @@ export type ProjectUpdateWithoutArchitectureDocumentsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
   organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
@@ -2817,6 +2967,8 @@ export type ProjectUpdateWithoutArchitectureDocumentsInput = {
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
   qualityReports?: Prisma.QualityReportUpdateManyWithoutProjectNestedInput
@@ -2859,12 +3011,15 @@ export type ProjectUncheckedUpdateWithoutArchitectureDocumentsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUncheckedUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
   qualityReports?: Prisma.QualityReportUncheckedUpdateManyWithoutProjectNestedInput
@@ -2905,6 +3060,7 @@ export type ProjectCreateWithoutDevelopmentTasksInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
   organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
@@ -2913,6 +3069,8 @@ export type ProjectCreateWithoutDevelopmentTasksInput = {
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   qualityReports?: Prisma.QualityReportCreateNestedManyWithoutProjectInput
@@ -2955,12 +3113,15 @@ export type ProjectUncheckedCreateWithoutDevelopmentTasksInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionUncheckedCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   qualityReports?: Prisma.QualityReportUncheckedCreateNestedManyWithoutProjectInput
@@ -3017,6 +3178,7 @@ export type ProjectUpdateWithoutDevelopmentTasksInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
   organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
@@ -3025,6 +3187,8 @@ export type ProjectUpdateWithoutDevelopmentTasksInput = {
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   qualityReports?: Prisma.QualityReportUpdateManyWithoutProjectNestedInput
@@ -3067,12 +3231,15 @@ export type ProjectUncheckedUpdateWithoutDevelopmentTasksInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUncheckedUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   qualityReports?: Prisma.QualityReportUncheckedUpdateManyWithoutProjectNestedInput
@@ -3113,6 +3280,7 @@ export type ProjectCreateWithoutQualityReportsInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
   organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
@@ -3121,6 +3289,8 @@ export type ProjectCreateWithoutQualityReportsInput = {
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -3163,12 +3333,15 @@ export type ProjectUncheckedCreateWithoutQualityReportsInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionUncheckedCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -3225,6 +3398,7 @@ export type ProjectUpdateWithoutQualityReportsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
   organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
@@ -3233,6 +3407,8 @@ export type ProjectUpdateWithoutQualityReportsInput = {
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -3275,12 +3451,15 @@ export type ProjectUncheckedUpdateWithoutQualityReportsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUncheckedUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -3321,6 +3500,7 @@ export type ProjectCreateWithoutFoldersInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
   organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
@@ -3328,6 +3508,8 @@ export type ProjectCreateWithoutFoldersInput = {
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -3371,11 +3553,14 @@ export type ProjectUncheckedCreateWithoutFoldersInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionUncheckedCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -3433,6 +3618,7 @@ export type ProjectUpdateWithoutFoldersInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
   organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
@@ -3440,6 +3626,8 @@ export type ProjectUpdateWithoutFoldersInput = {
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -3483,11 +3671,14 @@ export type ProjectUncheckedUpdateWithoutFoldersInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUncheckedUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -3529,6 +3720,7 @@ export type ProjectCreateWithoutFavoriteProjectsInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
   organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
@@ -3537,6 +3729,8 @@ export type ProjectCreateWithoutFavoriteProjectsInput = {
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -3579,12 +3773,15 @@ export type ProjectUncheckedCreateWithoutFavoriteProjectsInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionUncheckedCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -3641,6 +3838,7 @@ export type ProjectUpdateWithoutFavoriteProjectsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
   organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
@@ -3649,6 +3847,8 @@ export type ProjectUpdateWithoutFavoriteProjectsInput = {
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -3691,12 +3891,15 @@ export type ProjectUncheckedUpdateWithoutFavoriteProjectsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUncheckedUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -3737,6 +3940,7 @@ export type ProjectCreateWithoutRecentProjectsInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
   organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
@@ -3745,6 +3949,8 @@ export type ProjectCreateWithoutRecentProjectsInput = {
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -3787,12 +3993,15 @@ export type ProjectUncheckedCreateWithoutRecentProjectsInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionUncheckedCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -3849,6 +4058,7 @@ export type ProjectUpdateWithoutRecentProjectsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
   organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
@@ -3857,6 +4067,8 @@ export type ProjectUpdateWithoutRecentProjectsInput = {
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -3899,12 +4111,15 @@ export type ProjectUncheckedUpdateWithoutRecentProjectsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUncheckedUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -3945,6 +4160,7 @@ export type ProjectCreateWithoutGitIntegrationInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
   organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
@@ -3952,6 +4168,8 @@ export type ProjectCreateWithoutGitIntegrationInput = {
   workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -3995,11 +4213,14 @@ export type ProjectUncheckedCreateWithoutGitIntegrationInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionUncheckedCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -4057,6 +4278,7 @@ export type ProjectUpdateWithoutGitIntegrationInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
   organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
@@ -4064,6 +4286,8 @@ export type ProjectUpdateWithoutGitIntegrationInput = {
   workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -4107,11 +4331,14 @@ export type ProjectUncheckedUpdateWithoutGitIntegrationInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUncheckedUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -4153,6 +4380,7 @@ export type ProjectCreateWithoutPullRequestsInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
   organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
@@ -4161,6 +4389,8 @@ export type ProjectCreateWithoutPullRequestsInput = {
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -4203,12 +4433,15 @@ export type ProjectUncheckedCreateWithoutPullRequestsInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionUncheckedCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -4265,6 +4498,7 @@ export type ProjectUpdateWithoutPullRequestsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
   organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
@@ -4273,6 +4507,8 @@ export type ProjectUpdateWithoutPullRequestsInput = {
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -4315,12 +4551,15 @@ export type ProjectUncheckedUpdateWithoutPullRequestsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUncheckedUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -4361,6 +4600,7 @@ export type ProjectCreateWithoutTestCasesInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
   organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
@@ -4369,6 +4609,8 @@ export type ProjectCreateWithoutTestCasesInput = {
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -4411,12 +4653,15 @@ export type ProjectUncheckedCreateWithoutTestCasesInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionUncheckedCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -4473,6 +4718,7 @@ export type ProjectUpdateWithoutTestCasesInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
   organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
@@ -4481,6 +4727,8 @@ export type ProjectUpdateWithoutTestCasesInput = {
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -4523,12 +4771,15 @@ export type ProjectUncheckedUpdateWithoutTestCasesInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUncheckedUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -4569,6 +4820,7 @@ export type ProjectCreateWithoutBugReportsInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
   organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
@@ -4577,6 +4829,8 @@ export type ProjectCreateWithoutBugReportsInput = {
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -4619,12 +4873,15 @@ export type ProjectUncheckedCreateWithoutBugReportsInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionUncheckedCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -4681,6 +4938,7 @@ export type ProjectUpdateWithoutBugReportsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
   organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
@@ -4689,6 +4947,8 @@ export type ProjectUpdateWithoutBugReportsInput = {
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -4731,12 +4991,15 @@ export type ProjectUncheckedUpdateWithoutBugReportsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUncheckedUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -4777,6 +5040,7 @@ export type ProjectCreateWithoutCoverageReportsInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
   organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
@@ -4785,6 +5049,8 @@ export type ProjectCreateWithoutCoverageReportsInput = {
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -4827,12 +5093,15 @@ export type ProjectUncheckedCreateWithoutCoverageReportsInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionUncheckedCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -4889,6 +5158,7 @@ export type ProjectUpdateWithoutCoverageReportsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
   organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
@@ -4897,6 +5167,8 @@ export type ProjectUpdateWithoutCoverageReportsInput = {
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -4939,12 +5211,15 @@ export type ProjectUncheckedUpdateWithoutCoverageReportsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUncheckedUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -4985,6 +5260,7 @@ export type ProjectCreateWithoutKnowledgeItemsInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
   organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
@@ -4993,6 +5269,8 @@ export type ProjectCreateWithoutKnowledgeItemsInput = {
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -5035,12 +5313,15 @@ export type ProjectUncheckedCreateWithoutKnowledgeItemsInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionUncheckedCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -5097,6 +5378,7 @@ export type ProjectUpdateWithoutKnowledgeItemsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
   organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
@@ -5105,6 +5387,8 @@ export type ProjectUpdateWithoutKnowledgeItemsInput = {
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -5147,12 +5431,15 @@ export type ProjectUncheckedUpdateWithoutKnowledgeItemsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUncheckedUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -5193,6 +5480,7 @@ export type ProjectCreateWithoutEnvironmentsInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
   organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
@@ -5201,6 +5489,8 @@ export type ProjectCreateWithoutEnvironmentsInput = {
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -5243,12 +5533,15 @@ export type ProjectUncheckedCreateWithoutEnvironmentsInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionUncheckedCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -5305,6 +5598,7 @@ export type ProjectUpdateWithoutEnvironmentsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
   organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
@@ -5313,6 +5607,8 @@ export type ProjectUpdateWithoutEnvironmentsInput = {
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -5355,12 +5651,15 @@ export type ProjectUncheckedUpdateWithoutEnvironmentsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUncheckedUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -5401,6 +5700,7 @@ export type ProjectCreateWithoutDeploymentsInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
   organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
@@ -5409,6 +5709,8 @@ export type ProjectCreateWithoutDeploymentsInput = {
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -5451,12 +5753,15 @@ export type ProjectUncheckedCreateWithoutDeploymentsInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionUncheckedCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -5513,6 +5818,7 @@ export type ProjectUpdateWithoutDeploymentsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
   organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
@@ -5521,6 +5827,8 @@ export type ProjectUpdateWithoutDeploymentsInput = {
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -5563,12 +5871,15 @@ export type ProjectUncheckedUpdateWithoutDeploymentsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUncheckedUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -5609,6 +5920,7 @@ export type ProjectCreateWithoutReleasesInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
   organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
@@ -5617,6 +5929,8 @@ export type ProjectCreateWithoutReleasesInput = {
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -5659,12 +5973,15 @@ export type ProjectUncheckedCreateWithoutReleasesInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionUncheckedCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -5721,6 +6038,7 @@ export type ProjectUpdateWithoutReleasesInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
   organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
@@ -5729,6 +6047,8 @@ export type ProjectUpdateWithoutReleasesInput = {
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -5771,12 +6091,15 @@ export type ProjectUncheckedUpdateWithoutReleasesInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUncheckedUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -5817,6 +6140,7 @@ export type ProjectCreateWithoutPlatformEventsInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
   organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
@@ -5825,6 +6149,8 @@ export type ProjectCreateWithoutPlatformEventsInput = {
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -5867,12 +6193,15 @@ export type ProjectUncheckedCreateWithoutPlatformEventsInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionUncheckedCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -5929,6 +6258,7 @@ export type ProjectUpdateWithoutPlatformEventsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
   organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
@@ -5937,6 +6267,8 @@ export type ProjectUpdateWithoutPlatformEventsInput = {
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -5979,12 +6311,15 @@ export type ProjectUncheckedUpdateWithoutPlatformEventsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUncheckedUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -6025,6 +6360,7 @@ export type ProjectCreateWithoutMetricsInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
   organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
@@ -6033,6 +6369,8 @@ export type ProjectCreateWithoutMetricsInput = {
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -6075,12 +6413,15 @@ export type ProjectUncheckedCreateWithoutMetricsInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionUncheckedCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -6137,6 +6478,7 @@ export type ProjectUpdateWithoutMetricsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
   organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
@@ -6145,6 +6487,8 @@ export type ProjectUpdateWithoutMetricsInput = {
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -6187,12 +6531,15 @@ export type ProjectUncheckedUpdateWithoutMetricsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUncheckedUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -6233,6 +6580,7 @@ export type ProjectCreateWithoutProjectHealthInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
   organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
@@ -6241,6 +6589,8 @@ export type ProjectCreateWithoutProjectHealthInput = {
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -6283,12 +6633,15 @@ export type ProjectUncheckedCreateWithoutProjectHealthInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionUncheckedCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -6345,6 +6698,7 @@ export type ProjectUpdateWithoutProjectHealthInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
   organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
@@ -6353,6 +6707,8 @@ export type ProjectUpdateWithoutProjectHealthInput = {
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -6395,12 +6751,15 @@ export type ProjectUncheckedUpdateWithoutProjectHealthInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUncheckedUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -6441,6 +6800,7 @@ export type ProjectCreateWithoutOrganizationInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
@@ -6448,6 +6808,8 @@ export type ProjectCreateWithoutOrganizationInput = {
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -6490,12 +6852,15 @@ export type ProjectUncheckedCreateWithoutOrganizationInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionUncheckedCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -6563,6 +6928,7 @@ export type ProjectCreateWithoutTeamProjectsInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
   organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
@@ -6571,6 +6937,8 @@ export type ProjectCreateWithoutTeamProjectsInput = {
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -6613,12 +6981,15 @@ export type ProjectUncheckedCreateWithoutTeamProjectsInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionUncheckedCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -6675,6 +7046,7 @@ export type ProjectUpdateWithoutTeamProjectsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
   organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
@@ -6683,6 +7055,8 @@ export type ProjectUpdateWithoutTeamProjectsInput = {
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -6725,12 +7099,15 @@ export type ProjectUncheckedUpdateWithoutTeamProjectsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUncheckedUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -6771,6 +7148,7 @@ export type ProjectCreateWithoutSecurityIssuesInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
   organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
@@ -6779,6 +7157,8 @@ export type ProjectCreateWithoutSecurityIssuesInput = {
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -6821,12 +7201,15 @@ export type ProjectUncheckedCreateWithoutSecurityIssuesInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionUncheckedCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -6883,6 +7266,7 @@ export type ProjectUpdateWithoutSecurityIssuesInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
   organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
@@ -6891,6 +7275,8 @@ export type ProjectUpdateWithoutSecurityIssuesInput = {
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -6933,12 +7319,15 @@ export type ProjectUncheckedUpdateWithoutSecurityIssuesInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUncheckedUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -6979,6 +7368,7 @@ export type ProjectCreateWithoutSecurityScansInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
   organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
@@ -6987,6 +7377,8 @@ export type ProjectCreateWithoutSecurityScansInput = {
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -7029,12 +7421,15 @@ export type ProjectUncheckedCreateWithoutSecurityScansInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionUncheckedCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -7091,6 +7486,7 @@ export type ProjectUpdateWithoutSecurityScansInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
   organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
@@ -7099,6 +7495,8 @@ export type ProjectUpdateWithoutSecurityScansInput = {
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -7141,12 +7539,15 @@ export type ProjectUncheckedUpdateWithoutSecurityScansInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUncheckedUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -7187,6 +7588,7 @@ export type ProjectCreateWithoutProductStrategiesInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
   organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
@@ -7195,6 +7597,8 @@ export type ProjectCreateWithoutProductStrategiesInput = {
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -7237,12 +7641,15 @@ export type ProjectUncheckedCreateWithoutProductStrategiesInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionUncheckedCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -7299,6 +7706,7 @@ export type ProjectUpdateWithoutProductStrategiesInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
   organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
@@ -7307,6 +7715,8 @@ export type ProjectUpdateWithoutProductStrategiesInput = {
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -7349,12 +7759,15 @@ export type ProjectUncheckedUpdateWithoutProductStrategiesInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUncheckedUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -7395,6 +7808,7 @@ export type ProjectCreateWithoutRequirementsInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
   organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
@@ -7403,6 +7817,8 @@ export type ProjectCreateWithoutRequirementsInput = {
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -7445,12 +7861,15 @@ export type ProjectUncheckedCreateWithoutRequirementsInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionUncheckedCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -7507,6 +7926,7 @@ export type ProjectUpdateWithoutRequirementsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
   organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
@@ -7515,6 +7935,8 @@ export type ProjectUpdateWithoutRequirementsInput = {
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -7557,12 +7979,15 @@ export type ProjectUncheckedUpdateWithoutRequirementsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUncheckedUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -7603,6 +8028,7 @@ export type ProjectCreateWithoutRoadmapsInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
   organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
@@ -7611,6 +8037,8 @@ export type ProjectCreateWithoutRoadmapsInput = {
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -7653,12 +8081,15 @@ export type ProjectUncheckedCreateWithoutRoadmapsInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionUncheckedCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -7715,6 +8146,7 @@ export type ProjectUpdateWithoutRoadmapsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
   organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
@@ -7723,6 +8155,8 @@ export type ProjectUpdateWithoutRoadmapsInput = {
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -7765,12 +8199,15 @@ export type ProjectUncheckedUpdateWithoutRoadmapsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUncheckedUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -7811,6 +8248,7 @@ export type ProjectCreateWithoutProductDecisionsInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
   organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
@@ -7819,6 +8257,8 @@ export type ProjectCreateWithoutProductDecisionsInput = {
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -7861,12 +8301,15 @@ export type ProjectUncheckedCreateWithoutProductDecisionsInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionUncheckedCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -7923,6 +8366,7 @@ export type ProjectUpdateWithoutProductDecisionsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
   organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
@@ -7931,6 +8375,8 @@ export type ProjectUpdateWithoutProductDecisionsInput = {
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -7973,12 +8419,15 @@ export type ProjectUncheckedUpdateWithoutProductDecisionsInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUncheckedUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -8019,6 +8468,7 @@ export type ProjectCreateWithoutDesignSystemConfigInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
   organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
@@ -8027,6 +8477,8 @@ export type ProjectCreateWithoutDesignSystemConfigInput = {
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -8069,12 +8521,15 @@ export type ProjectUncheckedCreateWithoutDesignSystemConfigInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionUncheckedCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -8131,6 +8586,7 @@ export type ProjectUpdateWithoutDesignSystemConfigInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
   organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
@@ -8139,6 +8595,8 @@ export type ProjectUpdateWithoutDesignSystemConfigInput = {
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -8181,12 +8639,15 @@ export type ProjectUncheckedUpdateWithoutDesignSystemConfigInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUncheckedUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -8227,6 +8688,7 @@ export type ProjectCreateWithoutFeedbackInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   owner: Prisma.UserCreateNestedOneWithoutProjectsInput
   organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
   tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
@@ -8235,6 +8697,8 @@ export type ProjectCreateWithoutFeedbackInput = {
   repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
@@ -8277,12 +8741,15 @@ export type ProjectUncheckedCreateWithoutFeedbackInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutProjectInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
   repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
   folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
   gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionUncheckedCreateNestedManyWithoutProjectInput
   productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
@@ -8339,6 +8806,7 @@ export type ProjectUpdateWithoutFeedbackInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
   organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
@@ -8347,6 +8815,8 @@ export type ProjectUpdateWithoutFeedbackInput = {
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -8389,12 +8859,15 @@ export type ProjectUncheckedUpdateWithoutFeedbackInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUncheckedUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -8423,6 +8896,446 @@ export type ProjectUncheckedUpdateWithoutFeedbackInput = {
   pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutProjectNestedInput
 }
 
+export type ProjectCreateWithoutSnapshotsInput = {
+  id?: string
+  name: string
+  slug?: string | null
+  description?: string | null
+  icon?: string | null
+  color?: string | null
+  status?: $Enums.ProjectStatus
+  favorite?: boolean
+  lastOpenedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  githubRepoUrl?: string | null
+  owner: Prisma.UserCreateNestedOneWithoutProjectsInput
+  organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
+  tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
+  documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
+  workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
+  repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
+  folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionCreateNestedManyWithoutProjectInput
+  productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
+  architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
+  developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
+  qualityReports?: Prisma.QualityReportCreateNestedManyWithoutProjectInput
+  recentProjects?: Prisma.RecentProjectCreateNestedManyWithoutProjectInput
+  favoriteProjects?: Prisma.FavoriteProjectCreateNestedManyWithoutProjectInput
+  teamProjects?: Prisma.TeamProjectCreateNestedManyWithoutProjectInput
+  usageLogs?: Prisma.AIUsageLogCreateNestedManyWithoutProjectInput
+  testCases?: Prisma.TestCaseCreateNestedManyWithoutProjectInput
+  bugReports?: Prisma.BugReportCreateNestedManyWithoutProjectInput
+  coverageReports?: Prisma.CoverageReportCreateNestedManyWithoutProjectInput
+  knowledgeItems?: Prisma.KnowledgeItemCreateNestedManyWithoutProjectInput
+  environments?: Prisma.EnvironmentCreateNestedManyWithoutProjectInput
+  deployments?: Prisma.DeploymentCreateNestedManyWithoutProjectInput
+  releases?: Prisma.ReleaseCreateNestedManyWithoutProjectInput
+  platformEvents?: Prisma.PlatformEventCreateNestedManyWithoutProjectInput
+  metrics?: Prisma.MetricCreateNestedManyWithoutProjectInput
+  projectHealth?: Prisma.ProjectHealthCreateNestedOneWithoutProjectInput
+  securityIssues?: Prisma.SecurityIssueCreateNestedManyWithoutProjectInput
+  securityScans?: Prisma.SecurityScanCreateNestedManyWithoutProjectInput
+  productStrategies?: Prisma.ProductStrategyCreateNestedManyWithoutProjectInput
+  requirements?: Prisma.RequirementCreateNestedManyWithoutProjectInput
+  roadmaps?: Prisma.RoadmapCreateNestedManyWithoutProjectInput
+  productDecisions?: Prisma.ProductDecisionCreateNestedManyWithoutProjectInput
+  designSystemConfig?: Prisma.DesignSystemConfigCreateNestedOneWithoutProjectInput
+  feedback?: Prisma.FeedbackCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestCreateNestedManyWithoutProjectInput
+}
+
+export type ProjectUncheckedCreateWithoutSnapshotsInput = {
+  id?: string
+  name: string
+  slug?: string | null
+  description?: string | null
+  icon?: string | null
+  color?: string | null
+  status?: $Enums.ProjectStatus
+  ownerId: string
+  organizationId?: string | null
+  favorite?: boolean
+  lastOpenedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  githubRepoUrl?: string | null
+  tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutProjectInput
+  documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
+  workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
+  repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
+  folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
+  agentSessions?: Prisma.AgentSessionUncheckedCreateNestedManyWithoutProjectInput
+  productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
+  architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
+  developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
+  qualityReports?: Prisma.QualityReportUncheckedCreateNestedManyWithoutProjectInput
+  recentProjects?: Prisma.RecentProjectUncheckedCreateNestedManyWithoutProjectInput
+  favoriteProjects?: Prisma.FavoriteProjectUncheckedCreateNestedManyWithoutProjectInput
+  teamProjects?: Prisma.TeamProjectUncheckedCreateNestedManyWithoutProjectInput
+  usageLogs?: Prisma.AIUsageLogUncheckedCreateNestedManyWithoutProjectInput
+  testCases?: Prisma.TestCaseUncheckedCreateNestedManyWithoutProjectInput
+  bugReports?: Prisma.BugReportUncheckedCreateNestedManyWithoutProjectInput
+  coverageReports?: Prisma.CoverageReportUncheckedCreateNestedManyWithoutProjectInput
+  knowledgeItems?: Prisma.KnowledgeItemUncheckedCreateNestedManyWithoutProjectInput
+  environments?: Prisma.EnvironmentUncheckedCreateNestedManyWithoutProjectInput
+  deployments?: Prisma.DeploymentUncheckedCreateNestedManyWithoutProjectInput
+  releases?: Prisma.ReleaseUncheckedCreateNestedManyWithoutProjectInput
+  platformEvents?: Prisma.PlatformEventUncheckedCreateNestedManyWithoutProjectInput
+  metrics?: Prisma.MetricUncheckedCreateNestedManyWithoutProjectInput
+  projectHealth?: Prisma.ProjectHealthUncheckedCreateNestedOneWithoutProjectInput
+  securityIssues?: Prisma.SecurityIssueUncheckedCreateNestedManyWithoutProjectInput
+  securityScans?: Prisma.SecurityScanUncheckedCreateNestedManyWithoutProjectInput
+  productStrategies?: Prisma.ProductStrategyUncheckedCreateNestedManyWithoutProjectInput
+  requirements?: Prisma.RequirementUncheckedCreateNestedManyWithoutProjectInput
+  roadmaps?: Prisma.RoadmapUncheckedCreateNestedManyWithoutProjectInput
+  productDecisions?: Prisma.ProductDecisionUncheckedCreateNestedManyWithoutProjectInput
+  designSystemConfig?: Prisma.DesignSystemConfigUncheckedCreateNestedOneWithoutProjectInput
+  feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutProjectInput
+}
+
+export type ProjectCreateOrConnectWithoutSnapshotsInput = {
+  where: Prisma.ProjectWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProjectCreateWithoutSnapshotsInput, Prisma.ProjectUncheckedCreateWithoutSnapshotsInput>
+}
+
+export type ProjectUpsertWithoutSnapshotsInput = {
+  update: Prisma.XOR<Prisma.ProjectUpdateWithoutSnapshotsInput, Prisma.ProjectUncheckedUpdateWithoutSnapshotsInput>
+  create: Prisma.XOR<Prisma.ProjectCreateWithoutSnapshotsInput, Prisma.ProjectUncheckedCreateWithoutSnapshotsInput>
+  where?: Prisma.ProjectWhereInput
+}
+
+export type ProjectUpdateToOneWithWhereWithoutSnapshotsInput = {
+  where?: Prisma.ProjectWhereInput
+  data: Prisma.XOR<Prisma.ProjectUpdateWithoutSnapshotsInput, Prisma.ProjectUncheckedUpdateWithoutSnapshotsInput>
+}
+
+export type ProjectUpdateWithoutSnapshotsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+  favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
+  organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
+  tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
+  documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
+  workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
+  repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
+  folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUpdateManyWithoutProjectNestedInput
+  productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
+  architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
+  developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
+  qualityReports?: Prisma.QualityReportUpdateManyWithoutProjectNestedInput
+  recentProjects?: Prisma.RecentProjectUpdateManyWithoutProjectNestedInput
+  favoriteProjects?: Prisma.FavoriteProjectUpdateManyWithoutProjectNestedInput
+  teamProjects?: Prisma.TeamProjectUpdateManyWithoutProjectNestedInput
+  usageLogs?: Prisma.AIUsageLogUpdateManyWithoutProjectNestedInput
+  testCases?: Prisma.TestCaseUpdateManyWithoutProjectNestedInput
+  bugReports?: Prisma.BugReportUpdateManyWithoutProjectNestedInput
+  coverageReports?: Prisma.CoverageReportUpdateManyWithoutProjectNestedInput
+  knowledgeItems?: Prisma.KnowledgeItemUpdateManyWithoutProjectNestedInput
+  environments?: Prisma.EnvironmentUpdateManyWithoutProjectNestedInput
+  deployments?: Prisma.DeploymentUpdateManyWithoutProjectNestedInput
+  releases?: Prisma.ReleaseUpdateManyWithoutProjectNestedInput
+  platformEvents?: Prisma.PlatformEventUpdateManyWithoutProjectNestedInput
+  metrics?: Prisma.MetricUpdateManyWithoutProjectNestedInput
+  projectHealth?: Prisma.ProjectHealthUpdateOneWithoutProjectNestedInput
+  securityIssues?: Prisma.SecurityIssueUpdateManyWithoutProjectNestedInput
+  securityScans?: Prisma.SecurityScanUpdateManyWithoutProjectNestedInput
+  productStrategies?: Prisma.ProductStrategyUpdateManyWithoutProjectNestedInput
+  requirements?: Prisma.RequirementUpdateManyWithoutProjectNestedInput
+  roadmaps?: Prisma.RoadmapUpdateManyWithoutProjectNestedInput
+  productDecisions?: Prisma.ProductDecisionUpdateManyWithoutProjectNestedInput
+  designSystemConfig?: Prisma.DesignSystemConfigUpdateOneWithoutProjectNestedInput
+  feedback?: Prisma.FeedbackUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUpdateManyWithoutProjectNestedInput
+}
+
+export type ProjectUncheckedUpdateWithoutSnapshotsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tasks?: Prisma.TaskUncheckedUpdateManyWithoutProjectNestedInput
+  documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
+  workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
+  repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
+  folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUncheckedUpdateManyWithoutProjectNestedInput
+  productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
+  architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
+  developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
+  qualityReports?: Prisma.QualityReportUncheckedUpdateManyWithoutProjectNestedInput
+  recentProjects?: Prisma.RecentProjectUncheckedUpdateManyWithoutProjectNestedInput
+  favoriteProjects?: Prisma.FavoriteProjectUncheckedUpdateManyWithoutProjectNestedInput
+  teamProjects?: Prisma.TeamProjectUncheckedUpdateManyWithoutProjectNestedInput
+  usageLogs?: Prisma.AIUsageLogUncheckedUpdateManyWithoutProjectNestedInput
+  testCases?: Prisma.TestCaseUncheckedUpdateManyWithoutProjectNestedInput
+  bugReports?: Prisma.BugReportUncheckedUpdateManyWithoutProjectNestedInput
+  coverageReports?: Prisma.CoverageReportUncheckedUpdateManyWithoutProjectNestedInput
+  knowledgeItems?: Prisma.KnowledgeItemUncheckedUpdateManyWithoutProjectNestedInput
+  environments?: Prisma.EnvironmentUncheckedUpdateManyWithoutProjectNestedInput
+  deployments?: Prisma.DeploymentUncheckedUpdateManyWithoutProjectNestedInput
+  releases?: Prisma.ReleaseUncheckedUpdateManyWithoutProjectNestedInput
+  platformEvents?: Prisma.PlatformEventUncheckedUpdateManyWithoutProjectNestedInput
+  metrics?: Prisma.MetricUncheckedUpdateManyWithoutProjectNestedInput
+  projectHealth?: Prisma.ProjectHealthUncheckedUpdateOneWithoutProjectNestedInput
+  securityIssues?: Prisma.SecurityIssueUncheckedUpdateManyWithoutProjectNestedInput
+  securityScans?: Prisma.SecurityScanUncheckedUpdateManyWithoutProjectNestedInput
+  productStrategies?: Prisma.ProductStrategyUncheckedUpdateManyWithoutProjectNestedInput
+  requirements?: Prisma.RequirementUncheckedUpdateManyWithoutProjectNestedInput
+  roadmaps?: Prisma.RoadmapUncheckedUpdateManyWithoutProjectNestedInput
+  productDecisions?: Prisma.ProductDecisionUncheckedUpdateManyWithoutProjectNestedInput
+  designSystemConfig?: Prisma.DesignSystemConfigUncheckedUpdateOneWithoutProjectNestedInput
+  feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutProjectNestedInput
+}
+
+export type ProjectCreateWithoutAgentSessionsInput = {
+  id?: string
+  name: string
+  slug?: string | null
+  description?: string | null
+  icon?: string | null
+  color?: string | null
+  status?: $Enums.ProjectStatus
+  favorite?: boolean
+  lastOpenedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  githubRepoUrl?: string | null
+  owner: Prisma.UserCreateNestedOneWithoutProjectsInput
+  organization?: Prisma.OrganizationCreateNestedOneWithoutProjectsInput
+  tasks?: Prisma.TaskCreateNestedManyWithoutProjectInput
+  documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
+  workflows?: Prisma.WorkflowCreateNestedManyWithoutProjectInput
+  repository?: Prisma.RepositoryCreateNestedOneWithoutProjectInput
+  folders?: Prisma.FolderCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotCreateNestedManyWithoutProjectInput
+  productDocuments?: Prisma.ProductDocumentCreateNestedManyWithoutProjectInput
+  architectureDocuments?: Prisma.ArchitectureDocumentCreateNestedManyWithoutProjectInput
+  developmentTasks?: Prisma.DevelopmentTaskCreateNestedManyWithoutProjectInput
+  qualityReports?: Prisma.QualityReportCreateNestedManyWithoutProjectInput
+  recentProjects?: Prisma.RecentProjectCreateNestedManyWithoutProjectInput
+  favoriteProjects?: Prisma.FavoriteProjectCreateNestedManyWithoutProjectInput
+  teamProjects?: Prisma.TeamProjectCreateNestedManyWithoutProjectInput
+  usageLogs?: Prisma.AIUsageLogCreateNestedManyWithoutProjectInput
+  testCases?: Prisma.TestCaseCreateNestedManyWithoutProjectInput
+  bugReports?: Prisma.BugReportCreateNestedManyWithoutProjectInput
+  coverageReports?: Prisma.CoverageReportCreateNestedManyWithoutProjectInput
+  knowledgeItems?: Prisma.KnowledgeItemCreateNestedManyWithoutProjectInput
+  environments?: Prisma.EnvironmentCreateNestedManyWithoutProjectInput
+  deployments?: Prisma.DeploymentCreateNestedManyWithoutProjectInput
+  releases?: Prisma.ReleaseCreateNestedManyWithoutProjectInput
+  platformEvents?: Prisma.PlatformEventCreateNestedManyWithoutProjectInput
+  metrics?: Prisma.MetricCreateNestedManyWithoutProjectInput
+  projectHealth?: Prisma.ProjectHealthCreateNestedOneWithoutProjectInput
+  securityIssues?: Prisma.SecurityIssueCreateNestedManyWithoutProjectInput
+  securityScans?: Prisma.SecurityScanCreateNestedManyWithoutProjectInput
+  productStrategies?: Prisma.ProductStrategyCreateNestedManyWithoutProjectInput
+  requirements?: Prisma.RequirementCreateNestedManyWithoutProjectInput
+  roadmaps?: Prisma.RoadmapCreateNestedManyWithoutProjectInput
+  productDecisions?: Prisma.ProductDecisionCreateNestedManyWithoutProjectInput
+  designSystemConfig?: Prisma.DesignSystemConfigCreateNestedOneWithoutProjectInput
+  feedback?: Prisma.FeedbackCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestCreateNestedManyWithoutProjectInput
+}
+
+export type ProjectUncheckedCreateWithoutAgentSessionsInput = {
+  id?: string
+  name: string
+  slug?: string | null
+  description?: string | null
+  icon?: string | null
+  color?: string | null
+  status?: $Enums.ProjectStatus
+  ownerId: string
+  organizationId?: string | null
+  favorite?: boolean
+  lastOpenedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  githubRepoUrl?: string | null
+  tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutProjectInput
+  documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
+  workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutProjectInput
+  repository?: Prisma.RepositoryUncheckedCreateNestedOneWithoutProjectInput
+  folders?: Prisma.FolderUncheckedCreateNestedManyWithoutProjectInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedCreateNestedOneWithoutProjectInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
+  productDocuments?: Prisma.ProductDocumentUncheckedCreateNestedManyWithoutProjectInput
+  architectureDocuments?: Prisma.ArchitectureDocumentUncheckedCreateNestedManyWithoutProjectInput
+  developmentTasks?: Prisma.DevelopmentTaskUncheckedCreateNestedManyWithoutProjectInput
+  qualityReports?: Prisma.QualityReportUncheckedCreateNestedManyWithoutProjectInput
+  recentProjects?: Prisma.RecentProjectUncheckedCreateNestedManyWithoutProjectInput
+  favoriteProjects?: Prisma.FavoriteProjectUncheckedCreateNestedManyWithoutProjectInput
+  teamProjects?: Prisma.TeamProjectUncheckedCreateNestedManyWithoutProjectInput
+  usageLogs?: Prisma.AIUsageLogUncheckedCreateNestedManyWithoutProjectInput
+  testCases?: Prisma.TestCaseUncheckedCreateNestedManyWithoutProjectInput
+  bugReports?: Prisma.BugReportUncheckedCreateNestedManyWithoutProjectInput
+  coverageReports?: Prisma.CoverageReportUncheckedCreateNestedManyWithoutProjectInput
+  knowledgeItems?: Prisma.KnowledgeItemUncheckedCreateNestedManyWithoutProjectInput
+  environments?: Prisma.EnvironmentUncheckedCreateNestedManyWithoutProjectInput
+  deployments?: Prisma.DeploymentUncheckedCreateNestedManyWithoutProjectInput
+  releases?: Prisma.ReleaseUncheckedCreateNestedManyWithoutProjectInput
+  platformEvents?: Prisma.PlatformEventUncheckedCreateNestedManyWithoutProjectInput
+  metrics?: Prisma.MetricUncheckedCreateNestedManyWithoutProjectInput
+  projectHealth?: Prisma.ProjectHealthUncheckedCreateNestedOneWithoutProjectInput
+  securityIssues?: Prisma.SecurityIssueUncheckedCreateNestedManyWithoutProjectInput
+  securityScans?: Prisma.SecurityScanUncheckedCreateNestedManyWithoutProjectInput
+  productStrategies?: Prisma.ProductStrategyUncheckedCreateNestedManyWithoutProjectInput
+  requirements?: Prisma.RequirementUncheckedCreateNestedManyWithoutProjectInput
+  roadmaps?: Prisma.RoadmapUncheckedCreateNestedManyWithoutProjectInput
+  productDecisions?: Prisma.ProductDecisionUncheckedCreateNestedManyWithoutProjectInput
+  designSystemConfig?: Prisma.DesignSystemConfigUncheckedCreateNestedOneWithoutProjectInput
+  feedback?: Prisma.FeedbackUncheckedCreateNestedManyWithoutProjectInput
+  pullRequests?: Prisma.PullRequestUncheckedCreateNestedManyWithoutProjectInput
+}
+
+export type ProjectCreateOrConnectWithoutAgentSessionsInput = {
+  where: Prisma.ProjectWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProjectCreateWithoutAgentSessionsInput, Prisma.ProjectUncheckedCreateWithoutAgentSessionsInput>
+}
+
+export type ProjectUpsertWithoutAgentSessionsInput = {
+  update: Prisma.XOR<Prisma.ProjectUpdateWithoutAgentSessionsInput, Prisma.ProjectUncheckedUpdateWithoutAgentSessionsInput>
+  create: Prisma.XOR<Prisma.ProjectCreateWithoutAgentSessionsInput, Prisma.ProjectUncheckedCreateWithoutAgentSessionsInput>
+  where?: Prisma.ProjectWhereInput
+}
+
+export type ProjectUpdateToOneWithWhereWithoutAgentSessionsInput = {
+  where?: Prisma.ProjectWhereInput
+  data: Prisma.XOR<Prisma.ProjectUpdateWithoutAgentSessionsInput, Prisma.ProjectUncheckedUpdateWithoutAgentSessionsInput>
+}
+
+export type ProjectUpdateWithoutAgentSessionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+  favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
+  organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
+  tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
+  documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
+  workflows?: Prisma.WorkflowUpdateManyWithoutProjectNestedInput
+  repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
+  folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUpdateManyWithoutProjectNestedInput
+  productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
+  architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
+  developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
+  qualityReports?: Prisma.QualityReportUpdateManyWithoutProjectNestedInput
+  recentProjects?: Prisma.RecentProjectUpdateManyWithoutProjectNestedInput
+  favoriteProjects?: Prisma.FavoriteProjectUpdateManyWithoutProjectNestedInput
+  teamProjects?: Prisma.TeamProjectUpdateManyWithoutProjectNestedInput
+  usageLogs?: Prisma.AIUsageLogUpdateManyWithoutProjectNestedInput
+  testCases?: Prisma.TestCaseUpdateManyWithoutProjectNestedInput
+  bugReports?: Prisma.BugReportUpdateManyWithoutProjectNestedInput
+  coverageReports?: Prisma.CoverageReportUpdateManyWithoutProjectNestedInput
+  knowledgeItems?: Prisma.KnowledgeItemUpdateManyWithoutProjectNestedInput
+  environments?: Prisma.EnvironmentUpdateManyWithoutProjectNestedInput
+  deployments?: Prisma.DeploymentUpdateManyWithoutProjectNestedInput
+  releases?: Prisma.ReleaseUpdateManyWithoutProjectNestedInput
+  platformEvents?: Prisma.PlatformEventUpdateManyWithoutProjectNestedInput
+  metrics?: Prisma.MetricUpdateManyWithoutProjectNestedInput
+  projectHealth?: Prisma.ProjectHealthUpdateOneWithoutProjectNestedInput
+  securityIssues?: Prisma.SecurityIssueUpdateManyWithoutProjectNestedInput
+  securityScans?: Prisma.SecurityScanUpdateManyWithoutProjectNestedInput
+  productStrategies?: Prisma.ProductStrategyUpdateManyWithoutProjectNestedInput
+  requirements?: Prisma.RequirementUpdateManyWithoutProjectNestedInput
+  roadmaps?: Prisma.RoadmapUpdateManyWithoutProjectNestedInput
+  productDecisions?: Prisma.ProductDecisionUpdateManyWithoutProjectNestedInput
+  designSystemConfig?: Prisma.DesignSystemConfigUpdateOneWithoutProjectNestedInput
+  feedback?: Prisma.FeedbackUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUpdateManyWithoutProjectNestedInput
+}
+
+export type ProjectUncheckedUpdateWithoutAgentSessionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  favorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tasks?: Prisma.TaskUncheckedUpdateManyWithoutProjectNestedInput
+  documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
+  workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
+  repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
+  folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
+  gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
+  productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
+  architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
+  developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
+  qualityReports?: Prisma.QualityReportUncheckedUpdateManyWithoutProjectNestedInput
+  recentProjects?: Prisma.RecentProjectUncheckedUpdateManyWithoutProjectNestedInput
+  favoriteProjects?: Prisma.FavoriteProjectUncheckedUpdateManyWithoutProjectNestedInput
+  teamProjects?: Prisma.TeamProjectUncheckedUpdateManyWithoutProjectNestedInput
+  usageLogs?: Prisma.AIUsageLogUncheckedUpdateManyWithoutProjectNestedInput
+  testCases?: Prisma.TestCaseUncheckedUpdateManyWithoutProjectNestedInput
+  bugReports?: Prisma.BugReportUncheckedUpdateManyWithoutProjectNestedInput
+  coverageReports?: Prisma.CoverageReportUncheckedUpdateManyWithoutProjectNestedInput
+  knowledgeItems?: Prisma.KnowledgeItemUncheckedUpdateManyWithoutProjectNestedInput
+  environments?: Prisma.EnvironmentUncheckedUpdateManyWithoutProjectNestedInput
+  deployments?: Prisma.DeploymentUncheckedUpdateManyWithoutProjectNestedInput
+  releases?: Prisma.ReleaseUncheckedUpdateManyWithoutProjectNestedInput
+  platformEvents?: Prisma.PlatformEventUncheckedUpdateManyWithoutProjectNestedInput
+  metrics?: Prisma.MetricUncheckedUpdateManyWithoutProjectNestedInput
+  projectHealth?: Prisma.ProjectHealthUncheckedUpdateOneWithoutProjectNestedInput
+  securityIssues?: Prisma.SecurityIssueUncheckedUpdateManyWithoutProjectNestedInput
+  securityScans?: Prisma.SecurityScanUncheckedUpdateManyWithoutProjectNestedInput
+  productStrategies?: Prisma.ProductStrategyUncheckedUpdateManyWithoutProjectNestedInput
+  requirements?: Prisma.RequirementUncheckedUpdateManyWithoutProjectNestedInput
+  roadmaps?: Prisma.RoadmapUncheckedUpdateManyWithoutProjectNestedInput
+  productDecisions?: Prisma.ProductDecisionUncheckedUpdateManyWithoutProjectNestedInput
+  designSystemConfig?: Prisma.DesignSystemConfigUncheckedUpdateOneWithoutProjectNestedInput
+  feedback?: Prisma.FeedbackUncheckedUpdateManyWithoutProjectNestedInput
+  pullRequests?: Prisma.PullRequestUncheckedUpdateManyWithoutProjectNestedInput
+}
+
 export type ProjectCreateManyOwnerInput = {
   id?: string
   name: string
@@ -8436,6 +9349,7 @@ export type ProjectCreateManyOwnerInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
 }
 
 export type ProjectUpdateWithoutOwnerInput = {
@@ -8450,6 +9364,7 @@ export type ProjectUpdateWithoutOwnerInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   organization?: Prisma.OrganizationUpdateOneWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
@@ -8457,6 +9372,8 @@ export type ProjectUpdateWithoutOwnerInput = {
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -8499,12 +9416,15 @@ export type ProjectUncheckedUpdateWithoutOwnerInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUncheckedUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -8547,6 +9467,7 @@ export type ProjectUncheckedUpdateManyWithoutOwnerInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ProjectCreateManyOrganizationInput = {
@@ -8562,6 +9483,7 @@ export type ProjectCreateManyOrganizationInput = {
   lastOpenedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  githubRepoUrl?: string | null
 }
 
 export type ProjectUpdateWithoutOrganizationInput = {
@@ -8576,6 +9498,7 @@ export type ProjectUpdateWithoutOrganizationInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutProjectsNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
@@ -8583,6 +9506,8 @@ export type ProjectUpdateWithoutOrganizationInput = {
   repository?: Prisma.RepositoryUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUpdateManyWithoutProjectNestedInput
@@ -8625,12 +9550,15 @@ export type ProjectUncheckedUpdateWithoutOrganizationInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutProjectNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutProjectNestedInput
   repository?: Prisma.RepositoryUncheckedUpdateOneWithoutProjectNestedInput
   folders?: Prisma.FolderUncheckedUpdateManyWithoutProjectNestedInput
   gitIntegration?: Prisma.GitIntegrationUncheckedUpdateOneWithoutProjectNestedInput
+  snapshots?: Prisma.ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
+  agentSessions?: Prisma.AgentSessionUncheckedUpdateManyWithoutProjectNestedInput
   productDocuments?: Prisma.ProductDocumentUncheckedUpdateManyWithoutProjectNestedInput
   architectureDocuments?: Prisma.ArchitectureDocumentUncheckedUpdateManyWithoutProjectNestedInput
   developmentTasks?: Prisma.DevelopmentTaskUncheckedUpdateManyWithoutProjectNestedInput
@@ -8673,6 +9601,7 @@ export type ProjectUncheckedUpdateManyWithoutOrganizationInput = {
   lastOpenedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  githubRepoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -8685,6 +9614,8 @@ export type ProjectCountOutputType = {
   documents: number
   workflows: number
   folders: number
+  snapshots: number
+  agentSessions: number
   productDocuments: number
   architectureDocuments: number
   developmentTasks: number
@@ -8717,6 +9648,8 @@ export type ProjectCountOutputTypeSelect<ExtArgs extends runtime.Types.Extension
   documents?: boolean | ProjectCountOutputTypeCountDocumentsArgs
   workflows?: boolean | ProjectCountOutputTypeCountWorkflowsArgs
   folders?: boolean | ProjectCountOutputTypeCountFoldersArgs
+  snapshots?: boolean | ProjectCountOutputTypeCountSnapshotsArgs
+  agentSessions?: boolean | ProjectCountOutputTypeCountAgentSessionsArgs
   productDocuments?: boolean | ProjectCountOutputTypeCountProductDocumentsArgs
   architectureDocuments?: boolean | ProjectCountOutputTypeCountArchitectureDocumentsArgs
   developmentTasks?: boolean | ProjectCountOutputTypeCountDevelopmentTasksArgs
@@ -8780,6 +9713,20 @@ export type ProjectCountOutputTypeCountWorkflowsArgs<ExtArgs extends runtime.Typ
  */
 export type ProjectCountOutputTypeCountFoldersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.FolderWhereInput
+}
+
+/**
+ * ProjectCountOutputType without action
+ */
+export type ProjectCountOutputTypeCountSnapshotsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ProjectSnapshotWhereInput
+}
+
+/**
+ * ProjectCountOutputType without action
+ */
+export type ProjectCountOutputTypeCountAgentSessionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AgentSessionWhereInput
 }
 
 /**
@@ -8972,6 +9919,7 @@ export type ProjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   lastOpenedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  githubRepoUrl?: boolean
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   organization?: boolean | Prisma.Project$organizationArgs<ExtArgs>
   tasks?: boolean | Prisma.Project$tasksArgs<ExtArgs>
@@ -8980,6 +9928,8 @@ export type ProjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   repository?: boolean | Prisma.Project$repositoryArgs<ExtArgs>
   folders?: boolean | Prisma.Project$foldersArgs<ExtArgs>
   gitIntegration?: boolean | Prisma.Project$gitIntegrationArgs<ExtArgs>
+  snapshots?: boolean | Prisma.Project$snapshotsArgs<ExtArgs>
+  agentSessions?: boolean | Prisma.Project$agentSessionsArgs<ExtArgs>
   productDocuments?: boolean | Prisma.Project$productDocumentsArgs<ExtArgs>
   architectureDocuments?: boolean | Prisma.Project$architectureDocumentsArgs<ExtArgs>
   developmentTasks?: boolean | Prisma.Project$developmentTasksArgs<ExtArgs>
@@ -9024,6 +9974,7 @@ export type ProjectSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   lastOpenedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  githubRepoUrl?: boolean
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   organization?: boolean | Prisma.Project$organizationArgs<ExtArgs>
 }, ExtArgs["result"]["project"]>
@@ -9042,6 +9993,7 @@ export type ProjectSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   lastOpenedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  githubRepoUrl?: boolean
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   organization?: boolean | Prisma.Project$organizationArgs<ExtArgs>
 }, ExtArgs["result"]["project"]>
@@ -9060,9 +10012,10 @@ export type ProjectSelectScalar = {
   lastOpenedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  githubRepoUrl?: boolean
 }
 
-export type ProjectOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "description" | "icon" | "color" | "status" | "ownerId" | "organizationId" | "favorite" | "lastOpenedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["project"]>
+export type ProjectOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "description" | "icon" | "color" | "status" | "ownerId" | "organizationId" | "favorite" | "lastOpenedAt" | "createdAt" | "updatedAt" | "githubRepoUrl", ExtArgs["result"]["project"]>
 export type ProjectInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   organization?: boolean | Prisma.Project$organizationArgs<ExtArgs>
@@ -9072,6 +10025,8 @@ export type ProjectInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   repository?: boolean | Prisma.Project$repositoryArgs<ExtArgs>
   folders?: boolean | Prisma.Project$foldersArgs<ExtArgs>
   gitIntegration?: boolean | Prisma.Project$gitIntegrationArgs<ExtArgs>
+  snapshots?: boolean | Prisma.Project$snapshotsArgs<ExtArgs>
+  agentSessions?: boolean | Prisma.Project$agentSessionsArgs<ExtArgs>
   productDocuments?: boolean | Prisma.Project$productDocumentsArgs<ExtArgs>
   architectureDocuments?: boolean | Prisma.Project$architectureDocumentsArgs<ExtArgs>
   developmentTasks?: boolean | Prisma.Project$developmentTasksArgs<ExtArgs>
@@ -9121,6 +10076,8 @@ export type $ProjectPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     repository: Prisma.$RepositoryPayload<ExtArgs> | null
     folders: Prisma.$FolderPayload<ExtArgs>[]
     gitIntegration: Prisma.$GitIntegrationPayload<ExtArgs> | null
+    snapshots: Prisma.$ProjectSnapshotPayload<ExtArgs>[]
+    agentSessions: Prisma.$AgentSessionPayload<ExtArgs>[]
     productDocuments: Prisma.$ProductDocumentPayload<ExtArgs>[]
     architectureDocuments: Prisma.$ArchitectureDocumentPayload<ExtArgs>[]
     developmentTasks: Prisma.$DevelopmentTaskPayload<ExtArgs>[]
@@ -9163,6 +10120,7 @@ export type $ProjectPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     lastOpenedAt: Date | null
     createdAt: Date
     updatedAt: Date
+    githubRepoUrl: string | null
   }, ExtArgs["result"]["project"]>
   composites: {}
 }
@@ -9565,6 +10523,8 @@ export interface Prisma__ProjectClient<T, Null = never, ExtArgs extends runtime.
   repository<T extends Prisma.Project$repositoryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$repositoryArgs<ExtArgs>>): Prisma.Prisma__RepositoryClient<runtime.Types.Result.GetResult<Prisma.$RepositoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   folders<T extends Prisma.Project$foldersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$foldersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FolderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   gitIntegration<T extends Prisma.Project$gitIntegrationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$gitIntegrationArgs<ExtArgs>>): Prisma.Prisma__GitIntegrationClient<runtime.Types.Result.GetResult<Prisma.$GitIntegrationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  snapshots<T extends Prisma.Project$snapshotsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$snapshotsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProjectSnapshotPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  agentSessions<T extends Prisma.Project$agentSessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$agentSessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AgentSessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   productDocuments<T extends Prisma.Project$productDocumentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$productDocumentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProductDocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   architectureDocuments<T extends Prisma.Project$architectureDocumentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$architectureDocumentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ArchitectureDocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   developmentTasks<T extends Prisma.Project$developmentTasksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$developmentTasksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DevelopmentTaskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -9634,6 +10594,7 @@ export interface ProjectFieldRefs {
   readonly lastOpenedAt: Prisma.FieldRef<"Project", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Project", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Project", 'DateTime'>
+  readonly githubRepoUrl: Prisma.FieldRef<"Project", 'String'>
 }
     
 
@@ -10185,6 +11146,54 @@ export type Project$gitIntegrationArgs<ExtArgs extends runtime.Types.Extensions.
    */
   include?: Prisma.GitIntegrationInclude<ExtArgs> | null
   where?: Prisma.GitIntegrationWhereInput
+}
+
+/**
+ * Project.snapshots
+ */
+export type Project$snapshotsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ProjectSnapshot
+   */
+  select?: Prisma.ProjectSnapshotSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ProjectSnapshot
+   */
+  omit?: Prisma.ProjectSnapshotOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectSnapshotInclude<ExtArgs> | null
+  where?: Prisma.ProjectSnapshotWhereInput
+  orderBy?: Prisma.ProjectSnapshotOrderByWithRelationInput | Prisma.ProjectSnapshotOrderByWithRelationInput[]
+  cursor?: Prisma.ProjectSnapshotWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ProjectSnapshotScalarFieldEnum | Prisma.ProjectSnapshotScalarFieldEnum[]
+}
+
+/**
+ * Project.agentSessions
+ */
+export type Project$agentSessionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AgentSession
+   */
+  select?: Prisma.AgentSessionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AgentSession
+   */
+  omit?: Prisma.AgentSessionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AgentSessionInclude<ExtArgs> | null
+  where?: Prisma.AgentSessionWhereInput
+  orderBy?: Prisma.AgentSessionOrderByWithRelationInput | Prisma.AgentSessionOrderByWithRelationInput[]
+  cursor?: Prisma.AgentSessionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AgentSessionScalarFieldEnum | Prisma.AgentSessionScalarFieldEnum[]
 }
 
 /**

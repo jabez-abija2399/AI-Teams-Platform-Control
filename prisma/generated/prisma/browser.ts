@@ -537,3 +537,18 @@ export type VerificationToken = Prisma.VerificationTokenModel
  * 
  */
 export type SampleProject = Prisma.SampleProjectModel
+/**
+ * Model ProjectSnapshot
+ * 
+ */
+export type ProjectSnapshot = Prisma.ProjectSnapshotModel
+/**
+ * Model AgentSession
+ * 
+ */
+export type AgentSession = Prisma.AgentSessionModel
+/**
+ * Model ChatMessage
+ * 
+ */
+export type ChatMessage = Prisma.ChatMessageModel
