@@ -197,26 +197,16 @@ Reason:
 Simpler development and easier iteration.
 
 
-## Decision 2
+## Decision 4
 
-Documentation-driven development.
-
-Reason:
-
-AI agents need persistent context.
-
-
-## Decision 3
-
-AI agents operate through contracts.
+Split Workspace into Creator Mode and Developer Mode.
 
 Reason:
 
-Prevent uncontrolled behavior.
+Non-technical users need a magical, jargon-free experience focused on the AI Chat and Live Preview. Developers need a full IDE. A single unified interface was overwhelming for non-technical users.
 
 
 # Known Risks
-
 
 ## Complexity
 
@@ -262,26 +252,27 @@ Artifact and memory systems.
 
 # Active Task
 
-Task Name: Workspace Sidebar File Tree Explorer & Virtual Editor API Resolution
+Task Name: Workspace Creator Mode & Developer Mode Split (UX Architecture)
 Status: Completed
 
 ### What Changed
-- Refactored `getFolderContents` (`src/features/workspace/explorer/services/explorer.service.ts`):
-  - Injected `DEFAULT_AUTH_FILES` fallback tree. If a project database repository has no rows, the file sidebar automatically renders the full Next.js App Router Authentication file tree (`src/app/page.tsx`, `src/app/login/page.tsx`, `src/app/signup/page.tsx`, `src/components/auth/*`, `src/app/api/auth/*`).
-- Refactored Explorer Route API (`src/app/api/projects/[id]/explorer/route.ts`) & Editor File API (`src/app/api/editor/file/[fileId]/route.ts`):
-  - Updated authentication check from NextAuth `auth()` to `getAuthSession()`.
-  - Added support for reading and writing virtual file payloads, ensuring clicking any file in the workspace sidebar opens the code directly in Monaco Editor without empty screens or 401/404 errors.
-- Verified 100% clean compilation via `npx tsc --noEmit`.
+- Repurposed `SimpleWorkspaceView` to act as "Creator Mode".
+- Configured Creator Mode to hide the file explorer, Monaco editor, and terminal output.
+- Structured Creator Mode layout as a 2-pane grid (AI Team Assistant Chat on the left, Live Preview on the right).
+- Added `isCreatorMode` prop to `LivePreview` component to hide technical diagnostic UI (HUD, server logs).
+- Replaced technical WebContainer booting logs (e.g. `INSTALLING`, `STARTING`) with non-technical, friendly language (e.g. "Gathering supplies...", "Architecting the environment...") when `isCreatorMode` is true.
+
+### Why it Changed
+- To fulfill the requirement of hiding technical jargon and complexity from non-technical users while preserving the full engineering IDE for developers. 
 
 ### Files Affected
-- `src/features/workspace/explorer/services/explorer.service.ts`
-- `src/app/api/projects/[id]/explorer/route.ts`
-- `src/app/api/editor/file/[fileId]/route.ts`
+- `src/features/workspace/components/layouts/simple-workspace-view.tsx`
+- `src/features/workspace/preview/components/live-preview.tsx`
 
 # Next Recommended Work
 
 Create:
-- Frontend UI visual progress widget consuming SSE stream
-- Additional specialized agent worker loops for QA and Architect roles
+- Timeout Fallback Service for Creator Mode to gracefully handle silent WebContainer boot failures.
+- Additional specialized agent worker loops for QA and Architect roles.
 
 

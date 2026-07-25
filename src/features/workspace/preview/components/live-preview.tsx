@@ -16,6 +16,7 @@ import {
   CheckCircle2,
   XCircle,
   HelpCircle,
+  Sparkles,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -40,9 +41,10 @@ interface LivePreviewProps {
   code?: string;
   filePath?: string;
   initialPreviewUrl?: string;
+  isCreatorMode?: boolean;
 }
 
-export function LivePreview({ projectId, code, filePath, initialPreviewUrl }: LivePreviewProps) {
+export function LivePreview({ projectId, code, filePath, initialPreviewUrl, isCreatorMode }: LivePreviewProps) {
   const [htmlContent, setHtmlContent] = useState<string | null>(null);
   const [e2bPreviewUrl, setE2bPreviewUrl] = useState<string | null>(initialPreviewUrl || null);
   const [inAppPreviewUrl, setInAppPreviewUrl] = useState<string | null>(null);
@@ -241,6 +243,19 @@ export function LivePreview({ projectId, code, filePath, initialPreviewUrl }: Li
     generateSingleFileFallback();
   }, [generateSingleFileFallback]);
 
+  // TEST LOG: Monitor which preview is currently running
+  useEffect(() => {
+    if (wc.previewUrl) {
+      console.log('🧪 [LivePreview State] RUNNING via WebContainer:', wc.previewUrl);
+    } else if (e2bPreviewUrl) {
+      console.log('🧪 [LivePreview State] RUNNING via E2B Cloud Sandbox:', e2bPreviewUrl);
+    } else if (inAppPreviewUrl || htmlContent) {
+      console.log('🧪 [LivePreview State] RUNNING via Inline Static HTML Fallback');
+    } else {
+      console.log('🧪 [LivePreview State] NOT RUNNING YET (Status: Offline or Booting)');
+    }
+  }, [wc.previewUrl, e2bPreviewUrl, inAppPreviewUrl, htmlContent]);
+
   const STATIC_LOGIN_PREVIEW_HTML = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -421,68 +436,121 @@ export function LivePreview({ projectId, code, filePath, initialPreviewUrl }: Li
     setReloadKey((prev) => prev + 1);
   }, []);
 
+  const handleFixWithAI = (errorText: string) => {
+    const event = new CustomEvent('ai-fix-error', { 
+      detail: { 
+        error: errorText, 
+        context: 'Live Preview crash' 
+      }
+    });
+    window.dispatchEvent(event);
+  };
+
   return (
     <div className="flex h-full flex-col bg-slate-950 border-l border-slate-800 text-slate-200">
       {/* Header Bar */}
-      <div className="flex h-9 items-center justify-between border-b border-slate-800 px-3 bg-slate-900 select-none">
-        <div className="flex items-center gap-2">
-          <Code2 className="w-3.5 h-3.5 text-sky-400" />
-          <span className="text-xs font-semibold">Next.js App Preview</span>
+      <div className={cn(
+        "flex items-center justify-between select-none z-10",
+        isCreatorMode 
+          ? "h-14 px-5 border-b border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-[#0A0A0A]/50 backdrop-blur-xl"
+          : "h-9 px-3 border-b border-slate-800 bg-slate-900"
+      )}>
+        <div className="flex items-center gap-3">
+          {!isCreatorMode && <Code2 className="w-3.5 h-3.5 text-sky-400" />}
+          <span className={cn(
+            isCreatorMode ? "text-sm font-bold text-slate-800 dark:text-slate-200" : "text-xs font-semibold"
+          )}>
+            {isCreatorMode ? "Live Preview" : "Next.js App Preview"}
+          </span>
 
           {wc.previewUrl ? (
-            <span className="px-2 py-0.5 bg-emerald-950 border border-emerald-800 text-emerald-400 text-[10px] rounded-full font-mono font-medium flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span>WebContainer Active</span>
+            <span className={cn(
+              "flex items-center gap-1.5 font-medium rounded-full",
+              isCreatorMode 
+                ? "px-2.5 py-1 bg-emerald-100 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs border border-emerald-200 dark:border-emerald-500/20"
+                : "px-2 py-0.5 bg-emerald-950 border border-emerald-800 text-emerald-400 text-[10px] font-mono"
+            )}>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span>Online</span>
             </span>
           ) : e2bPreviewUrl ? (
-            <span className="px-2 py-0.5 bg-emerald-950 border border-emerald-800 text-emerald-400 text-[10px] rounded-full font-mono font-medium flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span>Dev Server Active</span>
+            <span className={cn(
+              "flex items-center gap-1.5 font-medium rounded-full",
+              isCreatorMode 
+                ? "px-2.5 py-1 bg-sky-100 dark:bg-sky-500/10 text-sky-600 dark:text-sky-400 text-xs border border-sky-200 dark:border-sky-500/20"
+                : "px-2 py-0.5 bg-emerald-950 border border-emerald-800 text-emerald-400 text-[10px] font-mono"
+            )}>
+              <span className="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse"></span>
+              <span>Dev Server</span>
             </span>
           ) : wc.status === 'INSTALLING' || wc.status === 'STARTING' || wc.status === 'BOOTING' || wc.status === 'MOUNTING' ? (
-            <span className="px-2 py-0.5 bg-amber-950 border border-amber-800 text-amber-400 text-[10px] rounded-full font-mono font-medium flex items-center gap-1">
+            <span className={cn(
+              "flex items-center gap-1.5 font-medium rounded-full",
+              isCreatorMode 
+                ? "px-2.5 py-1 bg-amber-100 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 text-xs border border-amber-200 dark:border-amber-500/20"
+                : "px-2 py-0.5 bg-amber-950 border border-amber-800 text-amber-400 text-[10px] font-mono"
+            )}>
               <Loader2 className="w-3 h-3 animate-spin" />
-              <span>{wc.status}</span>
+              <span>Building</span>
             </span>
           ) : inAppPreviewUrl || htmlContent ? (
-            <span className="px-2 py-0.5 bg-sky-950 border border-sky-800 text-sky-400 text-[10px] rounded-full font-mono font-medium flex items-center gap-1">
-              <span>Inline Preview</span>
+            <span className={cn(
+              "flex items-center gap-1.5 font-medium rounded-full",
+              isCreatorMode 
+                ? "px-2.5 py-1 bg-purple-100 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 text-xs border border-purple-200 dark:border-purple-500/20"
+                : "px-2 py-0.5 bg-sky-950 border border-sky-800 text-sky-400 text-[10px] font-mono"
+            )}>
+              <span>Static</span>
             </span>
           ) : (
-            <span className="px-2 py-0.5 bg-slate-800 text-slate-400 text-[10px] rounded font-mono">
-              {currentStep !== 'IDLE' ? `${currentStep} (${progressPercent}%)` : 'Server Offline'}
+            <span className={cn(
+              "rounded font-medium",
+              isCreatorMode 
+                ? "px-2.5 py-1 bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 text-xs border border-slate-200 dark:border-white/10"
+                : "px-2 py-0.5 bg-slate-800 text-slate-400 text-[10px] font-mono"
+            )}>
+              {currentStep !== 'IDLE' ? `${currentStep} (${progressPercent}%)` : 'Offline'}
             </span>
           )}
         </div>
 
-        <div className="flex items-center gap-1.5">
-          {/* Diagnostics Toggle */}
-          <button
-            onClick={() => setShowDiagnostics((prev) => !prev)}
-            className={cn(
-              'flex items-center gap-1 px-2 py-0.5 text-[10px] font-mono rounded border transition-colors',
-              showDiagnostics ? 'bg-sky-950 text-sky-300 border-sky-800' : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-slate-200'
-            )}
-            title="Toggle Preview Diagnostics HUD"
-          >
-            <Info className="w-3 h-3" />
-            <span>Info</span>
-          </button>
+        <div className="flex items-center gap-2">
+          {!isCreatorMode && (
+            <>
+              {/* Diagnostics Toggle */}
+              <button
+                onClick={() => setShowDiagnostics((prev) => !prev)}
+                className={cn(
+                  'flex items-center gap-1 px-2 py-0.5 text-[10px] font-mono rounded border transition-colors',
+                  showDiagnostics ? 'bg-sky-950 text-sky-300 border-sky-800' : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-slate-200'
+                )}
+                title="Toggle Preview Diagnostics HUD"
+              >
+                <Info className="w-3 h-3" />
+                <span>Info</span>
+              </button>
 
-          <button
-            onClick={() => setShowLogs((prev) => !prev)}
-            className={cn(
-              'flex items-center gap-1 px-2 py-0.5 text-[10px] font-mono rounded border transition-colors',
-              showLogs ? 'bg-slate-800 text-sky-400 border-slate-700' : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-slate-200'
-            )}
-            title="Toggle Server Logs"
-          >
-            <Terminal className="w-3 h-3" />
-            <span>Logs</span>
-          </button>
+              <button
+                onClick={() => setShowLogs((prev) => !prev)}
+                className={cn(
+                  'flex items-center gap-1 px-2 py-0.5 text-[10px] font-mono rounded border transition-colors',
+                  showLogs ? 'bg-slate-800 text-sky-400 border-slate-700' : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-slate-200'
+                )}
+                title="Toggle Server Logs"
+              >
+                <Terminal className="w-3 h-3" />
+                <span>Logs</span>
+              </button>
+            </>
+          )}
 
           {/* Viewport Toggles */}
-          <div className="flex items-center rounded border border-slate-800 bg-slate-950 p-0.5">
+          <div className={cn(
+            "flex items-center p-1 rounded-lg border",
+            isCreatorMode 
+              ? "bg-white dark:bg-[#111] border-slate-200 dark:border-white/10 shadow-sm"
+              : "bg-slate-950 border-slate-800 p-0.5"
+          )}>
             {(Object.keys(VIEWPORT_ICONS) as Viewport[]).map((v) => {
               const Icon = VIEWPORT_ICONS[v];
               return (
@@ -490,20 +558,33 @@ export function LivePreview({ projectId, code, filePath, initialPreviewUrl }: Li
                   key={v}
                   onClick={() => setViewport(v)}
                   className={cn(
-                    'p-1 rounded transition-colors',
-                    viewport === v ? 'bg-slate-800 text-sky-400' : 'text-slate-500 hover:text-slate-300'
+                    'p-1.5 rounded-md transition-all',
+                    viewport === v 
+                      ? (isCreatorMode ? 'bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white shadow-sm' : 'bg-slate-800 text-sky-400') 
+                      : (isCreatorMode ? 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5' : 'text-slate-500 hover:text-slate-300')
                   )}
                   title={v}
                 >
-                  <Icon className="h-3 w-3" />
+                  <Icon className="h-4 w-4" />
                 </button>
               );
             })}
           </div>
 
           {/* Refresh */}
-          <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-400 hover:text-slate-200" onClick={handleHardReload} title="Refresh Preview Frame">
-            <RefreshCw className={cn('h-3.5 w-3.5', loading && 'animate-spin')} />
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className={cn(
+              "transition-colors",
+              isCreatorMode 
+                ? "h-9 w-9 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg"
+                : "h-6 w-6 text-slate-400 hover:text-slate-200 rounded"
+            )}
+            onClick={handleHardReload} 
+            title="Refresh Preview Frame"
+          >
+            <RefreshCw className={cn('h-4 w-4', loading && 'animate-spin')} />
           </Button>
 
           {(e2bPreviewUrl || wc.previewUrl) && (
@@ -511,10 +592,15 @@ export function LivePreview({ projectId, code, filePath, initialPreviewUrl }: Li
               href={(e2bPreviewUrl || wc.previewUrl) as string}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-1 text-slate-400 hover:text-slate-200 rounded transition-colors"
+              className={cn(
+                "flex items-center justify-center transition-colors",
+                isCreatorMode 
+                  ? "h-9 w-9 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg"
+                  : "p-1 text-slate-400 hover:text-slate-200 rounded"
+              )}
               title="Open Preview URL in New Window"
             >
-              <ExternalLink className="h-3.5 w-3.5" />
+              <ExternalLink className="h-4 w-4" />
             </a>
           )}
         </div>
@@ -564,15 +650,33 @@ export function LivePreview({ projectId, code, filePath, initialPreviewUrl }: Li
         {/* WebContainer Booting Overlay */}
         {wc.status !== 'IDLE' && wc.status !== 'READY' && wc.status !== 'ERROR' && (
           <div className="absolute inset-0 bg-slate-950/90 backdrop-blur-md z-20 flex flex-col items-center justify-center p-6 text-center">
-            <Loader2 className="w-8 h-8 text-amber-400 animate-spin mb-4" />
-            <h4 className="text-sm font-semibold text-slate-200 mb-1">{wc.status}</h4>
-            <p className="text-xs text-slate-400">Preparing live WebContainer environment...</p>
-            <div className="w-48 h-2 bg-slate-800 rounded-full overflow-hidden mt-4 mb-4">
-              <div className="h-full bg-amber-500 animate-pulse transition-all duration-300" style={{ width: '60%' }} />
-            </div>
-            <button onClick={() => setShowLogs(true)} className="text-[10px] text-amber-500 hover:text-amber-400 underline font-mono bg-amber-500/10 px-3 py-1.5 rounded-full transition-colors">
-              View Boot Logs
-            </button>
+            {isCreatorMode ? (
+              <>
+                <Loader2 className="w-10 h-10 text-sky-400 animate-spin mb-6" />
+                <h4 className="text-xl font-bold text-slate-100 mb-2">
+                  {wc.status === 'INSTALLING' ? '📦 Gathering supplies...' : 
+                   wc.status === 'STARTING' ? '🚀 Launching your application...' : 
+                   wc.status === 'MOUNTING' ? '🏗️ Architecting the environment...' :
+                   '✨ Preparing your preview...'}
+                </h4>
+                <p className="text-sm text-slate-400">Our AI agents are assembling your product right now.</p>
+                <div className="w-64 h-1.5 bg-slate-800 rounded-full overflow-hidden mt-6 mb-2">
+                  <div className="h-full bg-sky-500 animate-pulse transition-all duration-300" style={{ width: '60%' }} />
+                </div>
+              </>
+            ) : (
+              <>
+                <Loader2 className="w-8 h-8 text-amber-400 animate-spin mb-4" />
+                <h4 className="text-sm font-semibold text-slate-200 mb-1">{wc.status}</h4>
+                <p className="text-xs text-slate-400">Preparing live WebContainer environment...</p>
+                <div className="w-48 h-2 bg-slate-800 rounded-full overflow-hidden mt-4 mb-4">
+                  <div className="h-full bg-amber-500 animate-pulse transition-all duration-300" style={{ width: '60%' }} />
+                </div>
+                <button onClick={() => setShowLogs(true)} className="text-[10px] text-amber-500 hover:text-amber-400 underline font-mono bg-amber-500/10 px-3 py-1.5 rounded-full transition-colors">
+                  View Boot Logs
+                </button>
+              </>
+            )}
           </div>
         )}
 
@@ -592,7 +696,11 @@ export function LivePreview({ projectId, code, filePath, initialPreviewUrl }: Li
               {buildError}
             </div>
 
-            <div className="flex items-center gap-2 pt-1">
+            <div className="flex items-center flex-wrap gap-2 pt-1">
+              <Button size="sm" className="bg-amber-500 hover:bg-amber-400 text-amber-950 text-xs gap-1.5 font-bold shadow-md" onClick={() => handleFixWithAI(buildError)}>
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Fix with AI</span>
+              </Button>
               <Button size="sm" className="bg-red-600 hover:bg-red-500 text-white text-xs gap-1.5" onClick={triggerDevServerBuild}>
                 <Play className="w-3.5 h-3.5" />
                 <span>Retry Build & Dev Server</span>
@@ -625,14 +733,20 @@ export function LivePreview({ projectId, code, filePath, initialPreviewUrl }: Li
               {wc.error || 'Unknown error occurred.'}
             </div>
             <div className="flex items-center gap-2">
+              <Button className="flex-1 bg-amber-500 hover:bg-amber-400 text-amber-950 text-xs font-bold gap-2 shadow-md" onClick={() => handleFixWithAI(wc.error || 'Unknown WebContainer error')}>
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Fix with AI</span>
+              </Button>
               <Button className="flex-1 bg-red-600 hover:bg-red-500 text-white text-xs font-semibold gap-2 shadow-md" onClick={() => wc.retry()}>
                 <Play className="w-3.5 h-3.5" />
                 <span>Retry Step</span>
               </Button>
-              <Button className="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold gap-2 shadow-md border border-slate-700" onClick={() => setShowLogs(true)}>
-                <Terminal className="w-3.5 h-3.5" />
-                <span>Logs</span>
-              </Button>
+              {!isCreatorMode && (
+                <Button className="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold gap-2 shadow-md border border-slate-700" onClick={() => setShowLogs(true)}>
+                  <Terminal className="w-3.5 h-3.5" />
+                  <span>Logs</span>
+                </Button>
+              )}
             </div>
           </div>
         ) : !e2bPreviewUrl && !htmlContent && !inAppPreviewUrl ? (

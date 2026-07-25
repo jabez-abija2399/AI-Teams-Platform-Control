@@ -17,7 +17,7 @@ Last Updated:
 
 Task Name:
 
-Complete Audit Documentation
+Workspace Creator Mode & Developer Mode Split (UX Architecture)
 
 
 Status:
