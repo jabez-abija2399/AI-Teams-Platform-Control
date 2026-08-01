@@ -1,73 +1,113 @@
 import { prisma } from '@/lib/prisma';
-import { testGeneratorTool, bugAnalyzerTool } from './qa.tools';
 import { getMemoryManager } from '@/ai/agents/memory/memory.manager';
 import { logAIEvent } from '@/ai/monitoring/ai.logger';
-import { qaOutputSchema, type QAOutput } from './qa.types';
-import type { DeveloperOutput } from '@/ai/agents/roles/developer/developer.types';
+import { aiCall } from '@/ai/agents/core/ai-call';
+import { qaConfig } from './qa.config';
+import { QA_SYSTEM_PROMPT } from './qa.prompt';
+import {
+  qaReportSpecSchema,
+  type QaReportSpec,
+} from './qa.types';
 import type { ApiResult } from '@/types/common.types';
 
-
+const QA_ROLE_NAME = 'Quality Assurance Engineer';
 
 async function getOrCreateQAAgentId(): Promise<string> {
   const existing = await prisma.agent.findFirst({ where: { role: 'QA' } });
   if (existing) return existing.id;
   const created = await prisma.agent.create({
-    data: { name: 'QA AI', role: 'QA', status: 'IDLE', capabilities: [] },
+    data: {
+      name: QA_ROLE_NAME,
+      role: 'QA',
+      status: 'IDLE',
+      capabilities: ['TESTING', 'CODE_REVIEW', 'BUG_FIXING', 'DOCUMENTATION'],
+    },
   });
   return created.id;
 }
 
-export async function reviewImplementation(
+export async function generateQaReportSpec(
   projectId: string,
-  implementation: DeveloperOutput,
-): Promise<ApiResult<QAOutput>> {
+  inputData: unknown,
+): Promise<ApiResult<QaReportSpec>> {
   const agentId = await getOrCreateQAAgentId();
 
-  await prisma.document.deleteMany({ where: { projectId, type: 'QA_IN_PROGRESS' } });
-  await prisma.document.create({
-    data: { projectId, type: 'QA_IN_PROGRESS', title: 'QA Review In Progress', content: '{}', author: 'QA AI' },
-  });
-
   await prisma.agent.update({ where: { id: agentId }, data: { status: 'WORKING' } });
-  await logAIEvent('QA_REVIEW_STARTED', { projectId }, agentId);
+  await logAIEvent('QA_REPORT_STARTED', { projectId }, agentId);
 
   try {
-    const testPlanResult = await testGeneratorTool.execute({ implementation, projectId, agentId });
-    if (!testPlanResult.success) throw new Error(testPlanResult.error);
+    const prompt = `Input Architecture, Implementation, and Specifications:\n${JSON.stringify(inputData, null, 2)}\n\nGenerate comprehensive QA Test Plan and Quality Report (Unit, Integration, E2E, Regression, Coverage, Risk Matrix, Bug Reports, Performance, Accessibility, Security). Produce JSON matching the exact required deliverable schema.\nRespond ONLY with valid JSON.`;
 
-    const bugsResult = await bugAnalyzerTool.execute({ implementation, projectId, agentId });
-    if (!bugsResult.success) throw new Error(bugsResult.error);
+    const raw = await aiCall<unknown>(
+      prompt,
+      QA_SYSTEM_PROMPT,
+      'QA',
+      qaConfig,
+      projectId,
+      agentId,
+    );
 
-    const criticalCount = bugsResult.data.filter((b) => b.severity === 'CRITICAL').length;
-    const highCount = bugsResult.data.filter((b) => b.severity === 'HIGH').length;
-    const score = Math.max(0, 100 - criticalCount * 30 - highCount * 15 - bugsResult.data.length * 5);
+    const spec = qaReportSpecSchema.parse(raw);
 
-    const output = qaOutputSchema.parse({
-      testPlan: testPlanResult.data,
-      qualityReport: { score, issues: bugsResult.data, recommendations: bugsResult.data.map((b) => b.solution) },
+    const savedDoc = await prisma.qaReportDocument.create({
+      data: {
+        projectId,
+        unitTests: spec.unitTests as any,
+        integrationTests: spec.integrationTests as any,
+        e2eTests: spec.e2eTests as any,
+        regressionPlan: spec.regressionPlan as any,
+        coverageAnalysis: spec.coverageAnalysis as any,
+        riskMatrix: spec.riskMatrix as any,
+        bugReports: spec.bugReports as any,
+        testSuites: spec.testSuites as any,
+        performanceTests: spec.performanceTests as any,
+        accessibilityTests: spec.accessibilityTests as any,
+        securityTests: spec.securityTests as any,
+        qualityReport: spec.qualityReport as any,
+        status: spec.status,
+      },
     });
 
     const memory = getMemoryManager();
     await Promise.all([
-      prisma.qualityReport.create({
-        data: { projectId, agentId, score: output.qualityReport.score, issues: output.qualityReport.issues as never, testPlan: output.testPlan as never, recommendations: output.qualityReport.recommendations as never },
-      }),
       prisma.document.create({
-        data: { projectId, type: 'QA_REVIEW', title: 'QA Review Report', content: JSON.stringify({ score: output.qualityReport.score, issues: output.qualityReport.issues, testPlan: output.testPlan }), author: 'QA AI' },
+        data: {
+          projectId,
+          type: 'TEST_PLAN',
+          title: `Comprehensive QA Test Plan & Quality Report`,
+          content: JSON.stringify(spec),
+          author: QA_ROLE_NAME,
+        },
       }),
-      memory.remember({ agentId, content: `Project ${projectId} QA review: score ${output.qualityReport.score}, ${bugsResult.data.length} issue(s) found`, type: 'PROJECT', metadata: { projectId } }),
+      memory.remember({
+        agentId,
+        content: `Project ${projectId}: Generated Quality Report with score ${spec.qualityReport.score} (${spec.qualityReport.verdict}) and ${spec.bugReports.length} bug reports.`,
+        type: 'PROJECT',
+        metadata: { projectId, docId: savedDoc.id },
+      }),
     ]);
 
-    await prisma.document.deleteMany({ where: { projectId, type: 'QA_IN_PROGRESS' } });
-
     await prisma.agent.update({ where: { id: agentId }, data: { status: 'IDLE' } });
-    await logAIEvent('QA_REVIEW_COMPLETED', { projectId, score }, agentId);
+    await logAIEvent('QA_REPORT_COMPLETED', { projectId, docId: savedDoc.id, score: spec.qualityReport.score }, agentId);
 
-    return { success: true, data: output };
+    return { success: true, data: spec };
   } catch (err) {
-    await prisma.document.deleteMany({ where: { projectId, type: 'QA_IN_PROGRESS' } });
     await prisma.agent.update({ where: { id: agentId }, data: { status: 'ERROR' } });
-    await logAIEvent('QA_REVIEW_FAILED', { projectId, error: String(err) }, agentId);
-    return { success: false, error: { message: err instanceof Error ? err.message : 'QA review failed', code: 'AI_ERROR' } };
+    await logAIEvent('QA_REPORT_FAILED', { projectId, error: String(err) }, agentId);
+    return {
+      success: false,
+      error: {
+        message: err instanceof Error ? err.message : 'QA report generation failed',
+        code: 'AI_ERROR',
+      },
+    };
   }
 }
+
+export async function reviewImplementation(
+  projectId: string,
+  implementation: unknown,
+): Promise<ApiResult<QaReportSpec>> {
+  return generateQaReportSpec(projectId, implementation);
+}
+

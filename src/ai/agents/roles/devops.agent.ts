@@ -1,15 +1,4 @@
-import { BaseAgent } from '../core/agent.base';
-import type { AgentExecutionResult } from '../core/agent.types';
-
-export class DevOpsAgent extends BaseAgent {
-  constructor(name = 'DevOps') {
-    super('DEVOPS', name);
-  }
-
-  override async execute(
-    task: string,
-    context?: Record<string, unknown>,
-  ): Promise<AgentExecutionResult> {
-    return super.execute(task, context);
-  }
-}
+export * from './devops/devops.agent';
+export * from './devops/devops.service';
+export * from './devops/devops.types';
+export * from './devops/devops.config';

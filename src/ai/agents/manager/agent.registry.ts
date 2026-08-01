@@ -7,11 +7,21 @@ import { DeveloperAgent } from '../roles/developer.agent';
 import { QAAgent } from '../roles/qa.agent';
 import { DevOpsAgent } from '../roles/devops.agent';
 import { DocumentationAgent } from '../roles/documentation.agent';
-import { SecurityAgent } from '../roles/security/security.agent';
+import { SecurityAgent } from '../roles/security.agent';
 import { DesignAgent } from '../roles/ui-ux/design.agent';
 import { OperationsAgent } from '../roles/operations/operations.agent';
 import { ProductManagerAgent } from '../roles/product-manager/product-manager.agent';
 import { ReviewerAgent } from '../roles/reviewer/reviewer.agent';
+import { FrontendAgent } from '../roles/frontend.agent';
+import { BackendAgent } from '../roles/backend.agent';
+import { DatabaseAgent } from '../roles/database.agent';
+import { ArchitectureReviewerAgent } from '../roles/architecture-reviewer.agent';
+import { CodeReviewerAgent } from '../roles/code-reviewer.agent';
+import { QualityReviewerAgent } from '../roles/quality-reviewer.agent';
+import { ProductDiscoveryAgent } from '../roles/product-discovery.agent';
+import { BusinessAnalystAgent } from '../roles/business-analyst.agent';
+import { UxResearcherAgent } from '../roles/ux-researcher.agent';
+import { UiDesignerAgent } from '../roles/ui-designer.agent';
 
 const BLOCKED_ROLES: AgentRole[] = [];
 
@@ -27,7 +37,18 @@ const agentClasses: Record<string, new (name?: string) => IAgent> = {
   DOCUMENTATION: DocumentationAgent,
   SECURITY: SecurityAgent,
   OPERATIONS: OperationsAgent,
+  FRONTEND: FrontendAgent,
+  BACKEND: BackendAgent,
+  DATABASE: DatabaseAgent,
+  ARCHITECTURE_REVIEWER: ArchitectureReviewerAgent,
+  CODE_REVIEWER: CodeReviewerAgent,
+  QUALITY_REVIEWER: QualityReviewerAgent,
+  PRODUCT_DISCOVERY: ProductDiscoveryAgent,
+  BUSINESS_ANALYST: BusinessAnalystAgent,
+  UX_RESEARCHER: UxResearcherAgent,
+  UI_DESIGNER: UiDesignerAgent,
 };
+
 
 export function createAgent(role: AgentRole, name?: string): IAgent {
   if (BLOCKED_ROLES.includes(role)) {
