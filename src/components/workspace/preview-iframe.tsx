@@ -5,6 +5,7 @@ import { Monitor, Tablet, Smartphone, RefreshCw, Loader2, ExternalLink, AlertCir
 import { clsx } from 'clsx';
 import { BuildStatus } from '@/hooks/use-ai-build-stream';
 import { useWebContainerPreview, type WCStatus } from '@/hooks/use-webcontainer-preview';
+import { ExecutionProgressMapper } from '@/features/creator-experience/services/execution-progress.mapper';
 
 interface PreviewIframeProps {
   previewUrl: string | null;
@@ -236,18 +237,23 @@ export function PreviewIframe({ previewUrl, status, progress, currentStep, proje
       <div className="flex-1 bg-slate-900/50 p-4 flex items-center justify-center overflow-auto relative">
         {/* Build stream overlay */}
         {isBuilding && (
-          <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center p-6 text-center">
-            <Loader2 className="w-8 h-8 text-sky-400 animate-spin mb-4" />
-            <h4 className="text-sm font-semibold text-slate-200 mb-1">Building Application in E2B Cloud Sandbox...</h4>
+          <div className="absolute inset-0 bg-slate-950/90 backdrop-blur-sm z-10 flex flex-col items-center justify-center p-6 text-center">
+            <div className="p-3 rounded-full bg-indigo-500/10 text-indigo-400 mb-4 animate-bounce">
+              <Loader2 className="w-8 h-8 text-indigo-400 animate-spin" />
+            </div>
+            <h4 className="text-base font-bold text-slate-100 mb-1">
+              {ExecutionProgressMapper.mapToFriendlyTitle(currentStep || status)}
+            </h4>
             <p className="text-xs text-slate-400 max-w-sm mb-4">
-              Current Phase: <span className="text-sky-400 font-mono">{currentStep}</span>
+              AI Team is coordinating software creation
             </p>
-            <div className="w-48 h-2 bg-slate-800 rounded-full overflow-hidden">
+            <div className="w-56 h-2 bg-slate-800 rounded-full overflow-hidden p-0.5 border border-slate-700">
               <div
-                className="h-full bg-sky-500 transition-all duration-300"
-                style={{ width: `${progress}%` }}
+                className="h-full bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-500 rounded-full transition-all duration-300"
+                style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
               />
             </div>
+            <span className="text-[11px] text-slate-400 font-mono mt-2">{Math.round(progress)}%</span>
           </div>
         )}
 

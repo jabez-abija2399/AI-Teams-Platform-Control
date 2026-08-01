@@ -11,8 +11,12 @@ export function WorkspaceBuildSync({ projectId }: { projectId: string }) {
   const triggerRefresh = useExplorerStore((s) => s.triggerRefresh);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // Guard: don't do anything if projectId is invalid
+  const validProjectId = projectId && projectId !== 'undefined' && projectId !== 'null';
+
   // Subscribe to developer build SSE — shared across mounting instances
   useEffect(() => {
+    if (!validProjectId) return;
     const count = (sharedSubs.get(projectId) ?? 0) + 1;
     sharedSubs.set(projectId, count);
 
@@ -57,6 +61,7 @@ export function WorkspaceBuildSync({ projectId }: { projectId: string }) {
   // Fallback: poll build-status for full workflow & missed events
   // Stops automatically when project reaches a terminal state or after 60 attempts (~5min)
   useEffect(() => {
+    if (!validProjectId) return;
     if (pollRef.current) return;
 
     let attempts = 0;
@@ -102,6 +107,7 @@ export function WorkspaceBuildSync({ projectId }: { projectId: string }) {
 
   // Check developer status on mount for completed builds
   useEffect(() => {
+    if (!validProjectId) return;
     fetch(`/api/projects/${projectId}/developer-status`)
       .then((r) => r.json())
       .then((json) => {

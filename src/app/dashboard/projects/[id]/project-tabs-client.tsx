@@ -12,6 +12,8 @@ import { DeploymentPanel } from '@/features/deployment/components/deployment-pan
 import { WorkspaceBuildSync } from '@/features/workspace/components/workspace-build-sync';
 import { Loader2, Rocket, CheckCircle, XCircle, Clock } from 'lucide-react';
 import type { CEOAnalysis } from '@/ai/agents/roles/ceo/ceo.types';
+import { MissionControlDashboard } from '@/features/observability/components/mission-control-dashboard';
+import { MissionControlWorkspace } from '@/components/workspace/mission-control-workspace';
 
 interface BuildStatus {
   projectStatus: string;
@@ -116,12 +118,16 @@ export function ProjectTabsClient({ projectId, defaultIdea }: { projectId: strin
 
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList>
+          <TabsTrigger value="mission-control">Mission Control</TabsTrigger>
           <TabsTrigger value="ceo">CEO AI</TabsTrigger>
           <TabsTrigger value="architect">Architect AI</TabsTrigger>
           <TabsTrigger value="developer">Developer AI</TabsTrigger>
           <TabsTrigger value="qa">QA AI</TabsTrigger>
           <TabsTrigger value="deploy">Deploy</TabsTrigger>
         </TabsList>
+        <TabsContent value="mission-control">
+          <MissionControlWorkspace projectId={projectId} />
+        </TabsContent>
         <TabsContent value="ceo">
           <CEOChat projectId={projectId} defaultIdea={defaultIdea} onComplete={handleCeoComplete} />
         </TabsContent>
