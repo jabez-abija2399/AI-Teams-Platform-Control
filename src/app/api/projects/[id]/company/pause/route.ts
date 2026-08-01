@@ -1,0 +1,29 @@
+import { auth } from '@/lib/auth';
+import { unauthorizedResponse } from '@/lib/api-response';
+import { NextResponse } from 'next/server';
+import { ContinuousCompanyOrchestrator } from '@/core/company';
+
+interface Params {
+  params: Promise<{ id: string }>;
+}
+
+export async function POST(request: Request, { params }: Params) {
+  const session = await auth();
+  if (!session?.user?.id) return unauthorizedResponse();
+
+  const { id } = await params;
+  let reason = 'User requested pause';
+  try {
+    const body = await request.json();
+    if (body.reason) reason = body.reason;
+  } catch {
+    // Ignore JSON parse error if body is empty
+  }
+
+  const status = await ContinuousCompanyOrchestrator.pauseProject(id, reason);
+
+  return NextResponse.json({
+    success: true,
+    data: status,
+  });
+}
