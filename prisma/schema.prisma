@@ -19,6 +19,20 @@ enum ProjectStatus {
   ARCHIVED
 }
 
+enum ProjectApprovalStatus {
+  PENDING_DISCOVERY
+  WAITING_FOR_CLARIFICATION
+  WAITING_FOR_APPROVAL
+  APPROVED
+  REJECTED
+}
+
+enum ArchitectureApprovalStatus {
+  WAITING_FOR_ARCHITECTURE_APPROVAL
+  ARCHITECTURE_APPROVED
+  ARCHITECTURE_REJECTED
+}
+
 enum TaskStatus {
   TODO
   IN_PROGRESS
@@ -37,14 +51,24 @@ enum AgentRole {
   CEO
   ARCHITECT
   DEVELOPER
+  FRONTEND
+  BACKEND
+  DATABASE
   QA
   PRODUCT_MANAGER
   REVIEWER
+  ARCHITECTURE_REVIEWER
+  CODE_REVIEWER
+  QUALITY_REVIEWER
   UI_UX
   DEVOPS
   DOCUMENTATION
   SECURITY
+  PRODUCT_DISCOVERY
   OPERATIONS
+  BUSINESS_ANALYST
+  UX_RESEARCHER
+  UI_DESIGNER
 }
 
 enum AgentStatus {
@@ -101,8 +125,8 @@ model Project {
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
-  owner          User            @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  organization   Organization?   @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  owner          User              @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  organization   Organization?     @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   tasks          Task[]
   documents      Document[]
   workflows      Workflow[]
@@ -117,10 +141,40 @@ model Project {
   architectureDocuments ArchitectureDocument[]
   developmentTasks      DevelopmentTask[]
   qualityReports        QualityReport[]
+  productRequirements   ProductRequirement[]
+  businessAnalystSpecs  BusinessAnalystSpec[]
+  uxResearchDocuments   UxResearchDocument[]
+  uiDesignDocuments     UiDesignDocument[]
+  databaseDesignDocuments DatabaseDesignDocument[]
+  backendDesignDocuments BackendDesignDocument[]
+  frontendDesignDocuments FrontendDesignDocument[]
+  qaReportDocuments     QaReportDocument[]
+  securityReportDocuments SecurityReportDocument[]
+  devopsPlanDocuments   DevopsPlanDocument[]
+  workflowState         ProjectWorkflowState?
+  handoffRecords        AgentHandoffRecord[]
+  artifactLifecycleRecords ArtifactLifecycleRecord[]
+  approvalHistories     ApprovalHistory[]
 
   recentProjects   RecentProject[]
   favoriteProjects FavoriteProject[]
   teamProjects     TeamProject[]
+  productClarification ProductClarification?
+  productProposal ProductProposal?
+  architectureProposal ArchitectureProposal?
+  companyMemories CompanyMemoryRecord[]
+  companyDecisions CompanyDecision[]
+  milestones ProjectMilestone[]
+  workPackages WorkPackage[]
+  executiveTasks ExecutiveTask[]
+  executionRuns ExecutionRunRecord[]
+  taskConflicts TaskConflictRecord[]
+  agentProfiles AIAgentProfile[]
+  agentCapabilities AgentCapability[]
+  promptRecords AgentPromptRecord[]
+  messageRecords AgentMessageRecord[]
+  conversations AgentConversation[]
+  agentExecutions AgentExecution[]
 
   // AI Usage
   usageLogs AIUsageLog[]
@@ -161,7 +215,11 @@ model Project {
   // Prompt 24: Marketplace (no direct relation)
 
   // Prompt 25: AI Learning (uses Agent relation)
-  pullRequests PullRequest[]
+  pullRequests      PullRequest[]
+  projectExecutions ProjectExecution[]
+  executionEvents   ExecutionEvent[]
+  toolExecutionLogs ToolExecutionLog[]
+  agentMessages     AgentMessage[]
 
   @@index([ownerId])
   @@index([organizationId])
@@ -473,6 +531,274 @@ model ProductDocument {
   @@index([projectId])
   @@index([agentId])
   @@map("product_documents")
+}
+
+model ProductRequirement {
+  id                String   @id @default(cuid())
+  projectId         String
+  prd               Json
+  personas          Json
+  stories           Json
+  acceptanceCriteria Json
+  roadmap           Json
+  featurePriorities Json
+  releasePlan       Json
+  dependencies      Json?
+  risks             Json?
+  status            String   @default("APPROVED")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("product_requirements")
+}
+
+model BusinessAnalystSpec {
+  id                    String   @id @default(cuid())
+  projectId             String
+  srs                   Json
+  businessRules         Json
+  processFlows          Json
+  useCases              Json
+  actors                Json
+  traceabilityMatrix    Json
+  functionalSpecs       Json
+  nonFunctionalSpecs    Json
+  edgeCases             Json
+  validationRules       Json
+  riskAnalysis          Json
+  dependencyMapping     Json
+  decisionTables        Json
+  acceptanceMatrix      Json
+  complexityEstimate    Json
+  status                String   @default("APPROVED")
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("business_analyst_specs")
+}
+
+model UxResearchDocument {
+  id                    String   @id @default(cuid())
+  projectId             String
+  userJourney           Json
+  empathyMap            Json
+  painPoints            Json
+  personas              Json
+  navigationFlow        Json
+  informationArchitecture Json
+  accessibilityReport   Json
+  interactionPrinciples Json
+  usabilityRisks        Json
+  researchSummary       Json
+  recommendations       Json
+  wireframeDescriptions Json
+  screenInventory       Json
+  status                String   @default("APPROVED")
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("ux_research_documents")
+}
+
+model UiDesignDocument {
+  id                   String   @id @default(cuid())
+  projectId            String
+  designSystem         Json
+  colorPalette         Json
+  typography           Json
+  spacingRules         Json
+  gridSystem           Json
+  components           Json
+  icons                Json
+  layoutSpecifications Json
+  responsiveRules      Json
+  animationSpecifications Json
+  pageDesigns          Json
+  componentHierarchy   Json
+  accessibilityRules   Json
+  designTokens         Json
+  status               String   @default("APPROVED")
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("ui_design_documents")
+}
+
+model DatabaseDesignDocument {
+  id                    String   @id @default(cuid())
+  projectId             String
+  erd                   Json
+  prismaSchema          String   @db.Text
+  indexes               Json
+  relations             Json
+  foreignKeys           Json
+  migrationPlan         Json
+  seedPlan              Json
+  optimization          Json
+  queryPlan             Json
+  partitionStrategy     Json
+  cachingStrategy       Json
+  databaseConstraints   Json
+  namingConventions     Json
+  backupStrategy        Json
+  recoveryStrategy      Json
+  databaseDocumentation Json
+  status                String   @default("APPROVED")
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("database_design_documents")
+}
+
+model BackendDesignDocument {
+  id                 String   @id @default(cuid())
+  projectId          String
+  folderStructure    Json
+  restApis           Json
+  routeDefinitions   Json
+  controllers        Json
+  services           Json
+  repositories       Json
+  validationRules    Json
+  authentication     Json
+  authorization      Json
+  businessLogic      Json
+  errorHandling      Json
+  logging            Json
+  rateLimiting       Json
+  testingStrategy    Json
+  openApiSpec        String   @db.Text
+  backgroundJobs     Json
+  workerDefinitions  Json
+  status             String   @default("APPROVED")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("backend_design_documents")
+}
+
+model FrontendDesignDocument {
+  id                       String   @id @default(cuid())
+  projectId                String
+  applicationStructure     Json
+  routing                  Json
+  layouts                  Json
+  pages                    Json
+  components               Json
+  hooks                    Json
+  stateManagement          Json
+  apiIntegration           Json
+  forms                    Json
+  validationRules          Json
+  responsiveLayouts        Json
+  performanceOptimizations Json
+  accessibility            Json
+  seo                      Json
+  testingStrategy          Json
+  status                   String   @default("APPROVED")
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("frontend_design_documents")
+}
+
+model QaReportDocument {
+  id                String   @id @default(cuid())
+  projectId         String
+  unitTests         Json
+  integrationTests  Json
+  e2eTests          Json
+  regressionPlan    Json
+  coverageAnalysis  Json
+  riskMatrix        Json
+  bugReports        Json
+  testSuites        Json
+  performanceTests  Json
+  accessibilityTests Json
+  securityTests     Json
+  qualityReport     Json
+  status            String   @default("APPROVED")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("qa_report_documents")
+}
+
+model SecurityReportDocument {
+  id                   String   @id @default(cuid())
+  projectId            String
+  threatModel          Json
+  owaspReview          Json
+  authenticationAudit  Json
+  authorizationAudit   Json
+  dependencyScan       Json
+  secretDetection      Json
+  apiSecurityReview    Json
+  infrastructureReview Json
+  dataProtectionReport Json
+  complianceReport     Json
+  riskScore            Json
+  remediationPlan      Json
+  status               String   @default("APPROVED")
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("security_report_documents")
+}
+
+model DevopsPlanDocument {
+  id                   String   @id @default(cuid())
+  projectId            String
+  docker               String   @db.Text
+  dockerCompose        String   @db.Text
+  cicdPipelines        Json
+  githubActions        Json
+  deploymentPlan       Json
+  infrastructureDiagram String  @db.Text
+  environmentVariables Json
+  secretsStrategy      Json
+  scalingPlan          Json
+  monitoringPlan       Json
+  loggingPlan          Json
+  backupPlan           Json
+  rollbackStrategy     Json
+  healthChecks         Json
+  productionChecklist  Json
+  status               String   @default("APPROVED")
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("devops_plan_documents")
 }
 
 model ArchitectureDocument {
@@ -1841,3 +2167,482 @@ model ChatMessage {
   @@index([sessionId])
   @@map("chat_messages")
 }
+
+// ─────────────────────────────
+// Phase 18: Persistent Distributed Execution
+// ─────────────────────────────
+
+model ProjectExecution {
+  id          String    @id @default(cuid())
+  projectId   String
+  workflowId  String
+  status      String
+  currentTask String?
+  startedAt   DateTime?
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  project Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tasks   ExecutionTask[]
+
+  @@index([projectId])
+  @@map("project_executions")
+}
+
+model ExecutionTask {
+  id              String    @id @default(cuid())
+  executionId     String
+  agentRole       String
+  taskType        String
+  description     String
+  priority        String    @default("MEDIUM")
+  status          String    @default("PENDING")
+  attempts        Int       @default(0)
+  maxAttempts     Int       @default(3)
+  dependencies    String[]
+  inputArtifacts  String[]
+  outputArtifacts String[]
+  startedAt       DateTime?
+  completedAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  execution ProjectExecution @relation(fields: [executionId], references: [id], onDelete: Cascade)
+  runs      AgentRun[]
+
+  @@index([executionId])
+  @@index([status])
+  @@map("execution_tasks")
+}
+
+model AgentRun {
+  id               String   @id @default(cuid())
+  taskId           String
+  agentRole        String
+  modelUsed        String
+  promptTokens     Int      @default(0)
+  completionTokens Int      @default(0)
+  status           String
+  errorMessage     String?
+  duration         Int? // duration in ms
+  createdAt        DateTime @default(now())
+
+  task ExecutionTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+  @@map("agent_runs")
+}
+
+model ExecutionEvent {
+  id               String   @id @default(cuid())
+  projectId        String
+  type             String
+  creatorMessage   String
+  developerMessage String?
+  metadata         Json?
+  createdAt        DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("execution_events")
+}
+
+model ToolExecutionLog {
+  id        String   @id @default(cuid())
+  agentRole String
+  toolName  String
+  projectId String
+  input     Json?
+  output    Json?
+  success   Boolean
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([toolName])
+  @@map("tool_execution_logs")
+}
+
+// ─────────────────────────────
+// Phase 19: Mission Control & Agent Collaboration
+// ─────────────────────────────
+
+model AgentMessage {
+  id        String   @id @default(cuid())
+  projectId String
+  sender    String
+  receiver  String?
+  message   String
+  type      String // REQUEST, INFORMATION, WARNING, APPROVAL, FEEDBACK
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("agent_messages")
+}
+
+model ProductClarification {
+  id        String                @id @default(cuid())
+  projectId String                @unique
+  project   Project               @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  questions Json
+  answers   Json?
+  status    ProjectApprovalStatus @default(PENDING_DISCOVERY)
+  createdAt DateTime              @default(now())
+  updatedAt DateTime              @updatedAt
+
+  @@map("product_clarifications")
+}
+
+model ProductProposal {
+  id        String   @id @default(cuid())
+  projectId String   @unique
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  proposal  Json
+  approved  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("product_proposals")
+}
+
+model ArchitectureProposal {
+  id        String   @id @default(cuid())
+  projectId String   @unique
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  proposal  Json
+  approved  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("architecture_proposals")
+}
+
+model CompanyMemoryRecord {
+  id        String   @id @default(cuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  key       String
+  value     Json
+  version   Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([projectId, key])
+  @@map("company_memory_records")
+}
+
+model CompanyDecision {
+  id              String   @id @default(cuid())
+  projectId       String
+  project         Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  category        String
+  title           String
+  selectedOption  String
+  alternatives    Json
+  rationale       String
+  confidenceScore Float    @default(0.9)
+  status          String   @default("approved")
+  createdByAgent  String
+  approvedByUser  Boolean  @default(true)
+  timestamp       DateTime @default(now())
+
+  @@index([projectId, category])
+  @@map("company_decisions")
+}
+
+model ProjectMilestone {
+  id                   String   @id @default(cuid())
+  projectId            String
+  project              Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title                String
+  description          String
+  priority             String   @default("high")
+  estimatedDuration    String
+  dependencies         Json
+  completionPercentage Float    @default(0.0)
+  status               String   @default("pending")
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  workPackages         WorkPackage[]
+
+  @@map("project_milestones")
+}
+
+model WorkPackage {
+  id               String           @id @default(cuid())
+  projectId        String
+  project          Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  milestoneId      String
+  milestone        ProjectMilestone @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
+  objective        String
+  ownerAgent       String
+  estimatedEffort  String
+  dependencies     Json
+  risks            Json
+  deliverables     Json
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  executiveTasks   ExecutiveTask[]
+
+  @@map("work_packages")
+}
+
+model ExecutiveTask {
+  id                   String      @id @default(cuid())
+  projectId            String
+  project              Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  workPackageId        String
+  workPackage          WorkPackage @relation(fields: [workPackageId], references: [id], onDelete: Cascade)
+  title                String
+  description          String
+  assignedAgent        String
+  reviewerAgent        String
+  priority             String      @default("medium")
+  status               String      @default("pending")
+  estimatedTime        String
+  actualTime           String?
+  blockers             Json
+  dependencyChain      Json
+  completionPercentage Float       @default(0.0)
+  createdAt            DateTime    @default(now())
+  updatedAt            DateTime    @updatedAt
+
+  @@map("executive_tasks")
+}
+
+model ExecutionRunRecord {
+  id           String   @id @default(cuid())
+  projectId    String
+  project      Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  taskId       String
+  agentRole    String
+  status       String   @default("Queued")
+  retryCount   Int      @default(0)
+  logs         Json
+  reviewStatus String   @default("Pending")
+  startedAt    DateTime @default(now())
+  completedAt  DateTime?
+
+  @@index([projectId, taskId])
+  @@map("execution_run_records")
+}
+
+model TaskConflictRecord {
+  id           String   @id @default(cuid())
+  projectId    String
+  project      Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  conflictType String
+  description  String
+  affectedTask String
+  resolved     Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  @@map("task_conflict_records")
+}
+
+model AIAgentProfile {
+  id               String   @id @default(cuid())
+  projectId        String?
+  project          Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  role             String
+  name             String
+  avatar           String
+  title            String
+  skills           Json
+  personality      String
+  responsibilities Json
+  experienceLevel  String   @default("Senior")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([projectId, role])
+  @@map("ai_agent_profiles")
+}
+
+model AgentCapability {
+  id              String   @id @default(cuid())
+  projectId       String?
+  project         Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  role            String
+  domain          String
+  skills          Json
+  confidenceScore Float    @default(0.9)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([role, domain])
+  @@map("agent_capabilities")
+}
+
+model AgentPromptRecord {
+  id            String   @id @default(cuid())
+  projectId     String?
+  project       Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  agentRole     String
+  taskId        String
+  systemPrompt  String
+  contextTokens Int
+  generatedAt   DateTime @default(now())
+
+  @@index([projectId, taskId])
+  @@map("agent_prompt_records")
+}
+
+model AgentMessageRecord {
+  id           String   @id @default(cuid())
+  projectId    String?
+  project      Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  senderRole   String
+  receiverRole String?
+  messageType  String
+  content      String
+  createdAt    DateTime @default(now())
+
+  @@index([projectId, senderRole])
+  @@map("agent_message_records")
+}
+
+model AgentConversation {
+  id           String   @id @default(cuid())
+  projectId    String?
+  project      Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  topic        String
+  participants Json
+  status       String   @default("active")
+  createdAt    DateTime @default(now())
+
+  @@index([projectId, status])
+  @@map("agent_conversations")
+}
+
+model AgentDelegation {
+  id           String   @id @default(cuid())
+  parentTaskId String
+  fromAgent    String
+  toAgent      String
+  status       String   @default("assigned")
+  createdAt    DateTime @default(now())
+
+  @@index([parentTaskId, fromAgent])
+  @@map("agent_delegations")
+}
+
+model AgentExecution {
+  id           String   @id @default(cuid())
+  projectId    String?
+  project      Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  agentRole    String
+  taskId       String
+  model        String
+  status       String   @default("queued")
+  inputTokens  Int      @default(0)
+  outputTokens Int      @default(0)
+  cost         Float    @default(0)
+  result       Json?
+  errorMessage String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  toolExecutions ToolExecution[]
+
+  @@index([projectId, taskId])
+  @@map("agent_executions")
+}
+
+model ToolExecution {
+  id          String   @id @default(cuid())
+  executionId String
+  execution   AgentExecution @relation(fields: [executionId], references: [id], onDelete: Cascade)
+  toolName    String
+  input       Json
+  output      Json?
+  status      String   @default("pending")
+  createdAt   DateTime @default(now())
+
+  @@index([executionId, toolName])
+  @@map("tool_executions")
+}
+
+model ProjectWorkflowState {
+  id               String   @id @default(cuid())
+  projectId        String   @unique
+  project          Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  currentPhase     String   @default("CREATED")
+  completedPhases  Json     @default("[]")
+  activeAgent      String?
+  currentArtifact  String?
+  progress         Int      @default(0)
+  nextAction       String?
+  waitingApprovals Json     @default("[]")
+  risks            Json     @default("[]")
+  metadata         Json?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([projectId])
+  @@map("project_workflow_states")
+}
+
+model AgentHandoffRecord {
+  id             String   @id @default(cuid())
+  projectId      String
+  project        Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  fromAgentRole  String
+  toAgentRole    String
+  artifactType   String
+  artifactId     String?
+  status         String   @default("SUCCESS")
+  notes          String?
+  metadata       Json?
+  createdAt      DateTime @default(now())
+
+  @@index([projectId, fromAgentRole, toAgentRole])
+  @@map("agent_handoff_records")
+}
+
+model ArtifactLifecycleRecord {
+  id             String   @id @default(cuid())
+  projectId      String
+  project        Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  artifactType   String
+  artifactId     String
+  producerRole   String
+  consumerRoles  Json     @default("[]")
+  status         String   @default("CREATED")
+  version        Int      @default(1)
+  contentSummary String?
+  metadata       Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([projectId, artifactType])
+  @@map("artifact_lifecycle_records")
+}
+
+model ApprovalHistory {
+  id            String   @id @default(cuid())
+  projectId     String
+  project       Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  approvalType  String
+  phase         String
+  artifactType  String?
+  artifactId    String?
+  status        String   @default("PENDING")
+  requestedBy   String
+  reviewedBy    String?
+  comments      String?
+  metadata      Json?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([projectId, approvalType, status])
+  @@map("approval_histories")
+}
+
