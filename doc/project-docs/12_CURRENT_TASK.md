@@ -9,7 +9,7 @@ Version:
 
 Last Updated:
 
-2026-07-23
+2026-07-25
 
 
 # Active Task
@@ -17,35 +17,50 @@ Last Updated:
 
 Task Name:
 
-Workspace Creator Mode & Developer Mode Split (UX Architecture)
+Integration Sprint 1 — Connecting Autonomous Company Pipeline
 
 
 Status:
 
-Completed
+In Progress
 
 
 # Objective
 
 
-Perform a comprehensive audit of the AI Teams Platform codebase and create three audit documents:
+Connect all existing engines into one autonomous company pipeline.
 
-1. Complete System Understanding
-2. AI Company Operating Model
-3. Transformation and Execution Plan
+The individual agents and engines exist but are NOT wired together.
+
+Integration Sprint 1 connects:
+
+1. Product Discovery → Clarification → Proposal → Approval
+2. Replace hardcoded Executive Planning with real ExecutivePlanner
+3. Wire Capability Matching before agent dispatch
+4. Wire Context Injection before agent execution
+5. Wire Review Committee after QA
+6. Fix CREATED state loop
+7. Verify Resume logic from all paused states
+8. Build full E2E test (ExpenseFlow)
+9. Mission Control live sync
+10. Final integration audit
 
 
 # Context
 
 
-The platform has reached Phase 4 completion with 27 prompts built and verified.
+All individual components exist:
 
-A full audit was needed to:
+- 21 agent roles implemented
+- CompanyPipelineEngine with 12 phases
+- ClarificationEngine, ProductProposalEngine, ExecutivePlanner
+- AgentCapabilityEngine, ContextInjectorService
+- ReviewCommittee, HandoffManager, ApprovalManager
+- ArtifactManager, WorkflowManager
 
-- Understand current state
-- Identify gaps
-- Plan transformation phases
-- Establish maturity baseline
+But they are NOT connected into one autonomous pipeline.
+
+Integration Sprint 1 fixes this.
 
 
 # Related Documentation
@@ -58,7 +73,8 @@ Before working read:
 - 01_PROJECT_MEMORY.md
 - 03_ARCHITECTURE.md
 - 07_AGENT_CONTRACTS.md
-- 09_DEVELOPMENT_RULES.md
+- 47_E2E_WORKFLOW_AUDIT.md
+- 48_INTEGRATION_SPRINT_1.md
 
 
 # Assigned Agent

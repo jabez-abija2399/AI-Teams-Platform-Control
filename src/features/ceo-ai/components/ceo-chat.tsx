@@ -103,6 +103,13 @@ export function CEOChat({ projectId, defaultIdea, onComplete }: CEOChatProps) {
         setRunning(false);
         setLoading(false);
         onComplete?.(json.data);
+
+        // Trigger the full autonomous pipeline (fire-and-forget)
+        fetch(`/api/projects/${projectId}/lifecycle/start`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userIdea: text }),
+        }).catch(() => {});
       } else {
         setError(json.error?.message ?? 'Analysis failed');
         setRunning(false);

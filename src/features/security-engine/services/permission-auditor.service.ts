@@ -118,6 +118,67 @@ const ROLE_DEFAULTS: Record<AgentRole, RoleDefaults> = {
       code: ['read'],
     },
   },
+  FRONTEND: {
+    allowedResources: ['project', 'task', 'code', 'design'],
+    deniedResources: ['budget', 'billing', 'database', 'deployment'],
+    defaultActions: {
+      project: ['read'],
+      task: ['read', 'update'],
+      code: ['read', 'create', 'update', 'delete'],
+      design: ['read'],
+    },
+  },
+  BACKEND: {
+    allowedResources: ['project', 'task', 'code', 'database'],
+    deniedResources: ['budget', 'billing', 'deployment'],
+    defaultActions: {
+      project: ['read'],
+      task: ['read', 'update'],
+      code: ['read', 'create', 'update', 'delete'],
+      database: ['read'],
+    },
+  },
+  DATABASE: {
+    allowedResources: ['project', 'task', 'database', 'code'],
+    deniedResources: ['budget', 'billing', 'deployment', 'design'],
+    defaultActions: {
+      project: ['read'],
+      task: ['read', 'update'],
+      database: ['read', 'create', 'update'],
+      code: ['read', 'create', 'update'],
+    },
+  },
+  ARCHITECTURE_REVIEWER: {
+    allowedResources: ['project', 'task', 'review', 'architecture'],
+    deniedResources: ['budget', 'billing', 'deployment'],
+    defaultActions: {
+      project: ['read'],
+      task: ['read'],
+      review: ['read', 'create', 'update'],
+      architecture: ['read'],
+    },
+  },
+  CODE_REVIEWER: {
+    allowedResources: ['project', 'task', 'review', 'code'],
+    deniedResources: ['budget', 'billing', 'deployment'],
+    defaultActions: {
+      project: ['read'],
+      task: ['read'],
+      review: ['read', 'create', 'update'],
+      code: ['read'],
+    },
+  },
+  QUALITY_REVIEWER: {
+    allowedResources: ['project', 'task', 'review', 'requirement', 'design'],
+    deniedResources: ['budget', 'billing', 'deployment'],
+    defaultActions: {
+      project: ['read'],
+      task: ['read'],
+      review: ['read', 'create', 'update'],
+      requirement: ['read'],
+      design: ['read'],
+    },
+  },
   OPERATIONS: {
     allowedResources: ['project', 'task', 'deployment', 'monitoring'],
     deniedResources: ['budget', 'billing', 'code'],
@@ -126,6 +187,45 @@ const ROLE_DEFAULTS: Record<AgentRole, RoleDefaults> = {
       task: ['read', 'update'],
       deployment: ['read', 'create', 'update'],
       monitoring: ['read', 'create', 'update'],
+    },
+  },
+  PRODUCT_DISCOVERY: {
+    allowedResources: ['project', 'task', 'requirement', 'specification'],
+    deniedResources: ['code', 'database', 'deployment', 'budget', 'billing'],
+    defaultActions: {
+      project: ['read', 'update'],
+      task: ['read', 'create'],
+      requirement: ['read', 'create', 'update'],
+      specification: ['read', 'create', 'update'],
+    },
+  },
+  BUSINESS_ANALYST: {
+    allowedResources: ['project', 'task', 'requirement', 'specification'],
+    deniedResources: ['code', 'database', 'deployment', 'budget', 'billing'],
+    defaultActions: {
+      project: ['read', 'update'],
+      task: ['read', 'create', 'update'],
+      requirement: ['read', 'create', 'update'],
+      specification: ['read', 'create', 'update'],
+    },
+  },
+  UX_RESEARCHER: {
+    allowedResources: ['project', 'task', 'design', 'requirement'],
+    deniedResources: ['code', 'database', 'deployment', 'budget', 'billing'],
+    defaultActions: {
+      project: ['read', 'update'],
+      task: ['read', 'create', 'update'],
+      design: ['read', 'create', 'update'],
+      requirement: ['read'],
+    },
+  },
+  UI_DESIGNER: {
+    allowedResources: ['project', 'task', 'design'],
+    deniedResources: ['code', 'database', 'deployment', 'budget', 'billing'],
+    defaultActions: {
+      project: ['read', 'update'],
+      task: ['read', 'create', 'update'],
+      design: ['read', 'create', 'update'],
     },
   },
 };
