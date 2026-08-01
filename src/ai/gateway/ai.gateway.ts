@@ -83,7 +83,7 @@ async function aiGenerateWithRoutes(
 
     currentOptions = { ...currentOptions, model };
 
-    for (let attempt = 0; attempt <= Math.min(MAX_RETRIES, 1); attempt++) {
+    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
       try {
         const response = await provider.generate(currentOptions);
         return response;
@@ -98,7 +98,7 @@ async function aiGenerateWithRoutes(
 
         if (!isRetryable(error)) break;
 
-        if (attempt < MAX_RETRIES) {
+        if (attempt < MAX_RETRIES - 1) {
           await sleep(getRetryDelay(attempt));
         }
       }
@@ -118,7 +118,7 @@ async function aiGenerateWithFallback(
   let currentOptions = { ...options };
 
   for (const { name, provider } of chain) {
-    for (let attempt = 0; attempt <= Math.min(MAX_RETRIES, 1); attempt++) {
+    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
       try {
         const response = await provider.generate(currentOptions);
         return response;
@@ -134,13 +134,13 @@ async function aiGenerateWithFallback(
 
         if (!isRetryable(error)) break;
 
-        if (attempt < MAX_RETRIES) {
+        if (attempt < MAX_RETRIES - 1) {
           await sleep(getRetryDelay(attempt));
         }
       }
     }
 
-    if (providerName && name === providerName) break;
+    if (providerName && name === providerName) continue;
   }
 
   throw lastError ?? new Error('AI generation failed across all providers');
@@ -157,7 +157,7 @@ export async function* aiStream(
       yield* provider.stream(options);
       return;
     } catch (error) {
-      if (chain.indexOf({ name, provider } as typeof chain[number]) === chain.length - 1) {
+      if (chain.findIndex(p => p.name === name && p.provider === provider) === chain.length - 1) {
         throw error;
       }
     }
