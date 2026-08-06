@@ -12,26 +12,26 @@ import { DeepSeekProvider } from './deepseek.adapter';
 
 const providers = new Map<AIProviderName, AIProviderAdapter>();
 
-function createProvider(name: AIProviderName): AIProviderAdapter {
+function createProvider(name: AIProviderName, options?: { apiKey?: string; defaultModel?: string }): AIProviderAdapter {
   switch (name) {
     case 'openai':
-      return new OpenAIProvider();
+      return new OpenAIProvider(options);
     case 'anthropic':
-      return new AnthropicProvider();
+      return new AnthropicProvider(options);
     case 'ollama':
       return new OllamaProvider();
     case 'gemini':
-      return new GeminiProvider();
+      return new GeminiProvider(options);
     case 'groq':
-      return new GroqProvider();
+      return new GroqProvider(options);
     case 'openrouter':
-      return new OpenRouterProvider();
+      return new OpenRouterProvider(options);
     case 'together':
-      return new TogetherProvider();
+      return new TogetherProvider(options);
     case 'huggingface':
-      return new HuggingFaceProvider();
+      return new HuggingFaceProvider(options);
     case 'deepseek':
-      return new DeepSeekProvider();
+      return new DeepSeekProvider(options);
     default:
       throw new ProviderNotFoundError(name);
   }
@@ -44,6 +44,15 @@ export function getProvider(name: AIProviderName): AIProviderAdapter {
     providers.set(name, provider);
   }
   return provider;
+}
+
+/** Ephemeral provider with a user-supplied key — never cached into the shared env registry */
+export function createProviderWithApiKey(
+  name: AIProviderName,
+  apiKey: string,
+  defaultModel?: string,
+): AIProviderAdapter {
+  return createProvider(name, { apiKey, defaultModel });
 }
 
 export function getAvailableProviders(): AIProviderAdapter[] {

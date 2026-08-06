@@ -1,12 +1,26 @@
-import type { AIGenerateOptions, AIResponse, AIStreamChunk, AIProviderName, ModelRoute } from './ai.types';
-import { getFirstAvailableProvider, getOrCreateProvider } from '../providers/provider.factory';
-import { getAvailableProviders } from '../providers/provider.registry';
+import type {
+  AIGenerateOptions,
+  AIResponse,
+  AIStreamChunk,
+  AIProviderName,
+  ModelRoute,
+} from './ai.types';
+import { getOrCreateProvider } from '../providers/provider.factory';
+import { createProviderWithApiKey, getAvailableProviders } from '../providers/provider.registry';
 import { MAX_RETRIES } from './ai.constants';
 import { extractJson } from '@/ai/utils/extract-json';
 
+export interface UserAiKeyOverride {
+  provider: AIProviderName;
+  apiKey: string;
+  defaultModel?: string;
+}
+
 function isRetryable(err: unknown): boolean {
   const msg = err instanceof Error ? err.message : String(err);
-  return /429|rate.?limit|too many request|500|502|503|service.?unavailable|timeout|etimedout|econnrefused|econnreset|network|fetch.*fail/i.test(msg);
+  return /429|rate.?limit|too many request|500|502|503|service.?unavailable|timeout|etimedout|econnrefused|econnreset|network|fetch.*fail/i.test(
+    msg,
+  );
 }
 
 function isModelNotFound(err: unknown): boolean {
@@ -22,9 +36,21 @@ async function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-const FALLBACK_CHAIN: AIProviderName[] = ['groq', 'deepseek', 'gemini', 'openrouter', 'anthropic', 'openai', 'ollama', 'together', 'huggingface'];
+const FALLBACK_CHAIN: AIProviderName[] = [
+  'groq',
+  'deepseek',
+  'gemini',
+  'openrouter',
+  'anthropic',
+  'openai',
+  'ollama',
+  'together',
+  'huggingface',
+];
 
-function buildProviderChain(preferred?: AIProviderName): Array<{ name: AIProviderName; provider: ReturnType<typeof getOrCreateProvider> }> {
+function buildProviderChain(
+  preferred?: AIProviderName,
+): Array<{ name: AIProviderName; provider: ReturnType<typeof getOrCreateProvider> }> {
   const available = getAvailableProviders();
   if (available.length === 0) {
     throw new Error('No AI providers are configured. Please set at least one API key.');
@@ -53,11 +79,60 @@ function buildProviderChain(preferred?: AIProviderName): Array<{ name: AIProvide
   return chain.map((name) => ({ name, provider: getOrCreateProvider(name) }));
 }
 
+async function generateWithProvider(
+  provider: { generate: (options: AIGenerateOptions) => Promise<AIResponse> },
+  options: AIGenerateOptions,
+): Promise<AIResponse> {
+  let currentOptions = { ...options };
+  let lastError: Error | undefined;
+
+  for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+    try {
+      return await provider.generate(currentOptions);
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+
+      if (isModelNotFound(error)) {
+        currentOptions = { ...currentOptions, model: undefined };
+        attempt = -1;
+        continue;
+      }
+
+      if (!isRetryable(error)) break;
+
+      if (attempt < MAX_RETRIES - 1) {
+        await sleep(getRetryDelay(attempt));
+      }
+    }
+  }
+
+  throw lastError ?? new Error('AI generation failed');
+}
+
 export async function aiGenerate(
   options: AIGenerateOptions,
   providerName?: AIProviderName,
   routes?: ModelRoute[],
+  userKey?: UserAiKeyOverride | null,
 ): Promise<AIResponse> {
+  if (userKey?.apiKey) {
+    try {
+      const userProvider = createProviderWithApiKey(
+        userKey.provider,
+        userKey.apiKey,
+        userKey.defaultModel,
+      );
+      if (userProvider.isAvailable()) {
+        return await generateWithProvider(userProvider, {
+          ...options,
+          model: userKey.defaultModel || options.model,
+        });
+      }
+    } catch {
+      // Fall through to platform / env providers
+    }
+  }
+
   if (routes && routes.length > 0) {
     return aiGenerateWithRoutes(options, routes);
   }
@@ -72,10 +147,10 @@ async function aiGenerateWithRoutes(
   let lastError: Error | undefined;
   let currentOptions = { ...options };
 
-  for (const { provider: providerName, model } of routes) {
+  for (const { provider: routeProvider, model } of routes) {
     let provider;
     try {
-      provider = getOrCreateProvider(providerName);
+      provider = getOrCreateProvider(routeProvider);
       if (!provider.isAvailable()) continue;
     } catch {
       continue;
@@ -85,8 +160,7 @@ async function aiGenerateWithRoutes(
 
     for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
       try {
-        const response = await provider.generate(currentOptions);
-        return response;
+        return await provider.generate(currentOptions);
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
 
@@ -120,8 +194,7 @@ async function aiGenerateWithFallback(
   for (const { name, provider } of chain) {
     for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
       try {
-        const response = await provider.generate(currentOptions);
-        return response;
+        return await provider.generate(currentOptions);
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
         const msg = lastError.message.toLowerCase();
@@ -149,7 +222,27 @@ async function aiGenerateWithFallback(
 export async function* aiStream(
   options: AIGenerateOptions,
   providerName?: AIProviderName,
+  userKey?: UserAiKeyOverride | null,
 ): AsyncGenerator<AIStreamChunk, void, undefined> {
+  if (userKey?.apiKey) {
+    try {
+      const userProvider = createProviderWithApiKey(
+        userKey.provider,
+        userKey.apiKey,
+        userKey.defaultModel,
+      );
+      if (userProvider.isAvailable()) {
+        yield* userProvider.stream({
+          ...options,
+          model: userKey.defaultModel || options.model,
+        });
+        return;
+      }
+    } catch {
+      // Fall through
+    }
+  }
+
   const chain = buildProviderChain(providerName);
 
   for (const { name, provider } of chain) {
@@ -157,7 +250,10 @@ export async function* aiStream(
       yield* provider.stream(options);
       return;
     } catch (error) {
-      if (chain.findIndex(p => p.name === name && p.provider === provider) === chain.length - 1) {
+      if (
+        chain.findIndex((p) => p.name === name && p.provider === provider) ===
+        chain.length - 1
+      ) {
         throw error;
       }
     }
@@ -168,8 +264,9 @@ export async function aiGenerateStructured<T>(
   options: AIGenerateOptions,
   schema: { parse: (data: unknown) => T },
   providerName?: AIProviderName,
+  userKey?: UserAiKeyOverride | null,
 ): Promise<{ data: T; response: AIResponse }> {
-  const response = await aiGenerate(options, providerName);
+  const response = await aiGenerate(options, providerName, undefined, userKey);
   const parsed = schema.parse(extractJson(response.content));
   return { data: parsed as T, response };
 }

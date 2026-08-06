@@ -8,6 +8,7 @@ import type {
 import { aiGenerate, aiStream, aiGenerateStructured } from '../gateway/ai.gateway';
 import { logUsage } from './usage.service';
 import { getCachedResponse, setCachedResponse } from '@/ai/cache/ai-cache.service';
+import { resolveUserAiCredentialForProject } from '@/features/ai-credentials/ai-credentials.service';
 
 function translateError(raw: string): { message: string; code: string } {
   const lower = raw.toLowerCase();
@@ -15,16 +16,19 @@ function translateError(raw: string): { message: string; code: string } {
     return { message: 'AI service is busy. Please wait 30 seconds and try again.', code: 'RATE_LIMITED' };
   }
   if (/401|unauthorized|invalid.*key|api.?key/.test(lower)) {
-    return { message: 'AI service authentication failed. Please check your API key.', code: 'AUTH_ERROR' };
+    return { message: 'AI authentication failed. Check your API key in Settings.', code: 'AUTH_ERROR' };
   }
   if (/403|forbidden|access.?denied/.test(lower)) {
-    return { message: 'AI service access denied. Please check your API key permissions.', code: 'ACCESS_DENIED' };
+    return { message: 'AI access denied. Check your API key permissions in Settings.', code: 'ACCESS_DENIED' };
   }
   if (/402|payment|billing|insufficient_credit/.test(lower)) {
-    return { message: 'AI provider requires payment or additional credits. Please check your account.', code: 'PAYMENT_REQUIRED' };
+    return {
+      message: 'Your AI provider needs payment or credits. Top up the account that owns this API key.',
+      code: 'PAYMENT_REQUIRED',
+    };
   }
   if (/quota|limit.*exceeded/.test(lower)) {
-    return { message: 'AI usage quota reached. Please check your billing or try again tomorrow.', code: 'QUOTA_EXCEEDED' };
+    return { message: 'AI usage quota reached. Check billing with your provider or try again later.', code: 'QUOTA_EXCEEDED' };
   }
   if (/timeout|etimedout|timed.?out/.test(lower)) {
     return { message: 'Request timed out. The AI model may be overloaded. Please try again.', code: 'TIMEOUT' };
@@ -35,7 +39,28 @@ function translateError(raw: string): { message: string; code: string } {
   if (/network|fetch.*fail|econnrefused|econnreset/.test(lower)) {
     return { message: 'Could not reach the AI service. Please check your connection.', code: 'NETWORK_ERROR' };
   }
+  if (/no ai providers are configured/.test(lower)) {
+    return {
+      message: 'No API key configured. Add your AI provider key in Settings before continuing.',
+      code: 'NO_API_KEY',
+    };
+  }
   return { message: 'Something went wrong with the AI service.', code: 'AI_ERROR' };
+}
+
+async function resolveUserKey(projectId?: string) {
+  if (!projectId) return null;
+  try {
+    const cred = await resolveUserAiCredentialForProject(projectId);
+    if (!cred) return null;
+    return {
+      provider: cred.provider,
+      apiKey: cred.apiKey,
+      defaultModel: cred.defaultModel,
+    };
+  } catch {
+    return null;
+  }
 }
 
 export class AIService {
@@ -48,7 +73,8 @@ export class AIService {
     const cached = getCachedResponse(options);
     if (cached) return cached;
 
-    const response = await aiGenerate(options, provider, routes);
+    const userKey = await resolveUserKey(metadata?.projectId);
+    const response = await aiGenerate(options, provider, routes, userKey);
 
     setCachedResponse(options, response);
 
@@ -67,8 +93,9 @@ export class AIService {
     metadata?: { agentId?: string; workflowId?: string; taskId?: string; projectId?: string },
   ): AsyncGenerator<AIStreamChunk, void, undefined> {
     let finalUsage: AIStreamChunk | undefined;
+    const userKey = await resolveUserKey(metadata?.projectId);
 
-    for await (const chunk of aiStream(options, provider)) {
+    for await (const chunk of aiStream(options, provider, userKey)) {
       if (chunk.type === 'usage') {
         finalUsage = chunk;
       }
@@ -90,7 +117,8 @@ export class AIService {
     provider?: AIProviderName,
     metadata?: { agentId?: string; workflowId?: string; taskId?: string; projectId?: string },
   ): Promise<{ data: T; response: AIResponse }> {
-    const result = await aiGenerateStructured(options, schema, provider);
+    const userKey = await resolveUserKey(metadata?.projectId);
+    const result = await aiGenerateStructured(options, schema, provider, userKey);
 
     await logUsage(
       { provider: result.response.provider, model: result.response.model, usage: result.response.usage },

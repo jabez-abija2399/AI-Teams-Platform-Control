@@ -3,6 +3,7 @@ import type { ApiResult } from '@/types/common.types';
 
 const ERROR_STATUS: Record<string, number> = {
   VALIDATION_ERROR: 400,
+  API_KEY_REQUIRED: 400,
   NOT_FOUND: 404,
   UNAUTHORIZED: 401,
   FORBIDDEN: 403,
