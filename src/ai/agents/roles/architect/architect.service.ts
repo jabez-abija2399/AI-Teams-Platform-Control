@@ -314,7 +314,7 @@ function buildDefaultArchitecture(title: string, isAuth: boolean): ArchitectAnal
 export function buildHeuristicArchitecture(
   input: unknown,
   feedback?: string,
-  stack?: Pick<StackIntent, 'htmlCss' | 'staticNoBackend'> | null,
+  stack?: Pick<StackIntent, 'htmlCss' | 'staticNoBackend' | 'stack'> | null,
 ): ArchitectAnalysis {
   const isAuth = detectAuthScope(input, feedback);
   const plan = asRecord(input);
