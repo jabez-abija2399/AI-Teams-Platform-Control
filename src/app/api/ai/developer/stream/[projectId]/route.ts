@@ -63,10 +63,15 @@ export async function GET(
       const onCompleted = ({
         jobId,
         returnvalue,
+        name,
       }: {
         jobId: string;
         returnvalue: unknown;
+        name?: string;
       }) => {
+        const completedProjectId = name?.replace(/^build-/, '').split('-')[0] || projectId;
+        if (completedProjectId !== projectId) return;
+
         sendSSE('completed', {
           jobId,
           projectId,

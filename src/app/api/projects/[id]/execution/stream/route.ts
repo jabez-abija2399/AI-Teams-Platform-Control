@@ -21,7 +21,10 @@ export async function GET(
 
   const stream = new ReadableStream({
     start(controller) {
+      let closed = false;
+
       const sendSSE = (event: string, data: Record<string, unknown>) => {
+        if (closed) return;
         try {
           const payload = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
           controller.enqueue(encoder.encode(payload));
@@ -30,14 +33,17 @@ export async function GET(
         }
       };
 
-      // Send initial connection event
       sendSSE('connected', {
         projectId,
         message: 'Connected to Execution Pipeline Stream',
         timestamp: new Date().toISOString(),
       });
 
-      // Listen for pipeline events
+      // Keep proxies / browsers from closing idle streams → prevents sticky "Reconnecting…"
+      const heartbeat = setInterval(() => {
+        sendSSE('heartbeat', { projectId, timestamp: new Date().toISOString() });
+      }, 15_000);
+
       const eventHandler = (data: unknown) => {
         sendSSE('pipeline_event', data as Record<string, unknown>);
       };
@@ -52,16 +58,20 @@ export async function GET(
       visibilityService.events.on(eventChannel, eventHandler);
       visibilityService.events.on(timelineChannel, timelineHandler);
 
-      // Clean up resources on client disconnect
-      req.signal.addEventListener('abort', () => {
+      const cleanup = () => {
+        if (closed) return;
+        closed = true;
+        clearInterval(heartbeat);
         visibilityService.events.off(eventChannel, eventHandler);
         visibilityService.events.off(timelineChannel, timelineHandler);
         try {
           controller.close();
         } catch {
-          // Stream might already be closed
+          // already closed
         }
-      });
+      };
+
+      req.signal.addEventListener('abort', cleanup);
     },
   });
 

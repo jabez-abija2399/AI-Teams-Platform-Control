@@ -9,7 +9,7 @@ import {
 import { prisma } from '@/lib/prisma';
 import { indexWorkspaceFiles } from '@/lib/ast';
 import { builderGraph } from '@/lib/agents/builder-graph';
-import { startSandboxDevServer, bootNextDevServer } from '@/lib/sandbox/dev-server';
+import { bootNextDevServer } from '@/lib/sandbox/dev-server';
 import { generateNextJsBaseFilesArray } from '@/lib/templates/nextjs-template';
 
 export interface AIBuildProgress {
@@ -123,7 +123,8 @@ export async function processAIBuildJob(job: Job<AIBuildJobData>): Promise<{ suc
 
   try {
     // Step A: Invoke LangGraph Multi-Agent Orchestration Graph (Architect -> Coder -> QA)
-    const graphState = await builderGraph.invoke({
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const _graphState = await builderGraph.invoke({
       projectId,
       userPrompt,
       astContext: '',
@@ -284,5 +285,7 @@ export const developerAgentWorker = new Worker<AIBuildJobData>(
   {
     connection: redisConnection,
     concurrency: 5,
+    stalledInterval: 30000,
+    maxStalledCount: 3,
   }
 );

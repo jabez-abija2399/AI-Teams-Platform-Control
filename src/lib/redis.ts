@@ -23,6 +23,14 @@ if (process.env.NODE_ENV !== 'production') {
   globalThis.globalRedisConnection = redisConnection;
 }
 
+export async function disconnectRedis(): Promise<void> {
+  await redisConnection.quit();
+  delete globalThis.globalRedisConnection;
+}
+
+process.on('SIGTERM', disconnectRedis);
+process.on('SIGINT', disconnectRedis);
+
 /**
  * Auxiliary helper function to verify Redis connectivity at startup or health check routes.
  */

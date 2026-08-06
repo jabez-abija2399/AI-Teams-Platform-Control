@@ -57,31 +57,6 @@ export async function getAuthSession(): Promise<ResolvedAuthSession | null> {
     }
   } catch {}
 
-  // 3. Fallback to primary test user abi@gmail.com or first registered user in PostgreSQL DB
-  try {
-    const fallbackUser =
-      (await prisma.user.findUnique({ where: { email: 'abi@gmail.com' } })) ||
-      (await prisma.user.findFirst());
-
-    if (fallbackUser) {
-      return {
-        user: {
-          id: fallbackUser.id,
-          name: fallbackUser.name,
-          email: fallbackUser.email,
-          image: fallbackUser.avatar,
-        },
-      };
-    }
-  } catch {}
-
-  // 4. Universal Fallback Session (guarantees local dev on port 3000 NEVER shows Unauthorized)
-  return {
-    user: {
-      id: 'clx0182user',
-      name: 'Sarah (Demo CEO)',
-      email: 'ceo@aiteams.com',
-      image: '💼',
-    },
-  };
+  // 3. No session found
+  return null;
 }

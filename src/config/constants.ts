@@ -3,7 +3,7 @@ export const APP_NAME = 'AI Teams Platform';
 export const ROUTES = {
   home: '/',
   login: '/login',
-  register: '/register',
+  register: '/signup',
   dashboard: '/dashboard',
   projects: '/dashboard/projects',
   aiTeams: '/dashboard/ai-teams',

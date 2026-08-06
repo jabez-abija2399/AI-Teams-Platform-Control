@@ -5,8 +5,9 @@ const cache = new LRUCache<string, number>({
   ttl: 60_000,
 });
 
-export function rateLimit(key: string, limit = 10): { allowed: boolean } {
-  const count = (cache.get(key) ?? 0) + 1;
-  cache.set(key, count);
-  return { allowed: count <= limit };
+export function rateLimit(key: string, identifier: string, limit = 10): { allowed: boolean; resetIn: number } {
+  const cacheKey = `${key}:${identifier}`;
+  const count = (cache.get(cacheKey) ?? 0) + 1;
+  cache.set(cacheKey, count);
+  return { allowed: count <= limit, resetIn: 60_000 };
 }

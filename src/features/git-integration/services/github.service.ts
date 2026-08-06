@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { encrypt, decrypt } from '@/lib/encryption';
 import type { ApiResult } from '@/types/common.types';
 import type {
   GitIntegrationState,
@@ -10,6 +11,27 @@ import type {
 } from '../types';
 
 const GITHUB_API = 'https://api.github.com';
+
+function decryptToken(encryptedToken: string | null): string | null {
+  if (!encryptedToken) return null;
+  try {
+    return decrypt(encryptedToken);
+  } catch {
+    return encryptedToken;
+  }
+}
+
+async function getIntegrationWithToken(
+  projectId: string,
+): Promise<{ integration: NonNullable<Awaited<ReturnType<typeof prisma.gitIntegration.findUnique>>>; token: string } | null> {
+  const integration = await prisma.gitIntegration.findUnique({
+    where: { projectId },
+  });
+  if (!integration) return null;
+  const token = decryptToken(integration.accessToken);
+  if (!token) return null;
+  return { integration, token };
+}
 
 async function ghFetch<T>(path: string, token: string): Promise<T> {
   const res = await fetch(`${GITHUB_API}${path}`, {
@@ -29,10 +51,10 @@ async function ghFetch<T>(path: string, token: string): Promise<T> {
 export async function getIntegration(
   projectId: string,
 ): Promise<ApiResult<GitIntegrationState | null>> {
-  const integration = await prisma.gitIntegration.findUnique({
-    where: { projectId },
-  });
-  if (!integration) return { success: true, data: null };
+  const result = await getIntegrationWithToken(projectId);
+  if (!result) return { success: true, data: null };
+
+  const { integration } = result;
 
   return {
     success: true,
@@ -102,7 +124,7 @@ export async function connectGitHub(
     data: {
       projectId,
       provider: 'github',
-      accessToken: tokenData.access_token,
+      accessToken: encrypt(tokenData.access_token),
       githubUserId: user.id,
       githubUsername: user.login,
     },
@@ -146,21 +168,20 @@ export async function createRemoteRepo(
   projectId: string,
   input: CreateRepoInput,
 ): Promise<ApiResult<GitHubRepo>> {
-  const integration = await prisma.gitIntegration.findUnique({
-    where: { projectId },
-  });
-  if (!integration || !integration.accessToken) {
+  const result = await getIntegrationWithToken(projectId);
+  if (!result) {
     return {
       success: false,
       error: { message: 'GitHub not connected', code: 'NOT_FOUND' },
     };
   }
 
-  const repo = await ghFetch<GitHubRepo>('/user/repos', integration.accessToken);
+  const { integration, token } = result;
+  const repo = await ghFetch<GitHubRepo>('/user/repos', token);
   const createRes = await fetch(`${GITHUB_API}/user/repos`, {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${integration.accessToken}`,
+      Authorization: `Bearer ${token}`,
       Accept: 'application/vnd.github+json',
       'Content-Type': 'application/json',
       'X-GitHub-Api-Version': '2022-11-28',
@@ -201,17 +222,16 @@ export async function linkExistingRepo(
   projectId: string,
   repoFullName: string,
 ): Promise<ApiResult<void>> {
-  const integration = await prisma.gitIntegration.findUnique({
-    where: { projectId },
-  });
-  if (!integration || !integration.accessToken) {
+  const result = await getIntegrationWithToken(projectId);
+  if (!result) {
     return {
       success: false,
       error: { message: 'GitHub not connected', code: 'NOT_FOUND' },
     };
   }
 
-  const repo = await ghFetch<GitHubRepo>(`/repos/${repoFullName}`, integration.accessToken);
+  const { integration, token } = result;
+  const repo = await ghFetch<GitHubRepo>(`/repos/${repoFullName}`, token);
 
   const [owner, name] = repo.full_name.split('/');
   await prisma.gitIntegration.update({
@@ -230,10 +250,8 @@ export async function linkExistingRepo(
 export async function listRemoteRepos(
   projectId: string,
 ): Promise<ApiResult<GitHubRepo[]>> {
-  const integration = await prisma.gitIntegration.findUnique({
-    where: { projectId },
-  });
-  if (!integration || !integration.accessToken) {
+  const result = await getIntegrationWithToken(projectId);
+  if (!result) {
     return {
       success: false,
       error: { message: 'GitHub not connected', code: 'NOT_FOUND' },
@@ -242,7 +260,7 @@ export async function listRemoteRepos(
 
   const repos = await ghFetch<GitHubRepo[]>(
     '/user/repos?sort=updated&per_page=30',
-    integration.accessToken,
+    result.token,
   );
 
   return { success: true, data: repos };
@@ -253,17 +271,15 @@ export async function pushToGitHub(
   commitMessage: string,
   branch: string = 'main',
 ): Promise<ApiResult<{ sha: string }>> {
-  const integration = await prisma.gitIntegration.findUnique({
-    where: { projectId },
-  });
-  if (!integration || !integration.accessToken || !integration.repoOwner || !integration.repoName) {
+  const result = await getIntegrationWithToken(projectId);
+  if (!result || !result.integration.repoOwner || !result.integration.repoName) {
     return {
       success: false,
       error: { message: 'GitHub not connected or no repo linked', code: 'NOT_FOUND' },
     };
   }
 
-  const repoPath = `${integration.repoOwner}/${integration.repoName}`;
+  const repoPath = `${result.integration.repoOwner}/${result.integration.repoName}`;
 
   const files = await prisma.file.findMany({
     where: { repository: { projectId } },
@@ -271,7 +287,7 @@ export async function pushToGitHub(
 
   const getRef = await ghFetch<{ object: { sha: string } }>(
     `/repos/${repoPath}/git/ref/heads/${branch}`,
-    integration.accessToken,
+    result.token,
   ).catch(() => null);
 
   let baseSha = getRef?.object?.sha;
@@ -280,7 +296,7 @@ export async function pushToGitHub(
     const createRef = await fetch(`${GITHUB_API}/repos/${repoPath}/git/refs`, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${integration.accessToken}`,
+        Authorization: `Bearer ${result.token}`,
         Accept: 'application/vnd.github+json',
         'Content-Type': 'application/json',
         'X-GitHub-Api-Version': '2022-11-28',
@@ -306,7 +322,7 @@ export async function pushToGitHub(
   const createTree = await fetch(`${GITHUB_API}/repos/${repoPath}/git/trees`, {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${integration.accessToken}`,
+      Authorization: `Bearer ${result.token}`,
       Accept: 'application/vnd.github+json',
       'Content-Type': 'application/json',
       'X-GitHub-Api-Version': '2022-11-28',
@@ -325,7 +341,7 @@ export async function pushToGitHub(
   const createCommit = await fetch(`${GITHUB_API}/repos/${repoPath}/git/commits`, {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${integration.accessToken}`,
+      Authorization: `Bearer ${result.token}`,
       Accept: 'application/vnd.github+json',
       'Content-Type': 'application/json',
       'X-GitHub-Api-Version': '2022-11-28',
@@ -348,7 +364,7 @@ export async function pushToGitHub(
   const updateRef = await fetch(`${GITHUB_API}/repos/${repoPath}/git/refs/heads/${branch}`, {
     method: 'PATCH',
     headers: {
-      Authorization: `Bearer ${integration.accessToken}`,
+      Authorization: `Bearer ${result.token}`,
       Accept: 'application/vnd.github+json',
       'Content-Type': 'application/json',
       'X-GitHub-Api-Version': '2022-11-28',

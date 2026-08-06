@@ -1,9 +1,12 @@
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
+import { PrismaAdapter } from '@auth/prisma-adapter';
 import bcrypt from 'bcryptjs';
+import { prisma } from '@/lib/prisma';
 import { loginSchema } from '@/features/auth/schemas/auth.schema';
 
 const { handlers, auth: nextAuthAuth, signIn, signOut } = NextAuth({
+  adapter: PrismaAdapter(prisma),
   logger: {
     error(error: any) {
       if (error?.name === 'JWTSessionError' || (typeof error === 'string' && error.includes('JWTSessionError'))) return;
@@ -11,6 +14,7 @@ const { handlers, auth: nextAuthAuth, signIn, signOut } = NextAuth({
     },
   },
   session: { strategy: 'jwt' },
+  secret: process.env.NEXTAUTH_SECRET,
   trustHost: true,
   pages: { signIn: '/login' },
   providers: [
@@ -19,8 +23,6 @@ const { handlers, auth: nextAuthAuth, signIn, signOut } = NextAuth({
       async authorize(credentials) {
         const parsed = loginSchema.safeParse(credentials);
         if (!parsed.success) return null;
-
-        const { prisma } = await import('@/lib/prisma');
 
         const user = await prisma.user.findUnique({
           where: { email: parsed.data.email },
@@ -60,17 +62,7 @@ export const auth = async (...args: any[]) => {
   } catch {
     // ignore
   }
-
-  // Auto-fallback demo CEO session for local port 3000 development & zero-config testing
-  return {
-    user: {
-      id: 'clx0182user',
-      name: 'Sarah (Demo CEO)',
-      email: 'ceo@aiteams.com',
-      image: '💼',
-    },
-    expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-  };
+  return null;
 };
 
 export { handlers, signIn, signOut };
