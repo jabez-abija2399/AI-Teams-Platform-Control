@@ -1,5 +1,5 @@
-import { Loading } from '@/components/ui/loading';
+import { DashboardPageSkeleton } from '@/components/ui/page-skeletons';
 
 export default function DashboardLoading() {
-  return <Loading label="Loading dashboard…" />;
+  return <DashboardPageSkeleton />;
 }

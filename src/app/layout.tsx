@@ -41,7 +41,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={`${manrope.variable} ${fraunces.variable} ${jetbrains.variable} font-sans antialiased`}>
         <Providers>
           {children}
-          <Toaster position="top-right" richColors />
+          <Toaster
+            position="top-right"
+            richColors
+            closeButton
+            toastOptions={{
+              classNames: {
+                toast: 'rounded-xl border border-border/80 shadow-lg',
+                title: 'text-sm font-medium',
+                description: 'text-xs text-muted-foreground',
+              },
+            }}
+          />
         </Providers>
       </body>
     </html>

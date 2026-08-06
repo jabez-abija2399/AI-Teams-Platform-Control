@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { ErrorState } from '@/components/ui/error-state';
 import { ROUTES } from '@/config/constants';
 
-export default function ProjectError({
+export default function ProjectsError({
   error,
   reset,
 }: {
@@ -12,16 +12,16 @@ export default function ProjectError({
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error('[project]', error);
+    console.error('[projects]', error);
   }, [error]);
 
   return (
     <ErrorState
-      title="Couldn't load this project"
-      description="This project may be unavailable or you may not have access. Try again or return to your list."
+      title="Couldn't load projects"
+      description="We couldn't load your project list. Check your connection and try again."
       onRetry={reset}
-      backHref={ROUTES.projects}
-      backLabel="Back to projects"
+      backHref={ROUTES.dashboard}
+      backLabel="Dashboard"
     />
   );
 }

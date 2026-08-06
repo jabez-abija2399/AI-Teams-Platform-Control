@@ -1,5 +1,5 @@
-import { Loading } from '@/components/ui/loading';
+import { ProjectsPageSkeleton } from '@/components/ui/page-skeletons';
 
 export default function ProjectsLoading() {
-  return <Loading label="Loading projects…" />;
+  return <ProjectsPageSkeleton />;
 }
