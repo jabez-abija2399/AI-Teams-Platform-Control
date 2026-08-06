@@ -622,7 +622,7 @@ export async function implementFromArchitectureTodos(
   stack?: {
     htmlCss?: boolean;
     staticNoBackend?: boolean;
-    stack?: DeliveryStack;
+    stack: DeliveryStack;
     label?: string;
   } | null,
   revisionFeedback?: string,
