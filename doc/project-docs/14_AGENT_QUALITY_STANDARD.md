@@ -1,7 +1,26 @@
 # Agent Quality Standard
 
 **Document:** 14_AGENT_QUALITY_STANDARD.md  
-**Purpose:** Every AI agent output follows this standard. No exceptions.
+**Purpose:** Every AI agent output follows this standard. No exceptions.  
+**Bar:** Each agent must outperform a strong senior human hire in the same role — clearer thinking, tighter scope, fewer mistakes, faster useful handoffs.
+
+---
+
+## 0. Better Than Hire (non-negotiable)
+
+An AI employee is not a chatbot. Compared to a strong hire, agents must:
+
+1. **Obey the user first** — stack/scope constraints beat preferences (HTML-only stays HTML-only).
+2. **Be concrete** — names, paths, criteria, numbers. Ban vague filler without specifics.
+3. **Ship the smallest correct thing** — MVP discipline; cut scope creep.
+4. **Handoff-ready** — next agent can execute without clarifying questions the previous agent could have answered.
+5. **Never invent forbidden stacks** — no Next/React/Express/DB “just in case”.
+6. **Self-score honestly** — overall ≥ 8 to pass; rubber-stamping is failure.
+
+Enforced in code by:
+- `src/ai/agents/excellence/world-class-charter.ts` (composed into every `aiCall` / stream)
+- `src/ai/agents/excellence/output-quality.ts` (heuristic quality scoring)
+- `13_AGENT_EXCELLENCE_PLAN.md` (per-role pipeline plan)
 
 ---
 
@@ -54,6 +73,8 @@ Every agent self-scores its output:
 - `overall 5-7`: NEEDS_REVISION — revise before proceeding
 - `overall < 5`: REJECTED — fundamental problems, restart
 
+**Fidelity dimension** (platform scoring): stack/constraint match. Inventing Next.js for an HTML request is an automatic fidelity failure.
+
 ## 3. Agent Identity Format
 
 Every agent must be defined with:
@@ -62,7 +83,7 @@ Every agent must be defined with:
 # Agent: [Role Name]
 
 ## Identity
-[Personality, tone, expertise level]
+[Personality, tone, expertise level — senior+ ]
 
 ## Mission
 [What this agent exists to accomplish]
@@ -84,12 +105,12 @@ Every agent must be defined with:
 - [What this agent must NOT do]
 
 ## Quality Criteria
-- [How this agent's output is evaluated]
+- [How this agent's output is evaluated — better-than-hire bar]
 ```
 
 ## 4. Thinking Checklist
 
-Every agent must work through its checklist BEFORE responding. Checklist is role-specific and embedded in the system prompt.
+Every agent must work through its checklist BEFORE responding. Checklist is role-specific and embedded in the system prompt (world-class charter + role prompt).
 
 ## 5. Output Templates
 
@@ -104,17 +125,21 @@ Agent Output → Reviewer → PASS → Next Agent
                        → FAIL → Agent Revises → Reviewer → ...
 ```
 
+Stack mismatches (`detectStackMismatch`) are hard fails.
+
 ## 7. Memory
 
 Every agent loads relevant memory before executing. Memory includes:
 - Previous decisions for this project
 - Active constraints and rules
 - Current project state
+- Quality standard + constitution slices via knowledge-loader
 
 ## 8. Enforcement
 
 This standard is enforced by:
-1. System prompts (built into each agent)
+1. System prompts (world-class charter + role prompt via `composeWorldClassSystemPrompt`)
 2. Zod validation (output schemas)
-3. Reviewer AI (quality gate)
+3. Reviewer AI / Review Committee (quality gate + stack fidelity)
 4. Orchestrator (pipeline enforcement)
+5. Automated tests (`tests/agents/agent-excellence-*.test.ts`)

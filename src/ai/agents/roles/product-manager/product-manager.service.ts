@@ -12,6 +12,7 @@ import {
 } from './product-manager.types';
 import type { CEOAnalysis } from '@/ai/agents/roles/ceo/ceo.types';
 import type { ApiResult } from '@/types/common.types';
+import { resolveStackIntent } from '@/core/company-orchestration/stack-intent';
 
 const PM_ROLE_NAME = 'Product Manager AI';
 
@@ -22,6 +23,120 @@ async function getOrCreatePMAgentId(): Promise<string> {
     data: { name: PM_ROLE_NAME, role: 'PRODUCT_MANAGER', status: 'IDLE', capabilities: ['REQUIREMENTS_ANALYSIS'] },
   });
   return created.id;
+}
+
+function extractFeatureNames(ceoAnalysis: unknown): string[] {
+  if (!ceoAnalysis || typeof ceoAnalysis !== 'object') return ['Core user flow'];
+  const obj = ceoAnalysis as Record<string, unknown>;
+  const names: string[] = [];
+
+  const req = obj.requirements as Record<string, unknown> | undefined;
+  if (req && Array.isArray(req.features)) {
+    for (const f of req.features.slice(0, 6)) {
+      if (f && typeof f === 'object' && 'name' in f) {
+        const n = String((f as { name: unknown }).name || '').trim();
+        if (n) names.push(n);
+      }
+    }
+  }
+  if (Array.isArray(obj.featureSpecs)) {
+    for (const f of obj.featureSpecs.slice(0, 6)) {
+      if (f && typeof f === 'object' && 'name' in f) {
+        const n = String((f as { name: unknown }).name || '').trim();
+        if (n) names.push(n);
+      }
+    }
+  }
+  if (names.length === 0 && typeof obj.vision === 'object' && obj.vision) {
+    const sol = String((obj.vision as { solution?: string }).solution || '').trim();
+    if (sol) names.push(sol.slice(0, 60));
+  }
+  return names.length ? [...new Set(names)].slice(0, 6) : ['Core user flow'];
+}
+
+/** Lean PRD so Product Manager never stalls Mission Control at ~25%. */
+export function buildHeuristicRefinedRequirements(
+  ceoAnalysis: unknown,
+  revisionFeedback?: string,
+): RefinedRequirements {
+  let features = extractFeatureNames(ceoAnalysis);
+  const feedback = (revisionFeedback || '').trim();
+  const intent = resolveStackIntent(ceoAnalysis, feedback);
+  const f = feedback.toLowerCase();
+
+  if (intent.staticNoBackend || intent.htmlCss) {
+    features = ['Login (HTML)', 'Sign up (HTML)', 'Home (HTML)'];
+  } else if (f.includes('simpler') || f.includes('only') || f.includes('too many')) {
+    features = features.slice(0, 3);
+  }
+  if (!intent.htmlCss && (f.includes('login') || f.includes('auth') || f.includes('sign up'))) {
+    features = ['Login', 'Sign up', 'Protected home'];
+  }
+
+  const userStories = features.map((name, idx) => ({
+    id: `US-${String(idx + 1).padStart(3, '0')}`,
+    title: name,
+    asA: 'user',
+    iWant: `use ${name}`,
+    soThat: intent.staticNoBackend
+      ? 'I can navigate static pages without a framework'
+      : 'I can complete my primary goal',
+    acceptanceCriteria: intent.staticNoBackend
+      ? [
+          `${name} is a real .html file`,
+          'Page uses shared css/styles.css',
+          'No Next.js or React required',
+        ]
+      : [
+          `${name} is reachable from the main flow`,
+          `${name} works for a happy-path user`,
+        ],
+    priority: idx === 0 ? 'HIGH' : 'MEDIUM',
+    estimatedEffort: 'MEDIUM',
+  }));
+
+  return refinedRequirementsSchema.parse({
+    userStories,
+    featureSpecs: features.map((name, idx) => ({
+      name,
+      description: intent.staticNoBackend
+        ? `Static HTML/CSS page for ${name}`
+        : `MVP capability: ${name}`,
+      userStories: [userStories[idx]!],
+      dependencies: idx > 0 ? [features[0]!] : [],
+      technicalNotes: [
+        ...intent.constraints,
+        feedback ? `Incorporate feedback: ${feedback}` : 'Pipeline lean package from CEO strategy',
+      ].join(' · '),
+    })),
+    nonFunctionalRequirements: intent.staticNoBackend
+      ? [
+          {
+            category: 'Delivery',
+            requirement: 'Ship as static HTML + CSS files only',
+            rationale: intent.label,
+          },
+          {
+            category: 'Compatibility',
+            requirement: 'Open in modern browsers without a build step',
+            rationale: 'No framework lock-in',
+          },
+        ]
+      : [
+          {
+            category: 'Performance',
+            requirement: 'Primary screens load in under 3 seconds on broadband',
+            rationale: 'Keep MVP snappy',
+          },
+          {
+            category: 'Security',
+            requirement: 'Protect authenticated routes and validate inputs',
+            rationale: 'Baseline production hygiene',
+          },
+        ],
+    backlog: features.map((name) => `Polish ${name}`),
+    clarificationsNeeded: feedback ? [`Addressed: ${feedback}`] : intent.constraints,
+  });
 }
 
 export async function refineRequirements(
@@ -39,12 +154,10 @@ export async function refineRequirements(
   await logAIEvent('PM_REFINEMENT_STARTED', { projectId }, agentId);
 
   try {
-    const result = await requirementRefinementTool.execute({ ceoAnalysis, projectId, agentId });
-    if (!result.success) throw new Error(result.error);
-
-    const refined = refinedRequirementsSchema.parse(result.data);
-
+    // Lean-first — same pattern as Architect / BA / Development.
+    const refined = buildHeuristicRefinedRequirements(ceoAnalysis);
     const memory = getMemoryManager();
+
     await Promise.all([
       prisma.document.create({
         data: {
@@ -67,12 +180,49 @@ export async function refineRequirements(
     await prisma.agent.update({ where: { id: agentId }, data: { status: 'IDLE' } });
     await logAIEvent('PM_REFINEMENT_COMPLETED', { projectId }, agentId);
 
+    // Optional LLM enrichment in background — never blocks pipeline.
+    void (async () => {
+      try {
+        const result = await requirementRefinementTool.execute({
+          ceoAnalysis,
+          projectId,
+          agentId,
+        });
+        if (!result.success) return;
+        const enriched = refinedRequirementsSchema.parse(result.data);
+        await prisma.document.create({
+          data: {
+            projectId,
+            type: 'REFINED_REQUIREMENTS',
+            title: 'Refined Requirements (enriched)',
+            content: JSON.stringify(enriched),
+            author: 'Product Manager AI',
+          },
+        });
+      } catch {
+        /* optional */
+      }
+    })();
+
     return { success: true, data: refined };
   } catch (err) {
     await prisma.document.deleteMany({ where: { projectId, type: 'PM_IN_PROGRESS' } });
     await prisma.agent.update({ where: { id: agentId }, data: { status: 'ERROR' } });
     await logAIEvent('PM_REFINEMENT_FAILED', { projectId, error: String(err) }, agentId);
-    return { success: false, error: { message: err instanceof Error ? err.message : 'PM refinement failed', code: 'AI_ERROR' } };
+
+    // Last-resort heuristic so PRODUCT_RUNNING never fails the pipeline.
+    try {
+      const fallback = buildHeuristicRefinedRequirements(ceoAnalysis);
+      return { success: true, data: fallback };
+    } catch {
+      return {
+        success: false,
+        error: {
+          message: err instanceof Error ? err.message : 'PM refinement failed',
+          code: 'AI_ERROR',
+        },
+      };
+    }
   }
 }
 

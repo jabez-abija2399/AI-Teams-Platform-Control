@@ -1,5 +1,6 @@
 import type { ITool, ToolResult } from '@/ai/agents/tools/tool.interface';
 import { aiCall } from '@/ai/agents/core/ai-call';
+import { aiCallStreaming } from '@/ai/agents/core/ai-call-stream';
 import { architectConfig } from './architect.config';
 import { ARCHITECT_SYSTEM_PROMPT } from './architect.prompt';
 import {
@@ -12,8 +13,29 @@ import {
 } from './architect.types';
 import type { ProductRequirement } from '@/ai/agents/roles/ceo/ceo.types';
 
-function escapePrompt(val: unknown): string {
-  return JSON.stringify(val, null, 2);
+async function callArchitectJson<T>(
+  prompt: string,
+  projectId?: string,
+  agentId?: string,
+): Promise<T> {
+  if (projectId) {
+    return aiCallStreaming<T>(
+      prompt,
+      ARCHITECT_SYSTEM_PROMPT,
+      'ARCHITECT',
+      architectConfig,
+      projectId,
+      agentId,
+    );
+  }
+  return aiCall<T>(
+    prompt,
+    ARCHITECT_SYSTEM_PROMPT,
+    'ARCHITECT',
+    architectConfig,
+    projectId,
+    agentId,
+  );
 }
 
 export const architectureDesignerTool: ITool<
@@ -25,11 +47,8 @@ export const architectureDesignerTool: ITool<
     'Produces a system architecture (frontend, backend, database, infra, security) from product requirements.',
   async execute({ requirements, projectId, agentId }): Promise<ToolResult<TechnicalArchitecture>> {
     try {
-      const raw = await aiCall<unknown>(
+      const raw = await callArchitectJson<unknown>(
         `Product requirements: ${JSON.stringify(requirements)}\n\nProduce a system architecture as JSON with keys: frontend, backend, database, infrastructure, security. Respond ONLY with valid JSON.`,
-        ARCHITECT_SYSTEM_PROMPT,
-        'ARCHITECT',
-        architectConfig,
         projectId,
         agentId,
       );
@@ -50,11 +69,8 @@ export const databaseDesignerTool: ITool<{ requirements: ProductRequirement; pro
     'Produces a database schema (entities, relationships, indexes, constraints) from features.',
   async execute({ requirements, projectId, agentId }): Promise<ToolResult<DatabaseDesign>> {
     try {
-      const raw = await aiCall<unknown>(
+      const raw = await callArchitectJson<unknown>(
         `Features: ${JSON.stringify(requirements.features)}\n\nProduce a database design as JSON with keys: entities (array of {name, fields: [{name, type}]}), relationships (array of strings), indexes (array of strings), constraints (array of strings). Respond ONLY with valid JSON.`,
-        ARCHITECT_SYSTEM_PROMPT,
-        'ARCHITECT',
-        architectConfig,
         projectId,
         agentId,
       );
@@ -77,7 +93,7 @@ export const apiDesignerTool: ITool<
   description: 'Produces REST API endpoints from requirements and database design.',
   async execute({ requirements, database, projectId, agentId }): Promise<ToolResult<APISpecification>> {
     try {
-      const raw = await aiCall<unknown>(
+      const raw = await callArchitectJson<unknown>(
         `Requirements: ${JSON.stringify(requirements)}\nDatabase: ${JSON.stringify(database)}\n\n` +
         `Produce an API specification as JSON with keys: endpoints (array of objects).\n` +
         `Each endpoint object MUST have:\n` +
@@ -86,9 +102,6 @@ export const apiDesignerTool: ITool<
         `- request: object describing request body (optional, only for POST/PUT/PATCH)\n` +
         `- response: object describing response shape with field names as keys and type strings as values, e.g. {"id": "string", "name": "string", "createdAt": "string"}. Do NOT use an array for response.\n\n` +
         `Respond ONLY with valid JSON.`,
-        ARCHITECT_SYSTEM_PROMPT,
-        'ARCHITECT',
-        architectConfig,
         projectId,
         agentId,
       );

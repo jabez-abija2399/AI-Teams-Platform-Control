@@ -84,6 +84,7 @@ export class OrganizationalIntelligenceService {
             content: `[${category}] ${title}: ${content}`,
             importance: 'HIGH',
           },
+          select: { id: true },
         });
       }
     } catch (err) {

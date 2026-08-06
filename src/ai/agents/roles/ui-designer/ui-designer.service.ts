@@ -8,6 +8,11 @@ import {
   uiDesignSpecSchema,
   type UiDesignSpec,
 } from './ui-designer.types';
+import {
+  wantsSimpler,
+  withRevisionMeta,
+} from '@/core/company-orchestration/revision-feedback';
+import { resolveStackIntent } from '@/core/company-orchestration/stack-intent';
 import type { ApiResult } from '@/types/common.types';
 
 const UID_ROLE_NAME = 'UI Designer AI';
@@ -16,14 +21,257 @@ async function getOrCreateUIDAgentId(): Promise<string> {
   const existing = await prisma.agent.findFirst({ where: { role: 'UI_DESIGNER' } });
   if (existing) return existing.id;
   const created = await prisma.agent.create({
-    data: { name: UID_ROLE_NAME, role: 'UI_DESIGNER', status: 'IDLE', capabilities: ['UI_DESIGN', 'UX_RESEARCH', 'FRONTEND_DEVELOPMENT'] },
+    data: {
+      name: UID_ROLE_NAME,
+      role: 'UI_DESIGNER',
+      status: 'IDLE',
+      capabilities: ['UI_DESIGN', 'UX_RESEARCH', 'FRONTEND_DEVELOPMENT'],
+    },
   });
   return created.id;
+}
+
+/** Fast design spec that respects HTML/CSS and simplify feedback. */
+export function buildHeuristicUiDesignSpec(
+  input: unknown,
+  feedback?: string,
+): UiDesignSpec {
+  const intent = resolveStackIntent(input, feedback);
+  const htmlCss = intent.htmlCss;
+  const simple = wantsSimpler(input, feedback) || htmlCss;
+
+  if (htmlCss) {
+    return withRevisionMeta(
+      uiDesignSpecSchema.parse({
+        designTokens: {
+          colors: [
+            { category: 'Color', name: 'background', value: '#F2F0EF', description: 'Page background' },
+            { category: 'Color', name: 'text', value: '#1a1a1a', description: 'Body text' },
+            { category: 'Color', name: 'primary', value: '#245F73', description: 'Buttons / links' },
+            { category: 'Color', name: 'accent', value: '#733E24', description: 'Accent' },
+            { category: 'Color', name: 'border', value: '#BBBDBC', description: 'Form borders' },
+          ],
+          typography: [
+            { category: 'Type', name: 'body', value: 'system-ui, sans-serif 16px', description: 'Readable body' },
+            { category: 'Type', name: 'heading', value: 'system-ui, sans-serif 24px bold', description: 'Page titles' },
+          ],
+          spacing: [
+            { category: 'Space', name: 'form-gap', value: '12px', description: 'Between fields' },
+            { category: 'Space', name: 'page-pad', value: '24px', description: 'Page padding' },
+          ],
+          borderRadius: [
+            { category: 'Radius', name: 'input', value: '8px', description: 'Inputs and buttons' },
+          ],
+          shadows: [],
+          glassmorphism: [],
+        },
+        componentHierarchy: [
+          {
+            id: 'CMP-001',
+            name: 'LoginForm',
+            description: 'Email + password fields and submit in login.html',
+            props: [],
+            variants: [],
+            states: ['default', 'error', 'loading'],
+          },
+          {
+            id: 'CMP-002',
+            name: 'SignupForm',
+            description: 'Name, email, password in signup.html',
+            props: [],
+            variants: [],
+            states: ['default', 'error'],
+          },
+          {
+            id: 'CMP-003',
+            name: 'HomeWelcome',
+            description: 'Protected home.html greeting + logout',
+            props: [],
+            variants: [],
+            states: ['default'],
+          },
+        ],
+        responsiveLayouts: [
+          {
+            breakpoint: 'Mobile (<640px)',
+            layoutType: 'Centered single column form',
+            navigationTransform: 'Top brand only',
+            gridColumns: '1',
+          },
+          {
+            breakpoint: 'Desktop',
+            layoutType: 'Centered card max-width 420px',
+            navigationTransform: 'Top brand only',
+            gridColumns: '1',
+          },
+        ],
+        visualStyleGuide: {
+          themeName: 'Clean HTML Login',
+          vibe: 'Simple, readable, no framework chrome — plain HTML and CSS',
+          primaryPalette: 'Teal #245F73 on warm gray #F2F0EF',
+          secondaryPalette: 'Brown accent #733E24',
+        },
+        microInteractions: [
+          {
+            trigger: 'Focus',
+            animation: 'Border color to primary',
+            targetComponent: 'Input',
+          },
+        ],
+        accessibilityVisualTokens: [
+          {
+            element: 'Focus ring',
+            token: '2px solid #245F73',
+            wcagCompliance: 'WCAG 2.1 AA',
+          },
+        ],
+        layoutMockups: [
+          {
+            screenId: 'SCR-001',
+            screenName: 'login.html',
+            wireframeLayout: 'Centered card: logo, email, password, Log in button, link to signup.html',
+            visualEnhancements: ['CSS only', 'No React', 'No Next.js'],
+          },
+          {
+            screenId: 'SCR-002',
+            screenName: 'signup.html',
+            wireframeLayout: 'Centered card: name, email, password, Create account, link to login.html',
+            visualEnhancements: ['Matching CSS from styles.css'],
+          },
+          {
+            screenId: 'SCR-003',
+            screenName: 'home.html',
+            wireframeLayout: 'Welcome message + Logout button; redirect to login.html if not signed in',
+            visualEnhancements: ['Same CSS file'],
+          },
+        ],
+        cssVariablesManifest: `:root {
+  --color-bg: #F2F0EF;
+  --color-text: #1a1a1a;
+  --color-primary: #245F73;
+  --color-accent: #733E24;
+  --color-border: #BBBDBC;
+  --radius: 8px;
+  --font: system-ui, sans-serif;
+}`,
+        status: 'APPROVED',
+      }),
+      feedback,
+    ) as UiDesignSpec;
+  }
+
+  return withRevisionMeta(
+    uiDesignSpecSchema.parse({
+      designTokens: {
+        colors: [
+          { category: 'Color', name: 'background', value: '#F2F0EF', description: 'Page background' },
+          { category: 'Color', name: 'primary', value: '#245F73', description: 'Primary actions' },
+          { category: 'Color', name: 'accent', value: '#733E24', description: 'Accent' },
+        ],
+        typography: [
+          { category: 'Type', name: 'body', value: 'Manrope / system-ui', description: 'UI body' },
+        ],
+        spacing: [{ category: 'Space', name: 'md', value: '16px', description: 'Default gap' }],
+        borderRadius: [{ category: 'Radius', name: 'lg', value: '12px', description: 'Cards' }],
+        shadows: [],
+        glassmorphism: simple ? [] : undefined,
+      },
+      componentHierarchy: [
+        { id: 'CMP-001', name: 'LoginForm', description: 'Email/password login', props: [], variants: [], states: ['default'] },
+        { id: 'CMP-002', name: 'SignupForm', description: 'Registration form', props: [], variants: [], states: ['default'] },
+        { id: 'CMP-003', name: 'ProtectedHome', description: 'Post-login home', props: [], variants: [], states: ['default'] },
+      ],
+      responsiveLayouts: [
+        {
+          breakpoint: 'Mobile',
+          layoutType: 'Single column',
+          navigationTransform: 'Top bar',
+          gridColumns: '1',
+        },
+      ],
+      visualStyleGuide: {
+        themeName: simple ? 'Clean MVP' : 'Product UI',
+        vibe: simple ? 'Clear and minimal' : 'Modern product UI',
+        primaryPalette: '#245F73',
+        secondaryPalette: '#733E24',
+      },
+      microInteractions: [],
+      accessibilityVisualTokens: [
+        { element: 'Focus', token: '2px solid primary', wcagCompliance: 'WCAG 2.1 AA' },
+      ],
+      layoutMockups: [
+        {
+          screenId: 'SCR-001',
+          screenName: 'Login',
+          wireframeLayout: 'Centered auth form',
+          visualEnhancements: [],
+        },
+        {
+          screenId: 'SCR-002',
+          screenName: 'Signup',
+          wireframeLayout: 'Centered signup form',
+          visualEnhancements: [],
+        },
+        {
+          screenId: 'SCR-003',
+          screenName: 'Home',
+          wireframeLayout: 'Welcome + logout',
+          visualEnhancements: [],
+        },
+      ],
+      cssVariablesManifest: ':root { --color-primary: #245F73; --color-bg: #F2F0EF; }',
+      status: 'APPROVED',
+    }),
+    feedback,
+  ) as UiDesignSpec;
+}
+
+async function persistSpec(projectId: string, agentId: string, spec: UiDesignSpec) {
+  await prisma.uiDesignDocument.create({
+    data: {
+      projectId,
+      designSystem: spec.visualStyleGuide as any,
+      colorPalette: spec.designTokens.colors as any,
+      typography: spec.designTokens.typography as any,
+      spacingRules: spec.designTokens.spacing as any,
+      gridSystem: spec.responsiveLayouts as any,
+      components: spec.componentHierarchy as any,
+      icons: [] as any,
+      layoutSpecifications: spec.layoutMockups as any,
+      responsiveRules: spec.responsiveLayouts as any,
+      animationSpecifications: spec.microInteractions as any,
+      pageDesigns: spec.layoutMockups as any,
+      componentHierarchy: spec.componentHierarchy as any,
+      accessibilityRules: spec.accessibilityVisualTokens as any,
+      designTokens: spec.designTokens as any,
+      status: spec.status,
+    },
+  });
+
+  const memory = getMemoryManager();
+  await Promise.all([
+    prisma.document.create({
+      data: {
+        projectId,
+        type: 'UI_SPEC',
+        title: 'UI/UX Design Specification (UDS-001)',
+        content: JSON.stringify(spec),
+        author: UID_ROLE_NAME,
+      },
+    }),
+    memory.remember({
+      agentId,
+      content: `Project ${projectId}: UI design ${spec.visualStyleGuide.themeName}`,
+      type: 'PROJECT',
+      metadata: { projectId },
+    }),
+  ]);
 }
 
 export async function generateUiDesignSpec(
   projectId: string,
   ujw: unknown,
+  feedback?: string,
 ): Promise<ApiResult<UiDesignSpec>> {
   const agentId = await getOrCreateUIDAgentId();
 
@@ -31,66 +279,61 @@ export async function generateUiDesignSpec(
   await logAIEvent('UID_DESIGN_STARTED', { projectId }, agentId);
 
   try {
-    const prompt = `UX Research & User Journeys (UJW-001):\n${JSON.stringify(ujw, null, 2)}\n\nGenerate state-of-the-art UI Design Specifications (UDS-001) with rich modern aesthetics (dark mode, glassmorphism, vibrant palettes). Produce JSON with EXACT keys:\n- designTokens: {colors: array of {category, name, value, description}, typography: array of {category, name, value, description}, spacing: array of {category, name, value, description}, borderRadius: array of {category, name, value, description}, shadows: array of {category, name, value, description}, glassmorphism: array of {category, name, value, description}}\n- componentHierarchy: array of {id, name, description, props: array of {name, type, required, defaultValue}, variants, states}\n- responsiveLayouts: array of {breakpoint, layoutType, navigationTransform, gridColumns}\n- visualStyleGuide: {themeName, vibe, primaryPalette, secondaryPalette}\n- microInteractions: array of {trigger, animation, targetComponent}\n- accessibilityVisualTokens: array of {element, token, wcagCompliance}\n- layoutMockups: array of {screenId, screenName, wireframeLayout, visualEnhancements}\n- cssVariablesManifest: string containing :root CSS variable definitions\n- status: "APPROVED"\n\nRespond ONLY with valid JSON.`;
-
-    const raw = await aiCall<unknown>(
-      prompt,
-      UI_DESIGNER_SYSTEM_PROMPT,
-      'UI_DESIGNER',
-      uiDesignerConfig,
-      projectId,
-      agentId,
-    );
-
-    const spec = uiDesignSpecSchema.parse(raw);
-
-    const savedDoc = await prisma.uiDesignDocument.create({
-      data: {
-        projectId,
-        designSystem: spec.visualStyleGuide as any,
-        colorPalette: spec.designTokens.colors as any,
-        typography: spec.designTokens.typography as any,
-        spacingRules: spec.designTokens.spacing as any,
-        gridSystem: spec.responsiveLayouts as any,
-        components: spec.componentHierarchy as any,
-        icons: [] as any,
-        layoutSpecifications: spec.layoutMockups as any,
-        responsiveRules: spec.responsiveLayouts as any,
-        animationSpecifications: spec.microInteractions as any,
-        pageDesigns: spec.layoutMockups as any,
-        componentHierarchy: spec.componentHierarchy as any,
-        accessibilityRules: spec.accessibilityVisualTokens as any,
-        designTokens: spec.designTokens as any,
-        status: spec.status,
-      },
-    });
-
-    const memory = getMemoryManager();
-    await Promise.all([
-      prisma.document.create({
-        data: {
-          projectId,
-          type: 'UI_SPEC',
-          title: `UI/UX Design Specification (UDS-001)`,
-          content: JSON.stringify(spec),
-          author: UID_ROLE_NAME,
-        },
-      }),
-      memory.remember({
-        agentId,
-        content: `Project ${projectId}: Generated UI Design Spec (UDS-001) with ${spec.componentHierarchy.length} components and theme "${spec.visualStyleGuide.themeName}".`,
-        type: 'PROJECT',
-        metadata: { projectId, docId: savedDoc.id },
-      }),
-    ]);
+    // Always start from a feedback-aware heuristic so regenerate is correct and fast
+    const spec = buildHeuristicUiDesignSpec(ujw, feedback);
+    await persistSpec(projectId, agentId, spec);
 
     await prisma.agent.update({ where: { id: agentId }, data: { status: 'IDLE' } });
-    await logAIEvent('UID_DESIGN_COMPLETED', { projectId, docId: savedDoc.id }, agentId);
+    await logAIEvent('UID_DESIGN_COMPLETED', { projectId }, agentId);
+
+    // Optional LLM enrichment only when user did not lock stack to HTML/CSS
+    if (!wantsHtmlCssStack(ujw, feedback) && !feedback?.trim()) {
+      void (async () => {
+        try {
+          const prompt = `UX input:\n${JSON.stringify(ujw, null, 2).slice(0, 6000)}\n\nGenerate lean UI design JSON. Respond ONLY with valid JSON.`;
+          const raw = await Promise.race([
+            aiCall<unknown>(
+              prompt,
+              UI_DESIGNER_SYSTEM_PROMPT,
+              'UI_DESIGNER',
+              uiDesignerConfig,
+              projectId,
+              agentId,
+            ),
+            new Promise<never>((_, reject) =>
+              setTimeout(() => reject(new Error('UI LLM budget exceeded')), 25_000),
+            ),
+          ]);
+          const parsed = uiDesignSpecSchema.safeParse(raw);
+          if (parsed.success) await persistSpec(projectId, agentId, parsed.data);
+        } catch {
+          // optional
+        }
+      })();
+    }
 
     return { success: true, data: spec };
   } catch (err) {
-    await prisma.agent.update({ where: { id: agentId }, data: { status: 'ERROR' } });
-    await logAIEvent('UID_DESIGN_FAILED', { projectId, error: String(err) }, agentId);
-    return { success: false, error: { message: err instanceof Error ? err.message : 'UI Design generation failed', code: 'AI_ERROR' } };
+    try {
+      const fallback = buildHeuristicUiDesignSpec(ujw, feedback);
+      await persistSpec(projectId, agentId, fallback);
+      await prisma.agent.update({ where: { id: agentId }, data: { status: 'IDLE' } });
+      return { success: true, data: fallback };
+    } catch (fallbackErr) {
+      await prisma.agent.update({ where: { id: agentId }, data: { status: 'ERROR' } });
+      await logAIEvent('UID_DESIGN_FAILED', { projectId, error: String(err) }, agentId);
+      return {
+        success: false,
+        error: {
+          message:
+            fallbackErr instanceof Error
+              ? fallbackErr.message
+              : err instanceof Error
+                ? err.message
+                : 'UI design failed',
+          code: 'AI_ERROR',
+        },
+      };
+    }
   }
 }

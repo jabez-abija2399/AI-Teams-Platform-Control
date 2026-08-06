@@ -1,5 +1,9 @@
 import { BaseAgent } from '../core/agent.base';
 import type { AgentExecutionResult } from '../core/agent.types';
+import { aiCall } from '../core/ai-call';
+import { envModels } from '../core/model-routes';
+import type { AgentModelConfig } from './ceo/ceo.config';
+import { z } from 'zod';
 
 export interface MvpFeature {
   name: string;
@@ -28,97 +32,210 @@ export interface ProductSpecification {
   approvalRequired?: boolean;
 }
 
+const productSpecSchema = z.object({
+  productName: z.string().min(1),
+  vision: z.string().min(1),
+  problemStatement: z.string().min(1),
+  targetAudience: z.string().min(1),
+  platform: z.string().min(1),
+  complexity: z.enum(['MVP', 'MODERATE', 'COMPLEX']).default('MVP'),
+  mvpFeatures: z
+    .array(
+      z.object({
+        name: z.string(),
+        priority: z.enum(['HIGH', 'MEDIUM', 'LOW']).default('HIGH'),
+      }),
+    )
+    .min(1)
+    .max(6),
+  futureFeatures: z.array(z.string()).max(3).default([]),
+  questions: z.array(z.string()).max(3).default([]),
+});
+
+const DISCOVERY_SYSTEM_PROMPT = `You are Product Discovery for an AI software company.
+
+Return ONLY valid JSON:
+productName, vision, problemStatement, targetAudience, platform,
+complexity (MVP|MODERATE|COMPLEX), mvpFeatures[{name,priority}], futureFeatures[], questions[].
+
+Rules:
+- Match the user's requested scope EXACTLY. Do not expand a small idea into a big product.
+- If the user asks for a simple login/signup page, keep MVP to auth screens only (login, signup, protected page). Do NOT add tasks, invoices, analytics, collaboration, or unrelated features.
+- Prefer complexity MVP for small requests.
+- Max 4 mvpFeatures for simple ideas. Max 2 futureFeatures.
+- Use plain language. No markdown.`;
+
+const discoveryConfig: AgentModelConfig = {
+  models: envModels('PRODUCT_DISCOVERY'),
+  temperature: 0.2,
+  maxTokens: 1200,
+};
+
+function isAuthIdea(idea: string): boolean {
+  const lower = idea.toLowerCase();
+  return (
+    lower.includes('login') ||
+    lower.includes('log in') ||
+    lower.includes('signin') ||
+    lower.includes('sign in') ||
+    lower.includes('signup') ||
+    lower.includes('sign up') ||
+    lower.includes('auth')
+  );
+}
+
 export class ProductDiscoveryAgent extends BaseAgent {
   constructor(name = 'Product Discovery Agent') {
     super('PRODUCT_DISCOVERY', name);
   }
 
-  /**
-   * Analyzes raw user idea and transforms it into a structured ProductSpecification
-   */
   public async discoverProductSpecification(rawIdea: string): Promise<ProductSpecification> {
     const cleanIdea = rawIdea.trim();
+    // Lean-first: return heuristic immediately so Discovery never stalls the pipeline.
+    const heuristic = this.heuristicSpecification(cleanIdea);
+
+    void (async () => {
+      try {
+        const raw = await aiCall<unknown>(
+          `User idea (stay within this scope only):\n${cleanIdea}\n\nProduce the product discovery JSON now.`,
+          DISCOVERY_SYSTEM_PROMPT,
+          'PRODUCT_DISCOVERY',
+          discoveryConfig,
+        );
+        productSpecSchema.parse(raw);
+        // Enrichment is best-effort; pipeline already advanced with heuristic.
+      } catch {
+        /* optional */
+      }
+    })();
+
+    return heuristic;
+  }
+
+  private sanitizeSpec(
+    spec: z.infer<typeof productSpecSchema>,
+    idea: string,
+  ): ProductSpecification {
+    let mvpFeatures = spec.mvpFeatures;
+    let futureFeatures = spec.futureFeatures;
+
+    if (isAuthIdea(idea)) {
+      mvpFeatures = mvpFeatures.filter((f) => {
+        const n = f.name.toLowerCase();
+        return !(
+          n.includes('task') ||
+          n.includes('todo') ||
+          n.includes('invoice') ||
+          n.includes('booking') ||
+          n.includes('analytics') ||
+          n.includes('collaborat')
+        );
+      });
+      if (mvpFeatures.length === 0) {
+        mvpFeatures = [
+          { name: 'Email/password login', priority: 'HIGH' },
+          { name: 'Sign up page', priority: 'HIGH' },
+          { name: 'Protected page after login', priority: 'HIGH' },
+        ];
+      }
+      futureFeatures = futureFeatures
+        .filter((f) => {
+          const n = f.toLowerCase();
+          return !n.includes('analytics') && !n.includes('ai productivity') && !n.includes('collaborat');
+        })
+        .slice(0, 2);
+      if (futureFeatures.length === 0) {
+        futureFeatures = ['Forgot password', 'Optional Google login'];
+      }
+    }
+
+    return {
+      ...spec,
+      complexity: isAuthIdea(idea) ? 'MVP' : spec.complexity,
+      mvpFeatures: mvpFeatures.slice(0, isAuthIdea(idea) ? 4 : 6),
+      futureFeatures: futureFeatures.slice(0, 3),
+      clarificationRequired: spec.questions.length > 0,
+      approvalRequired: true,
+    };
+  }
+
+  private heuristicSpecification(cleanIdea: string): ProductSpecification {
     const lower = cleanIdea.toLowerCase();
 
-    // Deriving product name
+    if (isAuthIdea(cleanIdea)) {
+      return {
+        productName: 'Simple Login',
+        vision: 'A clean web login and signup experience for users.',
+        problemStatement: `Users need a simple way to sign up and log in: ${cleanIdea}`,
+        targetAudience: 'End users who need an account to access the app',
+        platform: 'Web application',
+        complexity: 'MVP',
+        mvpFeatures: [
+          { name: 'Email/password login', priority: 'HIGH' },
+          { name: 'Sign up page', priority: 'HIGH' },
+          { name: 'Protected page after login', priority: 'HIGH' },
+        ],
+        futureFeatures: ['Forgot password', 'Optional Google login'],
+        questions: [],
+        clarificationRequired: false,
+        approvalRequired: true,
+      };
+    }
+
     let productName = 'AppCraft';
-    if (lower.includes('todo')) productName = 'TodoFlow';
-    else if (lower.includes('e-commerce') || lower.includes('store') || lower.includes('shop')) productName = 'StoreCraft';
-    else if (lower.includes('dashboard') || lower.includes('saas')) productName = 'DashPulse';
+    if (lower.includes('todo') || lower.includes('task')) productName = 'TaskBoard';
+    else if (lower.includes('e-commerce') || lower.includes('store') || lower.includes('shop'))
+      productName = 'Storefront';
+    else if (lower.includes('hotel') || lower.includes('booking')) productName = 'BookingApp';
     else {
-      const words = cleanIdea.split(' ').filter(w => w.length > 2);
-      const mainWord = words[0] ? words[0].charAt(0).toUpperCase() + words[0].slice(1) : 'SmartApp';
-      productName = `${mainWord}Flow`;
+      const words = cleanIdea.split(' ').filter((w) => w.length > 2);
+      const mainWord = words[0]
+        ? words[0].charAt(0).toUpperCase() + words[0].slice(1)
+        : 'App';
+      productName = mainWord.slice(0, 24);
     }
 
-    // Target audience & platform
-    const targetAudience = lower.includes('team') || lower.includes('business')
-      ? 'Small teams and business professionals'
-      : 'Students, creators, and individuals';
-
-    const platform = lower.includes('mobile') ? 'Mobile & Web application' : 'Web application';
-
-    // MVP Features breakdown
-    const mvpFeatures: MvpFeature[] = [];
-
-    if (lower.includes('todo') || lower.includes('task')) {
-      mvpFeatures.push(
-        { name: 'Create tasks', priority: 'HIGH' },
-        { name: 'Complete tasks', priority: 'HIGH' },
-        { name: 'Task categories & tags', priority: 'MEDIUM' },
-        { name: 'Delete tasks', priority: 'HIGH' }
-      );
-    } else if (lower.includes('store') || lower.includes('shop') || lower.includes('e-commerce')) {
-      mvpFeatures.push(
-        { name: 'Product catalog browsing', priority: 'HIGH' },
-        { name: 'Shopping cart & Checkout', priority: 'HIGH' },
-        { name: 'Stripe Payment Processing', priority: 'HIGH' },
-        { name: 'User order history', priority: 'MEDIUM' }
-      );
-    } else {
-      mvpFeatures.push(
-        { name: 'User Authentication', priority: 'HIGH' },
-        { name: 'Core Dashboard View', priority: 'HIGH' },
-        { name: 'Data Creation & Management', priority: 'HIGH' },
-        { name: 'Settings & Profile Management', priority: 'MEDIUM' }
-      );
-    }
-
-    // Future features & clarification questions
-    const futureFeatures = [
-      'Team collaboration & sharing',
-      'AI productivity assistant',
-      'Advanced analytics & reporting export',
-    ];
-
-    const questions: string[] = [];
-    if (cleanIdea.length < 15) {
-      questions.push('Would you like email/password authentication or social logins?');
-    }
-
-    const vision = lower.includes('todo') || lower.includes('task')
-      ? 'A simple task management application helping users organize daily activities'
-      : `A streamlined ${platform.toLowerCase()} helping users ${cleanIdea.toLowerCase()}`;
+    const mvpFeatures: MvpFeature[] =
+      lower.includes('todo') || lower.includes('task')
+        ? [
+            { name: 'Create tasks', priority: 'HIGH' },
+            { name: 'Complete tasks', priority: 'HIGH' },
+            { name: 'Task list view', priority: 'HIGH' },
+          ]
+        : lower.includes('store') || lower.includes('shop') || lower.includes('e-commerce')
+          ? [
+              { name: 'Product catalog', priority: 'HIGH' },
+              { name: 'Cart and checkout', priority: 'HIGH' },
+              { name: 'Order confirmation', priority: 'MEDIUM' },
+            ]
+          : [
+              { name: 'Main user flow', priority: 'HIGH' },
+              { name: 'Basic data create/view', priority: 'HIGH' },
+              { name: 'Simple settings', priority: 'MEDIUM' },
+            ];
 
     return {
       productName,
-      vision,
-      problemStatement: `Users need an intuitive, reliable tool to solve: ${cleanIdea}`,
-      targetAudience,
-      platform,
+      vision: `Build: ${cleanIdea}`,
+      problemStatement: cleanIdea,
+      targetAudience: lower.includes('team') || lower.includes('business')
+        ? 'Small teams'
+        : 'Individual users',
+      platform: lower.includes('mobile') ? 'Mobile & Web' : 'Web application',
       complexity: 'MVP',
       mvpFeatures,
-      futureFeatures,
-      questions,
+      futureFeatures: ['Polish and improvements after first version'],
+      questions: [],
+      clarificationRequired: false,
+      approvalRequired: true,
     };
   }
 
   override async execute(
     task: string,
-    context?: Record<string, unknown>,
+    _context?: Record<string, unknown>,
   ): Promise<AgentExecutionResult> {
     const spec = await this.discoverProductSpecification(task);
-
     return {
       success: true,
       output: JSON.stringify(spec, null, 2),

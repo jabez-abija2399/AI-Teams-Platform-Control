@@ -2,6 +2,7 @@ import { generate } from '@/ai/services/ai.service';
 import { extractJson } from '@/ai/utils/extract-json';
 import type { AgentModelConfig } from '../roles/ceo/ceo.config';
 import { loadKnowledgeForAgent } from './knowledge-loader';
+import { composeWorldClassSystemPrompt } from '../excellence/world-class-charter';
 
 const AI_CALL_TIMEOUT = 120_000;
 
@@ -37,6 +38,7 @@ export async function aiCall<T>(
 ): Promise<T> {
   const knowledge = loadKnowledgeForAgent(role);
   const enrichedPrompt = knowledge ? `${knowledge}\n\n${prompt}` : prompt;
+  const worldClassSystem = composeWorldClassSystemPrompt(role, systemPrompt);
   const messages = [{ role: 'user' as const, content: enrichedPrompt }];
   const metadata = { projectId, agentId };
   const errors: string[] = [];
@@ -45,7 +47,7 @@ export async function aiCall<T>(
     try {
       return await tryRoute<T>(
         route.model,
-        systemPrompt,
+        worldClassSystem,
         messages,
         config.temperature,
         config.maxTokens,

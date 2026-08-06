@@ -50,6 +50,7 @@ export class AgentMemoryService {
         content: encoded,
         importance,
       },
+      select: { id: true, agentId: true, content: true, createdAt: true },
     });
 
     return {

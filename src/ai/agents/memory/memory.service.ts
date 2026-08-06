@@ -54,12 +54,21 @@ export async function storeMemory(
 
   if (await dbOk()) {
     try {
+      // Ensure agent row exists — otherwise memories_agentId_fkey fails and can break phases
+      const agent = await prisma.agent.findUnique({ where: { id: record.agentId }, select: { id: true } });
+      if (!agent) {
+        // Fall through to in-memory without flipping _dbOk (DB is fine; agent missing)
+        throw new Error('AGENT_MISSING');
+      }
+
       const created = await prisma.memory.create({
         data: {
           agentId: record.agentId,
           content: encoded,
           importance: record.type === 'episodic' ? 'LOW' : record.type === 'semantic' ? 'MEDIUM' : 'HIGH',
         },
+        // Avoid returning Float[] embedding — adapter-pg can throw e.map is not a function
+        select: { id: true, agentId: true, content: true, createdAt: true },
       });
       const memRecord: MemoryRecord = {
         id: created.id,
@@ -71,8 +80,15 @@ export async function storeMemory(
       };
       inMemoryStore.set(memRecord.id, memRecord);
       return memRecord;
-    } catch {
-      _dbOk = false;
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      if (msg !== 'AGENT_MISSING') {
+        // Real DB failure — cache as down briefly
+        _dbOk = false;
+        setTimeout(() => {
+          _dbOk = null;
+        }, 30_000);
+      }
     }
   }
 

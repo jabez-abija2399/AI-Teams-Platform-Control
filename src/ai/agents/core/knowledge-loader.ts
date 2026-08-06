@@ -33,14 +33,19 @@ function loadDoc(key: DocKey): string {
 }
 
 const KNOWLEDGE_MAP: Record<string, DocKey[]> = {
-  CEO: ['CONSTITUTION', 'MEMORY', 'PRODUCT', 'AI_COMPANY'],
-  ARCHITECT: ['CONSTITUTION', 'ARCHITECTURE', 'DEV_RULES', 'DECISIONS'],
-  PRODUCT_MANAGER: ['CONSTITUTION', 'PRODUCT', 'AI_COMPANY', 'MEMORY'],
-  DEVELOPER: ['CONSTITUTION', 'ARCHITECTURE', 'DEV_RULES', 'AGENT_CONTRACTS', 'ARTIFACTS'],
-  FRONTEND: ['CONSTITUTION', 'DESIGN_SYSTEM', 'DEV_RULES', 'ARTIFACTS'],
-  BACKEND: ['CONSTITUTION', 'ARCHITECTURE', 'DEV_RULES', 'DECISIONS'],
-  DATABASE: ['CONSTITUTION', 'ARCHITECTURE', 'DEV_RULES'],
+  CEO: ['CONSTITUTION', 'MEMORY', 'PRODUCT', 'AI_COMPANY', 'QUALITY_STANDARD'],
+  PRODUCT_MANAGER: ['CONSTITUTION', 'PRODUCT', 'AI_COMPANY', 'MEMORY', 'QUALITY_STANDARD'],
+  PRODUCT_DISCOVERY: ['CONSTITUTION', 'PRODUCT', 'AI_COMPANY', 'QUALITY_STANDARD'],
+  BUSINESS_ANALYST: ['CONSTITUTION', 'PRODUCT', 'ARTIFACTS', 'QUALITY_STANDARD'],
+  UI_DESIGNER: ['CONSTITUTION', 'DESIGN_SYSTEM', 'PRODUCT', 'QUALITY_STANDARD'],
+  ARCHITECT: ['CONSTITUTION', 'ARCHITECTURE', 'DEV_RULES', 'DECISIONS', 'QUALITY_STANDARD'],
+  DEVELOPER: ['CONSTITUTION', 'ARCHITECTURE', 'DEV_RULES', 'AGENT_CONTRACTS', 'ARTIFACTS', 'QUALITY_STANDARD'],
+  FRONTEND: ['CONSTITUTION', 'DESIGN_SYSTEM', 'DEV_RULES', 'ARTIFACTS', 'QUALITY_STANDARD'],
+  BACKEND: ['CONSTITUTION', 'ARCHITECTURE', 'DEV_RULES', 'DECISIONS', 'QUALITY_STANDARD'],
+  DATABASE: ['CONSTITUTION', 'ARCHITECTURE', 'DEV_RULES', 'QUALITY_STANDARD'],
   QA: ['CONSTITUTION', 'DEV_RULES', 'ARTIFACTS', 'QUALITY_STANDARD'],
+  SECURITY: ['CONSTITUTION', 'DEV_RULES', 'QUALITY_STANDARD', 'AGENT_CONTRACTS'],
+  DEVOPS: ['CONSTITUTION', 'ARCHITECTURE', 'DEV_RULES', 'QUALITY_STANDARD'],
   REVIEWER: ['CONSTITUTION', 'QUALITY_STANDARD', 'DEV_RULES'],
   ARCHITECTURE_REVIEWER: ['CONSTITUTION', 'ARCHITECTURE', 'DECISIONS', 'QUALITY_STANDARD'],
   CODE_REVIEWER: ['CONSTITUTION', 'DEV_RULES', 'QUALITY_STANDARD', 'AGENT_CONTRACTS'],
@@ -49,37 +54,48 @@ const KNOWLEDGE_MAP: Record<string, DocKey[]> = {
 
 const DOMAIN_KNOWLEDGE_SNIPPETS: Record<string, string> = {
   CEO: `## Executive Strategy & Product Vision Guidelines
-- Maintain alignment with core project constitution and strategic goals.
-- Prioritize market fit, user value, and long-term architectural health.`,
+- Outperform a senior product executive: one-sentence goal restatement, ruthless MVP cuts, explicit stack constraints.
+- Prioritize market fit, user value, and long-term health — never invent stacks the user rejected.`,
+  PRODUCT_MANAGER: `## Product Management Guidelines
+- INVEST stories with testable acceptance criteria; map 1:1 to Discovery MVP.
+- Explicit out-of-scope list; forward HTML/CSS / no-backend constraints into every feature spec.`,
+  PRODUCT_DISCOVERY: `## Product Discovery Guidelines
+- Match requested scope exactly (auth-only stays auth-only). Max 4 MVP features for simple ideas.`,
+  BUSINESS_ANALYST: `## Business Analysis Guidelines
+- Specs must be unambiguous and testable. Trace Story → Spec → Test. Edge cases are mandatory.`,
+  UI_DESIGNER: `## UI Design Guidelines
+- Yacht Club tokens (#F2F0EF, #245F73, #733E24). Screens match stack (static → login/signup/home HTML pages).
+- Accessibility: labels, focus rings, contrast — no generic purple AI kits.`,
+  ARCHITECT: `## Architecture Guidelines
+- User constraints beat aesthetics. Explicit Frontend / Backend / Database — use "None" when forbidden.
+- No cargo-cult microservices for a static login page.`,
   DEVELOPER: `## Software Development & Implementation Guidelines
-- Write clean, modular, strict TypeScript code adhering to SOLID principles.
-- Handle all error states and edge cases systematically.`,
+- Code matches approved architecture file-for-file. Static stack → real .html/.css, not Next "equivalents".
+- Clean, accessible markup; handle edge cases; never ship dead framework configs.`,
   FRONTEND: `## Specialized Frontend Engineering Guidelines
-- Always use React 19 / Next.js best practices (Server Components by default, Client Components only when state/interactivity required).
-- Enforce Vanilla CSS or Tailwind CSS tokens from the design system; avoid arbitrary magic values.
-- Accessibility: Ensure proper aria labels, keyboard focus trapping for modals, and WCAG 2.1 AA color contrast.
-- Performance: Prevent layout shifts (CLS), optimize images, and avoid unnecessary re-renders.`,
+- Match approved architecture first (static HTML/CSS when required; React/Next only when architecture says so).
+- Design-system tokens; WCAG 2.1 AA contrast; keyboard focus; no layout thrash.`,
   BACKEND: `## Specialized Backend Engineering Guidelines
-- API Security: Validate all incoming request headers, queries, and bodies using Zod schemas.
-- Error Handling: Return standard error JSON structures with appropriate HTTP status codes (400, 401, 403, 404, 500).
-- Authentication: Verify session tokens and enforce role-based access control (RBAC) before executing business logic.
-- Performance: Implement pagination on list endpoints and avoid N+1 database queries.`,
+- Only when architecture includes a backend. Zod validation, RBAC, standard error JSON, pagination.
+- If architecture says backend None — do not invent APIs.`,
   DATABASE: `## Specialized Database & ORM Guidelines
-- Schema Modeling: Define relational fields with explicit cardinality and CASCADE/SET NULL delete behaviors.
-- Indexing: Ensure all foreign key columns and frequently queried fields (e.g., email, slug, status) have indexes.
-- Migrations: Never drop columns or tables containing production data without multi-phase migration safety steps.`,
+- Only when architecture includes a database. Indexed FKs, clear cardinality, safe migrations.
+- If architecture says database None — skip schema entirely.`,
+  QA: `## QA Guidelines
+- Tests match the real stack (static → HTML checklist; not Jest for no-JS apps).
+- Risk-based coverage; call out intentional gaps.`,
+  SECURITY: `## Security Guidelines
+- Threat model matches reality (static demo ≠ invent bcrypt/session theater).
+- Honest risk scores; clear remediation owners.`,
+  DEVOPS: `## DevOps Guidelines
+- Preview-first; production deploy is always user-triggered.
+- Static → nginx / static host; never force Node+Postgres onto static HTML.`,
   ARCHITECTURE_REVIEWER: `## Architecture Review Focus Areas
-- Scalability: Verify if the system can scale to 10x load without a rewrite.
-- Security Boundary: Check for proper separation between client and server; ensure secrets are never exposed.
-- Maintainability: Prefer standard, well-tested architectural patterns over clever or complex custom frameworks.`,
+- Fail stack mismatches and invented backends. Prefer maintainable patterns over clever frameworks.`,
   CODE_REVIEWER: `## Code Review Focus Areas
-- Strict TypeScript: Reject any use of 'any', unchecked type casts, or non-null assertions ('!') without explicit justification.
-- SOLID Principles: Check that functions and components have a single responsibility.
-- Async Safety: Ensure all promises are handled and errors are caught in async/await blocks.`,
+- Reject stack contradictions and untyped shortcuts without justification. Single responsibility. Async safety.`,
   QUALITY_REVIEWER: `## Quality & UX Review Focus Areas
-- Acceptance Criteria: Verify that every single user story acceptance criterion is met.
-- UX Friction: Check for missing empty states, unclear error messages, or confusing user flows.
-- PRD Fidelity: Ensure the deliverables match the original CEO and PM specifications without scope creep or omission.`,
+- Acceptance criteria fidelity. UX friction (empty/error states). No scope creep vs CEO/PM specs.`,
 };
 
 export function loadKnowledgeForAgent(role: string): string {
