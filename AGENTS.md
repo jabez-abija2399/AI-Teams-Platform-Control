@@ -2,7 +2,7 @@
 
 All AI agents must read:
 
-`.opencode/instructions.md`
+`doc/project-docs/01_PROJECT_MEMORY.md`
 
 before performing any work.
 
@@ -31,7 +31,9 @@ doc/project-docs/
 ├── 09_DEVELOPMENT_RULES.md       # Engineering standards
 ├── 10_ROADMAP.md                 # Project roadmap
 ├── 11_DECISION_LOG.md            # Architecture decisions
-└── 12_CURRENT_TASK.md            # Active work context
+├── 12_CURRENT_TASK.md            # Active work context
+├── 13_AGENT_EXCELLENCE_PLAN.md   # Per-agent quality plan
+└── 14_AGENT_QUALITY_STANDARD.md  # Better-than-hire quality bar
 ```
 
 
@@ -41,7 +43,7 @@ doc/project-docs/
 
 **Architecture questions:** Read `03_ARCHITECTURE.md`
 
-**Agent behavior:** Read `07_AGENT_CONTRACTS.md`
+**Agent behavior:** Read `07_AGENT_CONTRACTS.md`, `13_AGENT_EXCELLENCE_PLAN.md`, and `14_AGENT_QUALITY_STANDARD.md`
 
 **Code standards:** Read `09_DEVELOPMENT_RULES.md`
 

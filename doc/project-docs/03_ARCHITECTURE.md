@@ -472,21 +472,13 @@ Deployment Engine
 
 ```
 src/
-  app/
-  components/
-  modules/
-    users/
-    projects/
-    agents/
-    workflows/
-    artifacts/
-    memory/
-  lib/
-    database/
-    ai/
-    utils/
-  prisma/
-  docs/
+  app/           # Next.js App Router (API routes, middleware, pages)
+  core/          # Domain logic (orchestration, state machines, event bus)
+  features/      # Feature modules (auth, deployment, projects, etc.)
+  lib/           # Shared utilities (auth, encryption, rate-limit, redis, middleware)
+  workers/       # BullMQ workers
+  prisma/        # Prisma schema and generated client
+  tests/         # Unit and integration tests
 ```
 
 
@@ -507,4 +499,36 @@ Always:
 - Create clear boundaries.
 - Document decisions.
 - Reuse existing systems.
+
+
+# 11. Security Infrastructure
+
+
+## Authentication & Authorization
+
+- **NextAuth** with Prisma adapter and JWT session strategy
+- **Project-scoped access control** via Next.js middleware (`src/app/middleware.ts`)
+- **CSRF protection** for all state-mutating API routes (POST/PUT/PATCH/DELETE)
+- **Password hashing** with bcrypt (cost factor 12)
+
+
+## Data Protection
+
+- **AES-256-GCM encryption** for sensitive fields (e.g., `GitIntegration.accessToken`)
+- Encryption key stored in `ENCRYPTION_KEY` environment variable
+- Utility: `src/lib/encryption.ts`
+
+
+## Rate Limiting
+
+- Per-user/IP scoped rate limiting via `src/lib/rate-limit.ts`
+- LRU cache with configurable limits and TTL
+- Applied to all API routes through middleware
+
+
+## Session & Cache Management
+
+- **Redis** for BullMQ queue management and caching
+- Graceful disconnect on SIGTERM/SIGINT via `src/lib/redis.ts`
+- Singleton connection with global caching in development
 

@@ -82,18 +82,9 @@ Each module must be self-contained.
 
 All code must be fully typed.
 
-Never use:
+Avoid `any` types. Use explicit interfaces, union types, or `unknown` with type narrowing instead.
 
-- `any`
-- Implicit types
-- Type assertions without validation
-
-
-Always use:
-
-- Explicit interfaces
-- Zod schemas for validation
-- Strict TypeScript configuration
+When `any` is unavoidable (e.g., external library callbacks), add `// eslint-disable-next-line @typescript-eslint/no-explicit-any` with a comment explaining why.
 
 
 
@@ -167,10 +158,18 @@ Every feature requires:
 Test structure:
 
 ```
-__tests__/
-  service.test.ts
-  integration.test.ts
+tests/
+  lib/
+    rate-limit.test.ts
+  features/
+    auth/
+      auth.test.ts
+  api/
+    projects/
+      project-access.test.ts
 ```
+
+Aim for minimum 80% coverage on new code.
 
 
 

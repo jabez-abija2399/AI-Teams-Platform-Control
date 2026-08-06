@@ -83,9 +83,9 @@ Prisma
 
 ## Authentication
 
-Planned:
+Implemented:
 
-NextAuth / Auth solution
+NextAuth with Prisma adapter, JWT session strategy, credentials provider with bcrypt password hashing.
 
 
 # Main Modules

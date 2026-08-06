@@ -9,7 +9,7 @@ Version:
 
 Last Updated:
 
-2026-07-25
+2026-08-06
 
 
 # Active Task
@@ -17,177 +17,44 @@ Last Updated:
 
 Task Name:
 
-Integration Sprint 1 — Connecting Autonomous Company Pipeline
+Step-by-step: Verify → DB → React scaffold
 
 
 Status:
 
-In Progress
+Completed
 
 
-# Objective
+# Results
 
 
-Connect all existing engines into one autonomous company pipeline.
+## Step 1 — Verify HTML/CSS path
 
-The individual agents and engines exist but are NOT wired together.
-
-Integration Sprint 1 connects:
-
-1. Product Discovery → Clarification → Proposal → Approval
-2. Replace hardcoded Executive Planning with real ExecutivePlanner
-3. Wire Capability Matching before agent dispatch
-4. Wire Context Injection before agent execution
-5. Wire Review Committee after QA
-6. Fix CREATED state loop
-7. Verify Resume logic from all paused states
-8. Build full E2E test (ExpenseFlow)
-9. Mission Control live sync
-10. Final integration audit
+- Added `tests/project-stack/step1-html-css-path.test.ts` — **5/5 passed**
+- Default/recommended stack = `static-html`
+- Heuristic emits login/signup/home without Next/React
 
 
-# Context
+## Step 2 — Fix DB
+
+- Root cause: TCP password in `.env` invalid; peer auth via unix socket works
+- Set `DATABASE_URL` to socket form: `postgresql://jabez@localhost:5432/ai_teams_platform?host=/var/run/postgresql`
+- Applied `prisma/manual/add_file_review_columns.sql` → `reviewStatus` + `previousContent` on `files`
+- DB connect verified (`FILES_COUNT` readable)
+- Skipped full `prisma db push --accept-data-loss` (would recreate workflow array columns); app already uses jsonb-safe helpers
 
 
-All individual components exist:
+## Step 3 — React/Vite scaffold
 
-- 21 agent roles implemented
-- CompanyPipelineEngine with 12 phases
-- ClarificationEngine, ProductProposalEngine, ExecutivePlanner
-- AgentCapabilityEngine, ContextInjectorService
-- ReviewCommittee, HandoffManager, ApprovalManager
-- ArtifactManager, WorkflowManager
-
-But they are NOT connected into one autonomous pipeline.
-
-Integration Sprint 1 fixes this.
+- Added `react-vite-scaffold.ts` (Vite + App + Yacht Club styles)
+- `buildHeuristicImplementation` branches on `react-vite` / confirmed React
+- Confirmed React maps to `DeliveryStack: react-vite` (not Next)
+- Tests: `tests/project-stack/step3-react-vite.test.ts`
 
 
-# Related Documentation
+# How to verify in UI
 
 
-Before working read:
-
-
-- 00_PROJECT_CONSTITUTION.md
-- 01_PROJECT_MEMORY.md
-- 03_ARCHITECTURE.md
-- 07_AGENT_CONTRACTS.md
-- 47_E2E_WORKFLOW_AUDIT.md
-- 48_INTEGRATION_SPRINT_1.md
-
-
-# Assigned Agent
-
-
-Role:
-
-CTO / Principal Architect
-
-
-# Changes Made
-
-
-## Files Created
-
-```
-AI_TEAMS_PLATFORM_COMPLETE_AUDIT/
-├── 01_COMPLETE_SYSTEM_UNDERSTANDING.md     (1,074 lines, 49KB)
-├── 02_AI_COMPANY_OPERATING_MODEL.md        (713 lines, 32KB)
-└── 03_TRANSFORMATION_AND_EXECUTION_PLAN.md (716 lines, 30KB)
-```
-
-
-## Files Updated
-
-```
-08_PROJECT_MEMORY.md — Added audit findings, maturity scores, transformation direction
-```
-
-
-## Files Created (project-docs)
-
-```
-ai-teams-platform/doc/project-docs/
-├── 00_PROJECT_CONSTITUTION.md
-├── 01_PROJECT_MEMORY.md
-├── 02_PRODUCT.md
-├── 03_ARCHITECTURE.md
-├── 04_AI_COMPANY.md
-├── 05_WORKFLOWS.md
-├── 06_ARTIFACT_SYSTEM.md
-├── 07_AGENT_CONTRACTS.md
-├── 08_DESIGN_SYSTEM.md
-├── 09_DEVELOPMENT_RULES.md
-├── 10_ROADMAP.md
-├── 11_DECISION_LOG.md
-└── 12_CURRENT_TASK.md
-```
-
-
-# Key Findings
-
-
-## Overall Maturity Score: 5.3/10
-
-
-| Category | Score |
-|----------|-------|
-| Product | 6/10 |
-| Architecture | 7/10 |
-| Database | 7/10 |
-| AI | 7/10 |
-| Agents | 5/10 |
-| Workflow | 5/10 |
-| Memory | 3/10 |
-| UI | 6/10 |
-| Security | 4/10 |
-| Testing | 1/10 |
-| Infrastructure | 2/10 |
-
-
-## Critical Gaps
-
-1. Zero automated tests (highest risk)
-2. All state in-memory (not persisted)
-3. No job queue (fire-and-forget)
-4. No inter-agent communication
-5. No OAuth authentication
-6. No RBAC enforcement
-7. No real deployment pipeline
-
-
-# Transformation Plan
-
-
-## 5 Phases
-
-1. **Phase 1 — Foundation Hardening** (3-4 weeks): Persist state, add tests, BullMQ queue
-2. **Phase 2 — AI Employee Organization** (4-6 weeks): Complete agents, communication, tools
-3. **Phase 3 — Workflow Engine** (3-4 weeks): DAG workflows, approvals, failure handling
-4. **Phase 4 — Mission Control** (3-4 weeks): Company dashboard, cost tracking, approvals
-5. **Phase 5 — Autonomous AI Company** (6-8 weeks): Full autonomous execution and deployment
-
-
-# Verification
-
-
-- [x] All source files analyzed
-- [x] Database schema documented
-- [x] AI system architecture mapped
-- [x] Maturity scores assigned
-- [x] Transformation phases defined
-- [x] Project memory updated
-
-
-# Next Recommended Step
-
-
-Begin Phase 1: Foundation Hardening
-
-1. Write integration tests
-2. Persist workflow state to PostgreSQL
-3. Persist memory to PostgreSQL
-4. Add BullMQ + Redis job queue
-5. Add structured logging
-
+1. Create project with HTML/CSS → Studio Preview Fast → pages show, no stack ask  
+2. Create project with React → Development/ensure → `vite.config.ts` + `src/App.tsx` in Explorer  
+3. Preview Fast = instant · Full = Vite WebContainer  
