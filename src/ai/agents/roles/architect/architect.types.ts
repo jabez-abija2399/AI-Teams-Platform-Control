@@ -69,5 +69,42 @@ export const architectAnalysisSchema = z.object({
   api: apiSpecificationSchema,
   decisions: z.array(technologyDecisionSchema).default([]),
   qualityScore: qualityScoreSchema.optional(),
+  /** Full intended folder/file tree for Developer */
+  fileStructure: z
+    .array(
+      z.object({
+        path: smartString,
+        type: z.enum(['file', 'folder']).default('file'),
+        description: smartString.default(''),
+        layer: smartString.optional(),
+      }),
+    )
+    .default([]),
+  /** Ordered implementation todos — Developer must finish these before QA */
+  implementationTodos: z
+    .array(
+      z.object({
+        id: smartString,
+        title: smartString,
+        description: smartString.default(''),
+        files: z.array(smartString).default([]),
+        status: z.enum(['pending', 'in_progress', 'done', 'failed']).default('pending'),
+        dependsOn: z.array(smartString).default([]),
+        layer: smartString.optional(),
+      }),
+    )
+    .default([]),
+  /** Optional QA checklist derived from architecture */
+  qaTodos: z
+    .array(
+      z.object({
+        id: smartString,
+        title: smartString,
+        description: smartString.default(''),
+        relatedFiles: z.array(smartString).default([]),
+        status: z.enum(['pending', 'in_progress', 'done', 'failed']).default('pending'),
+      }),
+    )
+    .default([]),
 });
 export type ArchitectAnalysis = z.infer<typeof architectAnalysisSchema>;

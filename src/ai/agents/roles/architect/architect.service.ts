@@ -15,8 +15,24 @@ import type { ApiResult } from '@/types/common.types';
 import { wantsHtmlCssStack, wantsStaticNoBackend } from '@/core/company-orchestration/revision-feedback';
 import { resolveStackFromMemory } from '@/core/memory/persist-stack-constraints';
 import type { StackIntent } from '@/core/company-orchestration/stack-intent';
+import { buildDeliveryPlanForStack } from '@/core/company-orchestration/architecture-delivery-plan';
+import { persistDeliveryPlan } from '@/core/company-orchestration/implementation-todo.store';
 
 export { wantsHtmlCssStack, wantsStaticNoBackend };
+
+function withDeliveryPlan(
+  analysis: ArchitectAnalysis,
+  title: string,
+  stack?: Pick<StackIntent, 'htmlCss' | 'staticNoBackend' | 'stack'> | null,
+): ArchitectAnalysis {
+  const plan = buildDeliveryPlanForStack(title, stack);
+  return architectAnalysisSchema.parse({
+    ...analysis,
+    fileStructure: plan.fileStructure,
+    implementationTodos: plan.implementationTodos,
+    qaTodos: plan.qaTodos,
+  });
+}
 
 async function getOrCreateArchitectAgentId(): Promise<string> {
   const existing = await prisma.agent.findFirst({ where: { role: 'ARCHITECT' } });
@@ -315,24 +331,28 @@ export function buildHeuristicArchitecture(
     : buildDefaultArchitecture(title, isAuth);
 
   const trimmed = feedback?.trim();
-  if (!trimmed) return base;
+  if (!trimmed) return withDeliveryPlan(base, title, stack);
 
-  return {
-    ...base,
-    revisionNote: trimmed,
-    architecture: {
-      ...base.architecture,
-    },
-    decisions: [
-      {
-        technology: htmlCss ? 'HTML + CSS (per your saved stack)' : 'User revision',
-        reason: trimmed,
-        alternative: htmlCss ? 'Next.js' : 'Previous draft',
-        tradeoff: 'Architecture regenerated to match your comments',
+  return withDeliveryPlan(
+    {
+      ...base,
+      revisionNote: trimmed,
+      architecture: {
+        ...base.architecture,
       },
-      ...base.decisions.filter((d) => !(htmlCss && d.technology.toLowerCase().includes('next'))),
-    ],
-  } as ArchitectAnalysis & { revisionNote?: string };
+      decisions: [
+        {
+          technology: htmlCss ? 'HTML + CSS (per your saved stack)' : 'User revision',
+          reason: trimmed,
+          alternative: htmlCss ? 'Next.js' : 'Previous draft',
+          tradeoff: 'Architecture regenerated to match your comments',
+        },
+        ...base.decisions.filter((d) => !(htmlCss && d.technology.toLowerCase().includes('next'))),
+      ],
+    } as ArchitectAnalysis & { revisionNote?: string },
+    title,
+    stack,
+  );
 }
 
 async function persistArchitecture(
@@ -376,6 +396,17 @@ async function persistArchitecture(
       metadata: { projectId },
     }),
   ]);
+
+  // Persist folder tree + implementation/QA todos for Developer & Mission Control
+  if (analysis.fileStructure?.length || analysis.implementationTodos?.length) {
+    await persistDeliveryPlan(projectId, {
+      fileStructure: analysis.fileStructure || [],
+      implementationTodos: analysis.implementationTodos || [],
+      qaTodos: analysis.qaTodos || [],
+    }).catch((err) =>
+      console.warn('[Architect] persistDeliveryPlan failed:', err),
+    );
+  }
 }
 
 export async function designArchitecture(

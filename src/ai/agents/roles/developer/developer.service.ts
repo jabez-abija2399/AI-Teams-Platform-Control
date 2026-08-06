@@ -17,6 +17,16 @@ import {
 import { buildStaticHtmlCssFiles } from './static-html-scaffold';
 import { buildReactViteFiles } from './react-vite-scaffold';
 import { scoreAgentDeliverable } from '@/ai/agents/excellence/output-quality';
+import {
+  buildDeliveryPlanForStack,
+  type ImplementationTodo,
+  todosAllDone,
+} from '@/core/company-orchestration/architecture-delivery-plan';
+import {
+  loadDeliveryPlan,
+  persistDeliveryPlan,
+  updateImplementationTodos,
+} from '@/core/company-orchestration/implementation-todo.store';
 
 const MAX_RETRIES_PER_TASK = 3;
 
@@ -588,12 +598,225 @@ async function executeWithRetry(
   }
 }
 
+// ── Todo-driven implementation (Architect file tree → Developer todos) ──
+
+function extractTitleFromArch(architecture: unknown): string {
+  const arch = architecture && typeof architecture === 'object'
+    ? (architecture as Record<string, unknown>)
+    : {};
+  return (
+    (typeof arch.title === 'string' && arch.title) ||
+    (typeof arch.projectName === 'string' && arch.projectName) ||
+    'Application'
+  );
+}
+
+/**
+ * Prefer Architect's implementationTodos + fileStructure.
+ * Creates each todo's files, marks todo done, then hands off to QA only when all done.
+ */
+export async function implementFromArchitectureTodos(
+  projectId: string,
+  architecture: ArchitectAnalysis,
+  stack?: {
+    htmlCss?: boolean;
+    staticNoBackend?: boolean;
+    stack?: string;
+    label?: string;
+  } | null,
+  revisionFeedback?: string,
+): Promise<ApiResult<DeveloperOutput>> {
+  let plan =
+    architecture.implementationTodos?.length
+      ? {
+          fileStructure: architecture.fileStructure || [],
+          implementationTodos: architecture.implementationTodos.map((t) => ({
+            ...t,
+            status: t.status === 'done' ? ('pending' as const) : t.status,
+          })),
+          qaTodos: architecture.qaTodos || [],
+        }
+      : await loadDeliveryPlan(projectId);
+
+  if (!plan?.implementationTodos?.length) {
+    const title = extractTitleFromArch(architecture);
+    plan = buildDeliveryPlanForStack(title, stack);
+  }
+
+  // Reset todos to pending for a fresh Development run
+  plan = {
+    ...plan,
+    implementationTodos: plan.implementationTodos.map((t) => ({
+      ...t,
+      status: 'pending' as const,
+    })),
+  };
+  await persistDeliveryPlan(projectId, plan);
+
+  const heuristic = buildHeuristicImplementation(architecture, revisionFeedback, stack);
+  const fileMap = new Map(heuristic.changes.map((c) => [c.file.replace(/^\.\//, ''), c]));
+
+  const todos: ImplementationTodo[] = [...plan.implementationTodos];
+  const allChanges: CodeChange[] = [];
+  const generatedFiles: string[] = [];
+
+  await pulseGenerationHeartbeat(projectId, {
+    message: `Developer starting ${todos.length} architecture todos…`,
+    phase: 'DEVELOPMENT_RUNNING',
+    department: 'Software Engineering',
+  });
+
+  for (let i = 0; i < todos.length; i++) {
+    const todo = todos[i]!;
+    todo.status = 'in_progress';
+    await updateImplementationTodos(projectId, todos, plan.qaTodos);
+
+    await pulseGenerationHeartbeat(projectId, {
+      message: `Todo ${i + 1}/${todos.length}: ${todo.title}`,
+      phase: 'DEVELOPMENT_RUNNING',
+      department: 'Software Engineering',
+    });
+
+    const todoChanges: CodeChange[] = [];
+    for (const path of todo.files) {
+      const key = path.replace(/^\.\//, '');
+      const existing = fileMap.get(key);
+      if (existing) {
+        todoChanges.push(existing);
+      } else {
+        // Minimal stub so the path exists — Architect described it; Developer fills it
+        const layerNote = plan.fileStructure.find((f) => f.path === key)?.description || todo.description;
+        todoChanges.push({
+          file: key,
+          changeType: 'CREATE',
+          description: todo.title,
+          code: key.endsWith('.md')
+            ? `# ${todo.title}\n\n${layerNote}\n`
+            : key.endsWith('.json')
+              ? '{}\n'
+              : key.endsWith('.css')
+                ? `/* ${todo.title} — ${layerNote} */\n`
+                : key.endsWith('.html')
+                  ? `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${todo.title}</title></head><body><h1>${todo.title}</h1><p>${layerNote}</p></body></html>\n`
+                  : `// ${todo.title}\n// ${layerNote}\nexport {};\n`,
+        });
+      }
+    }
+
+    if (todoChanges.length === 0) {
+      todo.status = 'failed';
+      await updateImplementationTodos(projectId, todos, plan.qaTodos);
+      return {
+        success: false,
+        error: {
+          message: `Todo "${todo.title}" produced no files`,
+          code: 'TODO_EMPTY',
+        },
+      };
+    }
+
+    try {
+      await syncFilesToWorkspace(
+        projectId,
+        todoChanges.map((c) => ({
+          path: c.file,
+          content: c.code,
+          language: getLanguageFromPath(c.file),
+        })),
+      );
+    } catch (err) {
+      todo.status = 'failed';
+      await updateImplementationTodos(projectId, todos, plan.qaTodos);
+      return {
+        success: false,
+        error: {
+          message:
+            err instanceof Error
+              ? `Failed writing files for "${todo.title}": ${err.message}`
+              : `Failed writing files for "${todo.title}"`,
+          code: 'SYNC_FAILED',
+        },
+      };
+    }
+
+    for (const c of todoChanges) {
+      allChanges.push(c);
+      if (!generatedFiles.includes(c.file)) generatedFiles.push(c.file);
+    }
+    todo.status = 'done';
+    await updateImplementationTodos(projectId, todos, plan.qaTodos);
+  }
+
+  if (!todosAllDone(todos)) {
+    return {
+      success: false,
+      error: {
+        message: 'Not all implementation todos are done — cannot move to QA',
+        code: 'TODOS_INCOMPLETE',
+      },
+    };
+  }
+
+  const output = developerOutputSchema.parse({
+    plan: {
+      tasks: todos.map((t) => t.title),
+      files: generatedFiles,
+      dependencies: todos.flatMap((t) => t.dependsOn),
+      implementationOrder: todos.map((t) => t.title),
+    },
+    changes: allChanges,
+    report: {
+      completed: true,
+      changedFiles: generatedFiles,
+      issues: [],
+      notes: `Completed ${todos.length}/${todos.length} architecture todos. Ready for QA.`,
+    },
+  });
+
+  await pulseGenerationHeartbeat(projectId, {
+    message: `All ${todos.length} todos done — handing off to QA`,
+    phase: 'DEVELOPMENT_RUNNING',
+    department: 'Software Engineering',
+  });
+
+  return { success: true, data: output };
+}
+
 // ── Main implementation ────────────────────────────────────────────
 export async function implementArchitecture(
   projectId: string,
   architecture: ArchitectAnalysis,
   requirements?: ProductRequirement,
 ): Promise<ApiResult<DeveloperOutput>> {
+  // Prefer Architect todos → file creation → mark done → QA
+  const hasTodos =
+    (architecture?.implementationTodos && architecture.implementationTodos.length > 0) ||
+    Boolean(await loadDeliveryPlan(projectId));
+
+  if (hasTodos) {
+    try {
+      const { resolveStackFromMemory } = await import(
+        '@/core/memory/persist-stack-constraints'
+      );
+      const stack = await resolveStackFromMemory(projectId, architecture, requirements);
+      const todoRes = await implementFromArchitectureTodos(
+        projectId,
+        architecture,
+        stack,
+      );
+      if (todoRes.success) return todoRes;
+      // Fall through to classic DAG only on soft failure
+      if (
+        todoRes.error?.code === 'BUILD_IN_PROGRESS' ||
+        /402|credit|auth/i.test(todoRes.error?.message || '')
+      ) {
+        return todoRes;
+      }
+    } catch (err) {
+      console.warn('[Developer] todo-driven path failed, falling back:', err);
+    }
+  }
+
   // Never cancel an in-flight build when another caller re-enters (status poll used to
   // restart the pipeline every ~90s and abort the real work → "Build cancelled" loop).
   if (isBuildActive(projectId)) {
@@ -868,6 +1091,9 @@ export async function implementArchitecture(
 
     try {
       await syncFilesToWorkspace(projectId, filesForWorkspace);
+      if (filesForWorkspace.length === 0) {
+        throw new Error('Developer agent produced no files to sync');
+      }
       await aiBuildQueue.add(`build-${projectId}-${Date.now()}`, {
         projectId,
         userPrompt: 'Developer AI Code Build',
@@ -875,6 +1101,18 @@ export async function implementArchitecture(
       });
     } catch (err) {
       console.error('[Developer] Workspace sync or BullMQ enqueue failed:', err);
+      cleanupBuildState(projectId);
+      await prisma.agent.update({ where: { id: agentId }, data: { status: 'IDLE' } }).catch(() => {});
+      return {
+        success: false,
+        error: {
+          message:
+            err instanceof Error
+              ? `Failed to write project files: ${err.message}`
+              : 'Failed to write project files',
+          code: 'SYNC_FAILED',
+        },
+      };
     }
 
     await prisma.agent.update({ where: { id: agentId }, data: { status: 'IDLE' } });
