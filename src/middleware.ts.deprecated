@@ -1,0 +1,5 @@
+/**
+ * @deprecated Next.js 16 uses src/proxy.ts for request interception.
+ * Security middleware is implemented in src/proxy.ts.
+ */
+export {};

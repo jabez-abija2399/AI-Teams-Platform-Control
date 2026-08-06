@@ -8,10 +8,12 @@ export function DashboardLayoutClient({
   children,
   userName,
   userImage,
+  isSuperAdmin = false,
 }: {
   children: React.ReactNode;
   userName: string;
   userImage?: string | null;
+  isSuperAdmin?: boolean;
 }) {
   const pathname = usePathname();
   const isWorkspace = pathname?.includes('/workspace') ?? false;
@@ -22,7 +24,7 @@ export function DashboardLayoutClient({
 
   return (
     <div className="flex h-dvh overflow-hidden bg-background">
-      <Sidebar />
+      <Sidebar isSuperAdmin={isSuperAdmin} />
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <Navbar userName={userName} userImage={userImage} />
         <main className="relative flex-1 overflow-y-auto">

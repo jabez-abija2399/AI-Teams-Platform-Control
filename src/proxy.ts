@@ -6,7 +6,6 @@ const AUTH_ROUTES = ['/login', '/register', '/signup'];
 
 function hasSessionToken(request: NextRequest): boolean {
   return (
-    request.cookies.has('session_token') ||
     request.cookies.has('authjs.session-token') ||
     request.cookies.has('__Secure-authjs.session-token') ||
     request.cookies.has('next-auth.session-token') ||
@@ -16,8 +15,7 @@ function hasSessionToken(request: NextRequest): boolean {
 
 /**
  * Edge-safe proxy: page auth redirects only.
- * Project API ownership/rate-limit checks run in route handlers (Node runtime)
- * via auth() + checkProjectAccess — Prisma cannot run in the Edge proxy.
+ * Project API ownership/rate-limit checks run in route handlers (Node runtime).
  */
 export default function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;

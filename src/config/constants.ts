@@ -8,6 +8,8 @@ export const ROUTES = {
   projects: '/dashboard/projects',
   aiTeams: '/dashboard/ai-teams',
   settings: '/dashboard/settings',
+  admin: '/dashboard/admin',
+  adminUsers: '/dashboard/admin/users',
 } as const;
 
 export const PROJECT_STATUS = {

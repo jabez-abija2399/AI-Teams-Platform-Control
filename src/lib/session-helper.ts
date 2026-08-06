@@ -1,6 +1,5 @@
 import { auth } from '@/lib/auth';
-import { cookies } from 'next/headers';
-import { prisma } from '@/lib/prisma';
+import type { PlatformRole } from '@/lib/platform-admin';
 
 export interface ResolvedAuthSession {
   user: {
@@ -8,14 +7,15 @@ export interface ResolvedAuthSession {
     name?: string | null;
     email?: string | null;
     image?: string | null;
+    platformRole?: PlatformRole;
   };
 }
 
 /**
- * Resolves active user session across NextAuth JWT session and custom session_token HTTP-only cookies.
+ * Resolves the active NextAuth JWT session only.
+ * Custom forgeable session_token cookies are intentionally not trusted.
  */
 export async function getAuthSession(): Promise<ResolvedAuthSession | null> {
-  // 1. Try NextAuth session
   try {
     const session = await auth();
     if (session?.user?.id) {
@@ -25,38 +25,12 @@ export async function getAuthSession(): Promise<ResolvedAuthSession | null> {
           name: session.user.name || 'User',
           email: session.user.email,
           image: session.user.image,
+          platformRole: session.user.platformRole,
         },
       };
     }
-  } catch {}
-
-  // 2. Try custom HTTP-only session cookie
-  try {
-    const cookieStore = await cookies();
-    const token =
-      cookieStore.get('session_token')?.value ||
-      cookieStore.get('authjs.session-token')?.value ||
-      cookieStore.get('next-auth.session-token')?.value;
-
-    if (token && token.startsWith('sess_')) {
-      const parts = token.split('_');
-      if (parts.length >= 2 && parts[1]) {
-        const userId = parts[1];
-        const dbUser = await prisma.user.findUnique({ where: { id: userId } });
-        if (dbUser) {
-          return {
-            user: {
-              id: dbUser.id,
-              name: dbUser.name,
-              email: dbUser.email,
-              image: dbUser.avatar,
-            },
-          };
-        }
-      }
-    }
-  } catch {}
-
-  // 3. No session found
+  } catch {
+    // invalid / expired session
+  }
   return null;
 }
