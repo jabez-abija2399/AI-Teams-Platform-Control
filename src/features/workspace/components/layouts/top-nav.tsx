@@ -1,56 +1,150 @@
 'use client';
 
-import { Search, ArrowLeft, Sparkles, Folder } from 'lucide-react';
 import Link from 'next/link';
+import {
+  ArrowLeft,
+  Columns2,
+  Command,
+  Eye,
+  Play,
+  Rocket,
+  Search,
+  Sparkles,
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useWorkspaceStore } from '../../stores/workspace.store';
 
-export function TopNav({ projectName, userName }: { projectName: string; userName: string }) {
+export function TopNav({
+  projectName,
+  userName,
+  onBackToMission,
+}: {
+  projectName: string;
+  userName: string;
+  onBackToMission?: () => void;
+}) {
+  const {
+    togglePreviewSplit,
+    layout,
+    setActivity,
+    setPreviewSplit,
+    enterStudioFocus,
+    toggleSimpleMode,
+    simpleMode,
+  } = useWorkspaceStore();
+
+  const openDeploy = () => {
+    setPreviewSplit(false);
+    setActivity('deployment');
+  };
+
+  const runPreview = () => {
+    enterStudioFocus({ activity: 'explorer' });
+    window.dispatchEvent(new CustomEvent('toggle-workspace-preview'));
+  };
+
   return (
-    <div className="flex h-11 shrink-0 items-center justify-between border-b bg-card px-3 text-foreground select-none z-20">
-      <div className="flex items-center gap-3">
-        <Link
-          href="/dashboard/projects"
-          className="p-1 hover:bg-secondary text-muted-foreground hover:text-foreground rounded transition-colors"
-          title="Back to Projects"
-        >
-          <ArrowLeft className="h-4 w-4" />
-        </Link>
+    <header className="z-20 flex h-11 shrink-0 items-center justify-between gap-3 border-b border-border/80 bg-card/95 px-2.5 backdrop-blur-md select-none sm:px-3">
+      <div className="flex min-w-0 items-center gap-1.5 sm:gap-2.5">
+        {onBackToMission ? (
+          <button
+            type="button"
+            onClick={onBackToMission}
+            className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px] font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            title="Back to Mission Control"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Mission</span>
+          </button>
+        ) : (
+          <Link
+            href="/dashboard/projects"
+            className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            title="Back to Projects"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Link>
+        )}
 
-        <div className="flex items-center gap-2">
-          <Folder className="h-4 w-4 text-sky-600 dark:text-sky-400" />
-          <span className="text-xs font-semibold tracking-wide text-foreground">{projectName}</span>
-        </div>
+        <div className="hidden h-4 w-px bg-border sm:block" />
 
-        <div className="flex items-center gap-1.5 px-2 py-0.5 bg-secondary border border-border text-foreground rounded-full text-[11px] font-medium">
-          <Sparkles className="w-3 h-3 text-sky-600 dark:text-sky-400 animate-pulse" />
-          <span>AI Multi-Agent Sync</span>
+        <div className="min-w-0">
+          <div className="flex items-center gap-2">
+            <span className="truncate text-[13px] font-semibold tracking-tight text-foreground">
+              {projectName}
+            </span>
+            <span className="hidden items-center gap-1 rounded border border-primary/20 bg-primary/8 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-primary sm:inline-flex">
+              <Sparkles className="h-2.5 w-2.5" />
+              Studio
+            </span>
+          </div>
         </div>
       </div>
 
-      <button className="hidden w-72 items-center gap-2 rounded-md border border-input bg-background px-3 py-1 text-xs text-muted-foreground hover:border-foreground/20 transition-colors sm:flex">
-        <Search className="h-3.5 w-3.5" />
-        <span>Search or jump to file...</span>
-        <kbd className="ml-auto rounded border bg-muted px-1 py-0.5 text-[9px]">
-          Ctrl+K
+      <button
+        type="button"
+        className="hidden max-w-md flex-1 items-center gap-2 rounded-lg border border-border/80 bg-muted/40 px-3 py-1.5 text-left text-xs text-muted-foreground transition-colors hover:border-primary/25 hover:bg-muted/70 md:flex"
+        title="Search files"
+      >
+        <Search className="h-3.5 w-3.5 shrink-0" />
+        <span className="truncate">Search files…</span>
+        <kbd className="ml-auto inline-flex items-center gap-0.5 rounded border border-border bg-background px-1.5 py-0.5 text-[9px] font-medium text-muted-foreground">
+          <Command className="h-2.5 w-2.5" />K
         </kbd>
       </button>
 
-      <div className="flex items-center gap-2">
+      <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
         <button
-          onClick={() => {
-            const event = new CustomEvent('toggle-workspace-preview');
-            window.dispatchEvent(event);
-          }}
-          className="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-sm"
-          title="Run & View Application Preview"
+          type="button"
+          onClick={() => togglePreviewSplit()}
+          className={cn(
+            'hidden items-center gap-1.5 rounded-md border px-2 py-1 text-[11px] font-medium transition-colors sm:inline-flex',
+            layout.previewSplit
+              ? 'border-primary/30 bg-primary/10 text-primary'
+              : 'border-border bg-background text-muted-foreground hover:text-foreground',
+          )}
+          title="Toggle side Preview"
         >
-          <span>▶ Run & Preview</span>
+          <Columns2 className="h-3.5 w-3.5" />
+          <span className="hidden lg:inline">Split</span>
         </button>
 
-        <span className="text-xs text-muted-foreground font-medium">Developer:</span>
-        <span className="text-xs text-foreground font-semibold px-2 py-0.5 bg-secondary border border-border rounded">
+        <button
+          type="button"
+          onClick={runPreview}
+          className="inline-flex items-center gap-1.5 rounded-md bg-primary px-2.5 py-1 text-[11px] font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
+          title="Run & Preview"
+        >
+          <Play className="h-3 w-3 fill-current" />
+          <span className="hidden sm:inline">Preview</span>
+          <Eye className="h-3 w-3 sm:hidden" />
+        </button>
+
+        <button
+          type="button"
+          onClick={openDeploy}
+          className="inline-flex items-center gap-1.5 rounded-md border border-accent/40 bg-accent/10 px-2.5 py-1 text-[11px] font-semibold text-accent transition-colors hover:bg-accent/15"
+          title="Deploy to production (explicit — never auto)"
+        >
+          <Rocket className="h-3.5 w-3.5" />
+          <span className="hidden sm:inline">Deploy</span>
+        </button>
+
+        <div className="hidden h-4 w-px bg-border lg:block" />
+
+        <button
+          type="button"
+          onClick={toggleSimpleMode}
+          className="hidden rounded-md px-2 py-1 text-[10px] font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground lg:inline"
+          title="Toggle Creator / Developer mode"
+        >
+          {simpleMode ? 'Creator' : 'Developer'}
+        </button>
+
+        <span className="hidden max-w-[100px] truncate rounded-md border border-border bg-muted/50 px-2 py-0.5 text-[10px] font-medium text-foreground xl:inline">
           {userName}
         </span>
       </div>
-    </div>
+    </header>
   );
 }

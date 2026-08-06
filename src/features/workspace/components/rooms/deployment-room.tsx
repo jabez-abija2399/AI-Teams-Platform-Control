@@ -42,8 +42,8 @@ export function DeploymentRoom({ projectId }: { projectId: string }) {
           {/* Center — Deploy steps + artifacts + activity */}
           <div className="col-span-8 space-y-4">
             {/* Deploy Progress */}
-            <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5">
-              <h3 className="text-xs font-semibold text-white mb-4">
+            <div className="rounded-xl border border-border bg-white/[0.02] p-5">
+              <h3 className="text-xs font-semibold text-foreground mb-4">
                 {isComplete ? "Deployment Complete" : "Deployment Progress"}
               </h3>
               <div className="space-y-2">
@@ -52,18 +52,18 @@ export function DeploymentRoom({ projectId }: { projectId: string }) {
                     <div className={cn(
                       "flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold",
                       step.status === "completed" && "bg-emerald-500/20 text-emerald-400",
-                      step.status === "active" && "bg-sky-500/20 text-sky-400 animate-pulse",
-                      step.status === "pending" && "bg-white/[0.05] text-zinc-600"
+                      step.status === "active" && "bg-primary/20 text-primary animate-pulse",
+                      step.status === "pending" && "bg-muted text-muted-foreground"
                     )}>
                       {step.status === "completed" ? "✓" : index + 1}
                     </div>
                     <span className={cn(
                       "text-sm",
-                      step.status === "completed" ? "text-emerald-400" : step.status === "active" ? "text-white" : "text-zinc-600"
+                      step.status === "completed" ? "text-emerald-400" : step.status === "active" ? "text-foreground" : "text-muted-foreground"
                     )}>
                       {step.name}
                     </span>
-                    {step.status === "active" && <div className="ml-auto h-1.5 w-1.5 rounded-full bg-sky-400 animate-pulse" />}
+                    {step.status === "active" && <div className="ml-auto h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />}
                   </div>
                 ))}
               </div>
@@ -83,7 +83,7 @@ export function DeploymentRoom({ projectId }: { projectId: string }) {
 
             {state.artifacts.length > 0 && (
               <div>
-                <h3 className="text-[10px] uppercase tracking-wider text-zinc-500 mb-2">Deployment Artifacts</h3>
+                <h3 className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Deployment Artifacts</h3>
                 <div className="space-y-2">
                   {state.artifacts.slice(0, 3).map((artifact) => (
                     <ArtifactCard key={artifact.id} artifact={artifact} />
@@ -93,14 +93,14 @@ export function DeploymentRoom({ projectId }: { projectId: string }) {
             )}
 
             <div>
-              <h3 className="text-[10px] uppercase tracking-wider text-zinc-500 mb-2">Activity Feed</h3>
+              <h3 className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Activity Feed</h3>
               <ActivityFeed items={state.activities} />
             </div>
           </div>
 
           {/* Right — Team */}
           <div className="col-span-4">
-            <h3 className="text-[10px] uppercase tracking-wider text-zinc-500 mb-3">Team</h3>
+            <h3 className="text-[10px] uppercase tracking-wider text-muted-foreground mb-3">Team</h3>
             <AIEmployeeGrid employees={state.employees} />
           </div>
         </div>

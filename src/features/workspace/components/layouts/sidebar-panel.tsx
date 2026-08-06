@@ -25,9 +25,9 @@ export function SidebarPanel({ children }: { children: React.ReactNode }) {
       className="relative flex shrink-0 flex-col border-r bg-card text-card-foreground select-none z-10"
       style={{ width: layout.sidebarWidth }}
     >
-      <div className="flex h-9 items-center justify-between border-b px-3 bg-muted/40">
-        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-foreground">
-          <Icon className="h-3.5 w-3.5 text-sky-600 dark:text-sky-400" />
+      <div className="flex h-9 items-center justify-between border-b border-border/70 bg-muted/30 px-3">
+        <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-foreground">
+          <Icon className="h-3.5 w-3.5 text-primary" />
           <span>{currentActivity?.label || selectedActivity.replace('-', ' ')}</span>
         </div>
         <button

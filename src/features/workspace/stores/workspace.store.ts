@@ -28,8 +28,18 @@ interface WorkspaceState {
   setSidebarWidth: (width: number) => void;
   setAIPanelWidth: (width: number) => void;
   setBottomPanelHeight: (height: number) => void;
+  setPreviewPaneWidth: (width: number) => void;
+  setPreviewSplit: (open: boolean) => void;
+  togglePreviewSplit: () => void;
+  /** Focus Studio for post-pipeline: Explorer + Preview split, technical mode */
+  enterStudioFocus: (opts?: { activity?: ActivityId; openDeploy?: boolean }) => void;
   toggleSimpleMode: () => void;
+  setSimpleMode: (value: boolean) => void;
   completeTour: () => void;
+}
+
+function mergeLayout(partial: Partial<WorkspaceLayoutPrefs>): WorkspaceLayoutPrefs {
+  return { ...DEFAULT_LAYOUT, ...partial };
 }
 
 export const useWorkspaceStore = create<WorkspaceState>()(
@@ -38,11 +48,11 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       currentProjectId: null,
       openTabs: [],
       activeTabId: null,
-      selectedActivity: 'ai-employees',
-      activeBottomPanel: 'terminal',
+      selectedActivity: 'explorer',
+      activeBottomPanel: 'preview',
       activeAgentTab: 'ceo',
       layout: DEFAULT_LAYOUT,
-      simpleMode: true,
+      simpleMode: false,
       tourCompleted: false,
 
       setCurrentProject: (projectId) =>
@@ -95,12 +105,51 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         set((state) => ({ layout: { ...state.layout, aiPanelWidth: width } })),
       setBottomPanelHeight: (height) =>
         set((state) => ({ layout: { ...state.layout, bottomPanelHeight: height } })),
+      setPreviewPaneWidth: (width) =>
+        set((state) => ({ layout: { ...state.layout, previewPaneWidth: width } })),
+      setPreviewSplit: (open) =>
+        set((state) => ({ layout: { ...state.layout, previewSplit: open } })),
+      togglePreviewSplit: () =>
+        set((state) => ({
+          layout: { ...state.layout, previewSplit: !state.layout.previewSplit },
+        })),
+
+      enterStudioFocus: (opts) =>
+        set((state) => ({
+          simpleMode: false,
+          selectedActivity: opts?.openDeploy ? 'deployment' : opts?.activity ?? 'explorer',
+          activeBottomPanel: 'preview',
+          layout: {
+            ...state.layout,
+            previewSplit: !opts?.openDeploy,
+            sidebarCollapsed: false,
+            aiPanelCollapsed: true,
+            bottomPanelCollapsed: true,
+            previewPaneWidth: Math.max(state.layout.previewPaneWidth || 480, 420),
+          },
+        })),
 
       toggleSimpleMode: () =>
         set((state) => ({ simpleMode: !state.simpleMode })),
+      setSimpleMode: (value) => set({ simpleMode: value }),
       completeTour: () =>
         set({ tourCompleted: true }),
     }),
-    { name: 'workspace-layout', partialize: (state) => ({ layout: state.layout, simpleMode: state.simpleMode, tourCompleted: state.tourCompleted }) },
+    {
+      name: 'workspace-layout',
+      partialize: (state) => ({
+        layout: state.layout,
+        simpleMode: state.simpleMode,
+        tourCompleted: state.tourCompleted,
+      }),
+      merge: (persisted, current) => {
+        const p = persisted as Partial<WorkspaceState> | undefined;
+        return {
+          ...current,
+          ...p,
+          layout: mergeLayout(p?.layout ?? {}),
+        };
+      },
+    },
   ),
 );

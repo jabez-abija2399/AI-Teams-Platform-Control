@@ -1,12 +1,9 @@
 import { redirect, notFound } from 'next/navigation';
 import { getAuthSession } from '@/lib/session-helper';
 import { getProject } from '@/features/projects/services/project.service';
-import { WorkspaceShell } from '@/features/workspace/components/workspace-shell';
 import { CommandPaletteProvider } from '@/features/editor';
-import { WorkspaceSidebarContent } from '@/features/workspace/components/workspace-sidebar-content';
 import { ProjectInitializer } from '@/features/workspace/components/project-initializer';
 import { WorkspaceBuildSync } from '@/features/workspace/components/workspace-build-sync';
-import { AssistantChatWrapper } from './assistant-chat-wrapper';
 import { CompanyWorkspaceWrapper } from './company-workspace-wrapper';
 
 export default async function WorkspacePage({

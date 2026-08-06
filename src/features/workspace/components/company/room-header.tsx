@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
 
 export function RoomHeader({
   phaseNumber,
@@ -13,51 +13,57 @@ export function RoomHeader({
   totalPhases: number;
   title: string;
   subtitle?: string;
-  status: "running" | "completed" | "waiting" | "approval";
+  status: 'running' | 'completed' | 'waiting' | 'approval';
 }) {
   return (
-    <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-3">
+    <div className="flex items-center justify-between border-b border-border bg-card/60 px-5 py-3.5">
       <div className="flex items-center gap-3">
         <div
           className={cn(
-            "flex h-8 w-8 items-center justify-center rounded-lg text-xs font-bold",
-            status === "running" && "bg-sky-500/10 text-sky-400",
-            status === "completed" && "bg-emerald-500/10 text-emerald-400",
-            status === "waiting" && "bg-white/[0.05] text-zinc-500",
-            status === "approval" && "bg-amber-500/10 text-amber-400"
+            'flex h-9 w-9 items-center justify-center rounded-xl text-xs font-bold',
+            status === 'running' && 'bg-primary/10 text-primary',
+            status === 'completed' && 'bg-primary/15 text-primary',
+            status === 'waiting' && 'bg-muted text-muted-foreground',
+            status === 'approval' && 'bg-accent/15 text-accent',
           )}
         >
-          {status === "completed" ? "✓" : phaseNumber}
+          {status === 'completed' ? '✓' : phaseNumber}
         </div>
         <div>
-          <h2 className="text-sm font-semibold text-white">{title}</h2>
-          {subtitle && <p className="text-[10px] text-zinc-500">{subtitle}</p>}
+          <h2 className="font-heading text-base font-semibold text-foreground">{title}</h2>
+          {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
         </div>
       </div>
 
       <div className="flex items-center gap-3">
-        <span className="text-[10px] text-zinc-600">
+        <span className="hidden text-xs text-muted-foreground sm:inline">
           Phase {phaseNumber}/{totalPhases}
         </span>
         <div
           className={cn(
-            "flex items-center gap-1.5 rounded-md px-2 py-1 text-[10px] font-medium",
-            status === "running" && "bg-sky-500/10 text-sky-400",
-            status === "completed" && "bg-emerald-500/10 text-emerald-400",
-            status === "waiting" && "bg-white/[0.05] text-zinc-500",
-            status === "approval" && "bg-amber-500/10 text-amber-400"
+            'flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium',
+            status === 'running' && 'bg-primary/10 text-primary',
+            status === 'completed' && 'bg-primary/10 text-primary',
+            status === 'waiting' && 'bg-muted text-muted-foreground',
+            status === 'approval' && 'bg-accent/15 text-accent',
           )}
         >
           <span
             className={cn(
-              "h-1.5 w-1.5 rounded-full",
-              status === "running" && "bg-sky-400 animate-pulse",
-              status === "completed" && "bg-emerald-400",
-              status === "waiting" && "bg-zinc-500",
-              status === "approval" && "bg-amber-400 animate-pulse"
+              'h-1.5 w-1.5 rounded-full',
+              status === 'running' && 'animate-soft-pulse bg-primary',
+              status === 'completed' && 'bg-primary',
+              status === 'waiting' && 'bg-muted-foreground',
+              status === 'approval' && 'animate-soft-pulse bg-accent',
             )}
           />
-          {status === "running" ? "In Progress" : status === "completed" ? "Complete" : status === "waiting" ? "Waiting" : "Approval Required"}
+          {status === 'running'
+            ? 'In Progress'
+            : status === 'completed'
+              ? 'Complete'
+              : status === 'waiting'
+                ? 'Waiting'
+                : 'Needs Approval'}
         </div>
       </div>
     </div>

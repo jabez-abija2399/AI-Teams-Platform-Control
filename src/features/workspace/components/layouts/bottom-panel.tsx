@@ -32,17 +32,17 @@ const PipelineBoard = dynamic(
 );
 
 const TABS: { id: BottomPanelTab; label: string }[] = [
-  { id: 'pipeline', label: 'Pipeline' },
   { id: 'preview', label: 'Preview' },
-  { id: 'review', label: 'Review' },
-  { id: 'performance', label: 'Performance' },
-  { id: 'workflow', label: 'Workflow' },
-  { id: 'database', label: 'Database' },
   { id: 'terminal', label: 'Terminal' },
   { id: 'problems', label: 'Problems' },
   { id: 'output', label: 'Output' },
+  { id: 'pipeline', label: 'Pipeline' },
+  { id: 'review', label: 'Review' },
   { id: 'logs', label: 'Logs' },
   { id: 'tests', label: 'Tests' },
+  { id: 'database', label: 'Database' },
+  { id: 'performance', label: 'Performance' },
+  { id: 'workflow', label: 'Workflow' },
 ];
 
 export function BottomPanel() {

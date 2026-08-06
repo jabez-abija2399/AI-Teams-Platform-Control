@@ -16,12 +16,14 @@ export const ACTIVITY_ITEMS: ActivityItem[] = [
 ];
 
 export const DEFAULT_LAYOUT: WorkspaceLayoutPrefs = {
-  sidebarWidth: 260,
-  aiPanelWidth: 340,
-  bottomPanelHeight: 220,
+  sidebarWidth: 268,
+  aiPanelWidth: 320,
+  bottomPanelHeight: 280,
+  previewPaneWidth: 480,
   sidebarCollapsed: false,
-  aiPanelCollapsed: false,
+  aiPanelCollapsed: true,
   bottomPanelCollapsed: true,
+  previewSplit: true,
 };
 
 export const MIN_PANEL_WIDTH = 180;

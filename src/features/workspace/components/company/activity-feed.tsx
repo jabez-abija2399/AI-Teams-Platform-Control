@@ -13,12 +13,12 @@ export interface ActivityItem {
 }
 
 const typeConfig: Record<ActivityItem["type"], { color: string; icon: string }> = {
-  created: { color: "text-sky-400", icon: "+" },
+  created: { color: "text-primary", icon: "+" },
   reviewed: { color: "text-amber-400", icon: "eye" },
   fixed: { color: "text-emerald-400", icon: "check" },
   deployed: { color: "text-purple-400", icon: "rocket" },
   approved: { color: "text-emerald-400", icon: "thumbs-up" },
-  started: { color: "text-sky-400", icon: "play" },
+  started: { color: "text-primary", icon: "play" },
   completed: { color: "text-emerald-400", icon: "check-circle" },
 };
 
@@ -47,18 +47,18 @@ export function ActivityFeedItem({ item }: { item: ActivityItem }) {
   return (
     <div className="group flex items-start gap-3 py-2.5">
       <div className="relative flex-shrink-0 pt-0.5">
-        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/[0.05] text-sm">
+        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-muted text-sm">
           {item.agentAvatar}
         </div>
         <div
           className={cn(
             "absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full border-2 border-[#09090b]",
-            item.type === "created" && "bg-sky-500",
+            item.type === "created" && "bg-primary",
             item.type === "reviewed" && "bg-amber-500",
             item.type === "fixed" && "bg-emerald-500",
             item.type === "deployed" && "bg-purple-500",
             item.type === "approved" && "bg-emerald-500",
-            item.type === "started" && "bg-sky-500",
+            item.type === "started" && "bg-primary",
             item.type === "completed" && "bg-emerald-500"
           )}
         />
@@ -66,12 +66,12 @@ export function ActivityFeedItem({ item }: { item: ActivityItem }) {
 
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-medium text-white">{item.agentName}</span>
-          <span className="text-[10px] text-zinc-600">{formatTime(item.timestamp)}</span>
+          <span className="text-xs font-medium text-foreground">{item.agentName}</span>
+          <span className="text-[10px] text-muted-foreground">{formatTime(item.timestamp)}</span>
         </div>
-        <p className="mt-0.5 text-xs text-zinc-400">{item.action}</p>
+        <p className="mt-0.5 text-xs text-muted-foreground">{item.action}</p>
         {item.detail && (
-          <p className="mt-0.5 text-[10px] text-zinc-600 truncate">{item.detail}</p>
+          <p className="mt-0.5 text-[10px] text-muted-foreground truncate">{item.detail}</p>
         )}
       </div>
 
@@ -86,7 +86,7 @@ export function ActivityFeed({ items }: { items: ActivityItem[] }) {
   if (items.length === 0) {
     return (
       <div className="flex h-32 items-center justify-center">
-        <p className="text-xs text-zinc-600">No activity yet</p>
+        <p className="text-xs text-muted-foreground">No activity yet</p>
       </div>
     );
   }

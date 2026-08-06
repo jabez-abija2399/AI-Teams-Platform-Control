@@ -23,14 +23,14 @@ export function ArchitectureRoom({ projectId }: { projectId: string }) {
       <div className="flex-1 overflow-auto p-4">
         <div className="grid grid-cols-12 gap-4">
           <div className="col-span-8">
-            <div className="mb-4 rounded-xl border border-white/[0.06] bg-white/[0.02] p-5">
-              <h3 className="text-xs font-semibold text-white mb-4">System Architecture</h3>
-              <p className="text-xs text-zinc-400">Software Architect is designing the system architecture and technology stack.</p>
+            <div className="mb-4 rounded-xl border border-border bg-white/[0.02] p-5">
+              <h3 className="text-xs font-semibold text-foreground mb-4">System Architecture</h3>
+              <p className="text-xs text-muted-foreground">Software Architect is designing the system architecture and technology stack.</p>
             </div>
 
             {state.artifacts.length > 0 && (
               <div className="space-y-2">
-                <h3 className="text-[10px] uppercase tracking-wider text-zinc-500 mb-2">Generated Artifacts</h3>
+                <h3 className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Generated Artifacts</h3>
                 {state.artifacts.map((artifact) => (
                   <ArtifactCard key={artifact.id} artifact={artifact} />
                 ))}
@@ -53,7 +53,7 @@ export function ArchitectureRoom({ projectId }: { projectId: string }) {
           </div>
 
           <div className="col-span-4">
-            <h3 className="text-[10px] uppercase tracking-wider text-zinc-500 mb-3">Team Status</h3>
+            <h3 className="text-[10px] uppercase tracking-wider text-muted-foreground mb-3">Team Status</h3>
             <AIEmployeeGrid employees={state.employees} />
           </div>
         </div>

@@ -1,13 +1,11 @@
-"use client";
+'use client';
 
-import { useMemo } from "react";
-import { AIEmployeeGrid } from "../company/ai-employee-card";
-import { ActivityFeed } from "../company/activity-feed";
-import { ApprovalDialog } from "../company/approval-dialog";
-import { RoomHeader } from "../company/room-header";
-import { ThinkingPanel } from "../company/thinking-panel";
-import { AnalysisSteps } from "../company/analysis-steps";
-import { usePipelineContext } from "../../hooks/use-pipeline";
+import { useMemo } from 'react';
+import { cn } from '@/lib/utils';
+import { ApprovalDialog } from '../company/approval-dialog';
+import { RoomHeader } from '../company/room-header';
+import { ThinkingPanel } from '../company/thinking-panel';
+import { usePipelineContext } from '../../hooks/use-pipeline';
 
 interface DiscoveryRoomProps {
   projectId: string;
@@ -17,176 +15,219 @@ interface DiscoveryRoomProps {
 
 const THINKING_STEPS = [
   {
-    label: "Market Research",
-    content: "Analyzing market trends, competitor landscape, and growth opportunities for your business idea.",
-    keywords: ["market", "competitor", "trend", "research"],
+    label: 'Market Research',
+    content: 'Analyzing market trends, competitor landscape, and growth opportunities for your business idea.',
+    keywords: ['market', 'competitor', 'trend', 'research'],
   },
   {
-    label: "Business Model Analysis",
-    content: "Evaluating revenue streams, cost structure, and value proposition to ensure business viability.",
-    keywords: ["revenue", "cost", "value", "model"],
+    label: 'Business Model Analysis',
+    content: 'Evaluating revenue streams, cost structure, and value proposition to ensure business viability.',
+    keywords: ['revenue', 'cost', 'value', 'model'],
   },
   {
-    label: "User Persona Development",
-    content: "Identifying target users, their pain points, behaviors, and needs to shape the product direction.",
-    keywords: ["user", "persona", "pain", "behavior"],
+    label: 'User Persona Development',
+    content: 'Identifying target users, their pain points, behaviors, and needs to shape the product direction.',
+    keywords: ['user', 'persona', 'pain', 'behavior'],
   },
   {
-    label: "Technical Feasibility",
-    content: "Assessing technology requirements, integration needs, and implementation complexity.",
-    keywords: ["technical", "feasibility", "architecture"],
+    label: 'Technical Feasibility',
+    content: 'Assessing technology requirements, integration needs, and implementation complexity.',
+    keywords: ['technical', 'feasibility', 'architecture'],
   },
   {
-    label: "Risk Assessment",
-    content: "Evaluating potential risks, mitigation strategies, and success factors for your project.",
-    keywords: ["risk", "assessment", "mitigation"],
+    label: 'Risk Assessment',
+    content: 'Evaluating potential risks, mitigation strategies, and success factors for your project.',
+    keywords: ['risk', 'assessment', 'mitigation'],
   },
   {
-    label: "Product Specification",
-    content: "Compiling all findings into a comprehensive product specification document.",
-    keywords: ["specification", "document", "compile"],
+    label: 'Product Specification',
+    content: 'Compiling all findings into a comprehensive product specification document.',
+    keywords: ['specification', 'document', 'compile'],
   },
 ];
 
-function getStepStates(progress: number, activities: { action: string }[]) {
-  const activeText = activities.map((a) => a.action.toLowerCase()).join(" ");
-  const stepCount = THINKING_STEPS.length;
-  const completedSteps = Math.floor((progress / 100) * stepCount);
-  const activeIdx = Math.min(completedSteps, stepCount - 1);
-
-  return THINKING_STEPS.map((step, i) => {
-    let status: "completed" | "active" | "pending" = "pending";
-    if (i < completedSteps) {
-      status = "completed";
-    } else if (i === activeIdx && progress > 0) {
-      status = "active";
-    }
-    return {
-      ...step,
-      status,
-      content: step.content,
-    };
-  });
+function statusLabel(status: string): string {
+  switch (status) {
+    case 'active':
+      return 'Working';
+    case 'waiting':
+      return 'Queued';
+    case 'completed':
+      return 'Done';
+    case 'error':
+      return 'Error';
+    default:
+      return 'Standby';
+  }
 }
 
 export function DiscoveryRoom({
-  projectId,
   projectName,
   projectDescription,
 }: DiscoveryRoomProps) {
   const { state, approve } = usePipelineContext();
-  const isComplete = state.phaseStatus === "completed";
-  const isApproval = state.phaseStatus === "approval";
-  const isActive = state.phaseStatus === "running";
+  const isComplete = state.phaseStatus === 'completed';
+  const isApproval = state.phaseStatus === 'approval';
+  const isActive = state.phaseStatus === 'running';
 
-  const thinkingSteps = useMemo(
-    () => getStepStates(state.progress, state.activities),
-    [state.progress, state.activities]
-  );
+  const thinkingSteps = useMemo(() => {
+    const stepCount = THINKING_STEPS.length;
+    const completedSteps = Math.floor((state.progress / 100) * stepCount);
+    const activeIdx = Math.min(completedSteps, stepCount - 1);
 
-  const analysisSteps = useMemo(
-    () =>
-      THINKING_STEPS.map((step, i) => ({
-        id: step.label.toLowerCase().replace(/\s+/g, "_"),
-        label: step.label,
-        icon: ["🔍", "💰", "👤", "⚙️", "⚠️", "📄"][i]!,
-        status: (i < Math.floor((state.progress / 100) * THINKING_STEPS.length)
-          ? "completed"
-          : i === Math.floor((state.progress / 100) * THINKING_STEPS.length) && state.progress > 0
-            ? "active"
-            : "pending") as "completed" | "active" | "pending",
-        detail: step.keywords.join(", "),
-      })),
-    [state.progress]
-  );
+    return THINKING_STEPS.map((step, i) => {
+      let status: 'completed' | 'active' | 'pending' = 'pending';
+      if (i < completedSteps) status = 'completed';
+      else if (i === activeIdx && state.progress > 0) status = 'active';
+      return { ...step, status };
+    });
+  }, [state.progress]);
+
+  const pipelineLines = useMemo(() => {
+    const fromActivities = state.activities.slice(0, 3).map((a) => a.action);
+    if (fromActivities.length > 0) return fromActivities;
+    return THINKING_STEPS.slice(0, 3).map((s) => s.label);
+  }, [state.activities]);
+
+  const employees = state.employees.length
+    ? state.employees.slice(0, 6).map((e) => ({
+        role: `${e.name} · ${e.role}`,
+        status: statusLabel(e.status),
+        active: e.status === 'active',
+      }))
+    : [
+        { role: 'CEO · Vision', status: isActive ? 'Working' : 'Standby', active: isActive },
+        { role: 'Architect · System design', status: 'Standby', active: false },
+        { role: 'Engineers · Implementation', status: 'Standby', active: false },
+        { role: 'QA · Verification', status: 'Standby', active: false },
+      ];
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full flex-col bg-background">
       <RoomHeader
         phaseNumber={1}
         totalPhases={12}
         title="Discovery Room"
         subtitle={
           isComplete
-            ? "CEO completed the analysis"
+            ? 'CEO completed the analysis'
             : isApproval
-              ? "CEO needs your approval to proceed"
-              : "CEO is analyzing your business idea"
+              ? 'CEO needs your approval to proceed'
+              : 'CEO is analyzing your business idea'
         }
-        status={isComplete ? "completed" : isApproval ? "approval" : "running"}
+        status={isComplete ? 'completed' : isApproval ? 'approval' : 'running'}
       />
 
-      <div className="flex-1 overflow-auto">
-        <div className="grid h-full grid-cols-12 gap-0">
-          {/* Left — Project Vision + Analysis Steps */}
-          <div className="col-span-3 border-r border-white/[0.06] p-4 space-y-4">
-            <div>
-              <h3 className="text-[10px] uppercase tracking-wider text-zinc-500 mb-3">Project Vision</h3>
-              <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
-                <h4 className="text-sm font-semibold text-white">{projectName}</h4>
-                <p className="mt-2 text-xs text-zinc-400 leading-relaxed">{projectDescription}</p>
-              </div>
+      <div className="flex-1 overflow-auto p-4 sm:p-6">
+        <div className="mx-auto grid max-w-6xl gap-5 lg:grid-cols-[1fr_1.15fr]">
+          <div className="space-y-4">
+            <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+              <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                Project vision
+              </p>
+              <h3 className="font-heading mt-2 text-lg font-semibold">{projectName}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{projectDescription}</p>
             </div>
 
-            <div>
-              <h3 className="text-[10px] uppercase tracking-wider text-zinc-500 mb-3">Analysis Steps</h3>
-              <AnalysisSteps steps={analysisSteps} overallProgress={state.progress} />
+            <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+              <div className="border-b border-border bg-muted/40 px-4 py-3">
+                <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                  AI employees
+                </p>
+              </div>
+              <div className="space-y-2.5 p-4">
+                {employees.map((employee) => (
+                  <div
+                    key={employee.role}
+                    className="flex items-center justify-between rounded-xl border border-border/80 bg-background px-3 py-2.5"
+                  >
+                    <span className="text-sm font-medium">{employee.role}</span>
+                    <span
+                      className={cn(
+                        'text-[11px] font-medium',
+                        employee.active ? 'animate-soft-pulse text-primary' : 'text-muted-foreground',
+                      )}
+                    >
+                      {employee.status}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
-          {/* Center — Thinking Panel */}
-          <div className="col-span-6 flex flex-col p-4">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/[0.05] text-sm">👔</div>
-              <div>
-                <span className="text-xs font-medium text-white">CEO AI</span>
-                <span className="ml-2 text-[10px] text-zinc-500">
-                  {isComplete ? "Analysis Complete" : isActive ? "Analyzing Business Opportunity" : "Waiting to start..."}
+          <div className="space-y-4">
+            <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+              <div className="flex items-center justify-between border-b border-border bg-muted/40 px-4 py-3">
+                <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                  Pipeline
+                </p>
+                <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-medium text-primary">
+                  Discovery {state.progress}%
                 </span>
+              </div>
+              <div className="space-y-4 p-5">
+                <div className="h-2 overflow-hidden rounded-full bg-muted">
+                  <div
+                    className="h-full rounded-full bg-primary transition-all"
+                    style={{ width: `${state.progress}%` }}
+                  />
+                </div>
+                <div className="space-y-2.5">
+                  {pipelineLines.map((line, i) => (
+                    <div key={`${line}-${i}`} className="flex gap-3 text-sm text-muted-foreground">
+                      <span
+                        className={cn(
+                          'mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full',
+                          i === 0 ? 'animate-soft-pulse bg-primary' : 'bg-brand-gray',
+                        )}
+                      />
+                      <span className={i === 0 ? 'text-foreground' : undefined}>{line}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
-            <ThinkingPanel
-              steps={thinkingSteps}
-              isActive={isActive}
-            />
-
-            {/* Approval */}
-            {isApproval && state.approvalRequests[0] && (() => {
-              const req = state.approvalRequests[0]!;
-              return (
-                <div className="mt-4">
-                  <ApprovalDialog
-                    request={req}
-                    onApprove={() => approve(req.artifactName || "PRODUCT_APPROVAL")}
-                    onRequestChanges={() => {}}
-                    onReject={() => {}}
-                  />
+            <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+              <div className="mb-3 flex items-center gap-2">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-sm">
+                  👔
                 </div>
-              );
-            })()}
+                <div>
+                  <span className="text-xs font-medium text-foreground">CEO AI</span>
+                  <span className="ml-2 text-[10px] text-muted-foreground">
+                    {isComplete
+                      ? 'Analysis complete'
+                      : isActive
+                        ? 'Analyzing business opportunity'
+                        : 'Waiting to start…'}
+                  </span>
+                </div>
+              </div>
+              <ThinkingPanel steps={thinkingSteps} isActive={isActive} />
+            </div>
+
+            {isApproval && state.approvalRequests[0] && (
+              <ApprovalDialog
+                request={state.approvalRequests[0]}
+                onApprove={() =>
+                  approve(state.approvalRequests[0]!.artifactName || 'PRODUCT_APPROVAL')
+                }
+                onRequestChanges={() => {}}
+                onReject={() => {}}
+              />
+            )}
 
             {isComplete && (
-              <div className="mt-4 rounded-xl border border-emerald-500/20 bg-emerald-500/[0.03] p-4">
-                <p className="text-xs font-medium text-emerald-400">✓ Analysis Complete</p>
-                <p className="mt-1 text-xs text-zinc-400">
-                  The CEO has completed the business analysis and is ready for the next phase.
+              <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4">
+                <p className="text-sm font-medium text-primary">Analysis complete</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  The CEO finished business analysis and is ready for the next phase.
                 </p>
               </div>
             )}
           </div>
-
-          {/* Right — AI Team */}
-          <div className="col-span-3 border-l border-white/[0.06] p-4">
-            <h3 className="text-[10px] uppercase tracking-wider text-zinc-500 mb-3">AI Team</h3>
-            <AIEmployeeGrid employees={state.employees} />
-          </div>
-        </div>
-
-        {/* Bottom — Activity Feed */}
-        <div className="border-t border-white/[0.06] p-4">
-          <h3 className="text-[10px] uppercase tracking-wider text-zinc-500 mb-2">Activity Feed</h3>
-          <ActivityFeed items={state.activities} />
         </div>
       </div>
     </div>

@@ -80,9 +80,15 @@ export function LivePreview({ projectId, code, filePath, initialPreviewUrl, isCr
           setInAppPreviewUrl(null);
         }
         
-        // Try WebContainer in parallel
-        if (result.data?.files) {
-          wc.start(result.data.files).catch(() => {
+        // WebContainer for confirmed Next.js or React (Vite)
+        if (
+          result.data?.mode === 'webcontainer' &&
+          result.data?.files &&
+          Object.keys(result.data.files).length > 0 &&
+          result.data?.stack?.confirmed
+        ) {
+          const runtime = result.data.stack.id === 'react' ? 'vite' : 'next';
+          wc.start(result.data.files, runtime).catch(() => {
             // WebContainer failed, fallback to inline HTML already set above
           });
         }

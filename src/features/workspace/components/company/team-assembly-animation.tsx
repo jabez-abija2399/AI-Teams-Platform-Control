@@ -27,10 +27,10 @@ export function TeamAssemblyAnimation({ phase }: { phase: "creating" | "ready" }
       </div>
 
       <div className="text-center">
-        <h3 className="text-lg font-semibold text-white">
+        <h3 className="text-lg font-semibold text-foreground">
           {phase === "creating" ? "Assembling Your AI Team..." : "Your Team is Ready"}
         </h3>
-        <p className="mt-1 text-sm text-zinc-400">
+        <p className="mt-1 text-sm text-muted-foreground">
           {phase === "creating"
             ? "Hiring world-class AI engineers"
             : "11 AI employees ready to build your product"}
@@ -47,10 +47,10 @@ export function TeamAssemblyAnimation({ phase }: { phase: "creating" | "ready" }
             )}
             style={{ transitionDelay: `${emp.delay}ms` }}
           >
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/[0.05] text-xl border border-white/[0.06]">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted text-xl border border-border">
               {emp.avatar}
             </div>
-            <span className="text-[10px] text-zinc-500">{emp.name}</span>
+            <span className="text-[10px] text-muted-foreground">{emp.name}</span>
           </div>
         ))}
       </div>

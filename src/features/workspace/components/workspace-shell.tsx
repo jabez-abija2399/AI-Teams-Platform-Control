@@ -8,6 +8,7 @@ import { EditorArea } from './layouts/editor-area';
 import { AIPanel } from './layouts/ai-panel';
 import { BottomPanel } from './layouts/bottom-panel';
 import { StatusBar } from './layouts/status-bar';
+import { StudioPreviewPane } from './layouts/studio-preview-pane';
 import { SimpleWorkspaceView } from './layouts/simple-workspace-view';
 import { SpotlightTour } from '@/features/onboarding/components/spotlight-tour';
 import { useWorkspaceStore } from '../stores/workspace.store';
@@ -18,6 +19,9 @@ interface WorkspaceShellProps {
   projectId: string;
   sidebarContent: React.ReactNode;
   aiPanelContent: React.ReactNode;
+  /** Prefer technical IDE chrome (Studio after Complete). */
+  forceTechnical?: boolean;
+  onBackToMission?: () => void;
 }
 
 export function WorkspaceShell({
@@ -26,18 +30,37 @@ export function WorkspaceShell({
   projectId,
   sidebarContent,
   aiPanelContent,
+  forceTechnical = false,
+  onBackToMission,
 }: WorkspaceShellProps) {
-  const { simpleMode, tourCompleted, toggleSimpleMode, completeTour } = useWorkspaceStore();
+  const {
+    simpleMode,
+    tourCompleted,
+    toggleSimpleMode,
+    completeTour,
+    setCurrentProject,
+    setSimpleMode,
+  } = useWorkspaceStore();
   const [isDesktop, setIsDesktop] = useState(true);
 
   useEffect(() => {
-    const check = () => setIsDesktop(window.innerWidth >= 768);
+    setCurrentProject(projectId);
+  }, [projectId, setCurrentProject]);
+
+  useEffect(() => {
+    if (forceTechnical) setSimpleMode(false);
+  }, [forceTechnical, setSimpleMode]);
+
+  useEffect(() => {
+    const check = () => setIsDesktop(window.innerWidth >= 900);
     check();
     window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
   }, []);
 
-  const effectiveSimpleMode = simpleMode || !isDesktop;
+  const effectiveSimpleMode = forceTechnical
+    ? false
+    : simpleMode || !isDesktop;
 
   if (effectiveSimpleMode) {
     return (
@@ -56,29 +79,24 @@ export function WorkspaceShell({
   }
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden" data-tour="workspace">
-      <TopNav projectName={projectName} userName={userName} />
-      <div className="flex items-center justify-between border-b px-3 py-1.5 bg-muted/20 shrink-0">
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-muted-foreground font-mono">Developer Mode Active</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={toggleSimpleMode}
-            className="px-3 py-1 bg-sky-50 dark:bg-sky-500/10 hover:bg-sky-100 dark:hover:bg-sky-500/20 text-sky-600 dark:text-sky-400 border border-sky-200 dark:border-sky-500/20 rounded-md text-[11px] font-semibold flex items-center gap-1.5 transition-colors"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-sparkles"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
-            Switch to Creator Mode
-          </button>
-        </div>
-      </div>
-      <div className="flex flex-1 overflow-hidden">
+    <div
+      className="flex h-full min-h-0 flex-col overflow-hidden bg-background"
+      data-tour="workspace"
+      data-studio="shell"
+    >
+      <TopNav
+        projectName={projectName}
+        userName={userName}
+        onBackToMission={onBackToMission}
+      />
+      <div className="flex min-h-0 flex-1 overflow-hidden">
         <ActivityBar />
         <SidebarPanel>{sidebarContent}</SidebarPanel>
-        <div className="flex flex-1 flex-col overflow-hidden">
+        <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
           <EditorArea />
           <BottomPanel />
         </div>
+        <StudioPreviewPane projectId={projectId} />
         <AIPanel>{aiPanelContent}</AIPanel>
       </div>
       <StatusBar />

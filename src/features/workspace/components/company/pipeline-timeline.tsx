@@ -22,8 +22,8 @@ export function PipelineTimeline({ phases }: { phases: PipelinePhase[] }) {
               className={cn(
                 "flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold flex-shrink-0",
                 phase.status === "completed" && "bg-emerald-500/20 text-emerald-400",
-                phase.status === "active" && "bg-sky-500/20 text-sky-400 ring-2 ring-sky-500/30",
-                phase.status === "pending" && "bg-white/[0.05] text-zinc-600",
+                phase.status === "active" && "bg-primary/20 text-primary ring-2 ring-primary/30",
+                phase.status === "pending" && "bg-muted text-muted-foreground",
                 phase.status === "failed" && "bg-rose-500/20 text-rose-400"
               )}
             >
@@ -33,7 +33,7 @@ export function PipelineTimeline({ phases }: { phases: PipelinePhase[] }) {
               <div
                 className={cn(
                   "w-px flex-1 min-h-[20px]",
-                  phase.status === "completed" ? "bg-emerald-500/30" : "bg-white/[0.06]"
+                  phase.status === "completed" ? "bg-emerald-500/30" : "bg-muted"
                 )}
               />
             )}
@@ -45,22 +45,22 @@ export function PipelineTimeline({ phases }: { phases: PipelinePhase[] }) {
               <span
                 className={cn(
                   "text-xs font-medium",
-                  phase.status === "active" ? "text-white" : "text-zinc-400"
+                  phase.status === "active" ? "text-foreground" : "text-muted-foreground"
                 )}
               >
                 {phase.name}
               </span>
               {phase.agentRole && (
-                <span className="text-[10px] text-zinc-600">• {phase.agentRole}</span>
+                <span className="text-[10px] text-muted-foreground">• {phase.agentRole}</span>
               )}
             </div>
             {phase.description && (
-              <p className="mt-0.5 text-[10px] text-zinc-500">{phase.description}</p>
+              <p className="mt-0.5 text-[10px] text-muted-foreground">{phase.description}</p>
             )}
             {phase.status === "active" && phase.progress !== undefined && (
-              <div className="mt-2 h-1 overflow-hidden rounded-full bg-white/[0.06]">
+              <div className="mt-2 h-1 overflow-hidden rounded-full bg-muted">
                 <div
-                  className="h-full rounded-full bg-sky-500 transition-all duration-500"
+                  className="h-full rounded-full bg-primary transition-all duration-500"
                   style={{ width: `${phase.progress}%` }}
                 />
               </div>

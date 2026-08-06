@@ -23,9 +23,9 @@ export function ClarificationRoom({ projectId }: { projectId: string }) {
       <div className="flex-1 overflow-auto p-4">
         <div className="mx-auto max-w-2xl">
           <div className="mb-6 text-center">
-            <div className="flex h-12 w-12 mx-auto items-center justify-center rounded-xl bg-white/[0.05] text-2xl mb-3">📋</div>
-            <h3 className="text-sm font-semibold text-white">Gathering Requirements</h3>
-            <p className="mt-1 text-xs text-zinc-400">The Product Manager is clarifying requirements for your product.</p>
+            <div className="flex h-12 w-12 mx-auto items-center justify-center rounded-xl bg-muted text-2xl mb-3">📋</div>
+            <h3 className="text-sm font-semibold text-foreground">Gathering Requirements</h3>
+            <p className="mt-1 text-xs text-muted-foreground">The Product Manager is clarifying requirements for your product.</p>
           </div>
 
           {/* Show artifacts */}

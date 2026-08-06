@@ -38,7 +38,7 @@ export function AIPanel({ children }: { children: React.ReactNode }) {
           onClick={toggleAIPanel}
           title="Show AI Team panel (Ctrl+L)"
         >
-          <PanelRightOpen className="h-3.5 w-3.5 text-sky-600 dark:text-sky-400" />
+          <PanelRightOpen className="h-3.5 w-3.5 text-primary" />
         </Button>
       </div>
     );
@@ -56,9 +56,9 @@ export function AIPanel({ children }: { children: React.ReactNode }) {
       />
       <div className="flex h-9 items-center justify-between border-b px-3 bg-muted/40">
         <div className="flex items-center gap-1.5">
-          <Sparkles className="h-3.5 w-3.5 text-sky-600 dark:text-sky-400" />
-          <span className="text-xs font-semibold uppercase tracking-wider text-foreground">
-            AI Team Assistant
+          <Sparkles className="h-3.5 w-3.5 text-primary" />
+          <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-foreground">
+            Assistant
           </span>
           <kbd className="rounded border bg-muted px-1 py-0.5 text-[9px] text-muted-foreground font-mono">
             Ctrl+L

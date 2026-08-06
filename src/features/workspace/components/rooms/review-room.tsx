@@ -32,8 +32,8 @@ export function ReviewRoom({ projectId }: { projectId: string }) {
       <div className="flex-1 overflow-auto p-6">
         <div className="mx-auto max-w-3xl space-y-6">
           <div className="mb-6 text-center">
-            <h2 className="text-lg font-bold text-white">Review Committee</h2>
-            <p className="mt-1 text-xs text-zinc-400">Expert reviewers evaluating your product</p>
+            <h2 className="text-lg font-bold text-foreground">Review Committee</h2>
+            <p className="mt-1 text-xs text-muted-foreground">Expert reviewers evaluating your product</p>
           </div>
 
           <QualityScore
@@ -49,7 +49,7 @@ export function ReviewRoom({ projectId }: { projectId: string }) {
 
           {state.artifacts.length > 0 && (
             <div>
-              <h3 className="text-[10px] uppercase tracking-wider text-zinc-500 mb-2">Review Reports</h3>
+              <h3 className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Review Reports</h3>
               <div className="space-y-2">
                 {state.artifacts.map((artifact) => (
                   <ArtifactCard key={artifact.id} artifact={artifact} />
@@ -71,24 +71,24 @@ export function ReviewRoom({ projectId }: { projectId: string }) {
           })()}
 
           <div>
-            <h3 className="text-[10px] uppercase tracking-wider text-zinc-500 mb-2">Review Activity</h3>
+            <h3 className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Review Activity</h3>
             <ActivityFeed items={state.activities} />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
-              <h4 className="text-xs font-medium text-white mb-2">AI Team Status</h4>
+            <div className="rounded-xl border border-border bg-white/[0.02] p-4">
+              <h4 className="text-xs font-medium text-foreground mb-2">AI Team Status</h4>
               <AIEmployeeGrid employees={state.employees} />
             </div>
-            <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
-              <h4 className="text-xs font-medium text-white mb-2">Pipeline Progress</h4>
+            <div className="rounded-xl border border-border bg-white/[0.02] p-4">
+              <h4 className="text-xs font-medium text-foreground mb-2">Pipeline Progress</h4>
               <div className="space-y-1">
                 {state.phases.filter(p => p.id !== "completed").slice(0, 6).map((phase) => (
                   <div key={phase.id} className="flex items-center gap-2 text-[10px]">
-                    <span className={phase.status === "completed" ? "text-emerald-400" : phase.status === "active" ? "text-sky-400" : "text-zinc-600"}>
+                    <span className={phase.status === "completed" ? "text-emerald-400" : phase.status === "active" ? "text-primary" : "text-muted-foreground"}>
                       {phase.status === "completed" ? "✓" : phase.status === "active" ? "●" : "○"}
                     </span>
-                    <span className={phase.status === "completed" ? "text-zinc-400" : phase.status === "active" ? "text-white" : "text-zinc-600"}>
+                    <span className={phase.status === "completed" ? "text-muted-foreground" : phase.status === "active" ? "text-foreground" : "text-muted-foreground"}>
                       {phase.name}
                     </span>
                   </div>

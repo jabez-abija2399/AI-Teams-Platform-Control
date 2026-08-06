@@ -19,9 +19,13 @@ export interface WorkspaceLayoutPrefs {
   sidebarWidth: number;
   aiPanelWidth: number;
   bottomPanelHeight: number;
+  /** Width of the side Preview split (px). 0 = closed. */
+  previewPaneWidth: number;
   sidebarCollapsed: boolean;
   aiPanelCollapsed: boolean;
   bottomPanelCollapsed: boolean;
+  /** Cursor-style editor | preview side-by-side */
+  previewSplit: boolean;
 }
 
 export interface WorkspacePreferenceRecord {

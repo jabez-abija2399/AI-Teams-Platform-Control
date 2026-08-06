@@ -47,30 +47,31 @@ const LivePreview = dynamic(
 import { useState } from 'react';
 import { Search, FolderKanban, Sparkles } from 'lucide-react';
 
-export function WorkspaceSidebarContent() {
+export function WorkspaceSidebarContent({ projectId }: { projectId?: string }) {
   const { selectedActivity, currentProjectId } = useWorkspaceStore();
+  const id = projectId || currentProjectId;
 
   switch (selectedActivity) {
     case 'explorer':
-      return currentProjectId ? <ExplorerTree projectId={currentProjectId} /> : <Placeholder label="Select a project" />;
+      return id ? <ExplorerTree projectId={id} /> : <Placeholder label="Select a project" />;
     case 'preview':
-      return currentProjectId ? <LivePreview projectId={currentProjectId} /> : <Placeholder label="Select a project" />;
+      return id ? <LivePreview projectId={id} /> : <Placeholder label="Select a project" />;
     case 'git':
-      return currentProjectId ? <GitPanel projectId={currentProjectId} /> : <Placeholder label="Select a project" />;
+      return id ? <GitPanel projectId={id} /> : <Placeholder label="Select a project" />;
     case 'github':
-      return currentProjectId ? <GitHubIntegration projectId={currentProjectId} /> : <Placeholder label="Select a project" />;
+      return id ? <GitHubIntegration projectId={id} /> : <Placeholder label="Select a project" />;
     case 'quality':
-      return currentProjectId ? <QualityPanel projectId={currentProjectId} /> : <Placeholder label="Select a project" />;
+      return id ? <QualityPanel projectId={id} /> : <Placeholder label="Select a project" />;
     case 'documentation':
-      return currentProjectId ? <DocumentationPanel projectId={currentProjectId} /> : <Placeholder label="Select a project" />;
+      return id ? <DocumentationPanel projectId={id} /> : <Placeholder label="Select a project" />;
     case 'deployment':
-      return currentProjectId ? <DeploymentPanel projectId={currentProjectId} /> : <Placeholder label="Select a project" />;
+      return id ? <DeploymentPanel projectId={id} /> : <Placeholder label="Select a project" />;
     case 'analytics':
-      return currentProjectId ? <AnalyticsPanel projectId={currentProjectId} /> : <Placeholder label="Select a project" />;
+      return id ? <AnalyticsPanel projectId={id} /> : <Placeholder label="Select a project" />;
     case 'search':
       return <SearchSidebarPanel />;
     case 'ai-employees':
-      return currentProjectId ? <AgentTeamOverview projectId={currentProjectId} /> : <Placeholder label="Select a project" />;
+      return id ? <AgentTeamOverview projectId={id} /> : <Placeholder label="Select a project" />;
     case 'extensions':
       return <MarketplaceBrowse />;
     case 'settings':

@@ -57,13 +57,13 @@ export function DevelopmentRoom({ projectId }: DevelopmentRoomProps) {
 
         <div className="grid grid-cols-12 gap-0">
           {/* Center — Timeline + Artifacts + Activity */}
-          <div className="col-span-8 border-r border-white/[0.06] p-4">
-            <h3 className="text-[10px] uppercase tracking-wider text-zinc-500 mb-3">Live Timeline</h3>
+          <div className="col-span-8 border-r border-border p-4">
+            <h3 className="text-[10px] uppercase tracking-wider text-muted-foreground mb-3">Live Timeline</h3>
             <PipelineTimeline phases={timelinePhases} />
 
             {state.artifacts.length > 0 && (
-              <div className="mt-4 border-t border-white/[0.06] pt-4">
-                <h3 className="text-[10px] uppercase tracking-wider text-zinc-500 mb-2">Generated Artifacts</h3>
+              <div className="mt-4 border-t border-border pt-4">
+                <h3 className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Generated Artifacts</h3>
                 <div className="space-y-2">
                   {state.artifacts.slice(0, 5).map((artifact) => (
                     <ArtifactCard key={artifact.id} artifact={artifact} />
@@ -86,15 +86,15 @@ export function DevelopmentRoom({ projectId }: DevelopmentRoomProps) {
               );
             })()}
 
-            <div className="mt-4 border-t border-white/[0.06] pt-4">
-              <h3 className="text-[10px] uppercase tracking-wider text-zinc-500 mb-2">Activity Feed</h3>
+            <div className="mt-4 border-t border-border pt-4">
+              <h3 className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Activity Feed</h3>
               <ActivityFeed items={state.activities} />
             </div>
           </div>
 
           {/* Right — AI Employee Cards */}
           <div className="col-span-4 p-4">
-            <h3 className="text-[10px] uppercase tracking-wider text-zinc-500 mb-3">AI Employees</h3>
+            <h3 className="text-[10px] uppercase tracking-wider text-muted-foreground mb-3">AI Employees</h3>
             <AIEmployeeGrid employees={state.employees} />
           </div>
         </div>

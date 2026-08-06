@@ -20,16 +20,16 @@ export function QualityScore({
     <div
       className={cn(
         "rounded-xl border p-5",
-        "bg-gradient-to-b from-white/[0.02] to-transparent border-white/[0.06]"
+        "bg-gradient-to-b from-white/[0.02] to-transparent border-border"
       )}
     >
       <div className="text-center">
-        <p className="text-[10px] uppercase tracking-wider text-zinc-500">{label || "Quality Score"}</p>
+        <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{label || "Quality Score"}</p>
         <p className={cn("mt-2 text-4xl font-bold", color)}>{score}</p>
-        <p className="text-[10px] text-zinc-600">/100</p>
+        <p className="text-[10px] text-muted-foreground">/100</p>
       </div>
 
-      <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/[0.06]">
+      <div className="mt-4 h-2 overflow-hidden rounded-full bg-muted">
         <div
           className={cn("h-full rounded-full transition-all duration-700", bgColor)}
           style={{ width: `${score}%` }}
@@ -46,7 +46,7 @@ export function QualityScore({
                   detail.passed ? "bg-emerald-400" : "bg-amber-400"
                 )}
               />
-              <span className="text-[10px] text-zinc-400">{detail.label}</span>
+              <span className="text-[10px] text-muted-foreground">{detail.label}</span>
             </div>
           ))}
         </div>

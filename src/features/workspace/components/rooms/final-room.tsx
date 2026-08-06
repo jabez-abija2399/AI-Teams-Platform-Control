@@ -51,36 +51,36 @@ export function FinalRoom({ projectId, projectName }: FinalRoomProps) {
         <div className="mx-auto max-w-3xl">
           <div className="mb-8 text-center">
             <div className="flex h-20 w-20 mx-auto items-center justify-center rounded-3xl bg-gradient-to-br from-emerald-500/20 to-amber-500/10 text-4xl mb-4">🎉</div>
-            <h1 className="text-2xl font-bold text-white">Project Complete</h1>
-            <p className="mt-2 text-sm text-zinc-400">
-              Your AI software company has successfully built <span className="text-white font-medium">{projectName}</span>
+            <h1 className="text-2xl font-bold text-foreground">Project Complete</h1>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Your AI software company has successfully built <span className="text-foreground font-medium">{projectName}</span>
             </p>
           </div>
 
           <div className="grid grid-cols-3 gap-3 mb-6">
-            <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 text-center">
-              <p className="text-2xl font-bold text-white">{completedPhases}</p>
-              <p className="mt-1 text-[10px] text-zinc-500">Phases Completed</p>
+            <div className="rounded-xl border border-border bg-white/[0.02] p-4 text-center">
+              <p className="text-2xl font-bold text-foreground">{completedPhases}</p>
+              <p className="mt-1 text-[10px] text-muted-foreground">Phases Completed</p>
             </div>
-            <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 text-center">
-              <p className="text-2xl font-bold text-white">{state.healthScore}</p>
-              <p className="mt-1 text-[10px] text-zinc-500">Health Score</p>
+            <div className="rounded-xl border border-border bg-white/[0.02] p-4 text-center">
+              <p className="text-2xl font-bold text-foreground">{state.healthScore}</p>
+              <p className="mt-1 text-[10px] text-muted-foreground">Health Score</p>
             </div>
-            <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 text-center">
-              <p className="text-2xl font-bold text-white">{state.artifacts.length}</p>
-              <p className="mt-1 text-[10px] text-zinc-500">Artifacts Generated</p>
+            <div className="rounded-xl border border-border bg-white/[0.02] p-4 text-center">
+              <p className="text-2xl font-bold text-foreground">{state.artifacts.length}</p>
+              <p className="mt-1 text-[10px] text-muted-foreground">Artifacts Generated</p>
             </div>
           </div>
 
-          <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 mb-6">
-            <h3 className="text-xs font-semibold text-white mb-3">Deliverables</h3>
+          <div className="rounded-xl border border-border bg-white/[0.02] p-5 mb-6">
+            <h3 className="text-xs font-semibold text-foreground mb-3">Deliverables</h3>
             <div className="grid grid-cols-2 gap-3">
               {deliverables.map((item) => (
-                <div key={item.title} className="flex items-center gap-3 rounded-lg border border-white/[0.04] bg-white/[0.01] p-3">
+                <div key={item.title} className="flex items-center gap-3 rounded-lg border border-border bg-white/[0.01] p-3">
                   <span className="text-lg">{item.icon}</span>
                   <div>
-                    <p className="text-xs font-medium text-white">{item.title}</p>
-                    <p className="text-[10px] text-zinc-500">{item.description}</p>
+                    <p className="text-xs font-medium text-foreground">{item.title}</p>
+                    <p className="text-[10px] text-muted-foreground">{item.description}</p>
                   </div>
                   <span className="ml-auto text-emerald-400 text-xs">✓</span>
                 </div>
@@ -90,7 +90,7 @@ export function FinalRoom({ projectId, projectName }: FinalRoomProps) {
 
           {state.artifacts.length > 0 && (
             <div className="mb-6">
-              <h3 className="text-[10px] uppercase tracking-wider text-zinc-500 mb-2">Generated Artifacts</h3>
+              <h3 className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Generated Artifacts</h3>
               <div className="space-y-2">
                 {state.artifacts.map((artifact) => (
                   <ArtifactCard key={artifact.id} artifact={artifact} />
@@ -101,11 +101,11 @@ export function FinalRoom({ projectId, projectName }: FinalRoomProps) {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <h3 className="text-[10px] uppercase tracking-wider text-zinc-500 mb-2">AI Team</h3>
+              <h3 className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">AI Team</h3>
               <AIEmployeeGrid employees={state.employees} />
             </div>
             <div>
-              <h3 className="text-[10px] uppercase tracking-wider text-zinc-500 mb-2">Project Activity</h3>
+              <h3 className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Project Activity</h3>
               <ActivityFeed items={state.activities.slice(0, 10)} />
             </div>
           </div>

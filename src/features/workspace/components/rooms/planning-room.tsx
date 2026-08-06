@@ -42,9 +42,9 @@ export function PlanningRoom({ projectId }: { projectId: string }) {
       <div className="flex-1 overflow-auto p-4">
         <div className="grid grid-cols-12 gap-4">
           <div className="col-span-8 space-y-4">
-            <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5">
-              <h3 className="text-xs font-semibold text-white mb-3">Project Plan</h3>
-              <p className="text-xs text-zinc-400">
+            <div className="rounded-xl border border-border bg-white/[0.02] p-5">
+              <h3 className="text-xs font-semibold text-foreground mb-3">Project Plan</h3>
+              <p className="text-xs text-muted-foreground">
                 {isComplete(state)
                   ? "The project plan has been created with task breakdown and scheduling."
                   : "CEO is breaking down the project into milestones and tasks."}
@@ -52,13 +52,13 @@ export function PlanningRoom({ projectId }: { projectId: string }) {
             </div>
 
             <div>
-              <h3 className="text-[10px] uppercase tracking-wider text-zinc-500 mb-3">Pipeline Timeline</h3>
+              <h3 className="text-[10px] uppercase tracking-wider text-muted-foreground mb-3">Pipeline Timeline</h3>
               <PipelineTimeline phases={timelinePhases} />
             </div>
 
             {state.artifacts.length > 0 && (
               <div>
-                <h3 className="text-[10px] uppercase tracking-wider text-zinc-500 mb-2">Plan Documents</h3>
+                <h3 className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Plan Documents</h3>
                 <div className="space-y-2">
                   {state.artifacts.map((artifact) => (
                     <ArtifactCard key={artifact.id} artifact={artifact} />
@@ -80,13 +80,13 @@ export function PlanningRoom({ projectId }: { projectId: string }) {
             })()}
 
             <div>
-              <h3 className="text-[10px] uppercase tracking-wider text-zinc-500 mb-2">Activity Feed</h3>
+              <h3 className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Activity Feed</h3>
               <ActivityFeed items={state.activities} />
             </div>
           </div>
 
           <div className="col-span-4">
-            <h3 className="text-[10px] uppercase tracking-wider text-zinc-500 mb-3">Team</h3>
+            <h3 className="text-[10px] uppercase tracking-wider text-muted-foreground mb-3">Team</h3>
             <AIEmployeeGrid employees={state.employees} />
           </div>
         </div>

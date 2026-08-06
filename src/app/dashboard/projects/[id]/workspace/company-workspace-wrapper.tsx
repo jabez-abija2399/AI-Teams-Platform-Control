@@ -1,10 +1,13 @@
-"use client";
+'use client';
 
-import dynamic from "next/dynamic";
+import dynamic from 'next/dynamic';
 
-const CompanyWorkspace = dynamic(
-  () => import("@/features/workspace/components/company-workspace").then((m) => m.CompanyWorkspace),
-  { ssr: false }
+const ProjectWorkspaceHub = dynamic(
+  () =>
+    import('@/features/workspace/components/project-workspace-hub').then(
+      (m) => m.ProjectWorkspaceHub,
+    ),
+  { ssr: false },
 );
 
 interface CompanyWorkspaceWrapperProps {
@@ -14,18 +17,6 @@ interface CompanyWorkspaceWrapperProps {
   userName: string;
 }
 
-export function CompanyWorkspaceWrapper({
-  projectId,
-  projectName,
-  projectDescription,
-  userName,
-}: CompanyWorkspaceWrapperProps) {
-  return (
-    <CompanyWorkspace
-      projectId={projectId}
-      projectName={projectName}
-      projectDescription={projectDescription}
-      userName={userName}
-    />
-  );
+export function CompanyWorkspaceWrapper(props: CompanyWorkspaceWrapperProps) {
+  return <ProjectWorkspaceHub {...props} />;
 }

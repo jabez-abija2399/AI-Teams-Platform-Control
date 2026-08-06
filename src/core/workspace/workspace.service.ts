@@ -27,19 +27,20 @@ const PIPELINE_PHASE_TO_TIMELINE: Record<string, { id: string; title: string; de
   MONITORING: { id: 'phase_monitoring', title: 'Operations & Monitoring', description: 'Setting up telemetry, alerts, and health monitoring', agents: ['OPERATIONS'] },
 };
 
+/** Pipeline agent roles mapped to AI company employees (04_AI_COMPANY.md) */
 const ROLE_TO_EMPLOYEE: Record<string, { id: string; name: string; avatar: string }> = {
-  PRODUCT_DISCOVERY: { id: 'emp_pd', name: 'Product Discovery AI', avatar: '🔍' },
-  CEO: { id: 'emp_ceo', name: 'Chief Executive AI', avatar: '💼' },
-  PRODUCT_MANAGER: { id: 'emp_pm', name: 'Product Manager AI', avatar: '📊' },
-  BUSINESS_ANALYST: { id: 'emp_ba', name: 'Business Analyst AI', avatar: '📋' },
-  UI_UX: { id: 'emp_ui', name: 'UX/UI Designer AI', avatar: '🎨' },
-  ARCHITECT: { id: 'emp_arch', name: 'Principal Architect AI', avatar: '🏛️' },
-  OPERATIONS: { id: 'emp_ops', name: 'Operations AI', avatar: '⚙️' },
-  DEVELOPER: { id: 'emp_dev', name: 'Lead Developer AI', avatar: '⚡' },
-  QA: { id: 'emp_qa', name: 'QA Specialist AI', avatar: '🛡️' },
-  REVIEWER: { id: 'emp_rev', name: 'Review Committee AI', avatar: '📝' },
-  SECURITY: { id: 'emp_sec', name: 'Security Engineer AI', avatar: '🔒' },
-  DEVOPS: { id: 'emp_dops', name: 'DevOps Engineer AI', avatar: '🚀' },
+  PRODUCT_DISCOVERY: { id: 'emp_ceo', name: 'CEO · Vision', avatar: '👔' },
+  CEO: { id: 'emp_ceo', name: 'CEO · Vision', avatar: '👔' },
+  PRODUCT_MANAGER: { id: 'emp_pm', name: 'Product Manager · Requirements', avatar: '📋' },
+  BUSINESS_ANALYST: { id: 'emp_pm', name: 'Product Manager · Requirements', avatar: '📋' },
+  UI_UX: { id: 'emp_ui', name: 'Designer · UX / UI', avatar: '🎨' },
+  ARCHITECT: { id: 'emp_arch', name: 'Architect · System design', avatar: '🏗️' },
+  OPERATIONS: { id: 'emp_dops', name: 'DevOps · Deployment', avatar: '🚀' },
+  DEVELOPER: { id: 'emp_eng', name: 'Engineers · Implementation', avatar: '💻' },
+  QA: { id: 'emp_qa', name: 'QA · Verification', avatar: '🧪' },
+  REVIEWER: { id: 'emp_qa', name: 'QA · Verification', avatar: '🧪' },
+  SECURITY: { id: 'emp_sec', name: 'Security · Review', avatar: '🔒' },
+  DEVOPS: { id: 'emp_dops', name: 'DevOps · Deployment', avatar: '🚀' },
 };
 
 function mapLifecycleToPhaseState(lifecycle: ProjectLifecycleState): ProjectPhaseState {
@@ -86,17 +87,24 @@ export class WorkspaceService {
       history: [] as string[],
     }));
 
-    const defaultEmployees: AIEmployee[] = Object.entries(ROLE_TO_EMPLOYEE).map(([role, info]) => ({
-      id: info.id,
-      role,
-      name: info.name,
-      avatar: info.avatar,
-      status: 'Idle' as const,
-      currentTask: 'Waiting for assignment...',
-      progress: 0,
-      lastMessage: 'Standing by.',
-      health: 'healthy' as const,
-    }));
+    const seenIds = new Set<string>();
+    const defaultEmployees: AIEmployee[] = Object.entries(ROLE_TO_EMPLOYEE)
+      .filter(([, info]) => {
+        if (seenIds.has(info.id)) return false;
+        seenIds.add(info.id);
+        return true;
+      })
+      .map(([role, info]) => ({
+        id: info.id,
+        role,
+        name: info.name,
+        avatar: info.avatar,
+        status: 'Idle' as const,
+        currentTask: 'Waiting for assignment...',
+        progress: 0,
+        lastMessage: 'Standing by.',
+        health: 'healthy' as const,
+      }));
 
     const initialFeed = ActivityService.seedDefaultActivities(projectId, projectName);
 
@@ -149,16 +157,20 @@ export class WorkspaceService {
     }
 
     state.employees = state.employees.map((emp) => {
-      const def = PIPELINE_PHASE_DEFINITIONS[lifecyclePhase];
-      if (def && emp.role === def.agentRole) {
+      const activeId = ROLE_TO_EMPLOYEE[def.agentRole]?.id;
+      if (activeId && emp.id === activeId) {
         return {
           ...emp,
+          role: def.agentRole,
           status: 'Working' as const,
           currentTask: `Executing ${def.department}`,
           progress: def.progressPercentage,
           lastMessage: message || `Working on ${def.department}`,
           startedAt: emp.startedAt || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         };
+      }
+      if (emp.status === 'Working') {
+        return { ...emp, status: 'Idle' as const };
       }
       return emp;
     });
@@ -213,9 +225,11 @@ export class WorkspaceService {
     }
 
     state.employees = state.employees.map((emp) => {
-      if (def && emp.role === def.agentRole) {
+      const activeId = ROLE_TO_EMPLOYEE[def.agentRole]?.id;
+      if (activeId && emp.id === activeId) {
         return {
           ...emp,
+          role: def.agentRole,
           status: 'Completed' as const,
           currentTask: `${def.department} completed`,
           progress: 100,

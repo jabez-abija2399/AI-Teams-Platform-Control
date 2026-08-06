@@ -52,7 +52,7 @@ export function SimpleWorkspaceView({
 
   if (!effectiveSimpleMode) {
     return (
-      <div className="flex h-screen flex-col overflow-hidden bg-background text-foreground font-sans">
+      <div className="flex h-full min-h-0 flex-col overflow-hidden bg-background text-foreground font-sans">
         <TopNav projectName={projectName} userName={userName} />
         <div className="flex items-center justify-between border-b px-3 py-1.5 bg-muted/20 shrink-0">
           <ChangeHistoryDropdown projectId={projectId} />
@@ -83,7 +83,7 @@ export function SimpleWorkspaceView({
   }
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-slate-50 dark:bg-[#09090b] text-slate-900 dark:text-slate-100 font-sans">
+    <div className="flex h-full min-h-0 flex-col overflow-hidden bg-slate-50 dark:bg-[#09090b] text-slate-900 dark:text-slate-100 font-sans">
       {/* Sleek Minimal Header */}
       <header className="flex h-14 shrink-0 items-center justify-between px-6 py-2 z-20">
         <div className="flex items-center gap-4">

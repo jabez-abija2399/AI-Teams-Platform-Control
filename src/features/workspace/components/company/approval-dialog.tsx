@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 
 export interface ApprovalRequest {
   id: string;
@@ -9,7 +9,7 @@ export interface ApprovalRequest {
   description: string;
   requestedBy: string;
   artifactName?: string;
-  urgency: "normal" | "high" | "critical";
+  urgency: 'normal' | 'high' | 'critical';
 }
 
 export function ApprovalDialog({
@@ -24,48 +24,36 @@ export function ApprovalDialog({
   onRequestChanges?: () => void;
 }) {
   return (
-    <div
-      className={cn(
-        "rounded-xl border p-5",
-        "bg-gradient-to-b from-amber-500/[0.05] to-transparent border-amber-500/20"
-      )}
-    >
+    <div className="rounded-2xl border border-accent/25 bg-accent/5 p-5">
       <div className="flex items-start gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-500/10 text-lg">
-          ⚠️
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/15 text-sm font-semibold text-accent">
+          !
         </div>
         <div className="flex-1">
-          <h3 className="text-sm font-semibold text-white">{request.title}</h3>
-          <p className="mt-1 text-xs text-zinc-400">{request.description}</p>
+          <h3 className="text-sm font-semibold text-foreground">{request.title}</h3>
+          <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{request.description}</p>
           {request.artifactName && (
-            <p className="mt-2 text-[10px] text-zinc-500">
-              Artifact: <span className="text-zinc-400">{request.artifactName}</span>
+            <p className="mt-2 text-[11px] text-muted-foreground">
+              Artifact: <span className="font-medium text-foreground">{request.artifactName}</span>
             </p>
           )}
         </div>
       </div>
 
-      <div className="mt-4 flex items-center gap-2">
-        <Button
-          onClick={onApprove}
-          className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs h-8"
-        >
-          Approve
+      <div className="mt-4 flex flex-wrap items-center gap-2">
+        <Button onClick={onApprove} className="h-9 rounded-xl text-xs font-semibold">
+          Approve & continue
         </Button>
         {onRequestChanges && (
           <Button
             onClick={onRequestChanges}
             variant="outline"
-            className="border-white/10 text-zinc-400 hover:text-white hover:bg-white/[0.05] text-xs h-8"
+            className="h-9 rounded-xl text-xs"
           >
-            Request Changes
+            Request changes
           </Button>
         )}
-        <Button
-          onClick={onReject}
-          variant="ghost"
-          className="text-zinc-500 hover:text-rose-400 hover:bg-rose-500/10 text-xs h-8"
-        >
+        <Button onClick={onReject} variant="ghost" className="h-9 rounded-xl text-xs text-muted-foreground">
           Reject
         </Button>
       </div>
