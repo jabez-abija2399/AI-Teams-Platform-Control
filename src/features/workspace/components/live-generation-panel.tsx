@@ -105,7 +105,13 @@ export function LiveGenerationPanel({
             )}
             {live.kind === 'stuck' && (
               <p className="mt-2 text-xs text-muted-foreground">
-                Generation went quiet. Use Retry — do not wait for looping status text.
+                Generation went quiet. Tap Resume to continue this step — we will not skip ahead.
+              </p>
+            )}
+            {live.kind === 'credits' && (
+              <p className="mt-2 text-xs text-muted-foreground">
+                Pipeline stopped here on purpose. Add credits, then Resume to finish this agent’s
+                deliverable before the next department starts.
               </p>
             )}
             {live.detail && (
@@ -135,7 +141,7 @@ export function LiveGenerationPanel({
             ) : (
               <span className="flex items-center gap-2">
                 <RefreshCw className="h-4 w-4" />
-                {live.actionLabel || 'Retry generation'}
+                {live.actionLabel || 'Resume pipeline'}
               </span>
             )}
           </Button>

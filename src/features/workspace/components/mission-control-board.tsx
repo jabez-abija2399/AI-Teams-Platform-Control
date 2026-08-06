@@ -15,6 +15,9 @@ import type {
 import { ApprovalReviewPanel } from './approval-review-panel';
 import { LiveGenerationPanel } from './live-generation-panel';
 import { DeliverablesPanel } from './deliverables-panel';
+import { DeliverableChecklist } from './deliverable-checklist';
+import { ImplementationTodoList } from './implementation-todo-list';
+import type { DeliverableCheckItem } from '@/features/workspace/hooks/use-pipeline';
 
 /**
  * Simplified Mission Control roster (landing + docs hierarchy).
@@ -166,6 +169,8 @@ export function MissionControlBoard({
   pendingDocument,
   liveGeneration,
   revisionDiff,
+  deliverableChecklist,
+  deliveryPlan,
   rightTab: controlledTab,
   onRightTabChange,
   onApprove,
@@ -196,6 +201,23 @@ export function MissionControlBoard({
     feedback?: string;
     before: unknown;
     after: unknown;
+  } | null;
+  deliverableChecklist?: DeliverableCheckItem[] | null;
+  deliveryPlan?: {
+    implementationTodos?: Array<{
+      id: string;
+      title: string;
+      description?: string;
+      files?: string[];
+      status: 'pending' | 'in_progress' | 'done' | 'failed';
+    }>;
+    qaTodos?: Array<{
+      id: string;
+      title: string;
+      description?: string;
+      status: 'pending' | 'in_progress' | 'done' | 'failed';
+    }>;
+    progress?: { done: number; total: number; percent: number };
   } | null;
   rightTab?: RightTab;
   onRightTabChange?: (tab: RightTab) => void;
@@ -230,7 +252,7 @@ export function MissionControlBoard({
     phaseStatus === 'failed' || liveGeneration?.kind === 'stuck'
       ? activities.length > 0
         ? activities.slice(0, 5).map((a) => a.action)
-        : ['Generation stalled — use Retry to resume']
+        : ['Generation stalled — use Resume to continue this step']
       : activities.length > 0
         ? activities.slice(0, 5).map((a) => a.action)
         : [];
@@ -240,10 +262,11 @@ export function MissionControlBoard({
       ? {
           kind: 'failed' as const,
           tone: 'error' as const,
-          title: 'Generation stopped',
-          message: 'The pipeline stopped unexpectedly. You can retry from this step.',
+          title: 'Pipeline stopped',
+          message:
+            'This step did not finish. Resume to continue from here — we never skip unfinished work.',
           canRetry: true,
-          actionLabel: 'Retry generation',
+          actionLabel: 'Resume pipeline',
         }
       : null;
 
@@ -386,6 +409,13 @@ export function MissionControlBoard({
               );
             })}
           </div>
+
+          <DeliverableChecklist items={deliverableChecklist} />
+          <ImplementationTodoList
+            todos={deliveryPlan?.implementationTodos}
+            qaTodos={deliveryPlan?.qaTodos}
+            progress={deliveryPlan?.progress}
+          />
 
           {activityLines.length > 0 && (
             <div className="mt-auto space-y-2 border-t border-border pt-3">

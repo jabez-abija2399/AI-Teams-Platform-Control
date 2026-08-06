@@ -19,6 +19,10 @@ const defaultState: PipelineState = {
   pendingDocument: null,
   liveGeneration: null,
   usage: null,
+  credits: null,
+  strictMode: false,
+  deliverableChecklist: null,
+  deliveryPlan: null,
   revisionDiff: null,
 };
 

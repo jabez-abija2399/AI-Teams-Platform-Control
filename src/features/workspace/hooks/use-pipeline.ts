@@ -91,6 +91,21 @@ export interface TokenUsageInfo {
   sessionCostUsd: number;
 }
 
+export interface CreditBalanceInfo {
+  balance: number | null;
+  monthlyLimit: number | null;
+  source: "organization" | "project" | "unknown";
+  lowBalance: boolean;
+}
+
+export interface DeliverableCheckItem {
+  phase: string;
+  department: string;
+  artifactType: string;
+  status: "done" | "active" | "blocked" | "pending";
+  hasArtifact: boolean;
+}
+
 export interface RevisionDiffInfo {
   title: string;
   feedback?: string;
@@ -112,6 +127,26 @@ export interface PipelineState {
   pendingDocument?: PendingDocument | null;
   liveGeneration?: LiveGenerationInfo | null;
   usage?: TokenUsageInfo | null;
+  credits?: CreditBalanceInfo | null;
+  strictMode?: boolean;
+  deliverableChecklist?: DeliverableCheckItem[] | null;
+  deliveryPlan?: {
+    fileStructure?: Array<{ path: string; type: string; description: string }>;
+    implementationTodos?: Array<{
+      id: string;
+      title: string;
+      description?: string;
+      files?: string[];
+      status: "pending" | "in_progress" | "done" | "failed";
+    }>;
+    qaTodos?: Array<{
+      id: string;
+      title: string;
+      description?: string;
+      status: "pending" | "in_progress" | "done" | "failed";
+    }>;
+    progress?: { done: number; total: number; percent: number };
+  } | null;
   revisionDiff?: RevisionDiffInfo | null;
   /** Server lifecycle phase (e.g. COMPLETED, PRODUCT_RUNNING). */
   lifecyclePhase?: string;
@@ -145,6 +180,10 @@ const defaultState: PipelineState = {
   pendingDocument: null,
   liveGeneration: null,
   usage: null,
+  credits: null,
+  strictMode: false,
+  deliverableChecklist: null,
+  deliveryPlan: null,
   revisionDiff: null,
   lifecyclePhase: undefined,
   // Never show Start until status hydrates — avoids false Start+0% on failed/slow loads.
@@ -172,7 +211,8 @@ export function usePipeline(projectId: string): PipelineContextValue {
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastGoodRef = useRef<PipelineState | null>(null);
 
-  const fetchStatus = useCallback(async () => {
+  const fetchStatus = useCallback(async (opts?: { showLoading?: boolean }) => {
+    if (opts?.showLoading) setLoading(true);
     try {
       const res = await fetch(`/api/projects/${projectId}/pipeline/status`, {
         credentials: "same-origin",
@@ -404,7 +444,7 @@ export function usePipeline(projectId: string): PipelineContextValue {
   }, [projectId, fetchStatus]);
 
   const refresh = useCallback(async () => {
-    await fetchStatus();
+    await fetchStatus({ showLoading: !lastGoodRef.current });
   }, [fetchStatus]);
 
   return {

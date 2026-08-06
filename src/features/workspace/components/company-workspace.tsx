@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Building2, Code2, Command, Loader2, Sparkles } from 'lucide-react';
+import { toast } from 'sonner';
+import { ArrowLeft, Building2, Code2, Command, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PipelineProvider, usePipelineContext } from '../components/pipeline-provider';
 import { MissionControlBoard } from './mission-control-board';
@@ -12,6 +13,9 @@ import {
   MissionCommandPalette,
   type CommandActionId,
 } from './mission-command-palette';
+import { MissionControlSkeleton } from '@/components/ui/page-skeletons';
+import { ErrorState } from '@/components/ui/error-state';
+import { ROUTES } from '@/config/constants';
 
 import type { StudioOpenOptions } from '../types/studio.types';
 
@@ -112,11 +116,14 @@ function CompanyWorkspaceInner({
       if (!res.ok) {
         throw new Error(body?.error?.message || `Could not start (${res.status})`);
       }
+      toast.success('Pipeline started', { description: 'Your AI company is getting to work.' });
       await refresh();
       setTimeout(refresh, 1500);
       setTimeout(refresh, 4000);
     } catch (err) {
-      setStartError(err instanceof Error ? err.message : 'Could not start the pipeline');
+      const message = err instanceof Error ? err.message : 'Could not start the pipeline';
+      setStartError(message);
+      toast.error('Could not start pipeline', { description: message });
     } finally {
       setStarting(false);
     }
@@ -127,10 +134,13 @@ function CompanyWorkspaceInner({
     setStartError(null);
     try {
       await approve(artifact);
+      toast.success('Approved', { description: 'Pipeline continuing to the next phase.' });
       setTimeout(refresh, 1200);
       setTimeout(refresh, 3500);
     } catch (err) {
-      setStartError(err instanceof Error ? err.message : 'Could not approve');
+      const message = err instanceof Error ? err.message : 'Could not approve';
+      setStartError(message);
+      toast.error('Approval failed', { description: message });
     } finally {
       setApproving(false);
     }
@@ -141,11 +151,14 @@ function CompanyWorkspaceInner({
     setStartError(null);
     try {
       await requestChanges(artifact, comments);
+      toast.success('Changes requested', { description: 'Agents are regenerating with your feedback.' });
       setTimeout(refresh, 1200);
       setTimeout(refresh, 3500);
       setTimeout(refresh, 7000);
     } catch (err) {
-      setStartError(err instanceof Error ? err.message : 'Could not regenerate');
+      const message = err instanceof Error ? err.message : 'Could not regenerate';
+      setStartError(message);
+      toast.error('Could not request changes', { description: message });
     } finally {
       setRegenerating(false);
     }
@@ -156,10 +169,13 @@ function CompanyWorkspaceInner({
     setStartError(null);
     try {
       await retryGeneration();
+      toast.success('Resuming generation', { description: 'Retrying the failed step.' });
       setTimeout(refresh, 1000);
       setTimeout(refresh, 3000);
     } catch (err) {
-      setStartError(err instanceof Error ? err.message : 'Could not resume generation');
+      const message = err instanceof Error ? err.message : 'Could not resume generation';
+      setStartError(message);
+      toast.error('Retry failed', { description: message });
     } finally {
       setRetrying(false);
     }
@@ -188,16 +204,34 @@ function CompanyWorkspaceInner({
   };
 
   if (loading) {
+    return <MissionControlSkeleton projectName={projectName} />;
+  }
+
+  if (connectionStatus === 'offline') {
     return (
-      <div className="flex h-dvh items-center justify-center bg-background">
-        <div className="flex flex-col items-center gap-4">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-            <Loader2 className="h-6 w-6 animate-spin" />
-          </div>
-          <p className="font-heading text-lg font-semibold tracking-tight">
-            Opening Mission Control…
-          </p>
-        </div>
+      <div className="flex h-dvh flex-col bg-background">
+        <header className="flex h-12 shrink-0 items-center gap-3 border-b border-border/80 px-4">
+          <Link
+            href={ROUTES.projects}
+            className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            aria-label="Back to projects"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Link>
+          <p className="font-heading text-sm font-semibold tracking-tight">{projectName}</p>
+        </header>
+        <ErrorState
+          title="Mission Control is offline"
+          description={
+            error ||
+            'Could not load pipeline status. Check your connection and try again.'
+          }
+          onRetry={() => {
+            void refresh();
+          }}
+          backHref={ROUTES.projects}
+          backLabel="Back to projects"
+        />
       </div>
     );
   }
@@ -224,7 +258,7 @@ function CompanyWorkspaceInner({
               Mission Control
             </p>
           </div>
-          <span className="hidden items-center gap-1.5 rounded-md border border-primary/15 bg-primary/8 px-2 py-0.5 text-[11px] font-medium text-primary xl:inline-flex">
+          <span className="hidden items-center gap-1.5 rounded-md border border-primary/15 bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary xl:inline-flex">
             <Sparkles className="h-3 w-3" />
             AI company
           </span>
@@ -271,7 +305,48 @@ function CompanyWorkspaceInner({
         </div>
 
         <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-          <TokenMeter usage={state.usage} active={isGenerating} className="hidden sm:inline-flex" />
+          <TokenMeter
+            usage={state.usage}
+            credits={state.credits}
+            active={isGenerating}
+            className="hidden sm:inline-flex"
+          />
+
+          <button
+            type="button"
+            onClick={async () => {
+              const next = !state.strictMode;
+              try {
+                const res = await fetch(`/api/projects/${projectId}/pipeline/settings`, {
+                  method: 'POST',
+                  credentials: 'same-origin',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ strictMode: next }),
+                });
+                const json = await res.json().catch(() => ({}));
+                if (!res.ok || !json.success) {
+                  throw new Error(json?.error?.message || 'Could not update strict mode');
+                }
+                toast.success(next ? 'Strict mode on — no heuristic skips' : 'Strict mode off');
+                await refresh();
+              } catch (err: any) {
+                toast.error(err?.message || 'Strict mode update failed');
+              }
+            }}
+            className={cn(
+              'hidden items-center gap-1.5 rounded-lg border px-2 py-1 text-[11px] font-medium transition-colors md:inline-flex',
+              state.strictMode
+                ? 'border-accent/40 bg-accent/10 text-accent'
+                : 'border-border bg-background text-muted-foreground hover:border-primary/30 hover:text-foreground',
+            )}
+            title={
+              state.strictMode
+                ? 'Strict mode: never use heuristic fallbacks'
+                : 'Enable strict mode (fail closed, Resume to continue)'
+            }
+          >
+            {state.strictMode ? 'Strict' : 'Strict off'}
+          </button>
 
           {onOpenStudio && (
             <button
@@ -339,8 +414,17 @@ function CompanyWorkspaceInner({
       </header>
 
       {startError && (
-        <div className="shrink-0 border-b border-destructive/25 bg-destructive/10 px-4 py-2 text-sm text-destructive">
-          {startError}
+        <div className="shrink-0 border-b border-destructive/25 bg-destructive/10 px-4 py-2.5 text-sm text-destructive">
+          <span>{startError}</span>
+          {(startError.toLowerCase().includes('api key') ||
+            startError.toLowerCase().includes('settings')) && (
+            <>
+              {' '}
+              <Link href={ROUTES.settings} className="font-semibold underline underline-offset-2">
+                Open Settings
+              </Link>
+            </>
+          )}
         </div>
       )}
 
@@ -358,6 +442,8 @@ function CompanyWorkspaceInner({
           pendingDocument={state.pendingDocument}
           liveGeneration={state.liveGeneration}
           revisionDiff={state.revisionDiff}
+          deliverableChecklist={state.deliverableChecklist}
+          deliveryPlan={state.deliveryPlan}
           rightTab={rightTab}
           onRightTabChange={setRightTab}
           isWaiting={isWaiting}

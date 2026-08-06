@@ -81,8 +81,8 @@ export function MissionCommandPalette({
       },
       {
         id: 'retry',
-        label: 'Retry generation',
-        hint: 'Resume a stalled or failed phase',
+        label: 'Resume pipeline',
+        hint: 'Continue from a stalled, failed, or credits-blocked step',
         icon: <RefreshCw className="h-4 w-4" />,
         disabled: !canRetry,
       },

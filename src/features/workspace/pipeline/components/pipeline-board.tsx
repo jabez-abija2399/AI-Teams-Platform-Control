@@ -116,17 +116,17 @@ export function PipelineBoard({ projectId }: PipelineBoardProps) {
 
   if (loading) {
     return (
-      <div className="flex h-full items-center justify-center">
-        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+      <div className="flex h-full flex-col items-center justify-center gap-2 p-4" role="status">
+        <Loader2 className="h-4 w-4 animate-spin text-primary" />
+        <p className="text-xs text-muted-foreground">Loading pipeline…</p>
       </div>
     );
   }
 
   if (!pipeline || !pipeline.running) {
     return (
-      <div className="flex h-full items-center justify-center p-4 text-xs text-muted-foreground">
-        No active build. Use the Developer AI tab or "Run Full Build" to start
-        a new pipeline.
+      <div className="flex h-full items-center justify-center p-4 text-center text-xs leading-relaxed text-muted-foreground">
+        No active build. Start from Mission Control or run a full build to see steps here.
       </div>
     );
   }
