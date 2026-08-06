@@ -50,6 +50,10 @@ export function SignupForm() {
 
       const data = await res.json();
 
+      if (res.status === 429 || data?.error?.code === 'RATE_LIMITED') {
+        throw new Error(data?.error?.message || 'Too many signup attempts. Please wait and try again.');
+      }
+
       if (!res.ok || !data.success) {
         throw new Error(data.error?.message || 'Registration failed.');
       }

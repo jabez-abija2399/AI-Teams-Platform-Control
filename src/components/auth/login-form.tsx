@@ -34,7 +34,13 @@ export function LoginForm() {
       });
 
       if (!result || result.error || result.ok === false) {
-        setError('Invalid email or password.');
+        // Auth.js client may surface rate-limit as CredentialsSignin / generic error
+        const status = (result as { status?: number } | undefined)?.status;
+        if (status === 429) {
+          setError('Too many login attempts. Please wait a few minutes and try again.');
+        } else {
+          setError('Invalid email or password.');
+        }
         setLoading(false);
         return;
       }
