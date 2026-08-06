@@ -4,7 +4,6 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { X, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useWorkspaceStore } from '@/features/workspace/stores/workspace.store';
-import { EmptyState } from '@/components/ui/empty-state';
 import { MonacoEditorWrapper } from './monaco-editor';
 import type { MonacoEditorHandle } from './monaco-editor';
 import { EditorToolbar } from './editor-toolbar';
@@ -116,6 +115,35 @@ export function EditorContainer() {
   const { currentProjectId } = useWorkspaceStore();
   const [showPreview, setShowPreview] = useState(false);
 
+  const handleAcceptFile = useCallback(async () => {
+    if (!currentProjectId || !activeTab?.path) return;
+    await fetch(`/api/projects/${currentProjectId}/explorer/review`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ path: activeTab.path, action: 'accept' }),
+    });
+    window.dispatchEvent(new CustomEvent('explorer-refresh'));
+    if (activeTabId) {
+      loadedTabsRef.current.delete(activeTabId);
+      loadFile(activeTabId, activeTab.id, activeTab.path);
+    }
+  }, [currentProjectId, activeTab, activeTabId, loadFile]);
+
+  const handleRejectFile = useCallback(async () => {
+    if (!currentProjectId || !activeTab?.path) return;
+    await fetch(`/api/projects/${currentProjectId}/explorer/review`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ path: activeTab.path, action: 'reject' }),
+    });
+    window.dispatchEvent(new CustomEvent('explorer-refresh'));
+    window.dispatchEvent(new CustomEvent('studio-preview-reload'));
+    if (activeTabId) {
+      loadedTabsRef.current.delete(activeTabId);
+      loadFile(activeTabId, activeTab.id, activeTab.path);
+    }
+  }, [currentProjectId, activeTab, activeTabId, loadFile]);
+
   useEffect(() => {
     function handleToggle() {
       setShowPreview((prev) => !prev);
@@ -129,16 +157,16 @@ export function EditorContainer() {
       <CommandPalette />
 
       {openTabs.length > 0 && (
-        <div className="flex h-9 shrink-0 items-center overflow-x-auto border-b bg-card">
+        <div className="flex h-9 shrink-0 items-center overflow-x-auto border-b border-border/70 bg-muted/20">
           {openTabs.map((tab) => (
             <div
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={cn(
-                'flex h-full shrink-0 cursor-pointer items-center gap-2 border-r px-3 text-xs',
+                'flex h-full shrink-0 cursor-pointer items-center gap-2 border-r border-border/60 px-3 text-[12px]',
                 tab.id === activeTabId
-                  ? 'bg-background text-foreground'
-                  : 'text-muted-foreground hover:bg-secondary/40',
+                  ? 'bg-background text-foreground shadow-[inset_0_-2px_0_0_var(--primary)]'
+                  : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground',
               )}
             >
               <span>{tab.title}</span>
@@ -166,6 +194,9 @@ export function EditorContainer() {
           isDirty={activeState.isDirty}
           showPreview={showPreview}
           onTogglePreview={() => setShowPreview((prev) => !prev)}
+          reviewStatus={activeState.reviewStatus}
+          onAcceptFile={() => void handleAcceptFile()}
+          onRejectFile={() => void handleRejectFile()}
         />
       )}
 
@@ -200,19 +231,40 @@ export function EditorContainer() {
                 />
               </div>
             ) : !showPreview ? (
-              <div className="flex flex-col items-center justify-center flex-1 h-full bg-background p-6">
-                <EmptyState
-                  icon={FileText}
-                  title="No file open"
-                  description="Select a file from the explorer or launch live preview."
-                  className="border-0 mb-4"
-                />
-                <button
-                  onClick={() => setShowPreview(true)}
-                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-semibold flex items-center gap-2 shadow-lg transition-all"
-                >
-                  <span>▶ Launch & Preview Application</span>
-                </button>
+              <div className="flex flex-1 flex-col items-center justify-center gap-5 bg-[radial-gradient(ellipse_at_top,_rgba(36,95,115,0.08),_transparent_55%)] p-8">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-border bg-card shadow-sm">
+                  <FileText className="h-6 w-6 text-primary" />
+                </div>
+                <div className="max-w-sm text-center">
+                  <p className="font-heading text-lg font-semibold tracking-tight text-foreground">
+                    Studio is ready
+                  </p>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                    Open a file from Explorer on the left, or keep Preview open on the right to
+                    run the generated app.
+                  </p>
+                </div>
+                <div className="flex flex-wrap items-center justify-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      useWorkspaceStore.getState().enterStudioFocus({ activity: 'explorer' });
+                    }}
+                    className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3.5 py-2 text-xs font-semibold text-foreground shadow-sm transition-colors hover:border-primary/30"
+                  >
+                    Focus Explorer
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      useWorkspaceStore.getState().setPreviewSplit(true);
+                      setShowPreview(false);
+                    }}
+                    className="inline-flex items-center gap-2 rounded-lg bg-primary px-3.5 py-2 text-xs font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
+                  >
+                    ▶ Show Preview
+                  </button>
+                </div>
               </div>
             ) : null}
 

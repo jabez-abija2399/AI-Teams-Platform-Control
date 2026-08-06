@@ -2,127 +2,134 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
-import { Lock, Mail, ArrowRight, ShieldCheck, AlertCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Lock, Mail, ArrowRight, Sparkles, AlertCircle } from 'lucide-react';
+import { APP_NAME, ROUTES } from '@/config/constants';
+import { cn } from '@/lib/utils';
+import { buttonVariants } from '@/components/ui/button';
+
+const fieldClass =
+  'border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-11 w-full rounded-xl border border-border/80 bg-background py-1 pl-10 pr-3 text-sm outline-none transition-shadow focus-visible:ring-3';
 
 export function LoginForm() {
-  const router = useRouter();
-  const [email, setEmail] = useState('abi@gmail.com');
-  const [password, setPassword] = useState('Abija@2399');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    e.stopPropagation();
+    if (loading) return;
+
     setError(null);
     setLoading(true);
 
     try {
       const result = await signIn('credentials', {
-        email,
+        email: email.trim(),
         password,
         redirect: false,
+        callbackUrl: ROUTES.projects,
       });
 
-      if (result?.error) {
-        throw new Error('Invalid email or password.');
+      if (!result || result.error || result.ok === false) {
+        setError('Invalid email or password.');
+        setLoading(false);
+        return;
       }
 
-      router.push('/dashboard/projects');
-      router.refresh(); // Ensure RSC payload gets updated with auth session
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Authentication failed.');
-    } finally {
+      window.location.assign(result.url || ROUTES.projects);
+    } catch {
+      setError('Authentication failed. Please try again.');
       setLoading(false);
     }
   };
 
   return (
-    <Card className="w-full max-w-md shadow-2xl">
-      <CardHeader className="space-y-3 text-center">
-        <div className="mx-auto bg-primary/10 w-12 h-12 rounded-full flex items-center justify-center mb-2">
-          <ShieldCheck className="w-6 h-6 text-primary" />
-        </div>
-        <CardTitle className="text-2xl font-bold tracking-tight">Welcome back</CardTitle>
-        <CardDescription>
-          Enter your credentials to access your AI software projects.
-        </CardDescription>
-      </CardHeader>
+    <div className="w-full">
+      <div className="mb-8">
+        <Link href={ROUTES.home} className="mb-6 inline-flex items-center gap-2.5">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
+            <Sparkles className="h-4 w-4" />
+          </div>
+          <span className="font-heading text-xl font-semibold tracking-tight">{APP_NAME}</span>
+        </Link>
+        <h1 className="font-heading mt-4 text-3xl font-semibold tracking-tight">Welcome back</h1>
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+          Sign in to continue building with your AI company.
+        </p>
+      </div>
 
-      <CardContent>
+      <div className="rounded-2xl border border-border/80 bg-card/90 p-7 shadow-[0_24px_60px_-36px_rgba(36,95,115,0.45)]">
         {error && (
-          <div className="p-3 mb-4 bg-destructive/15 border border-destructive/30 rounded-md text-destructive text-sm flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0" />
+          <div className="mb-5 flex items-center gap-2 rounded-xl border border-destructive/25 bg-destructive/10 p-3 text-sm text-destructive">
+            <AlertCircle className="h-4 w-4 shrink-0" />
             <span>{error}</span>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4" noValidate>
           <div className="space-y-2">
-            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-              Email Address
+            <label htmlFor="login-email" className="text-sm font-medium">
+              Email
             </label>
             <div className="relative">
-              <Mail className="w-4 h-4 absolute left-3 top-3 text-muted-foreground" />
-              <Input
+              <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <input
+                id="login-email"
                 type="email"
                 required
+                autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@company.com"
-                className="pl-9"
+                className={fieldClass}
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                Password
-              </label>
-              <span className="text-xs text-muted-foreground hover:text-primary cursor-pointer transition-colors">
-                Forgot password?
-              </span>
-            </div>
+            <label htmlFor="login-password" className="text-sm font-medium">
+              Password
+            </label>
             <div className="relative">
-              <Lock className="w-4 h-4 absolute left-3 top-3 text-muted-foreground" />
-              <Input
+              <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <input
+                id="login-password"
                 type="password"
                 required
+                autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="pl-9"
+                className={fieldClass}
               />
             </div>
           </div>
 
-          <Button type="submit" disabled={loading} className="w-full mt-2 group">
-            {loading ? 'Authenticating...' : 'Sign In to Workspace'}
-            {!loading && <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />}
-          </Button>
+          <button
+            type="submit"
+            disabled={loading || !email.trim() || !password}
+            className={cn(
+              buttonVariants({ size: 'lg' }),
+              'group mt-2 h-11 w-full rounded-xl text-sm shadow-sm',
+            )}
+          >
+            {loading ? 'Signing in...' : 'Sign in to workspace'}
+            {!loading && (
+              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            )}
+          </button>
         </form>
-      </CardContent>
+      </div>
 
-      <CardFooter className="flex justify-center border-t p-4 mt-2">
-        <div className="text-sm text-muted-foreground">
-          Don&apos;t have an account?{' '}
-          <Link href="/signup" className="text-primary hover:underline font-semibold">
-            Create account
-          </Link>
-        </div>
-      </CardFooter>
-    </Card>
+      <p className="mt-6 text-center text-sm text-muted-foreground lg:text-left">
+        Don&apos;t have an account?{' '}
+        <Link href={ROUTES.register} className="font-semibold text-primary hover:underline">
+          Create account
+        </Link>
+      </p>
+    </div>
   );
 }

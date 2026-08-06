@@ -3,7 +3,13 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Lock, Mail, User, ArrowRight, ShieldCheck, AlertCircle } from 'lucide-react';
+import { Lock, Mail, User, ArrowRight, Sparkles, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { APP_NAME, ROUTES } from '@/config/constants';
+import { cn } from '@/lib/utils';
+import { buttonVariants } from '@/components/ui/button';
+
+const fieldClass =
+  'border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-11 w-full rounded-xl border border-border/80 bg-background py-1 pl-10 pr-3 text-sm outline-none transition-shadow focus-visible:ring-3';
 
 export function SignupForm() {
   const router = useRouter();
@@ -17,6 +23,9 @@ export function SignupForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation();
+    if (loading) return;
+
     setError(null);
     setSuccess(null);
 
@@ -36,7 +45,7 @@ export function SignupForm() {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email: email.trim(), password }),
       });
 
       const data = await res.json();
@@ -45,119 +54,142 @@ export function SignupForm() {
         throw new Error(data.error?.message || 'Registration failed.');
       }
 
-      setSuccess('Account created successfully! Redirecting to login...');
-      setTimeout(() => {
-        router.push('/login');
-      }, 1000);
+      setSuccess('Account created. Redirecting to sign in...');
+      setTimeout(() => router.push(ROUTES.login), 900);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed.');
-    } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-2xl space-y-6 text-slate-100 font-sans">
-      <div className="text-center space-y-2">
-        <div className="inline-flex items-center gap-2 px-3 py-1 bg-sky-950 border border-sky-800 text-sky-400 rounded-full text-xs font-mono">
-          <ShieldCheck className="w-3.5 h-3.5" />
-          <span>AI Teams Platform Auth</span>
-        </div>
-        <h1 className="text-2xl font-bold tracking-tight text-white">Create an Account</h1>
-        <p className="text-slate-400 text-xs">Join AI Teams Platform to orchestrate multi-agent software projects.</p>
+    <div className="w-full">
+      <div className="mb-8">
+        <Link href={ROUTES.home} className="mb-6 inline-flex items-center gap-2.5">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
+            <Sparkles className="h-4 w-4" />
+          </div>
+          <span className="font-heading text-xl font-semibold tracking-tight">{APP_NAME}</span>
+        </Link>
+        <h1 className="font-heading mt-4 text-3xl font-semibold tracking-tight">Create your account</h1>
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+          Launch your AI software company in minutes.
+        </p>
       </div>
 
-      {error && (
-        <div className="p-3 bg-red-950/80 border border-red-800 rounded-lg text-red-300 text-xs flex items-center gap-2">
-          <AlertCircle className="w-4 h-4 shrink-0" />
-          <span>{error}</span>
-        </div>
-      )}
-
-      {success && (
-        <div className="p-3 bg-emerald-950/80 border border-emerald-800 rounded-lg text-emerald-300 text-xs flex items-center gap-2">
-          <ShieldCheck className="w-4 h-4 shrink-0" />
-          <span>{success}</span>
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-slate-300">Full Name</label>
-          <div className="relative">
-            <User className="w-4 h-4 absolute left-3 top-3 text-slate-500" />
-            <input
-              type="text"
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="John Doe"
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg pl-9 pr-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-sky-500 transition-colors"
-            />
+      <div className="rounded-2xl border border-border/80 bg-card/90 p-7 shadow-[0_24px_60px_-36px_rgba(36,95,115,0.45)]">
+        {error && (
+          <div className="mb-5 flex items-center gap-2 rounded-xl border border-destructive/25 bg-destructive/10 p-3 text-sm text-destructive">
+            <AlertCircle className="h-4 w-4 shrink-0" />
+            <span>{error}</span>
           </div>
-        </div>
-
-        <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-slate-300">Email Address</label>
-          <div className="relative">
-            <Mail className="w-4 h-4 absolute left-3 top-3 text-slate-500" />
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="name@company.com"
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg pl-9 pr-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-sky-500 transition-colors"
-            />
+        )}
+        {success && (
+          <div className="mb-5 flex items-center gap-2 rounded-xl border border-primary/25 bg-primary/10 p-3 text-sm text-primary">
+            <CheckCircle2 className="h-4 w-4 shrink-0" />
+            <span>{success}</span>
           </div>
-        </div>
+        )}
 
-        <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-slate-300">Password</label>
-          <div className="relative">
-            <Lock className="w-4 h-4 absolute left-3 top-3 text-slate-500" />
-            <input
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Min. 8 characters"
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg pl-9 pr-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-sky-500 transition-colors"
-            />
+        <form onSubmit={handleSubmit} className="space-y-3.5" noValidate>
+          <div className="space-y-2">
+            <label htmlFor="signup-name" className="text-sm font-medium">
+              Full name
+            </label>
+            <div className="relative">
+              <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <input
+                id="signup-name"
+                type="text"
+                required
+                autoComplete="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Your name"
+                className={fieldClass}
+              />
+            </div>
           </div>
-        </div>
 
-        <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-slate-300">Confirm Password</label>
-          <div className="relative">
-            <Lock className="w-4 h-4 absolute left-3 top-3 text-slate-500" />
-            <input
-              type="password"
-              required
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Re-enter password"
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg pl-9 pr-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-sky-500 transition-colors"
-            />
+          <div className="space-y-2">
+            <label htmlFor="signup-email" className="text-sm font-medium">
+              Email
+            </label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <input
+                id="signup-email"
+                type="email"
+                required
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="name@company.com"
+                className={fieldClass}
+              />
+            </div>
           </div>
-        </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition-colors shadow-lg shadow-sky-950/50 disabled:opacity-50"
-        >
-          <span>{loading ? 'Creating Account...' : 'Create Account'}</span>
-          {!loading && <ArrowRight className="w-4 h-4" />}
-        </button>
-      </form>
+          <div className="space-y-2">
+            <label htmlFor="signup-password" className="text-sm font-medium">
+              Password
+            </label>
+            <div className="relative">
+              <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <input
+                id="signup-password"
+                type="password"
+                required
+                autoComplete="new-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="At least 8 characters"
+                className={fieldClass}
+              />
+            </div>
+          </div>
 
-      <div className="text-center text-xs text-slate-400 pt-2 border-t border-slate-800">
+          <div className="space-y-2">
+            <label htmlFor="signup-confirm" className="text-sm font-medium">
+              Confirm password
+            </label>
+            <div className="relative">
+              <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <input
+                id="signup-confirm"
+                type="password"
+                required
+                autoComplete="new-password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="••••••••"
+                className={fieldClass}
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading || !name.trim() || !email.trim() || !password || !confirmPassword}
+            className={cn(
+              buttonVariants({ size: 'lg' }),
+              'group mt-2 h-11 w-full rounded-xl text-sm shadow-sm',
+            )}
+          >
+            {loading ? 'Creating account...' : 'Create account'}
+            {!loading && (
+              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            )}
+          </button>
+        </form>
+      </div>
+
+      <p className="mt-6 text-center text-sm text-muted-foreground lg:text-left">
         Already have an account?{' '}
-        <Link href="/login" className="text-sky-400 hover:underline font-semibold">
+        <Link href={ROUTES.login} className="font-semibold text-primary hover:underline">
           Sign in
         </Link>
-      </div>
+      </p>
     </div>
   );
 }

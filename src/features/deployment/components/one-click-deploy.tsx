@@ -89,8 +89,10 @@ export function OneClickDeploy({ projectId }: { projectId: string }) {
     <div className="rounded-lg border p-4">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm font-medium">Quick Deploy</p>
-          <p className="text-xs text-muted-foreground">Deploy to Vercel in one click</p>
+          <p className="text-sm font-medium">Deploy to production</p>
+          <p className="text-xs text-muted-foreground">
+            Explicit only — never runs automatically after Preview
+          </p>
         </div>
         <Button onClick={handleDeploy} disabled={deploying} size="sm">
           {deploying ? (

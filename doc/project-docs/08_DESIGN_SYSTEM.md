@@ -4,7 +4,12 @@
 
 Version:
 
-1.0
+1.1
+
+
+Last Updated:
+
+2026-08-05
 
 
 
@@ -29,7 +34,7 @@ The interface should feel like:
 Characteristics:
 
 - Professional
-- Futuristic
+- Sophisticated
 - Clear
 - Powerful
 - Minimal
@@ -42,7 +47,7 @@ Characteristics:
 
 Style:
 
-Modern SaaS + AI Command Center
+Modern SaaS + AI Command Center with Yacht Club brand identity
 
 
 
@@ -50,58 +55,27 @@ Inspired by:
 
 - Developer tools
 - Enterprise dashboards
-- Space mission control interfaces
+- Nautical sophistication
 
 
 
-# Layout Principles
+# Brand Color System — Yacht Club Palette
 
 
 
-## Information Density
-
-
-The platform manages complex systems.
-
-Users need:
-
-- Overview
-- Status
-- Progress
-- Alerts
+| Token | Hex | Usage |
+|-------|-----|-------|
+| Brand Cream | `#F2F0EF` | Page backgrounds, light surfaces |
+| Brand Gray | `#BBBDBC` | Muted text, borders, secondary UI |
+| Brand Teal | `#245F73` | Primary actions, links, navigation active states |
+| Brand Brown | `#733E24` | Accent highlights, badges, warm CTAs |
 
 
 
-## Clear Hierarchy
+CSS variables (defined in `src/app/globals.css`):
 
-
-Important information must be visible first.
-
-
-
-# Color System
-
-
-
-Primary:
-
-AI Intelligence Blue
-
-
-Secondary:
-
-Professional Dark
-
-
-Accent:
-
-Action Highlight
-
-
-
-Background:
-
-Dark command interface
+- `--brand-cream`, `--brand-gray`, `--brand-teal`, `--brand-brown`
+- Mapped to shadcn tokens: `--primary`, `--background`, `--accent`, `--muted`
 
 
 
@@ -109,9 +83,21 @@ Dark command interface
 
 
 
-Primary:
+Primary (sans):
 
-Modern sans-serif
+Manrope (`--font-sans`)
+
+
+
+Display / headings:
+
+Fraunces (`--font-heading`)
+
+
+
+Code / mono:
+
+JetBrains Mono (`--font-mono`)
 
 
 
@@ -120,6 +106,7 @@ Requirements:
 - Readable
 - Technical
 - Clean
+- Brand-first hierarchy: product name and section titles use Fraunces; UI chrome uses Manrope
 
 
 
@@ -132,6 +119,7 @@ Every component must:
 - Have clear purpose
 - Be reusable
 - Support states
+- Use design tokens (not hardcoded slate/sky/blue classes)
 
 
 
@@ -232,7 +220,7 @@ Must support:
 
 - Keyboard navigation
 - Screen readers
-- Good contrast
+- Good contrast (teal on cream meets WCAG AA for large text)
 - Responsive layouts
 
 
@@ -244,7 +232,8 @@ Components should:
 
 - Be reusable
 - Be typed
-- Follow design tokens
+- Follow design tokens from `globals.css`
+- Prefer `bg-background`, `text-primary`, `border-border` over raw Tailwind color scales
 
 
 
@@ -258,4 +247,3 @@ Advanced features:
 - Agent communication graphs
 - Real-time collaboration
 - 3D organization map
-

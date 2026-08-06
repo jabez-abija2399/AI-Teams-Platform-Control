@@ -15,17 +15,19 @@ export default async function SettingsPage() {
   if (!profile) notFound();
 
   return (
-    <PageContainer className="max-w-lg">
+    <PageContainer className="max-w-xl">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
-        <p className="text-muted-foreground text-sm">Manage your account.</p>
+        <h1 className="font-heading text-3xl font-semibold tracking-tight">Settings</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Manage your account and preferences.</p>
       </div>
-      <ProfileForm
-        defaultValues={{
-          name: profile.name,
-          email: profile.email,
-        }}
-      />
+      <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+        <ProfileForm
+          defaultValues={{
+            name: profile.name,
+            email: profile.email,
+          }}
+        />
+      </div>
     </PageContainer>
   );
 }

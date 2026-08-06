@@ -6,6 +6,8 @@ export interface EditorState {
   cursorPosition: { line: number; column: number };
   viewState: unknown | null;
   decorations: EditorDecoration[];
+  reviewStatus?: 'accepted' | 'pending' | 'rejected';
+  path?: string;
 }
 
 export interface EditorDecoration {
@@ -45,4 +47,5 @@ export interface FileContent {
   content: string;
   language: string;
   path: string;
+  reviewStatus?: 'accepted' | 'pending' | 'rejected';
 }

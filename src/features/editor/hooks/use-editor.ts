@@ -80,6 +80,8 @@ export function useEditor() {
           cursorPosition: { line: 1, column: 1 },
           viewState: null,
           decorations: [],
+          reviewStatus: data.reviewStatus ?? 'accepted',
+          path: data.path,
         };
 
         setEditorStates((prev) => {

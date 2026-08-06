@@ -1,14 +1,15 @@
 import { SignupForm } from '@/components/auth/signup-form';
+import { AuthShell } from '@/components/auth/auth-shell';
 
 export const metadata = {
   title: 'Sign Up | AI Teams Platform',
-  description: 'Create an account to start orchestrating AI software teams.',
+  description: 'Create an account and launch your AI software company.',
 };
 
 export default function SignupPage() {
   return (
-    <main className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
+    <AuthShell>
       <SignupForm />
-    </main>
+    </AuthShell>
   );
 }
