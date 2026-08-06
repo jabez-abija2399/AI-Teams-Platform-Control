@@ -10,6 +10,8 @@ import { getTimelineEvents } from '@/features/ai-workspace/services/timeline.ser
 import { buildLiveGenerationState } from '@/core/company-orchestration/generation-status';
 import { prisma } from '@/lib/prisma';
 import { getUsageStats } from '@/ai/services/usage.service';
+import { getProjectCreditSnapshot } from '@/core/billing/project-credits';
+import { buildDeliverableChecklistForState } from '@/core/company-orchestration/deliverable-checklist';
 
 type PipelinePhaseId =
   | 'discovery'
@@ -464,6 +466,37 @@ export async function GET(
       }
     }
 
+    const { getProjectFileEvidence } = await import(
+      '@/core/company-orchestration/implementation-file-gate'
+    );
+    const fileEvidence = await getProjectFileEvidence(projectId).catch(() => null);
+    const needsDevelopmentRegeneration = Boolean(
+      fileEvidence &&
+        !fileEvidence.ok &&
+        (currentLifecyclePhase === 'COMPLETED' ||
+          currentLifecyclePhase === 'FAILED' ||
+          currentLifecyclePhase === 'DEVELOPMENT_RUNNING' ||
+          completedPhases.includes('DEVELOPMENT_RUNNING') ||
+          [
+            'TESTING_RUNNING',
+            'REVIEW_RUNNING',
+            'SECURITY_RUNNING',
+            'DEPLOYMENT_RUNNING',
+            'MONITORING',
+          ].includes(currentLifecyclePhase)),
+    );
+
+    // Never show 100% Done when Explorer has no real app files
+    if (needsDevelopmentRegeneration) {
+      displayProgress = Math.min(
+        displayProgress,
+        PIPELINE_PHASE_DEFINITIONS.DEVELOPMENT_RUNNING.progressPercentage,
+      );
+      if (currentLifecyclePhase === 'COMPLETED' || phaseStatus === 'completed') {
+        phaseStatus = 'failed';
+      }
+    }
+
     const genMeta = genMetaEarly;
     const lastGenerationError = (genMeta.lastGenerationError as
       | { message?: string; code?: string; at?: string }
@@ -533,6 +566,19 @@ export async function GET(
         heartbeatAt,
       });
       Object.assign(liveGeneration, classified);
+    }
+
+    if (needsDevelopmentRegeneration) {
+      Object.assign(liveGeneration, {
+        kind: 'failed',
+        tone: 'error',
+        title: 'Development incomplete',
+        message:
+          fileEvidence?.message ||
+          'No real project files in Explorer. Resume to regenerate Development.',
+        canRetry: true,
+        actionLabel: 'Resume Development',
+      });
     }
 
     const timeline = (await getTimelineEvents({ limit: 40 })).filter((e) => {
@@ -753,6 +799,39 @@ export async function GET(
       /* usage optional */
     }
 
+    const creditSnap = await getProjectCreditSnapshot(projectId).catch(() => null);
+    const credits = creditSnap
+      ? {
+          balance: creditSnap.balance,
+          monthlyLimit: creditSnap.monthlyLimit,
+          source: creditSnap.source,
+          lowBalance: creditSnap.lowBalance,
+        }
+      : null;
+    const strictMode = creditSnap?.strictMode ?? false;
+
+    const artifactTypes = Array.from(
+      new Set(
+        [
+          ...artifacts.map((a) => a?.type).filter(Boolean),
+          pendingDocument?.type,
+        ].filter((t): t is string => typeof t === 'string' && t.length > 0),
+      ),
+    );
+    const blockedPhase =
+      (typeof genMeta.resumePhase === 'string' && genMeta.resumePhase) ||
+      (typeof genMeta.generationPhase === 'string' && genMeta.generationPhase) ||
+      null;
+    const deliverableChecklist = buildDeliverableChecklistForState({
+      lifecyclePhase: currentLifecyclePhase,
+      blockedPhase:
+        currentLifecyclePhase === 'FAILED' || phaseStatus === 'failed'
+          ? blockedPhase
+          : null,
+      completedPhases,
+      artifactTypes,
+    });
+
     // Before → after diff after regenerate
     let revisionDiff: {
       title: string;
@@ -794,7 +873,36 @@ export async function GET(
         pendingDocument,
         liveGeneration,
         usage,
+        credits,
+        strictMode,
+        deliverableChecklist,
         revisionDiff,
+        needsDevelopmentRegeneration,
+        fileEvidence: fileEvidence
+          ? {
+              fileCount: fileEvidence.fileCount,
+              realFileCount: fileEvidence.realFileCount,
+              hasAppEntry: fileEvidence.hasAppEntry,
+              ok: fileEvidence.ok,
+            }
+          : null,
+        deliveryPlan: await (async () => {
+          try {
+            const { loadDeliveryPlan, progressFromPlan } = await import(
+              '@/core/company-orchestration/implementation-todo.store'
+            );
+            const plan = await loadDeliveryPlan(projectId);
+            if (!plan) return null;
+            return {
+              fileStructure: plan.fileStructure,
+              implementationTodos: plan.implementationTodos,
+              qaTodos: plan.qaTodos,
+              progress: progressFromPlan(plan),
+            };
+          } catch {
+            return null;
+          }
+        })(),
       },
     });
   } catch (error: any) {

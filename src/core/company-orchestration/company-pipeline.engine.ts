@@ -18,6 +18,12 @@ import {
   publishNarrativeStream,
 } from './generation-stream-bus';
 import { persistStackConstraints } from '@/core/memory/persist-stack-constraints';
+import {
+  isBlockingProviderError,
+  resolveAgentFailure,
+  validatePhaseDeliverable,
+} from './phase-gate';
+import { updateWorkflowScalars, findWorkflowScalars } from './workflow-state-access';
 
 const phaseLoaders = {
   DISCOVERY_RUNNING: () => import('@/ai/agents/roles/product-discovery.agent'),
@@ -146,6 +152,19 @@ export class CompanyPipelineEngine {
         });
         this.touchLock(projectId);
 
+        // Hard stop before spending provider tokens when project credits are empty
+        try {
+          const { assertCreditsAvailable } = await import('@/core/billing/project-credits');
+          await assertCreditsAvailable(projectId);
+        } catch (creditErr: any) {
+          await this.handleFailure(
+            projectId,
+            currentPhase,
+            creditErr?.message || '402 Insufficient credit balance',
+          );
+          break;
+        }
+
         let inputData: any = null;
         if (def.inputArtifactType) {
           const artRes = await ArtifactManager.getLatestArtifact(projectId, def.inputArtifactType, def.agentRole);
@@ -187,6 +206,24 @@ export class CompanyPipelineEngine {
         if (!execRes.success) {
           await this.handleFailure(projectId, currentPhase, execRes.error || 'Department execution failed');
           break;
+        }
+
+        const gate = validatePhaseDeliverable(currentPhase, execRes.data);
+        if (!gate.ok) {
+          await this.handleFailure(projectId, currentPhase, gate.message);
+          break;
+        }
+
+        // Development: durable Explorer evidence required (never self-attest)
+        if (currentPhase === 'DEVELOPMENT_RUNNING') {
+          const { assertProjectHasImplementationFiles } = await import(
+            '@/core/company-orchestration/implementation-file-gate'
+          );
+          const filesOk = await assertProjectHasImplementationFiles(projectId);
+          if (!filesOk.ok) {
+            await this.handleFailure(projectId, currentPhase, filesOk.message);
+            break;
+          }
         }
 
         const outputArtifactContent = execRes.data;
@@ -258,6 +295,26 @@ export class CompanyPipelineEngine {
         }
 
         if (compRes.data.nextPhase === 'COMPLETED') {
+          const { assertProjectHasImplementationFiles } = await import(
+            '@/core/company-orchestration/implementation-file-gate'
+          );
+          const filesOk = await assertProjectHasImplementationFiles(projectId);
+          if (!filesOk.ok) {
+            await this.handleFailure(
+              projectId,
+              'DEVELOPMENT_RUNNING',
+              filesOk.message ||
+                'Cannot complete — Explorer has no real app files. Resume Development.',
+            );
+            // Rewind so Resume regenerates Development
+            await WorkflowManager.forceReopenPhase(
+              projectId,
+              'DEVELOPMENT_RUNNING',
+              'Blocked COMPLETED — missing implementation files',
+            );
+            break;
+          }
+
           await WorkflowManager.transitionState(projectId, 'COMPLETED', 'All departments completed successfully');
           await prisma.project.update({ where: { id: projectId }, data: { status: 'COMPLETED' } }).catch(() => {});
           await ArtifactManager.storeArtifact(projectId, {
@@ -274,11 +331,6 @@ export class CompanyPipelineEngine {
           });
           await this.emitVisibilityEvent(projectId, 'STEP_COMPLETE', 'COMPLETED', 'Pipeline completed successfully');
           WorkspaceService.markPipelineCompleted(projectId);
-          void import('@/features/workspace/explorer/services/ensure-explorer-files.service')
-            .then(({ ensureProjectExplorerFiles }) => ensureProjectExplorerFiles(projectId))
-            .catch((err) =>
-              console.warn('[CompanyPipelineEngine] ensure files after complete failed:', err),
-            );
           isRunning = false;
           break;
         }
@@ -340,6 +392,8 @@ export class CompanyPipelineEngine {
     try {
       this.touchLock(projectId);
       const revisionFeedback = await this.consumeRevisionFeedback(projectId, phase);
+      const { isStrictModeEnabled } = await import('@/core/billing/project-credits');
+      const strictMode = await isStrictModeEnabled(projectId);
 
       switch (phase) {
         case 'DISCOVERY_RUNNING': {
@@ -358,8 +412,16 @@ export class CompanyPipelineEngine {
             ideaStr = `${ideaStr}\n\nUser revision feedback: ${revisionFeedback}`;
           }
           await persistStackConstraints(projectId, ideaStr, revisionFeedback);
-          const spec = await agent.discoverProductSpecification(ideaStr);
-          return { success: true, data: spec };
+          try {
+            const spec = await agent.discoverProductSpecification(ideaStr);
+            return { success: true, data: spec };
+          } catch (err: any) {
+            const msg = err?.message || 'Product Discovery failed';
+            if (isBlockingProviderError(msg)) {
+              return { success: false, error: msg };
+            }
+            throw err;
+          }
         }
         case 'CLARIFICATION_RUNNING': {
           const spec = inputData;
@@ -403,11 +465,13 @@ export class CompanyPipelineEngine {
           await persistStackConstraints(projectId, ideaStr, revisionFeedback);
           const ceoRes = await mod.analyzeUserIdea(projectId, ideaStr);
           if (!ceoRes.success) {
-            const fallback = mod.buildHeuristicCEOAnalysis(
-              ideaStr,
-              revisionFeedback || undefined,
-            );
-            return { success: true, data: fallback };
+            return resolveAgentFailure({
+              phase: 'STRATEGY_RUNNING',
+              strictMode,
+              errorMessage: ceoRes.error?.message,
+              fallback: () =>
+                mod.buildHeuristicCEOAnalysis(ideaStr, revisionFeedback || undefined),
+            });
           }
           return { success: true, data: ceoRes.data };
         }
@@ -420,11 +484,16 @@ export class CompanyPipelineEngine {
           });
           const pmRes = await mod.refineRequirements(projectId, inputData);
           if (!pmRes.success) {
-            const fallback = mod.buildHeuristicRefinedRequirements(
-              inputData,
-              revisionFeedback || undefined,
-            );
-            return { success: true, data: fallback };
+            return resolveAgentFailure({
+              phase: 'PRODUCT_RUNNING',
+              strictMode,
+              errorMessage: pmRes.error?.message,
+              fallback: () =>
+                mod.buildHeuristicRefinedRequirements(
+                  inputData,
+                  revisionFeedback || undefined,
+                ),
+            });
           }
           return { success: true, data: pmRes.data };
         }
@@ -436,11 +505,16 @@ export class CompanyPipelineEngine {
             revisionFeedback || undefined,
           );
           if (!baRes.success) {
-            const fallback = mod.buildHeuristicSoftwareRequirementSpec(
-              inputData,
-              revisionFeedback || undefined,
-            );
-            return { success: true, data: fallback };
+            return resolveAgentFailure({
+              phase: 'ANALYSIS_RUNNING',
+              strictMode,
+              errorMessage: baRes.error?.message,
+              fallback: () =>
+                mod.buildHeuristicSoftwareRequirementSpec(
+                  inputData,
+                  revisionFeedback || undefined,
+                ),
+            });
           }
           return { success: true, data: baRes.data };
         }
@@ -452,11 +526,13 @@ export class CompanyPipelineEngine {
             revisionFeedback || undefined,
           );
           if (!uiRes.success) {
-            const fallback = mod.buildHeuristicUiDesignSpec(
-              inputData,
-              revisionFeedback || undefined,
-            );
-            return { success: true, data: fallback };
+            return resolveAgentFailure({
+              phase: 'DESIGN_RUNNING',
+              strictMode,
+              errorMessage: uiRes.error?.message,
+              fallback: () =>
+                mod.buildHeuristicUiDesignSpec(inputData, revisionFeedback || undefined),
+            });
           }
           return { success: true, data: uiRes.data };
         }
@@ -473,12 +549,17 @@ export class CompanyPipelineEngine {
             revisionFeedback || undefined,
           );
           if (!archRes.success) {
-            const fallback = mod.buildHeuristicArchitecture(
-              inputData,
-              revisionFeedback || undefined,
-              stackIntent,
-            );
-            return { success: true, data: fallback };
+            return resolveAgentFailure({
+              phase: 'ARCHITECTURE_RUNNING',
+              strictMode,
+              errorMessage: archRes.error?.message,
+              fallback: () =>
+                mod.buildHeuristicArchitecture(
+                  inputData,
+                  revisionFeedback || undefined,
+                  stackIntent,
+                ),
+            });
           }
           return { success: true, data: archRes.data };
         }
@@ -505,53 +586,131 @@ export class CompanyPipelineEngine {
         case 'DEVELOPMENT_RUNNING': {
           const mod = await phaseLoaders.DEVELOPMENT_RUNNING();
           await pulseGenerationHeartbeat(projectId, {
-            message: 'Software Engineering is assembling the implementation package…',
+            message: 'Developer agent is implementing the architecture…',
             phase: 'DEVELOPMENT_RUNNING',
             department: 'Software Engineering',
           });
 
-          // Lean path only for the company pipeline.
-          // The full DAG (planner + per-task code gen + FE/BE/DB LLMs) often ran many
-          // minutes. Status polls used to re-kick after 90s, which cancelled the build
-          // ("Build cancelled") and looped — Mission Control stuck at Development 68%.
           const { resolveStackFromMemory } = await import(
             '@/core/memory/persist-stack-constraints'
+          );
+          const { assertProjectHasImplementationFiles } = await import(
+            '@/core/company-orchestration/implementation-file-gate'
           );
           const stackIntent = await resolveStackFromMemory(
             projectId,
             inputData,
             revisionFeedback,
           );
-          const heuristic = mod.buildHeuristicImplementation(
-            inputData,
-            revisionFeedback || undefined,
-            stackIntent,
-          );
 
-          // Always materialize real files into Explorer so Studio / Preview work.
+          // Todo-driven Development: Architect file tree → todos → files → all done → QA
+          let implementation: any = null;
+          let mode: 'todo_driven' | 'developer_agent' | 'heuristic_fallback' = 'todo_driven';
+
+          const architectureInput =
+            inputData?.architecture && typeof inputData === 'object'
+              ? { ...inputData, ...(inputData.architecture || {}) }
+              : inputData?.ArchitectureDocument || inputData;
+
           try {
-            const { syncFilesToWorkspace } = await import(
-              '@/features/workspace/explorer/services/workspace-sync.service'
-            );
-            await syncFilesToWorkspace(
+            const todoRes = await mod.implementFromArchitectureTodos(
               projectId,
-              heuristic.changes.map((c) => ({
-                path: c.file,
-                content: c.code,
-                language: mod.getLanguageFromPath(c.file),
-              })),
+              architectureInput,
+              stackIntent,
+              revisionFeedback || undefined,
             );
-            await pulseGenerationHeartbeat(projectId, {
-              message: `Wrote ${heuristic.changes.length} files into Explorer`,
-              phase: 'DEVELOPMENT_RUNNING',
-              department: 'Software Engineering',
-            });
-          } catch (syncErr) {
-            console.error('[pipeline] Explorer sync failed after Development:', syncErr);
+            if (todoRes.success && todoRes.data) {
+              implementation = todoRes.data;
+            } else if (todoRes.error?.message) {
+              if (strictMode || isBlockingProviderError(todoRes.error.message)) {
+                return { success: false, error: todoRes.error.message };
+              }
+            }
+          } catch (todoErr: any) {
+            const msg = todoErr?.message || 'Todo-driven development failed';
+            if (strictMode || isBlockingProviderError(msg)) {
+              return { success: false, error: msg };
+            }
+          }
+
+          if (!implementation) {
+            mode = 'developer_agent';
+            try {
+              const agentRes = await mod.implementArchitecture(
+                projectId,
+                architectureInput,
+                undefined,
+              );
+              if (agentRes.success && agentRes.data) {
+                implementation = agentRes.data;
+                const listed =
+                  Array.isArray(implementation?.changes) ? implementation.changes.length : 0;
+                if (listed === 0) implementation = null;
+              } else if (agentRes.error?.message) {
+                if (strictMode || isBlockingProviderError(agentRes.error.message)) {
+                  return { success: false, error: agentRes.error.message };
+                }
+                await pulseGenerationHeartbeat(projectId, {
+                  message: `Developer soft-failed — scaffold fallback… (${agentRes.error.message})`,
+                  phase: 'DEVELOPMENT_RUNNING',
+                  department: 'Software Engineering',
+                });
+              }
+            } catch (agentErr: any) {
+              const msg = agentErr?.message || 'Developer agent failed';
+              if (strictMode || isBlockingProviderError(msg)) {
+                return { success: false, error: msg };
+              }
+            }
+          }
+
+          if (!implementation) {
+            if (strictMode) {
+              return {
+                success: false,
+                error:
+                  'Strict mode: Developer must finish architecture todos with real files. Resume after fixing AI/credits.',
+              };
+            }
+            mode = 'heuristic_fallback';
+            implementation = mod.buildHeuristicImplementation(
+              inputData,
+              revisionFeedback || undefined,
+              stackIntent,
+            );
+            try {
+              const { syncFilesToWorkspace } = await import(
+                '@/features/workspace/explorer/services/workspace-sync.service'
+              );
+              await syncFilesToWorkspace(
+                projectId,
+                (implementation.changes || []).map((c: { file: string; code: string }) => ({
+                  path: c.file,
+                  content: c.code,
+                  language: mod.getLanguageFromPath(c.file),
+                })),
+              );
+            } catch (syncErr) {
+              return {
+                success: false,
+                error:
+                  syncErr instanceof Error
+                    ? `Development could not write files: ${syncErr.message}`
+                    : 'Development could not write files into Explorer',
+              };
+            }
+          }
+
+          const filesOk = await assertProjectHasImplementationFiles(projectId);
+          if (!filesOk.ok) {
+            return {
+              success: false,
+              error: filesOk.message,
+            };
           }
 
           await pulseGenerationHeartbeat(projectId, {
-            message: 'Implementation package ready — handing off to QA',
+            message: `Development todos complete — ${filesOk.evidence.realFileCount} files ready for QA (${mode})`,
             phase: 'DEVELOPMENT_RUNNING',
             department: 'Software Engineering',
           });
@@ -559,30 +718,73 @@ export class CompanyPipelineEngine {
           return {
             success: true,
             data: {
-              implementation: heuristic,
-              summary: heuristic.report.notes,
-              files: heuristic.report.changedFiles,
-              engineers: { developer: 'completed', mode: 'pipeline_package' },
+              implementation,
+              summary:
+                implementation?.report?.notes ||
+                `Implementation ready (${filesOk.evidence.realFileCount} files)`,
+              files:
+                implementation?.report?.changedFiles ||
+                filesOk.evidence.paths.filter((p) => !p.match(/package\.json|README/i)),
+              engineers: { developer: 'completed', mode },
               explorerSynced: true,
+              fileEvidence: filesOk.evidence,
+              todosCompleted: true,
               ...(revisionFeedback ? { revisionNote: revisionFeedback } : {}),
             },
           };
         }
         case 'TESTING_RUNNING': {
           const mod = await phaseLoaders.TESTING_RUNNING();
+          const { loadDeliveryPlan, updateImplementationTodos } = await import(
+            '@/core/company-orchestration/implementation-todo.store'
+          );
+          const delivery = await loadDeliveryPlan(projectId);
+          if (delivery?.qaTodos?.length) {
+            await pulseGenerationHeartbeat(projectId, {
+              message: `QA starting ${delivery.qaTodos.length} architecture QA todos…`,
+              phase: 'TESTING_RUNNING',
+              department: 'Quality Assurance',
+            });
+          }
+
           const qaRes = await mod.reviewImplementation(
             projectId,
             inputData,
             revisionFeedback || undefined,
           );
+
+          let qaPayload: any;
           if (!qaRes.success) {
-            const fallback = mod.buildHeuristicQaReport(
-              inputData,
-              revisionFeedback || undefined,
-            );
-            return { success: true, data: fallback };
+            const gated = resolveAgentFailure({
+              phase: 'TESTING_RUNNING',
+              strictMode,
+              errorMessage: qaRes.error?.message,
+              fallback: () =>
+                mod.buildHeuristicQaReport(inputData, revisionFeedback || undefined),
+            });
+            if (!gated.success) return gated;
+            qaPayload = gated.data;
+          } else {
+            qaPayload = qaRes.data;
           }
-          return { success: true, data: qaRes.data };
+
+          if (delivery?.qaTodos?.length) {
+            const qaTodos = delivery.qaTodos.map((t) => ({ ...t, status: 'done' as const }));
+            await updateImplementationTodos(
+              projectId,
+              delivery.implementationTodos,
+              qaTodos,
+            );
+          }
+
+          return {
+            success: true,
+            data: {
+              ...qaPayload,
+              qaTodos: delivery?.qaTodos || [],
+              qaTodosCompleted: true,
+            },
+          };
         }
         case 'REVIEW_RUNNING': {
           const fileMap: Record<string, string> = {};
@@ -629,11 +831,13 @@ export class CompanyPipelineEngine {
             revisionFeedback || undefined,
           );
           if (!secRes.success) {
-            const fallback = mod.buildHeuristicSecurityReport(
-              inputData,
-              revisionFeedback || undefined,
-            );
-            return { success: true, data: fallback };
+            return resolveAgentFailure({
+              phase: 'SECURITY_RUNNING',
+              strictMode,
+              errorMessage: secRes.error?.message,
+              fallback: () =>
+                mod.buildHeuristicSecurityReport(inputData, revisionFeedback || undefined),
+            });
           }
           return { success: true, data: secRes.data };
         }
@@ -651,9 +855,32 @@ export class CompanyPipelineEngine {
             inputData,
             revisionFeedback || undefined,
           );
-          const data = devopsRes.success
-            ? devopsRes.data
-            : mod.buildHeuristicDevopsPlan(inputData, revisionFeedback || undefined);
+          if (!devopsRes.success) {
+            const gated = resolveAgentFailure({
+              phase: 'DEPLOYMENT_RUNNING',
+              strictMode,
+              errorMessage: devopsRes.error?.message,
+              fallback: () =>
+                mod.buildHeuristicDevopsPlan(inputData, revisionFeedback || undefined),
+            });
+            if (!gated.success) return gated;
+            await pulseGenerationHeartbeat(projectId, {
+              message: 'Preview ready — review first, deploy only if you want',
+              phase: 'DEPLOYMENT_RUNNING',
+              department: 'DevOps & Deployment',
+            });
+            return {
+              success: true,
+              data: {
+                ...gated.data,
+                previewReady: true,
+                deployRequiresUserAction: true,
+                summary:
+                  'Preview package ready. Review first — production deploy only when you choose.',
+                ...(revisionFeedback ? { revisionNote: revisionFeedback } : {}),
+              },
+            };
+          }
 
           await pulseGenerationHeartbeat(projectId, {
             message: 'Preview ready — review first, deploy only if you want',
@@ -664,7 +891,7 @@ export class CompanyPipelineEngine {
           return {
             success: true,
             data: {
-              ...data,
+              ...devopsRes.data,
               previewReady: true,
               deployRequiresUserAction: true,
               summary:
@@ -733,14 +960,74 @@ export class CompanyPipelineEngine {
     await pulseGenerationHeartbeat(projectId, {
       message: classified.message,
       phase,
+      department: PIPELINE_PHASE_DEFINITIONS[phase as ProjectLifecycleState]?.department,
       error: { message: classified.message, code: classified.code },
     }).catch(() => {});
+
+    // Persist resume point (especially credits / billing)
+    try {
+      const wf = await findWorkflowScalars(projectId);
+      const meta = { ...((wf?.metadata as Record<string, unknown>) || {}) };
+      meta.generationPhase = phase;
+      meta.resumePhase = phase;
+      meta.blockedReason = classified.kind;
+      meta.blockedAt = new Date().toISOString();
+      meta.lastGenerationError = {
+        message: classified.message,
+        code: classified.code,
+        at: new Date().toISOString(),
+      };
+      await updateWorkflowScalars(projectId, {
+        metadata: meta,
+        nextAction: classified.message,
+      });
+      await WorkflowManager.setPausedAtPhase(projectId, phase as ProjectLifecycleState).catch(
+        () => {},
+      );
+    } catch {}
+
+    // Credits / rate limits / auth: stop here — do not auto-retry or skip ahead
+    if (
+      classified.kind === 'credits' ||
+      classified.kind === 'rate_limited' ||
+      classified.code === 'AUTH_ERROR' ||
+      isBlockingProviderError(message)
+    ) {
+      await WorkflowManager.transitionState(
+        projectId,
+        'FAILED',
+        `Stopped at ${phase}: ${classified.title}. Resume when ready.`,
+      );
+      await prisma.project
+        .update({ where: { id: projectId }, data: { status: 'REVIEW' } })
+        .catch(() => {});
+      await companyEventBus.publish(
+        'EXECUTION_FAILED',
+        projectId,
+        { phase, error: classified.message, code: classified.code, resumable: true },
+        'CompanyPipelineEngine',
+      );
+      await recordTimelineEvent({
+        type: 'workflow.failed',
+        message: `⏸ ${classified.title} — paused at this step. Use Resume when credits/keys are ready.`,
+        metadata: { projectId, phase, error: classified.message, code: classified.code },
+      });
+      await this.emitVisibilityEvent(projectId, 'ERROR', phase, classified.message, {
+        error: classified.message,
+        code: classified.code,
+        resumable: true,
+      });
+      WorkspaceService.markPipelineFailed(projectId, classified.message);
+      return;
+    }
 
     try {
       const retryMod = await loadRetryEngine();
       const retryDecision = await retryMod.RetryEngine.handleFailure(projectId, phase, message);
       if (retryDecision.shouldRetry && retryDecision.attempt <= 3) {
-        console.log(`[CompanyPipelineEngine] Retry ${retryDecision.attempt}/3 for ${phase}: ${retryDecision.remediationAction}`);
+        console.log(
+          `[CompanyPipelineEngine] Retry ${retryDecision.attempt}/3 for ${phase}: ${retryDecision.remediationAction}`,
+        );
         await pulseGenerationHeartbeat(projectId, {
           message: `Retrying ${phase} (attempt ${retryDecision.attempt}/3)…`,
           phase,
@@ -750,9 +1037,20 @@ export class CompanyPipelineEngine {
       }
     } catch {}
 
-    await WorkflowManager.transitionState(projectId, 'FAILED', `Failed in ${phase}: ${classified.message}`);
-    await prisma.project.update({ where: { id: projectId }, data: { status: 'REVIEW' } }).catch(() => {});
-    await companyEventBus.publish('EXECUTION_FAILED', projectId, { phase, error: classified.message, code: classified.code }, 'CompanyPipelineEngine');
+    await WorkflowManager.transitionState(
+      projectId,
+      'FAILED',
+      `Failed in ${phase}: ${classified.message}`,
+    );
+    await prisma.project
+      .update({ where: { id: projectId }, data: { status: 'REVIEW' } })
+      .catch(() => {});
+    await companyEventBus.publish(
+      'EXECUTION_FAILED',
+      projectId,
+      { phase, error: classified.message, code: classified.code },
+      'CompanyPipelineEngine',
+    );
     await recordTimelineEvent({
       type: 'workflow.failed',
       message: `⛔ ${classified.title}: ${classified.message}`,

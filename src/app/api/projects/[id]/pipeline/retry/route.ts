@@ -8,12 +8,14 @@ import {
   type ProjectLifecycleState,
 } from '@/core/company-orchestration/types';
 import { findWorkflowScalars } from '@/core/company-orchestration/workflow-state-access';
+import { getProjectFileEvidence } from '@/core/company-orchestration/implementation-file-gate';
 
 /**
- * Resume / retry generation after a stall, failure, or credits issue.
+ * Resume / regenerate after stall, failure, credits, or hollow Development (no files).
+ * Body (optional): { forcePhase?: 'DEVELOPMENT_RUNNING' }
  */
 export async function POST(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
@@ -26,6 +28,10 @@ export async function POST(
     }
 
     const { id: projectId } = await params;
+    const body = (await request.json().catch(() => ({}))) as {
+      forcePhase?: ProjectLifecycleState;
+    };
+
     const stateRes = await WorkflowManager.getOrInitState(projectId);
     if (!stateRes.success) {
       return NextResponse.json(stateRes, { status: 400 });
@@ -36,42 +42,88 @@ export async function POST(
     const meta = { ...((wf?.metadata as Record<string, unknown>) || {}) };
     const generationPhase = meta.generationPhase as ProjectLifecycleState | undefined;
     const pausedAt = state.pausedAtPhase;
+    const evidence = await getProjectFileEvidence(projectId);
 
     let targetPhase: ProjectLifecycleState | null = null;
 
-    if (state.currentPhase === 'FAILED') {
+    const phaseOrder = [
+      'TESTING_RUNNING',
+      'REVIEW_RUNNING',
+      'SECURITY_RUNNING',
+      'DEPLOYMENT_RUNNING',
+      'MONITORING',
+      'COMPLETED',
+    ];
+    const pastDevelopment =
+      state.currentPhase === 'DEVELOPMENT_RUNNING' ||
+      state.currentPhase === 'FAILED' ||
+      state.completedPhases.includes('DEVELOPMENT_RUNNING') ||
+      phaseOrder.includes(state.currentPhase);
+
+    // Only reopen Development when we claim(ed) it done or are past it — not during Discovery.
+    const needsDevRegen =
+      body.forcePhase === 'DEVELOPMENT_RUNNING' ||
+      (!evidence.ok && pastDevelopment);
+
+    if (needsDevRegen && state.currentPhase !== 'CREATED') {
+      const reopen = await WorkflowManager.forceReopenPhase(
+        projectId,
+        'DEVELOPMENT_RUNNING',
+        evidence.message || 'Regenerating Development — creating real project files',
+      );
+      if (!reopen.success) {
+        return NextResponse.json(reopen, { status: 400 });
+      }
+      targetPhase = 'DEVELOPMENT_RUNNING';
+    } else if (state.currentPhase === 'FAILED') {
       targetPhase =
-        generationPhase && PIPELINE_PHASE_DEFINITIONS[generationPhase]
-          ? generationPhase
-          : pausedAt && PIPELINE_PHASE_DEFINITIONS[pausedAt]
-            ? pausedAt
-            : 'DISCOVERY_RUNNING';
+        (meta.resumePhase as ProjectLifecycleState) &&
+        PIPELINE_PHASE_DEFINITIONS[meta.resumePhase as ProjectLifecycleState]
+          ? (meta.resumePhase as ProjectLifecycleState)
+          : generationPhase && PIPELINE_PHASE_DEFINITIONS[generationPhase]
+            ? generationPhase
+            : pausedAt && PIPELINE_PHASE_DEFINITIONS[pausedAt]
+              ? pausedAt
+              : 'DISCOVERY_RUNNING';
+
+      if (!evidence.ok) {
+        targetPhase = 'DEVELOPMENT_RUNNING';
+      }
 
       const transition = await WorkflowManager.transitionState(
         projectId,
         targetPhase,
-        'Retrying generation after interruption',
+        'Resuming pipeline from the stopped step',
       );
       if (!transition.success) {
-        return NextResponse.json(transition, { status: 400 });
+        // Fallback force reopen
+        const reopen = await WorkflowManager.forceReopenPhase(
+          projectId,
+          targetPhase,
+          'Force resume after failed transition',
+        );
+        if (!reopen.success) return NextResponse.json(reopen, { status: 400 });
       }
     } else if (
       state.currentPhase.endsWith('_RUNNING') ||
       state.currentPhase === 'MONITORING'
     ) {
-      targetPhase = state.currentPhase;
+      targetPhase = !evidence.ok ? 'DEVELOPMENT_RUNNING' : state.currentPhase;
+      if (targetPhase === 'DEVELOPMENT_RUNNING' && state.currentPhase !== 'DEVELOPMENT_RUNNING') {
+        await WorkflowManager.forceReopenPhase(
+          projectId,
+          'DEVELOPMENT_RUNNING',
+          'Missing files — regenerating Development',
+        );
+      }
     } else if (state.currentPhase === 'PAUSED' && pausedAt) {
-      // Resume regenerating the paused phase
-      targetPhase = pausedAt;
+      targetPhase = !evidence.ok ? 'DEVELOPMENT_RUNNING' : pausedAt;
       await WorkflowManager.setPausedAtPhase(projectId, null);
-      const transition = await WorkflowManager.transitionState(
+      await WorkflowManager.forceReopenPhase(
         projectId,
         targetPhase,
         'Resuming generation',
       );
-      if (!transition.success) {
-        return NextResponse.json(transition, { status: 400 });
-      }
     } else if (state.currentPhase === 'CREATED') {
       return NextResponse.json(
         {
@@ -83,6 +135,11 @@ export async function POST(
         },
         { status: 400 },
       );
+    } else if (state.currentPhase === 'COMPLETED' && evidence.ok) {
+      return NextResponse.json({
+        success: true,
+        data: { resumed: false, phase: 'COMPLETED', message: 'Already complete with files' },
+      });
     }
 
     await pulseGenerationHeartbeat(projectId, {
@@ -96,12 +153,9 @@ export async function POST(
       clearError: true,
     });
 
-    // Clear any dead lock from a cancelled/hung Development run
     CompanyPipelineEngine.forceReleaseLock(projectId);
-    try {
-      const { cancelBuild } = await import('@/ai/agents/roles/developer/developer.service');
-      cancelBuild(projectId);
-    } catch {}
+    // Do NOT cancel an active developer build on Resume — only release pipeline lock.
+    // (Previous cancelBuild caused "Build cancelled" loops.)
 
     setTimeout(() => {
       CompanyPipelineEngine.runPipeline(projectId).catch((err) => {
@@ -111,7 +165,11 @@ export async function POST(
 
     return NextResponse.json({
       success: true,
-      data: { resumed: true, phase: targetPhase || state.currentPhase },
+      data: {
+        resumed: true,
+        phase: targetPhase || state.currentPhase,
+        regeneratingDevelopment: needsDevRegen && !evidence.ok,
+      },
     });
   } catch (error: any) {
     console.error('[Pipeline Retry] Error:', error);

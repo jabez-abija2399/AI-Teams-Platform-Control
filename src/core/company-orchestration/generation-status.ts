@@ -52,8 +52,8 @@ export function classifyAiError(raw: string): ClassifiedAiError {
       code: 'CREDITS_EXHAUSTED',
       title: 'AI credits unavailable',
       message:
-        'The AI provider reports that credits or billing are exhausted. Add credits or update billing, then retry generation.',
-      actionLabel: 'Retry generation',
+        'The AI provider reports that credits or billing are exhausted. Add credits or update billing, then tap Resume to continue from this exact step.',
+      actionLabel: 'Resume pipeline',
     };
   }
 
@@ -62,8 +62,8 @@ export function classifyAiError(raw: string): ClassifiedAiError {
       kind: 'rate_limited',
       code: 'RATE_LIMITED',
       title: 'AI service is busy',
-      message: 'The model provider is rate-limiting requests. Wait a moment, then retry.',
-      actionLabel: 'Retry generation',
+      message: 'The model provider is rate-limiting requests. Wait a moment, then Resume this step.',
+      actionLabel: 'Resume pipeline',
     };
   }
 
@@ -73,8 +73,8 @@ export function classifyAiError(raw: string): ClassifiedAiError {
       code: 'AUTH_ERROR',
       title: 'AI provider configuration issue',
       message:
-        'We could not authenticate with the AI provider. Check your API keys in environment settings, then retry.',
-      actionLabel: 'Retry generation',
+        'We could not authenticate with the AI provider. Check your API keys, then Resume this step.',
+      actionLabel: 'Resume pipeline',
     };
   }
 
@@ -84,8 +84,8 @@ export function classifyAiError(raw: string): ClassifiedAiError {
       code: 'TIMEOUT',
       title: 'Generation timed out',
       message:
-        'This step took too long and was stopped. You can retry — the team will continue from the current phase.',
-      actionLabel: 'Retry generation',
+        'This step took too long and was stopped. Resume to continue from the current phase — we will not skip ahead.',
+      actionLabel: 'Resume pipeline',
     };
   }
 
@@ -94,8 +94,8 @@ export function classifyAiError(raw: string): ClassifiedAiError {
       kind: 'failed',
       code: 'NETWORK_ERROR',
       title: 'Connection interrupted',
-      message: 'We lost contact with the AI service. Check your connection and retry.',
-      actionLabel: 'Retry generation',
+      message: 'We lost contact with the AI service. Check your connection and Resume this step.',
+      actionLabel: 'Resume pipeline',
     };
   }
 
@@ -105,8 +105,8 @@ export function classifyAiError(raw: string): ClassifiedAiError {
     title: 'Generation stopped',
     message:
       raw?.trim()?.slice(0, 220) ||
-      'Something went wrong while the AI company was working. You can retry this step.',
-    actionLabel: 'Retry generation',
+      'Something went wrong while the AI company was working. Resume to finish this step before moving on.',
+    actionLabel: 'Resume pipeline',
   };
 }
 

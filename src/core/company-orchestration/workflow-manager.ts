@@ -136,12 +136,101 @@ export class WorkflowManager {
       risks: [],
     });
 
-    // Complete with empty Explorer is a product bug — backfill stack-aware files.
-    void import('@/features/workspace/explorer/services/ensure-explorer-files.service')
-      .then(({ ensureProjectExplorerFiles }) => ensureProjectExplorerFiles(projectId))
-      .catch((err) =>
-        console.warn('[WorkflowManager] ensure files after complete failed:', err),
-      );
+    // Never invent Explorer files just to look complete — require real Development output.
+  }
+
+  /**
+   * Force reopen a phase for regeneration (e.g. COMPLETED with empty Explorer → Development).
+   * Bypasses normal transition graph; trims completedPhases past the target.
+   */
+  public static async forceReopenPhase(
+    projectId: string,
+    phase: ProjectLifecycleState,
+    reason: string,
+  ): Promise<ApiResult<MissionControlStatus>> {
+    try {
+      const def = PIPELINE_PHASE_DEFINITIONS[phase];
+      if (!def) {
+        return {
+          success: false,
+          error: { message: `Unknown phase ${phase}`, code: 'INVALID_PHASE' },
+        };
+      }
+
+      // Do not call getOrInitState here — it can re-enter heal → forceReopen.
+      let current = await loadWorkflowRow(projectId);
+      if (!current) {
+        await prisma.projectWorkflowState.create({
+          data: {
+            projectId,
+            currentPhase: phase,
+            activeAgent: def.agentRole,
+            progress: def.progressPercentage,
+            nextAction: reason,
+          },
+          select: { projectId: true },
+        }).catch(() => {});
+        current = await loadWorkflowRow(projectId);
+      }
+
+      const lists = current ? await loadWorkflowLists(projectId) : { completedPhases: [] as string[], waitingApprovals: [] as string[], risks: [] as string[] };
+      const completedPhases = lists.completedPhases;
+      const order = PIPELINE_PROGRESS_PHASES;
+      const targetIdx = order.indexOf(phase);
+      const trimmed =
+        targetIdx >= 0
+          ? completedPhases.filter((p) => {
+              const i = order.indexOf(p);
+              return i >= 0 && i < targetIdx;
+            })
+          : completedPhases.filter((p) => p !== phase);
+
+      await updateWorkflowScalars(projectId, {
+        currentPhase: phase,
+        activeAgent: def.agentRole,
+        progress: def.progressPercentage,
+        nextAction: reason,
+      });
+      await setWorkflowArrays(projectId, {
+        completedPhases: trimmed,
+        waitingApprovals: [],
+      });
+
+      await prisma.project
+        .update({
+          where: { id: projectId },
+          data: { status: 'IN_PROGRESS' },
+        })
+        .catch(() => {});
+
+      const updated = await loadWorkflowRow(projectId);
+      if (!updated) {
+        return {
+          success: true,
+          data: {
+            projectId,
+            currentDepartment: def.department,
+            activeAgent: def.agentRole,
+            currentPhase: phase,
+            currentArtifact: def.outputArtifactType,
+            progress: def.progressPercentage,
+            nextAction: reason,
+            waitingApprovals: [],
+            completedPhases: trimmed,
+            risks: [],
+          },
+        };
+      }
+      return { success: true, data: toMissionControlStatus(updated) };
+    } catch (err: any) {
+      return {
+        success: false,
+        error: {
+          message: err?.message || 'Failed to reopen phase',
+          code: 'REOPEN_FAILED',
+        },
+      };
+    }
   }
 
   public static async healIfProjectFinished(projectId: string): Promise<boolean> {
@@ -168,28 +257,33 @@ export class WorkflowManager {
       }
 
       if (state?.currentPhase === 'CREATED' && project.status === 'IN_PROGRESS') {
-        const implDoc = await prisma.document.findFirst({
-          where: {
-            projectId,
-            OR: [
-              { type: 'Implementation' },
-              { type: 'DeploymentArtifact' },
-              { type: 'FinalRelease' },
-            ],
-          },
-          select: { id: true },
-        });
-        const repo = await prisma.repository.findFirst({
-          where: { projectId },
-          select: { id: true, _count: { select: { files: true } } },
-        });
-        const fileCount = repo?._count?.files ?? 0;
-        if (implDoc || fileCount > 0) {
+        const { getProjectFileEvidence } = await import(
+          '@/core/company-orchestration/implementation-file-gate'
+        );
+        const evidence = await getProjectFileEvidence(projectId);
+        // Never complete from a Document alone — require real Explorer app files
+        if (evidence.ok) {
           await this.markCompleted(projectId, 'Restored progress from existing deliverables');
           await prisma.project
             .update({ where: { id: projectId }, data: { status: 'COMPLETED' } })
             .catch(() => {});
           return true;
+        }
+      }
+
+      // Hollow COMPLETED (100% but no files) → reopen Development for Resume
+      if (state?.currentPhase === 'COMPLETED') {
+        const { getProjectFileEvidence } = await import(
+          '@/core/company-orchestration/implementation-file-gate'
+        );
+        const evidence = await getProjectFileEvidence(projectId);
+        if (!evidence.ok) {
+          await this.forceReopenPhase(
+            projectId,
+            'DEVELOPMENT_RUNNING',
+            evidence.message || 'Reopened Development — missing real files',
+          );
+          return false;
         }
       }
 
