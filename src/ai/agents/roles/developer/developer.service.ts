@@ -22,6 +22,7 @@ import {
   type ImplementationTodo,
   todosAllDone,
 } from '@/core/company-orchestration/architecture-delivery-plan';
+import type { DeliveryStack } from '@/core/company-orchestration/stack-intent';
 import {
   loadDeliveryPlan,
   persistDeliveryPlan,
@@ -621,7 +622,7 @@ export async function implementFromArchitectureTodos(
   stack?: {
     htmlCss?: boolean;
     staticNoBackend?: boolean;
-    stack?: string;
+    stack?: DeliveryStack;
     label?: string;
   } | null,
   revisionFeedback?: string,
