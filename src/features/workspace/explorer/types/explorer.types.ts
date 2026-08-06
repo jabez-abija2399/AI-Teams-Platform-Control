@@ -6,12 +6,15 @@ export interface ExplorerFolderNode {
   children: ExplorerNode[];
 }
 
+export type FileReviewStatus = 'accepted' | 'pending' | 'rejected';
+
 export interface ExplorerFileNode {
   id: string;
   type: 'file';
   name: string;
   path: string;
   language: string | null;
+  reviewStatus?: FileReviewStatus;
 }
 
 export type ExplorerNode = ExplorerFolderNode | ExplorerFileNode;

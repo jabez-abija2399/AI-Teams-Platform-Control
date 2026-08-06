@@ -1,20 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import type { ExplorerNode, ExplorerFolderNode } from '../types/explorer.types';
 
-const DEFAULT_AUTH_FILES: ExplorerNode[] = [
-  { id: 'virt_src_app_page', type: 'file', name: 'page.tsx', path: 'src/app/page.tsx', language: 'typescript' },
-  { id: 'virt_src_app_login_page', type: 'file', name: 'page.tsx', path: 'src/app/login/page.tsx', language: 'typescript' },
-  { id: 'virt_src_app_signup_page', type: 'file', name: 'page.tsx', path: 'src/app/signup/page.tsx', language: 'typescript' },
-  { id: 'virt_src_app_profile_page', type: 'file', name: 'page.tsx', path: 'src/app/profile/page.tsx', language: 'typescript' },
-  { id: 'virt_src_comp_login_form', type: 'file', name: 'login-form.tsx', path: 'src/components/auth/login-form.tsx', language: 'typescript' },
-  { id: 'virt_src_comp_signup_form', type: 'file', name: 'signup-form.tsx', path: 'src/components/auth/signup-form.tsx', language: 'typescript' },
-  { id: 'virt_src_api_login', type: 'file', name: 'route.ts', path: 'src/app/api/auth/login/route.ts', language: 'typescript' },
-  { id: 'virt_src_api_register', type: 'file', name: 'route.ts', path: 'src/app/api/auth/register/route.ts', language: 'typescript' },
-  { id: 'virt_src_api_logout', type: 'file', name: 'route.ts', path: 'src/app/api/auth/logout/route.ts', language: 'typescript' },
-  { id: 'virt_package_json', type: 'file', name: 'package.json', path: 'package.json', language: 'json' },
-  { id: 'virt_tsconfig_json', type: 'file', name: 'tsconfig.json', path: 'tsconfig.json', language: 'json' },
-];
-
 export async function getFolderContents(
   projectId: string,
   folderId: string | null,
@@ -50,16 +36,15 @@ export async function getFolderContents(
         name: f.path.split('/').pop() ?? f.path,
         path: f.path,
         language: f.language,
+        reviewStatus: (f.reviewStatus as 'accepted' | 'pending' | 'rejected') || 'accepted',
       }));
 
     const result = [...folderNodes, ...fileNodes];
-    if (result.length > 0) return result;
+    return result;
   } catch (err) {
     console.error(`[ExplorerService] Error fetching contents for project ${projectId}:`, err);
+    return [];
   }
-
-  // Fallback to guarantee complete file tree display in workspace sidebar
-  return DEFAULT_AUTH_FILES;
 }
 
 export async function createFolder(

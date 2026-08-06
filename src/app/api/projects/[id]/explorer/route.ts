@@ -20,7 +20,9 @@ export async function GET(
           where: { repositoryId: repo.id, path },
         });
       }
-    } catch {}
+    } catch (err) {
+      console.error('[Explorer] Error fetching file:', err);
+    }
 
     const fileName = path.split('/').pop() ?? path;
 

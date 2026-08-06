@@ -4,6 +4,7 @@ import { memo, useEffect, useState, useRef } from 'react';
 import { FolderNode } from './folder-node';
 import { FileNode } from './file-node';
 import { useExplorer } from '../hooks/use-explorer';
+import { useExplorerStore } from '../stores/explorer.store';
 import { useWorkspaceStore } from '../../stores/workspace.store';
 import { Loader2 } from 'lucide-react';
 import type { ExplorerNode } from '../types/explorer.types';
@@ -89,6 +90,14 @@ export function ExplorerTree({ projectId }: { projectId: string }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refreshTrigger]);
 
+  useEffect(() => {
+    const onRefresh = () => {
+      useExplorerStore.getState().triggerRefresh();
+    };
+    window.addEventListener('explorer-refresh', onRefresh);
+    return () => window.removeEventListener('explorer-refresh', onRefresh);
+  }, []);
+
   const rootNodes = loadedChildren['root'] ?? [];
 
   return (
@@ -100,8 +109,12 @@ export function ExplorerTree({ projectId }: { projectId: string }) {
         </div>
       )}
       {!loading && rootNodes.length === 0 && (
-        <div className="px-3 py-4 text-[11px] text-muted-foreground text-center">
-          No files found. Run a build to generate files.
+        <div className="px-3 py-5 text-center">
+          <p className="text-[11px] font-medium text-foreground">No files yet</p>
+          <p className="mt-1 text-[10px] leading-relaxed text-muted-foreground">
+            Opening Studio prepares files for this project. If this stays empty, finish Development
+            on Mission Control or click Reload Preview.
+          </p>
         </div>
       )}
       <TreeLevel projectId={projectId} folderKey="root" depth={0} refreshing={refreshing} />
