@@ -29,7 +29,7 @@ const TreeLevel = memo(function TreeLevel({
     <>
       {nodes.map((node: ExplorerNode) =>
         node.type === 'folder' ? (
-          <div key={node.id}>
+          <div key={`${projectId}:${node.id}`}>
             <FolderNode
               node={node}
               depth={depth}
@@ -48,7 +48,7 @@ const TreeLevel = memo(function TreeLevel({
           </div>
         ) : (
           <FileNode
-            key={node.id}
+            key={`${projectId}:${node.id}`}
             node={node}
             depth={depth}
             selected={selectedNodeId === node.id}
@@ -70,16 +70,24 @@ const TreeLevel = memo(function TreeLevel({
 });
 
 export function ExplorerTree({ projectId }: { projectId: string }) {
-  const { loadRoot, loadedChildren, refreshTrigger } = useExplorer(projectId);
+  const { loadRoot, loadedChildren, refreshTrigger, bindProject } = useExplorer(projectId);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const refreshCountRef = useRef(0);
-  const hasLoaded = useRef(false);
 
+  // Hard reset when the open project changes — never keep another project's tree
   useEffect(() => {
+    if (!projectId) return;
+    bindProject(projectId);
+    useExplorerStore.setState({
+      boundProjectId: projectId,
+      expandedFolders: new Set(),
+      loadedChildren: {},
+      selectedNodeId: null,
+    });
     setLoading(true);
     loadRoot().finally(() => setLoading(false));
-  }, [projectId, loadRoot]);
+  }, [projectId, bindProject, loadRoot]);
 
   useEffect(() => {
     refreshCountRef.current++;
@@ -87,7 +95,7 @@ export function ExplorerTree({ projectId }: { projectId: string }) {
       setRefreshing(true);
       loadRoot().finally(() => setRefreshing(false));
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refreshTrigger]);
 
   useEffect(() => {
@@ -98,26 +106,30 @@ export function ExplorerTree({ projectId }: { projectId: string }) {
     return () => window.removeEventListener('explorer-refresh', onRefresh);
   }, []);
 
-  const rootNodes = loadedChildren['root'] ?? [];
+  const bound = useExplorerStore((s) => s.boundProjectId);
+  const rootNodes =
+    bound === projectId ? (loadedChildren['root'] ?? []) : [];
 
   return (
-    <div className="py-1">
+    <div className="py-1" data-project-id={projectId}>
       {(loading || refreshing) && (
         <div className="flex items-center gap-2 px-3 py-2 text-[10px] text-muted-foreground">
           <Loader2 className="h-3 w-3 animate-spin" />
-          {loading ? 'Loading files...' : 'Refreshing...'}
+          {loading ? 'Loading this project…' : 'Refreshing…'}
         </div>
       )}
       {!loading && rootNodes.length === 0 && (
         <div className="px-3 py-5 text-center">
           <p className="text-[11px] font-medium text-foreground">No files yet</p>
           <p className="mt-1 text-[10px] leading-relaxed text-muted-foreground">
-            Opening Studio prepares files for this project. If this stays empty, finish Development
-            on Mission Control or click Reload Preview.
+            Opening Studio prepares files for this project only. If empty, finish Development on
+            Mission Control or reload Preview.
           </p>
         </div>
       )}
-      <TreeLevel projectId={projectId} folderKey="root" depth={0} refreshing={refreshing} />
+      {bound === projectId && (
+        <TreeLevel projectId={projectId} folderKey="root" depth={0} refreshing={refreshing} />
+      )}
     </div>
   );
 }

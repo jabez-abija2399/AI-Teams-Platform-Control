@@ -65,9 +65,16 @@ export function useEditor() {
     async (tabId: string, fileId: string, _filePath: string): Promise<FileContent | null> => {
       setIsLoading(true);
       try {
-        const res = await fetch(`/api/editor/file/${fileId}`);
+        const projectId = useWorkspaceStore.getState().currentProjectId;
+        const qs = projectId ? `?projectId=${encodeURIComponent(projectId)}` : '';
+        const res = await fetch(`/api/editor/file/${fileId}${qs}`);
         const json = await res.json();
         if (!json.success) return null;
+
+        // Refuse content from another project
+        if (projectId && json.data?.projectId && json.data.projectId !== projectId) {
+          return null;
+        }
 
         const data: FileContent = json.data;
         contentRef.current.set(tabId, data.content);
@@ -126,10 +133,11 @@ export function useEditor() {
       if (!state || !content || !state.isDirty) return;
 
       try {
+        const projectId = useWorkspaceStore.getState().currentProjectId;
         const res = await fetch(`/api/editor/file/${state.fileId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ content }),
+          body: JSON.stringify({ content, projectId }),
         });
         const json = await res.json();
         if (json.success) {

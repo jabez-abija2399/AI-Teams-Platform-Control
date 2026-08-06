@@ -55,8 +55,23 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       simpleMode: false,
       tourCompleted: false,
 
-      setCurrentProject: (projectId) =>
-        set({ currentProjectId: projectId, openTabs: [], activeTabId: null }),
+  setCurrentProject: (projectId) => {
+    set({ currentProjectId: projectId, openTabs: [], activeTabId: null });
+    // Clear Explorer cache so Studio never shows the previous project's files
+    void import('@/features/workspace/explorer/stores/explorer.store')
+      .then(({ useExplorerStore }) => {
+        if (projectId) useExplorerStore.getState().bindProject(projectId);
+        else {
+          useExplorerStore.setState({
+            boundProjectId: null,
+            loadedChildren: {},
+            expandedFolders: new Set(),
+            selectedNodeId: null,
+          });
+        }
+      })
+      .catch(() => {});
+  },
 
       openTab: (tab) =>
         set((state) => {
