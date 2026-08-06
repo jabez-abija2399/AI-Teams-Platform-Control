@@ -1,8 +1,9 @@
 import { prisma } from '@/lib/prisma';
-import { CompanyEventBus } from '@/core/integration/event-bus';
+import { companyEventBus } from '@/core/integration/event-bus';
 import { recordTimelineEvent } from '@/features/ai-workspace/services/timeline.service';
 import type { ApiResult } from '@/types/common.types';
 import type { ApprovalGateType, ProjectLifecycleState } from './types';
+import { findWorkflowScalars, setWorkflowTextArray, updateWorkflowScalars, parseStringList } from './workflow-state-access';
 
 export class ApprovalManager {
   /**
@@ -22,6 +23,12 @@ export class ApprovalManager {
       const existing = await prisma.approvalHistory.findFirst({
         where: { projectId, approvalType, status: 'PENDING' },
       });
+
+      // Always ensure workflow is PAUSED while a gate is pending.
+      // (Previously, an existing PENDING row returned early and left
+      // currentPhase as TESTING_RUNNING — UI showed approve, API rejected.)
+      await this.ensurePausedForApproval(projectId, approvalType, phase);
+
       if (existing) {
         return { success: true, data: { approvalId: existing.id } };
       }
@@ -38,24 +45,7 @@ export class ApprovalManager {
         },
       });
 
-      // Update ProjectWorkflowState to reflect waiting approval and paused state
-      const state = await prisma.projectWorkflowState.findUnique({ where: { projectId } });
-      if (state) {
-        const waiting = Array.isArray(state.waitingApprovals) ? (state.waitingApprovals as string[]) : [];
-        if (!waiting.includes(approvalType)) {
-          waiting.push(approvalType);
-        }
-        await prisma.projectWorkflowState.update({
-          where: { projectId },
-          data: {
-            currentPhase: 'PAUSED',
-            waitingApprovals: waiting as any,
-            nextAction: `Awaiting human executive decision for: ${approvalType}`,
-          },
-        });
-      }
-
-      await CompanyEventBus.publish(
+      await companyEventBus.publish(
         'APPROVAL_REQUESTED',
         projectId,
         { approvalId: approval.id, approvalType, phase, artifactType },
@@ -78,14 +68,71 @@ export class ApprovalManager {
     }
   }
 
+  /** Force PAUSED + waitingApprovals for a gate (idempotent heal). */
+  public static async ensurePausedForApproval(
+    projectId: string,
+    approvalType: ApprovalGateType,
+    phase?: ProjectLifecycleState | string | null,
+  ): Promise<void> {
+    let state: {
+      currentPhase: string;
+      waitingApprovals: unknown;
+      metadata: unknown;
+    } | null = null;
+    try {
+      const scalar = await prisma.projectWorkflowState.findUnique({
+        where: { projectId },
+        select: { currentPhase: true, metadata: true },
+      });
+      if (!scalar) return;
+      let waitingApprovals: unknown = [];
+      try {
+        const arrays = await prisma.$queryRaw<{ waitingApprovals: unknown }[]>`
+          SELECT "waitingApprovals" FROM project_workflow_states
+          WHERE "projectId" = ${projectId} LIMIT 1
+        `;
+        waitingApprovals = arrays[0]?.waitingApprovals ?? [];
+      } catch {
+        waitingApprovals = [];
+      }
+      state = { ...scalar, waitingApprovals };
+    } catch (err: any) {
+      console.warn('[ApprovalManager] findUnique failed:', err?.message);
+      return;
+    }
+    if (!state) return;
+
+    const waiting = parseStringList(state.waitingApprovals);
+    if (!waiting.includes(approvalType)) {
+      waiting.push(approvalType);
+    }
+
+    const meta = { ...((state.metadata as Record<string, unknown>) || {}) };
+    const pausePhase =
+      (phase && String(phase).endsWith('_RUNNING') ? phase : null) ||
+      (typeof meta.pausedAtPhase === 'string' ? meta.pausedAtPhase : null) ||
+      (state.currentPhase.endsWith('_RUNNING') ? state.currentPhase : null);
+    if (pausePhase) {
+      meta.pausedAtPhase = pausePhase;
+    }
+
+    // Scalars via Prisma; text[] via SQL — adapter-pg String[] writes can throw e.map.
+    await updateWorkflowScalars(projectId, {
+      currentPhase: 'PAUSED',
+      nextAction: `Awaiting human executive decision for: ${approvalType}`,
+      metadata: meta,
+    });
+
+    await setWorkflowTextArray(projectId, 'waitingApprovals', waiting);
+  }
+
   /**
-   * Resolves a pending approval (APPROVED or REJECTED).
-   * If APPROVED, removes the approval from waitingApprovals in ProjectWorkflowState.
+   * Resolves a pending approval (APPROVED, REJECTED, or CHANGES_REQUESTED).
    */
   public static async resolveApproval(
     projectId: string,
     approvalType: ApprovalGateType,
-    status: 'APPROVED' | 'REJECTED',
+    status: 'APPROVED' | 'REJECTED' | 'CHANGES_REQUESTED',
     reviewedBy: string = 'Human Executive',
     comments?: string,
   ): Promise<ApiResult<{ approvalId: string; status: string }>> {
@@ -110,29 +157,48 @@ export class ApprovalManager {
         },
       });
 
-      // Update ProjectWorkflowState waitingApprovals
-      const state = await prisma.projectWorkflowState.findUnique({ where: { projectId } });
+      const state = await findWorkflowScalars(projectId).catch(() => null);
       if (state) {
-        let waiting = Array.isArray(state.waitingApprovals) ? (state.waitingApprovals as string[]) : [];
+        // Load current waiting list via raw SQL (avoid String[] mapper)
+        let waiting: string[] = [];
+        try {
+          const rows = await prisma.$queryRaw<{ waitingApprovals: unknown }[]>`
+            SELECT "waitingApprovals" FROM project_workflow_states
+            WHERE "projectId" = ${projectId} LIMIT 1
+          `;
+          const raw = rows[0]?.waitingApprovals;
+          waiting = parseStringList(raw);
+        } catch {
+          waiting = [];
+        }
         waiting = waiting.filter((a) => a !== approvalType);
-        await prisma.projectWorkflowState.update({
-          where: { projectId },
-          data: {
-            waitingApprovals: waiting as any,
-          },
-        });
+        await setWorkflowTextArray(projectId, 'waitingApprovals', waiting);
       }
 
-      await CompanyEventBus.publish(
-        status === 'APPROVED' ? 'APPROVAL_GRANTED' : 'APPROVAL_REJECTED',
+      const eventName =
+        status === 'APPROVED'
+          ? 'APPROVAL_GRANTED'
+          : status === 'CHANGES_REQUESTED'
+            ? 'APPROVAL_REJECTED'
+            : 'APPROVAL_REJECTED';
+
+      await companyEventBus.publish(
+        eventName,
         projectId,
         { approvalId: updated.id, approvalType, status, reviewedBy, comments },
         'ApprovalManager',
       );
 
+      const message =
+        status === 'APPROVED'
+          ? `✅ ${approvalType} granted by ${reviewedBy}`
+          : status === 'CHANGES_REQUESTED'
+            ? `🔄 ${approvalType}: changes requested — regenerating`
+            : `❌ ${approvalType} rejected by ${reviewedBy}`;
+
       await recordTimelineEvent({
         type: status === 'APPROVED' ? 'workflow.approved' : 'workflow.rejected',
-        message: status === 'APPROVED' ? `✅ ${approvalType} granted by ${reviewedBy}` : `❌ ${approvalType} rejected by ${reviewedBy}`,
+        message,
         metadata: { projectId, approvalId: updated.id, approvalType, status, comments },
       });
 

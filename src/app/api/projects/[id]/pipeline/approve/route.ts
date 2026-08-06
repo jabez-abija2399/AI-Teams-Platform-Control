@@ -17,7 +17,11 @@ export async function POST(
 
     const { id: projectId } = await params;
     const body = await request.json().catch(() => ({}));
-    const { approvalType } = body;
+    const { approvalType, action = 'approve', comments } = body as {
+      approvalType?: string;
+      action?: 'approve' | 'request_changes';
+      comments?: string;
+    };
 
     if (!approvalType) {
       return NextResponse.json(
@@ -26,12 +30,47 @@ export async function POST(
       );
     }
 
+    const reviewedBy = session.user.name || session.user.email || session.user.id;
+
+    if (action === 'request_changes') {
+      const feedback = typeof comments === 'string' ? comments.trim() : '';
+      if (feedback.length < 3) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: {
+              message: 'Please add a short comment describing what to change.',
+              code: 'FEEDBACK_REQUIRED',
+            },
+          },
+          { status: 400 },
+        );
+      }
+
+      const result = await ProjectLifecycleService.resumeLifecycle(
+        projectId,
+        approvalType as any,
+        'CHANGES_REQUESTED',
+        reviewedBy,
+        feedback,
+      );
+
+      if (!result.success) {
+        return NextResponse.json(result, { status: 400 });
+      }
+
+      return NextResponse.json({
+        success: true,
+        data: { regenerating: true, approvalType },
+      });
+    }
+
     const result = await ProjectLifecycleService.resumeLifecycle(
       projectId,
-      approvalType,
+      approvalType as any,
       'APPROVED',
-      session.user.id,
-      `Approved by ${session.user.name || 'User'}`,
+      reviewedBy,
+      comments || `Approved by ${reviewedBy}`,
     );
 
     if (!result.success) {

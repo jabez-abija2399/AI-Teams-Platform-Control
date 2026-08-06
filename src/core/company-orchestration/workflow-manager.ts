@@ -1,75 +1,308 @@
 import { prisma } from '@/lib/prisma';
-import { PIPELINE_PHASE_DEFINITIONS, VALID_STATE_TRANSITIONS, type ProjectLifecycleState, type PhaseDefinition, type MissionControlStatus } from './types';
+import {
+  PIPELINE_PHASE_DEFINITIONS,
+  VALID_STATE_TRANSITIONS,
+  type ProjectLifecycleState,
+  type MissionControlStatus,
+} from './types';
 import { ArtifactManager } from './artifact-manager';
 import { ApprovalManager } from './approval-manager';
 import type { ApiResult } from '@/types/common.types';
+import {
+  findWorkflowScalars,
+  updateWorkflowScalars,
+  setWorkflowTextArray,
+  loadWorkflowLists,
+  parseStringList,
+} from './workflow-state-access';
+
+/** All pipeline phases that count as progress toward COMPLETED. */
+const PIPELINE_PROGRESS_PHASES: string[] = [
+  'DISCOVERY_RUNNING',
+  'CLARIFICATION_RUNNING',
+  'PROPOSAL_RUNNING',
+  'STRATEGY_RUNNING',
+  'PRODUCT_RUNNING',
+  'ANALYSIS_RUNNING',
+  'PLANNING_RUNNING',
+  'ARCHITECTURE_RUNNING',
+  'DESIGN_RUNNING',
+  'DEVELOPMENT_RUNNING',
+  'TESTING_RUNNING',
+  'REVIEW_RUNNING',
+  'SECURITY_RUNNING',
+  'DEPLOYMENT_RUNNING',
+  'MONITORING',
+];
+
+/** Prisma + @prisma/adapter-pg sometimes returns lists as raw strings / jsonb. */
+function asStringArray(value: unknown): string[] {
+  return parseStringList(value);
+}
+
+type WorkflowRow = {
+  projectId: string;
+  currentPhase: string;
+  activeAgent: string | null;
+  currentArtifact: string | null;
+  progress: number;
+  nextAction: string | null;
+  waitingApprovals: unknown;
+  completedPhases: unknown;
+  risks: unknown;
+  metadata: unknown;
+};
+
+function toMissionControlStatus(state: WorkflowRow): MissionControlStatus {
+  const phase = state.currentPhase as ProjectLifecycleState;
+  return {
+    projectId: state.projectId,
+    currentDepartment: PIPELINE_PHASE_DEFINITIONS[phase]?.department ?? 'Unknown',
+    activeAgent: state.activeAgent ?? 'SYSTEM',
+    currentPhase: phase,
+    currentArtifact: state.currentArtifact,
+    progress: state.progress,
+    nextAction: state.nextAction,
+    waitingApprovals: asStringArray(state.waitingApprovals) as MissionControlStatus['waitingApprovals'],
+    completedPhases: asStringArray(state.completedPhases),
+    risks: asStringArray(state.risks),
+    pausedAtPhase: (state.metadata as { pausedAtPhase?: ProjectLifecycleState } | null)?.pausedAtPhase,
+  };
+}
+
+async function loadWorkflowRow(projectId: string): Promise<WorkflowRow | null> {
+  const row = await findWorkflowScalars(projectId);
+  if (!row) return null;
+  const lists = await loadWorkflowLists(projectId);
+  return {
+    ...row,
+    completedPhases: lists.completedPhases,
+    waitingApprovals: lists.waitingApprovals,
+    risks: lists.risks,
+  };
+}
+
+async function setWorkflowArrays(
+  projectId: string,
+  fields: {
+    completedPhases?: string[];
+    waitingApprovals?: string[];
+    risks?: string[];
+  },
+): Promise<void> {
+  if (fields.completedPhases) {
+    await setWorkflowTextArray(projectId, 'completedPhases', fields.completedPhases);
+  }
+  if (fields.waitingApprovals) {
+    await setWorkflowTextArray(projectId, 'waitingApprovals', fields.waitingApprovals);
+  }
+  if (fields.risks) {
+    await setWorkflowTextArray(projectId, 'risks', fields.risks);
+  }
+}
 
 export class WorkflowManager {
-  /**
-   * Initializes or retrieves the ProjectWorkflowState for a given project.
-   */
+  public static async markCompleted(
+    projectId: string,
+    reason = 'Project marked complete',
+  ): Promise<void> {
+    const existing = await loadWorkflowRow(projectId);
+
+    if (existing) {
+      await updateWorkflowScalars(projectId, {
+        currentPhase: 'COMPLETED',
+        progress: 100,
+        nextAction: reason,
+        activeAgent: 'SYSTEM',
+        currentArtifact: 'FinalRelease',
+      });
+    } else {
+      await prisma.projectWorkflowState.create({
+        data: {
+          projectId,
+          currentPhase: 'COMPLETED',
+          progress: 100,
+          nextAction: reason,
+          activeAgent: 'SYSTEM',
+          currentArtifact: 'FinalRelease',
+        },
+        select: { projectId: true },
+      });
+    }
+
+    await setWorkflowArrays(projectId, {
+      completedPhases: PIPELINE_PROGRESS_PHASES,
+      waitingApprovals: [],
+      risks: [],
+    });
+
+    // Complete with empty Explorer is a product bug — backfill stack-aware files.
+    void import('@/features/workspace/explorer/services/ensure-explorer-files.service')
+      .then(({ ensureProjectExplorerFiles }) => ensureProjectExplorerFiles(projectId))
+      .catch((err) =>
+        console.warn('[WorkflowManager] ensure files after complete failed:', err),
+      );
+  }
+
+  public static async healIfProjectFinished(projectId: string): Promise<boolean> {
+    try {
+      const project = await prisma.project.findUnique({
+        where: { id: projectId },
+        select: { status: true },
+      });
+      if (!project) return false;
+
+      const state = await loadWorkflowRow(projectId);
+      if (project.status === 'COMPLETED' || project.status === 'ARCHIVED') {
+        if (state?.currentPhase === 'COMPLETED') {
+          if ((state.progress ?? 0) < 100) {
+            await updateWorkflowScalars(projectId, {
+              progress: 100,
+              nextAction: 'Pipeline completed',
+            });
+          }
+          return true;
+        }
+        await this.markCompleted(projectId, 'Restored completed project state');
+        return true;
+      }
+
+      if (state?.currentPhase === 'CREATED' && project.status === 'IN_PROGRESS') {
+        const implDoc = await prisma.document.findFirst({
+          where: {
+            projectId,
+            OR: [
+              { type: 'Implementation' },
+              { type: 'DeploymentArtifact' },
+              { type: 'FinalRelease' },
+            ],
+          },
+          select: { id: true },
+        });
+        const repo = await prisma.repository.findFirst({
+          where: { projectId },
+          select: { id: true, _count: { select: { files: true } } },
+        });
+        const fileCount = repo?._count?.files ?? 0;
+        if (implDoc || fileCount > 0) {
+          await this.markCompleted(projectId, 'Restored progress from existing deliverables');
+          await prisma.project
+            .update({ where: { id: projectId }, data: { status: 'COMPLETED' } })
+            .catch(() => {});
+          return true;
+        }
+      }
+
+      return false;
+    } catch (err: any) {
+      console.warn('[WorkflowManager] healIfProjectFinished failed:', err?.message);
+      return false;
+    }
+  }
+
   public static async getOrInitState(projectId: string): Promise<ApiResult<MissionControlStatus>> {
     try {
-      let state = await prisma.projectWorkflowState.findUnique({ where: { projectId } });
+      const project = await prisma.project.findUnique({
+        where: { id: projectId },
+        select: { status: true },
+      });
+      const projectFinished =
+        project?.status === 'COMPLETED' || project?.status === 'ARCHIVED';
+
+      let state = await loadWorkflowRow(projectId);
       if (!state) {
-        state = await prisma.projectWorkflowState.create({
+        if (projectFinished) {
+          await this.markCompleted(projectId, 'Restored completed project state');
+          state = await loadWorkflowRow(projectId);
+        } else {
+          try {
+            await prisma.projectWorkflowState.create({
+              data: {
+                projectId,
+                currentPhase: 'CREATED',
+                activeAgent: 'SYSTEM',
+                currentArtifact: null,
+                progress: 0,
+                nextAction: 'Ready to start Product Discovery',
+              },
+              select: { projectId: true },
+            });
+          } catch {
+            /* race */
+          }
+          state = await loadWorkflowRow(projectId);
+        }
+      }
+
+      if (state && state.currentPhase !== 'COMPLETED') {
+        const healed = await this.healIfProjectFinished(projectId);
+        if (healed) {
+          state = await loadWorkflowRow(projectId);
+        }
+      } else if (state?.currentPhase === 'COMPLETED' && (state.progress ?? 0) < 100) {
+        await updateWorkflowScalars(projectId, {
+          progress: 100,
+          nextAction: state.nextAction || 'Pipeline completed',
+        }).catch(() => {});
+        state = (await loadWorkflowRow(projectId)) ?? { ...state, progress: 100 };
+      }
+
+      if (!state && projectFinished) {
+        return {
+          success: true,
           data: {
             projectId,
-            currentPhase: 'CREATED',
-            completedPhases: [] as any,
+            currentDepartment: 'Company Operations',
             activeAgent: 'SYSTEM',
-            currentArtifact: null,
-            progress: 0,
-            nextAction: 'Ready to start Product Discovery',
-            waitingApprovals: [] as any,
-            risks: [] as any,
+            currentPhase: 'COMPLETED',
+            currentArtifact: 'FinalRelease',
+            progress: 100,
+            nextAction: 'Pipeline completed',
+            waitingApprovals: [],
+            completedPhases: PIPELINE_PROGRESS_PHASES,
+            risks: [],
           },
-        });
+        };
+      }
+
+      if (!state) {
+        return {
+          success: false,
+          error: { message: 'Failed to load workflow state', code: 'WORKFLOW_INIT_FAILED' },
+        };
       }
 
       return {
         success: true,
-        data: {
-          projectId: state.projectId,
-          currentDepartment: PIPELINE_PHASE_DEFINITIONS[state.currentPhase as ProjectLifecycleState]?.department ?? 'Unknown',
-          activeAgent: state.activeAgent ?? 'SYSTEM',
-          currentPhase: state.currentPhase as ProjectLifecycleState,
-          currentArtifact: state.currentArtifact,
-          progress: state.progress,
-          nextAction: state.nextAction,
-          waitingApprovals: (state.waitingApprovals as any) ?? [],
-          completedPhases: (state.completedPhases as any) ?? [],
-          risks: (state.risks as any) ?? [],
-          pausedAtPhase: (state.metadata as any)?.pausedAtPhase as ProjectLifecycleState | undefined,
-        },
+        data: toMissionControlStatus(state),
       };
     } catch (err: any) {
       return {
         success: false,
-        error: { message: err?.message || 'Failed to initialize workflow state', code: 'WORKFLOW_INIT_FAILED' },
+        error: {
+          message: err?.message || 'Failed to initialize workflow state',
+          code: 'WORKFLOW_INIT_FAILED',
+        },
       };
     }
   }
 
-  /**
-   * Evaluates if a given phase transition is allowed according to the strict state machine rules.
-   */
   public static canTransition(from: ProjectLifecycleState, to: ProjectLifecycleState): boolean {
     if (from === to) return true;
     const allowed = VALID_STATE_TRANSITIONS[from];
     return Array.isArray(allowed) && allowed.includes(to);
   }
 
-  /**
-   * Evaluates whether the next phase can begin by checking if required input artifacts exist.
-   */
   public static async evaluatePrerequisites(
     projectId: string,
     targetPhase: ProjectLifecycleState,
   ): Promise<ApiResult<boolean>> {
     const def = PIPELINE_PHASE_DEFINITIONS[targetPhase];
     if (!def) {
-      return { success: false, error: { message: `Unknown phase definition: ${targetPhase}`, code: 'UNKNOWN_PHASE' } };
+      return {
+        success: false,
+        error: { message: `Unknown phase definition: ${targetPhase}`, code: 'UNKNOWN_PHASE' },
+      };
     }
 
     if (!def.inputArtifactType) {
@@ -90,37 +323,24 @@ export class WorkflowManager {
     return { success: true, data: true };
   }
 
-  /**
-   * Records which phase triggered a pause-for-approval so that resume
-   * can advance to that phase's nextState instead of re-entering it.
-   * Pass null/undefined to clear (e.g. after resume).
-   */
   public static async setPausedAtPhase(
     projectId: string,
     pausedAtPhase: ProjectLifecycleState | null | undefined,
   ): Promise<void> {
     try {
-      const current = await prisma.projectWorkflowState.findUnique({ where: { projectId } });
-      const meta = (current?.metadata as Record<string, any>) ?? {};
+      const current = await findWorkflowScalars(projectId);
+      const meta = { ...((current?.metadata as Record<string, any>) ?? {}) };
       if (pausedAtPhase) {
         meta.pausedAtPhase = pausedAtPhase;
       } else {
         delete meta.pausedAtPhase;
       }
-      await prisma.projectWorkflowState.update({
-        where: { projectId },
-        data: {
-          metadata: meta as any,
-        },
-      });
+      await updateWorkflowScalars(projectId, { metadata: meta });
     } catch (err: any) {
       console.error('[WorkflowManager] setPausedAtPhase error:', err);
     }
   }
 
-  /**
-   * Transitions the project to a new state if valid and prerequisites are satisfied.
-   */
   public static async transitionState(
     projectId: string,
     toPhase: ProjectLifecycleState,
@@ -141,7 +361,6 @@ export class WorkflowManager {
         };
       }
 
-      // If transitioning to a running phase, verify prerequisites
       if (toPhase !== 'PAUSED' && toPhase !== 'FAILED' && toPhase !== 'COMPLETED') {
         const prereq = await this.evaluatePrerequisites(projectId, toPhase);
         if (!prereq.success) return { success: false, error: prereq.error };
@@ -149,35 +368,51 @@ export class WorkflowManager {
 
       const def = PIPELINE_PHASE_DEFINITIONS[toPhase];
       const newCompleted = [...current.completedPhases];
-      if (current.currentPhase !== 'PAUSED' && current.currentPhase !== 'CREATED' && !newCompleted.includes(current.currentPhase)) {
+      if (
+        current.currentPhase !== 'PAUSED' &&
+        current.currentPhase !== 'CREATED' &&
+        !newCompleted.includes(current.currentPhase)
+      ) {
         newCompleted.push(current.currentPhase);
       }
 
-      const updated = await prisma.projectWorkflowState.update({
-        where: { projectId },
-        data: {
-          currentPhase: toPhase,
-          completedPhases: newCompleted as any,
-          activeAgent: def?.agentRole ?? current.activeAgent,
-          progress: def?.progressPercentage ?? current.progress,
-          nextAction: reason ?? `Executing ${def?.department ?? toPhase}`,
-        },
+      let nextProgress = def?.progressPercentage ?? current.progress;
+      if (toPhase === 'PAUSED' || toPhase === 'FAILED') {
+        nextProgress = current.progress;
+      } else if (toPhase === 'COMPLETED') {
+        nextProgress = 100;
+      }
+
+      await updateWorkflowScalars(projectId, {
+        currentPhase: toPhase,
+        activeAgent: def?.agentRole ?? current.activeAgent,
+        progress: nextProgress,
+        nextAction: reason ?? `Executing ${def?.department ?? toPhase}`,
       });
+
+      await setWorkflowArrays(projectId, {
+        completedPhases: toPhase === 'COMPLETED' ? PIPELINE_PROGRESS_PHASES : newCompleted,
+        ...(toPhase === 'COMPLETED' ? { waitingApprovals: [] } : {}),
+      });
+
+      const updated = await loadWorkflowRow(projectId);
+      if (!updated) {
+        return {
+          success: true,
+          data: {
+            ...current,
+            currentPhase: toPhase,
+            progress: nextProgress,
+            nextAction: reason ?? current.nextAction,
+            completedPhases: toPhase === 'COMPLETED' ? PIPELINE_PROGRESS_PHASES : newCompleted,
+            waitingApprovals: toPhase === 'COMPLETED' ? [] : current.waitingApprovals,
+          },
+        };
+      }
 
       return {
         success: true,
-        data: {
-          projectId: updated.projectId,
-          currentDepartment: def?.department ?? 'Unknown',
-          activeAgent: updated.activeAgent ?? 'SYSTEM',
-          currentPhase: updated.currentPhase as ProjectLifecycleState,
-          currentArtifact: updated.currentArtifact,
-          progress: updated.progress,
-          nextAction: updated.nextAction,
-          waitingApprovals: (updated.waitingApprovals as any) ?? [],
-          completedPhases: (updated.completedPhases as any) ?? [],
-          risks: (updated.risks as any) ?? [],
-        },
+        data: toMissionControlStatus(updated),
       };
     } catch (err: any) {
       console.error('[WorkflowManager] transitionState error:', err);
@@ -188,32 +423,35 @@ export class WorkflowManager {
     }
   }
 
-  /**
-   * Called when an agent finishes its work in the current phase.
-   * Checks if an approval gate is required after this phase.
-   * If yes, pauses pipeline and requests approval.
-   * If no, returns next phase definition ready for automatic execution.
-   */
   public static async onPhaseCompleted(
     projectId: string,
     completedPhase: ProjectLifecycleState,
     outputArtifactType: string,
     outputArtifactId?: string,
-  ): Promise<ApiResult<{ action: 'PAUSE_FOR_APPROVAL' | 'PROCEED'; nextPhase?: ProjectLifecycleState; approvalType?: string }>> {
+  ): Promise<
+    ApiResult<{
+      action: 'PAUSE_FOR_APPROVAL' | 'PROCEED';
+      nextPhase?: ProjectLifecycleState;
+      approvalType?: string;
+    }>
+  > {
     try {
       const def = PIPELINE_PHASE_DEFINITIONS[completedPhase];
       if (!def) {
-        return { success: false, error: { message: `Unknown phase definition: ${completedPhase}`, code: 'UNKNOWN_PHASE' } };
+        return {
+          success: false,
+          error: {
+            message: `Unknown phase definition: ${completedPhase}`,
+            code: 'UNKNOWN_PHASE',
+          },
+        };
       }
 
-      // Update currentArtifact in workflow state
-      await prisma.projectWorkflowState.update({
-        where: { projectId },
-        data: { currentArtifact: outputArtifactType },
-      }).catch(() => {});
+      await updateWorkflowScalars(projectId, { currentArtifact: outputArtifactType }).catch(
+        () => {},
+      );
 
       if (def.approvalRequiredAfter) {
-        // Request approval and pause
         await ApprovalManager.requestApproval(
           projectId,
           def.approvalRequiredAfter,
@@ -243,7 +481,10 @@ export class WorkflowManager {
       console.error('[WorkflowManager] onPhaseCompleted error:', err);
       return {
         success: false,
-        error: { message: err?.message || 'Phase completion processing failed', code: 'PHASE_COMPLETE_FAILED' },
+        error: {
+          message: err?.message || 'Phase completion processing failed',
+          code: 'PHASE_COMPLETE_FAILED',
+        },
       };
     }
   }

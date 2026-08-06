@@ -11,6 +11,6 @@ export async function POST(request: Request, { params }: Params) {
   if (!session?.user?.id) return unauthorizedResponse();
 
   const { id } = await params;
-  const result = await CompanyPipelineEngine.runPipeline(id);
+  await CompanyPipelineEngine.runPipeline(id);
   return toResponse({ success: true, data: { projectId: id, status: 'pipeline_started' } });
 }

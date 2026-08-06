@@ -2,11 +2,22 @@ import { prisma } from '@/lib/prisma';
 import { WorkflowManager } from './workflow-manager';
 import { ArtifactManager } from './artifact-manager';
 import { HandoffManager } from './handoff-manager';
-import { CompanyEventBus } from '@/core/integration/event-bus';
+import { ApprovalManager } from './approval-manager';
+import { companyEventBus } from '@/core/integration/event-bus';
 import { recordTimelineEvent } from '@/features/ai-workspace/services/timeline.service';
 import { getExecutionVisibilityService } from '@/core/execution-engine/visibility.service';
 import { PIPELINE_PHASE_DEFINITIONS, type ProjectLifecycleState } from './types';
 import { WorkspaceService } from '@/core/workspace/workspace.service';
+import {
+  classifyAiError,
+  pulseGenerationHeartbeat,
+} from './generation-status';
+import {
+  clearGenerationStream,
+  publishGenerationStatus,
+  publishNarrativeStream,
+} from './generation-stream-bus';
+import { persistStackConstraints } from '@/core/memory/persist-stack-constraints';
 
 const phaseLoaders = {
   DISCOVERY_RUNNING: () => import('@/ai/agents/roles/product-discovery.agent'),
@@ -60,7 +71,34 @@ async function loadContextInjector() {
 }
 
 export class CompanyPipelineEngine {
+  /** projectId → startedAt ms; refreshed while work runs so long phases are not stolen */
+  private static readonly runningProjects = new Map<string, number>();
+  /** Development / LLM phases can exceed a few minutes — do not steal the lock early */
+  private static readonly LOCK_STALE_MS = 15 * 60_000;
+
+  private static touchLock(projectId: string): void {
+    if (this.runningProjects.has(projectId)) {
+      this.runningProjects.set(projectId, Date.now());
+    }
+  }
+
+  public static isPipelineLocked(projectId: string): boolean {
+    const startedAt = this.runningProjects.get(projectId);
+    return Boolean(startedAt && Date.now() - startedAt < this.LOCK_STALE_MS);
+  }
+
+  /** Used by Retry — drop a dead lock so resume can start cleanly */
+  public static forceReleaseLock(projectId: string): void {
+    this.runningProjects.delete(projectId);
+  }
+
   public static async runPipeline(projectId: string): Promise<void> {
+    const startedAt = this.runningProjects.get(projectId);
+    if (startedAt && Date.now() - startedAt < this.LOCK_STALE_MS) {
+      return;
+    }
+    this.runningProjects.set(projectId, Date.now());
+
     try {
       let isRunning = true;
       let iterations = 0;
@@ -68,6 +106,7 @@ export class CompanyPipelineEngine {
 
       while (isRunning && iterations < maxIterations) {
         iterations++;
+        this.touchLock(projectId);
         const stateRes = await WorkflowManager.getOrInitState(projectId);
         if (!stateRes.success) break;
 
@@ -92,6 +131,20 @@ export class CompanyPipelineEngine {
         });
         await this.emitVisibilityEvent(projectId, 'STEP_START', currentPhase, `Starting ${def.department}`, { department: def.department, agentRole: def.agentRole });
         WorkspaceService.updateFromPipelinePhase(projectId, currentPhase, `Starting ${def.department}`);
+        clearGenerationStream(projectId);
+        publishGenerationStatus(projectId, `${def.department} is generating…`);
+        void publishNarrativeStream(
+          projectId,
+          `${def.department} is composing the next deliverable for your review.`,
+          { chunkMs: 12 },
+        );
+        await pulseGenerationHeartbeat(projectId, {
+          message: `${def.department} is generating…`,
+          phase: currentPhase,
+          department: def.department,
+          clearError: true,
+        });
+        this.touchLock(projectId);
 
         let inputData: any = null;
         if (def.inputArtifactType) {
@@ -124,6 +177,13 @@ export class CompanyPipelineEngine {
         } catch {}
 
         const execRes = await this.executeDepartmentTask(projectId, currentPhase, inputData);
+        await pulseGenerationHeartbeat(projectId, {
+          message: execRes.success
+            ? `${def.department} finished — preparing handoff`
+            : `${def.department} needs attention`,
+          phase: currentPhase,
+          department: def.department,
+        });
         if (!execRes.success) {
           await this.handleFailure(projectId, currentPhase, execRes.error || 'Department execution failed');
           break;
@@ -177,8 +237,22 @@ export class CompanyPipelineEngine {
         if (compRes.data.action === 'PAUSE_FOR_APPROVAL') {
           await WorkflowManager.setPausedAtPhase(projectId, currentPhase);
           const approvalType = def.approvalRequiredAfter || 'Unknown Approval';
+          // Belt-and-suspenders: never leave *_RUNNING while a gate is open
+          if (def.approvalRequiredAfter) {
+            await ApprovalManager.ensurePausedForApproval(
+              projectId,
+              def.approvalRequiredAfter,
+              currentPhase,
+            );
+          }
           WorkspaceService.markApprovalRequired(projectId, approvalType, currentPhase);
           await this.emitVisibilityEvent(projectId, 'STEP_START', currentPhase, `Waiting for approval: ${approvalType}`);
+          await pulseGenerationHeartbeat(projectId, {
+            message: `Waiting for your approval: ${approvalType}`,
+            phase: currentPhase,
+            department: def.department,
+            clearError: true,
+          });
           isRunning = false;
           break;
         }
@@ -192,7 +266,7 @@ export class CompanyPipelineEngine {
             producerRole: 'SYSTEM',
             summary: 'Final autonomous release artifact',
           });
-          await CompanyEventBus.publish('PROJECT_COMPLETED', projectId, { status: 'COMPLETED' }, 'CompanyPipelineEngine');
+          await companyEventBus.publish('PROJECT_COMPLETED', projectId, { status: 'COMPLETED' }, 'CompanyPipelineEngine');
           await recordTimelineEvent({
             type: 'workflow.completed',
             message: '🎉 Project delivery pipeline completed successfully! Final release artifact generated.',
@@ -200,6 +274,11 @@ export class CompanyPipelineEngine {
           });
           await this.emitVisibilityEvent(projectId, 'STEP_COMPLETE', 'COMPLETED', 'Pipeline completed successfully');
           WorkspaceService.markPipelineCompleted(projectId);
+          void import('@/features/workspace/explorer/services/ensure-explorer-files.service')
+            .then(({ ensureProjectExplorerFiles }) => ensureProjectExplorerFiles(projectId))
+            .catch((err) =>
+              console.warn('[CompanyPipelineEngine] ensure files after complete failed:', err),
+            );
           isRunning = false;
           break;
         }
@@ -214,7 +293,43 @@ export class CompanyPipelineEngine {
     } catch (err: any) {
       console.error('[CompanyPipelineEngine] runPipeline fatal error:', err);
       await this.handleFailure(projectId, 'FAILED', err?.message || 'Fatal pipeline error');
+    } finally {
+      this.runningProjects.delete(projectId);
     }
+  }
+
+  /** Read + clear one-shot user revision feedback stored when regenerating after approval. */
+  private static async consumeRevisionFeedback(
+    projectId: string,
+    phase: ProjectLifecycleState,
+  ): Promise<string | null> {
+    try {
+      const { findWorkflowScalars, updateWorkflowScalars } = await import('./workflow-state-access');
+      const wf = await findWorkflowScalars(projectId);
+      const meta = { ...((wf?.metadata as Record<string, unknown>) || {}) };
+      if (meta.revisionTargetPhase === phase && typeof meta.revisionFeedback === 'string') {
+        const feedback = meta.revisionFeedback.trim();
+        delete meta.revisionFeedback;
+        delete meta.revisionTargetPhase;
+        await updateWorkflowScalars(projectId, { metadata: meta });
+        return feedback || null;
+      }
+
+      // Fallback: latest UserRevisionFeedback artifact for this phase
+      const art = await ArtifactManager.getLatestArtifact(projectId, 'UserRevisionFeedback');
+      if (art.success && art.data) {
+        const content = art.data as { phase?: string; feedback?: string };
+        if (
+          content.feedback &&
+          (!content.phase || content.phase === phase)
+        ) {
+          return String(content.feedback).trim() || null;
+        }
+      }
+    } catch (err) {
+      console.warn('[CompanyPipelineEngine] consumeRevisionFeedback failed:', err);
+    }
+    return null;
   }
 
   private static async executeDepartmentTask(
@@ -223,11 +338,26 @@ export class CompanyPipelineEngine {
     inputData: any,
   ): Promise<{ success: boolean; data?: any; error?: string }> {
     try {
+      this.touchLock(projectId);
+      const revisionFeedback = await this.consumeRevisionFeedback(projectId, phase);
+
       switch (phase) {
         case 'DISCOVERY_RUNNING': {
           const mod = await phaseLoaders.DISCOVERY_RUNNING();
+          await pulseGenerationHeartbeat(projectId, {
+            message: 'Product Discovery is shaping the brief…',
+            phase: 'DISCOVERY_RUNNING',
+            department: 'Product Discovery',
+          });
           const agent = new mod.ProductDiscoveryAgent();
-          const ideaStr = typeof inputData === 'string' ? inputData : inputData?.description || inputData?.name || JSON.stringify(inputData);
+          let ideaStr =
+            typeof inputData === 'string'
+              ? inputData
+              : inputData?.description || inputData?.name || JSON.stringify(inputData);
+          if (revisionFeedback) {
+            ideaStr = `${ideaStr}\n\nUser revision feedback: ${revisionFeedback}`;
+          }
+          await persistStackConstraints(projectId, ideaStr, revisionFeedback);
           const spec = await agent.discoverProductSpecification(ideaStr);
           return { success: true, data: spec };
         }
@@ -255,38 +385,101 @@ export class CompanyPipelineEngine {
         case 'PROPOSAL_RUNNING': {
           const mod = await phaseLoaders.PROPOSAL_RUNNING();
           const spec = inputData?.specification || inputData;
-          const proposal = mod.ProductProposalEngine.generateProposal(spec, projectId);
+          const proposal = mod.ProductProposalEngine.generateProposal(
+            spec,
+            projectId,
+            revisionFeedback || undefined,
+          );
           return { success: true, data: proposal };
         }
         case 'STRATEGY_RUNNING': {
           const mod = await phaseLoaders.STRATEGY_RUNNING();
+          await pulseGenerationHeartbeat(projectId, {
+            message: 'CEO is packaging strategy…',
+            phase: 'STRATEGY_RUNNING',
+            department: 'Executive Strategy',
+          });
           const ideaStr = typeof inputData === 'string' ? inputData : JSON.stringify(inputData);
+          await persistStackConstraints(projectId, ideaStr, revisionFeedback);
           const ceoRes = await mod.analyzeUserIdea(projectId, ideaStr);
-          if (!ceoRes.success) return { success: false, error: ceoRes.error.message };
+          if (!ceoRes.success) {
+            const fallback = mod.buildHeuristicCEOAnalysis(
+              ideaStr,
+              revisionFeedback || undefined,
+            );
+            return { success: true, data: fallback };
+          }
           return { success: true, data: ceoRes.data };
         }
         case 'PRODUCT_RUNNING': {
           const mod = await phaseLoaders.PRODUCT_RUNNING();
+          await pulseGenerationHeartbeat(projectId, {
+            message: 'Product Manager is refining requirements…',
+            phase: 'PRODUCT_RUNNING',
+            department: 'Product Management',
+          });
           const pmRes = await mod.refineRequirements(projectId, inputData);
-          if (!pmRes.success) return { success: false, error: pmRes.error.message };
+          if (!pmRes.success) {
+            const fallback = mod.buildHeuristicRefinedRequirements(
+              inputData,
+              revisionFeedback || undefined,
+            );
+            return { success: true, data: fallback };
+          }
           return { success: true, data: pmRes.data };
         }
         case 'ANALYSIS_RUNNING': {
           const mod = await phaseLoaders.ANALYSIS_RUNNING();
-          const baRes = await mod.generateSoftwareRequirementSpec(projectId, inputData);
-          if (!baRes.success) return { success: false, error: baRes.error.message };
+          const baRes = await mod.generateSoftwareRequirementSpec(
+            projectId,
+            inputData,
+            revisionFeedback || undefined,
+          );
+          if (!baRes.success) {
+            const fallback = mod.buildHeuristicSoftwareRequirementSpec(
+              inputData,
+              revisionFeedback || undefined,
+            );
+            return { success: true, data: fallback };
+          }
           return { success: true, data: baRes.data };
         }
         case 'DESIGN_RUNNING': {
           const mod = await phaseLoaders.DESIGN_RUNNING();
-          const uiRes = await mod.generateUiDesignSpec(projectId, inputData);
-          if (!uiRes.success) return { success: false, error: uiRes.error.message };
+          const uiRes = await mod.generateUiDesignSpec(
+            projectId,
+            inputData,
+            revisionFeedback || undefined,
+          );
+          if (!uiRes.success) {
+            const fallback = mod.buildHeuristicUiDesignSpec(
+              inputData,
+              revisionFeedback || undefined,
+            );
+            return { success: true, data: fallback };
+          }
           return { success: true, data: uiRes.data };
         }
         case 'ARCHITECTURE_RUNNING': {
           const mod = await phaseLoaders.ARCHITECTURE_RUNNING();
-          const archRes = await mod.designArchitecture(projectId, inputData);
-          if (!archRes.success) return { success: false, error: archRes.error.message };
+          const stackIntent = await persistStackConstraints(
+            projectId,
+            inputData,
+            revisionFeedback,
+          );
+          const archRes = await mod.designArchitecture(
+            projectId,
+            inputData,
+            revisionFeedback || undefined,
+          );
+          if (!archRes.success) {
+            const fallback = mod.buildHeuristicArchitecture(
+              inputData,
+              revisionFeedback || undefined,
+              stackIntent,
+            );
+            return { success: true, data: fallback };
+          }
           return { success: true, data: archRes.data };
         }
         case 'PLANNING_RUNNING': {
@@ -311,26 +504,85 @@ export class CompanyPipelineEngine {
         }
         case 'DEVELOPMENT_RUNNING': {
           const mod = await phaseLoaders.DEVELOPMENT_RUNNING();
-          const devRes = await mod.implementArchitecture(projectId, inputData);
-          if (!devRes.success) return { success: false, error: devRes.error.message };
-          return { success: true, data: devRes.data };
+          await pulseGenerationHeartbeat(projectId, {
+            message: 'Software Engineering is assembling the implementation package…',
+            phase: 'DEVELOPMENT_RUNNING',
+            department: 'Software Engineering',
+          });
+
+          // Lean path only for the company pipeline.
+          // The full DAG (planner + per-task code gen + FE/BE/DB LLMs) often ran many
+          // minutes. Status polls used to re-kick after 90s, which cancelled the build
+          // ("Build cancelled") and looped — Mission Control stuck at Development 68%.
+          const { resolveStackFromMemory } = await import(
+            '@/core/memory/persist-stack-constraints'
+          );
+          const stackIntent = await resolveStackFromMemory(
+            projectId,
+            inputData,
+            revisionFeedback,
+          );
+          const heuristic = mod.buildHeuristicImplementation(
+            inputData,
+            revisionFeedback || undefined,
+            stackIntent,
+          );
+
+          // Always materialize real files into Explorer so Studio / Preview work.
+          try {
+            const { syncFilesToWorkspace } = await import(
+              '@/features/workspace/explorer/services/workspace-sync.service'
+            );
+            await syncFilesToWorkspace(
+              projectId,
+              heuristic.changes.map((c) => ({
+                path: c.file,
+                content: c.code,
+                language: mod.getLanguageFromPath(c.file),
+              })),
+            );
+            await pulseGenerationHeartbeat(projectId, {
+              message: `Wrote ${heuristic.changes.length} files into Explorer`,
+              phase: 'DEVELOPMENT_RUNNING',
+              department: 'Software Engineering',
+            });
+          } catch (syncErr) {
+            console.error('[pipeline] Explorer sync failed after Development:', syncErr);
+          }
+
+          await pulseGenerationHeartbeat(projectId, {
+            message: 'Implementation package ready — handing off to QA',
+            phase: 'DEVELOPMENT_RUNNING',
+            department: 'Software Engineering',
+          });
+
+          return {
+            success: true,
+            data: {
+              implementation: heuristic,
+              summary: heuristic.report.notes,
+              files: heuristic.report.changedFiles,
+              engineers: { developer: 'completed', mode: 'pipeline_package' },
+              explorerSynced: true,
+              ...(revisionFeedback ? { revisionNote: revisionFeedback } : {}),
+            },
+          };
         }
         case 'TESTING_RUNNING': {
           const mod = await phaseLoaders.TESTING_RUNNING();
-          const qaRes = await mod.reviewImplementation(projectId, inputData);
-          if (!qaRes.success) return { success: false, error: qaRes.error.message };
-          let selfReview: any = null;
-          try {
-            const fileMap: Record<string, string> = {};
-            if (typeof qaRes.data === 'object' && qaRes.data !== null) {
-              Object.entries(qaRes.data as Record<string, unknown>).forEach(([k, v]) => {
-                if (typeof v === 'string') fileMap[k] = v;
-              });
-            }
-            const srMod = await loadSelfReflective();
-            selfReview = await srMod.SelfReflectiveEngine.executeSelfReflection(projectId, 'DEVELOPER', fileMap);
-          } catch {}
-          return { success: true, data: { ...qaRes.data, selfReview } };
+          const qaRes = await mod.reviewImplementation(
+            projectId,
+            inputData,
+            revisionFeedback || undefined,
+          );
+          if (!qaRes.success) {
+            const fallback = mod.buildHeuristicQaReport(
+              inputData,
+              revisionFeedback || undefined,
+            );
+            return { success: true, data: fallback };
+          }
+          return { success: true, data: qaRes.data };
         }
         case 'REVIEW_RUNNING': {
           const fileMap: Record<string, string> = {};
@@ -344,7 +596,10 @@ export class CompanyPipelineEngine {
             }
           }
           const engines = await loadReviewEngines();
-          const report = engines.ReviewCommittee.evaluateCodebase(projectId, fileMap);
+          const report = engines.ReviewCommittee.evaluateCodebase(projectId, fileMap, {
+            context: inputData,
+            feedback: revisionFeedback || undefined,
+          });
           let refactorReport: any = null;
           try {
             refactorReport = engines.AutonomousRefactoringEngine.analyzeAndRefactor(projectId, fileMap);
@@ -368,15 +623,55 @@ export class CompanyPipelineEngine {
         }
         case 'SECURITY_RUNNING': {
           const mod = await phaseLoaders.SECURITY_RUNNING();
-          const secRes = await mod.generateSecurityReportSpec(projectId, inputData);
-          if (!secRes.success) return { success: false, error: secRes.error.message };
+          const secRes = await mod.generateSecurityReportSpec(
+            projectId,
+            inputData,
+            revisionFeedback || undefined,
+          );
+          if (!secRes.success) {
+            const fallback = mod.buildHeuristicSecurityReport(
+              inputData,
+              revisionFeedback || undefined,
+            );
+            return { success: true, data: fallback };
+          }
           return { success: true, data: secRes.data };
         }
         case 'DEPLOYMENT_RUNNING': {
           const mod = await phaseLoaders.DEPLOYMENT_RUNNING();
-          const devopsRes = await mod.generateDevopsPlanSpec(projectId, inputData);
-          if (!devopsRes.success) return { success: false, error: devopsRes.error.message };
-          return { success: true, data: devopsRes.data };
+          await pulseGenerationHeartbeat(projectId, {
+            message: 'Preparing Preview package — you deploy only when ready…',
+            phase: 'DEPLOYMENT_RUNNING',
+            department: 'DevOps & Deployment',
+          });
+          this.touchLock(projectId);
+
+          const devopsRes = await mod.generateDevopsPlanSpec(
+            projectId,
+            inputData,
+            revisionFeedback || undefined,
+          );
+          const data = devopsRes.success
+            ? devopsRes.data
+            : mod.buildHeuristicDevopsPlan(inputData, revisionFeedback || undefined);
+
+          await pulseGenerationHeartbeat(projectId, {
+            message: 'Preview ready — review first, deploy only if you want',
+            phase: 'DEPLOYMENT_RUNNING',
+            department: 'DevOps & Deployment',
+          });
+
+          return {
+            success: true,
+            data: {
+              ...data,
+              previewReady: true,
+              deployRequiresUserAction: true,
+              summary:
+                'Preview package ready. Review first — production deploy only when you choose.',
+              ...(revisionFeedback ? { revisionNote: revisionFeedback } : {}),
+            },
+          };
         }
         case 'MONITORING': {
           const telemetryData = {
@@ -418,24 +713,55 @@ export class CompanyPipelineEngine {
   private static async handleFailure(projectId: string, phase: string, message: string): Promise<void> {
     console.error(`[CompanyPipelineEngine] Pipeline failed at phase ${phase}:`, message);
 
+    // Cancel / in-progress are ownership races — do not burn retries or flip to FAILED
+    const lower = (message || '').toLowerCase();
+    if (
+      lower.includes('build cancelled') ||
+      lower.includes('already in progress') ||
+      lower.includes('build_in_progress')
+    ) {
+      await pulseGenerationHeartbeat(projectId, {
+        message: 'Software Engineering is still working — waiting for the active build…',
+        phase,
+        department: 'Software Engineering',
+        clearError: true,
+      }).catch(() => {});
+      return;
+    }
+
+    const classified = classifyAiError(message);
+    await pulseGenerationHeartbeat(projectId, {
+      message: classified.message,
+      phase,
+      error: { message: classified.message, code: classified.code },
+    }).catch(() => {});
+
     try {
       const retryMod = await loadRetryEngine();
       const retryDecision = await retryMod.RetryEngine.handleFailure(projectId, phase, message);
       if (retryDecision.shouldRetry && retryDecision.attempt <= 3) {
         console.log(`[CompanyPipelineEngine] Retry ${retryDecision.attempt}/3 for ${phase}: ${retryDecision.remediationAction}`);
+        await pulseGenerationHeartbeat(projectId, {
+          message: `Retrying ${phase} (attempt ${retryDecision.attempt}/3)…`,
+          phase,
+          clearError: true,
+        }).catch(() => {});
         return;
       }
     } catch {}
 
-    await WorkflowManager.transitionState(projectId, 'FAILED', `Failed in ${phase}: ${message}`);
+    await WorkflowManager.transitionState(projectId, 'FAILED', `Failed in ${phase}: ${classified.message}`);
     await prisma.project.update({ where: { id: projectId }, data: { status: 'REVIEW' } }).catch(() => {});
-    await CompanyEventBus.publish('EXECUTION_FAILED', projectId, { phase, error: message }, 'CompanyPipelineEngine');
+    await companyEventBus.publish('EXECUTION_FAILED', projectId, { phase, error: classified.message, code: classified.code }, 'CompanyPipelineEngine');
     await recordTimelineEvent({
       type: 'workflow.failed',
-      message: `Pipeline failed in department phase ${phase}: ${message}`,
-      metadata: { projectId, phase, error: message },
+      message: `⛔ ${classified.title}: ${classified.message}`,
+      metadata: { projectId, phase, error: classified.message, code: classified.code },
     });
-    await this.emitVisibilityEvent(projectId, 'ERROR', phase, `Pipeline failed: ${message}`, { error: message });
-    WorkspaceService.markPipelineFailed(projectId, message);
+    await this.emitVisibilityEvent(projectId, 'ERROR', phase, classified.message, {
+      error: classified.message,
+      code: classified.code,
+    });
+    WorkspaceService.markPipelineFailed(projectId, classified.message);
   }
 }

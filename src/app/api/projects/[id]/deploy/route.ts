@@ -28,8 +28,23 @@ export async function POST(request: Request, { params }: Params) {
 
   const { id: projectId } = await params;
   const body = await request.json().catch(() => ({}));
-  const parsed = deploySchema.safeParse(body);
-  const data = parsed.success ? parsed.data : { provider: 'vercel', envVars: {}, files: {} };
+const parsed = deploySchema.safeParse(body);
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: {
+            message: 'Invalid deployment data',
+            code: 'VALIDATION_ERROR',
+            fieldErrors: parsed.error.flatten().fieldErrors,
+          },
+        },
+        { status: 400 },
+      );
+    }
+
+    const data = parsed.data;
   const providerUpper = data.provider.toUpperCase();
 
   // If token is provided or provider is Cloud provider, use triggerProductionDeploy
@@ -89,6 +104,12 @@ export async function POST(request: Request, { params }: Params) {
   await prisma.project.update({
     where: { id: projectId },
     data: { status: 'COMPLETED' },
+  });
+
+  // Keep Mission Control in sync — Project.status alone used to leave workflow at CREATED/0%.
+  const { WorkflowManager } = await import('@/core/company-orchestration/workflow-manager');
+  await WorkflowManager.markCompleted(projectId, 'Deployed — project complete').catch((err) => {
+    console.warn('[Deploy] workflow markCompleted failed:', err);
   });
 
   return NextResponse.json({

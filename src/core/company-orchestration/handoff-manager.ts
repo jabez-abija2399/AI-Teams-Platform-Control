@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { ArtifactManager, type ArtifactData } from './artifact-manager';
 import { getMemoryManager } from '@/ai/agents/memory/memory.manager';
-import { CompanyEventBus } from '@/core/integration/event-bus';
+import { companyEventBus } from '@/core/integration/event-bus';
 import { recordTimelineEvent } from '@/features/ai-workspace/services/timeline.service';
 import type { ApiResult } from '@/types/common.types';
 import type { ProjectLifecycleState } from './types';
@@ -71,7 +71,7 @@ export class HandoffManager {
       }
 
       // 5: Notify Mission Control
-      await CompanyEventBus.publish(
+      await companyEventBus.publish(
         'HANDOFF_COMPLETED',
         req.projectId,
         {
