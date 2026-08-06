@@ -378,42 +378,20 @@ export async function buildPreview(
     });
 
     if (!repository || repository.files.length === 0) {
-      try {
-        const { ensureProjectExplorerFiles } = await import(
-          '@/features/workspace/explorer/services/ensure-explorer-files.service'
-        );
-        await ensureProjectExplorerFiles(projectId);
-        repository = await prisma.repository.findUnique({
-          where: { projectId },
-          include: { files: true },
-        });
-      } catch (ensureErr) {
-        console.warn('[PreviewBuilder] ensure files failed:', ensureErr);
-      }
-    }
-
-    // Only scaffold Next when user confirmed Next.js (or soft-resolved to it)
-    if (activeStack === 'nextjs') {
-      await ensureProjectNextJsScaffold(projectId);
-      repository = await prisma.repository.findUnique({
-        where: { projectId },
-        include: { files: true },
-      });
-    }
-
-    if (!repository || repository.files.length === 0) {
+      // Do NOT invent scaffold files here — empty Preview is correct until Development writes.
       return {
         type: 'UNSUPPORTED',
         mode: catalog.previewStrategy === 'webcontainer' ? 'webcontainer' : 'static',
-        reason: 'No files in workspace yet — run Development or open Studio to sync files',
+        reason:
+          'No files in this project yet. Resume Development from Mission Control to generate them.',
         constraintLabel: catalog.label,
         stack: stackInfo,
-        fastAvailable: true,
+        fastAvailable: false,
         fullAvailable: false,
-        speed: 'fast',
+        speed: preferFast ? 'fast' : 'full',
         html: brandEmptyHtml(
-          'Preparing files…',
-          'Open Studio once to sync Explorer, or wait for Development to finish. Preview follows your saved stack.',
+          'No project files yet',
+          'Resume Development from Mission Control so the Developer agent writes files for this project only.',
         ),
       };
     }

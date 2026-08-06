@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   CheckCircle2,
   ExternalLink,
@@ -102,9 +102,11 @@ export function VibePreview({ projectId }: { projectId: string }) {
   const [reloadKey, setReloadKey] = useState(0);
 
   const wc = useWebContainerPreview();
+  const loadGenRef = useRef(0);
 
   const load = useCallback(async () => {
     if (!projectId) return;
+    const gen = ++loadGenRef.current;
     setLoading(true);
     setError(null);
     try {
@@ -113,27 +115,29 @@ export function VibePreview({ projectId }: { projectId: string }) {
       const res = await fetch(`/api/preview/${projectId}?${qs.toString()}`);
       if (!res.ok) throw new Error('Preview request failed');
       const json = await res.json();
+      if (gen !== loadGenRef.current) return; // stale project switch
       const data = (json.data || json) as PreviewPayload;
       setPayload(data);
       if (data.html) setHtml(data.html);
       else if (data.reason) setError(data.reason);
 
-      // Full mode only — boot WebContainer when stack is known
       if (
         speedMode === 'full' &&
         data.mode === 'webcontainer' &&
         data.files &&
         Object.keys(data.files).length > 0
       ) {
+        if (gen !== loadGenRef.current) return;
         const runtime = data.stack?.id === 'react' ? 'vite' : 'next';
         wc.start(data.files, runtime).catch(() => {});
       } else if (speedMode === 'fast') {
         wc.stop();
       }
     } catch (err) {
+      if (gen !== loadGenRef.current) return;
       setError(err instanceof Error ? err.message : 'Preview failed');
     } finally {
-      setLoading(false);
+      if (gen === loadGenRef.current) setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectId, entryHint, reloadKey, speedMode]);
@@ -143,9 +147,15 @@ export function VibePreview({ projectId }: { projectId: string }) {
   }, [load]);
 
   useEffect(() => {
+    loadGenRef.current += 1;
     setShowStackSettings(false);
     setSpeedMode('fast');
-  }, [projectId]);
+    setPayload(null);
+    setHtml(null);
+    setError(null);
+    setLoading(true);
+    wc.stop();
+  }, [projectId]); // eslint-disable-line react-hooks/exhaustive-deps — stop previous project's runtime
 
   useEffect(() => {
     const onReload = () => setReloadKey((k) => k + 1);

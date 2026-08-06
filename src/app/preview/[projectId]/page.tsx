@@ -94,17 +94,7 @@ export default async function ProjectPreviewPage({
   } catch {}
 
   if (!mainFileContent) {
-    const isAuthProject = projectName.toLowerCase().includes('login') ||
-      projectName.toLowerCase().includes('auth') ||
-      projectName.toLowerCase().includes('signup');
-
-    if (isAuthProject) {
-      const fs = await import('fs');
-      const path = await import('path');
-      try {
-        mainFileContent = fs.readFileSync(path.join(process.cwd(), 'src/app/page.tsx'), 'utf-8');
-      } catch {}
-    }
+    // Never fall back to platform source files (src/app/page.tsx) — that leaked other projects' UI.
   }
 
   const html = mainFileContent
@@ -115,7 +105,8 @@ export default async function ProjectPreviewPage({
 <body style="margin:0;background:#020617;color:#f1f5f9;font-family:system-ui,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center">
 <div style="background:#0f172a;border:1px solid #1e293b;border-radius:1rem;padding:2rem;max-width:420px;width:100%;text-align:center">
 <h2 style="font-size:18px;font-weight:700;color:#f8fafc;margin-bottom:8px">${projectName}</h2>
-<p style="font-size:12px;color:#475569;line-height:1.6">Waiting for AI team to build this project.<br>
+<p style="font-size:12px;color:#475569;line-height:1.6">No files in this project yet.<br>
+Resume Development so the Developer agent creates files here.<br>
 <span style="color:#38bdf8;font-family:monospace;font-size:11px">ID: ${projectId}</span></p>
 </div>
 </body>
