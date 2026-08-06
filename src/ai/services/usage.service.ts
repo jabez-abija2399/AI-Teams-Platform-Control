@@ -24,6 +24,16 @@ export async function logUsage(
         costUsd: response.usage.estimatedCostUsd ?? 0,
       },
     });
+    if (projectId) {
+      const { publishGenerationUsage } = await import(
+        '@/core/company-orchestration/generation-stream-bus'
+      );
+      publishGenerationUsage(projectId, {
+        promptTokens: response.usage.promptTokens,
+        completionTokens: response.usage.completionTokens,
+        totalTokens: response.usage.totalTokens,
+      });
+    }
   } catch {
     // Non-critical — usage logging failure should not break AI calls
   }

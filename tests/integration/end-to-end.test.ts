@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { PipelineManager } from '../../src/core/integration/pipeline-manager';
 import { IntegrationValidator } from '../../src/core/integration/integration-validator';
 import { ExecutionStateService } from '../../src/core/integration/execution-state.service';
-import { CompanyEventBus } from '../../src/core/integration/event-bus';
+import { companyEventBus } from '../../src/core/integration/event-bus';
 import * as ceoService from '../../src/ai/agents/roles/ceo/ceo.service';
 import * as pmService from '../../src/ai/agents/roles/product-manager/product-manager.service';
 import * as archService from '../../src/ai/agents/roles/architect/architect.service';
@@ -15,8 +15,8 @@ describe('Phase 30.5 — Autonomous AI Software Company End-to-End Orchestration
 
   beforeEach(() => {
     ExecutionStateService.resetAll();
-    CompanyEventBus.resetListeners();
-    CompanyEventBus.clearHistory();
+    companyEventBus.resetListeners();
+    companyEventBus.clearHistory();
 
     vi.spyOn(reviewerService, 'reviewArtifact').mockResolvedValue({
       success: true,
@@ -67,7 +67,7 @@ describe('Phase 30.5 — Autonomous AI Software Company End-to-End Orchestration
     });
 
     const eventsCaptured: string[] = [];
-    CompanyEventBus.subscribe('*', (evt) => {
+    companyEventBus.subscribe('*', (evt) => {
       eventsCaptured.push(evt.type);
     });
 

@@ -1,4 +1,4 @@
-export type ProjectLifecycleState =
+export type ProjectPhase =
   | 'CREATED'
   | 'DISCOVERY'
   | 'PLANNING'
@@ -9,6 +9,38 @@ export type ProjectLifecycleState =
   | 'COMPLETED'
   | 'FAILED'
   | 'PAUSED';
+
+export const PHASE_ORDER: ProjectPhase[] = [
+  'CREATED',
+  'DISCOVERY',
+  'PLANNING',
+  'ARCHITECTURE',
+  'EXECUTION',
+  'REVIEW',
+  'DEPLOYMENT_READY',
+  'COMPLETED',
+];
+
+export const VALID_TRANSITIONS: Record<ProjectPhase, ProjectPhase[]> = {
+  CREATED: ['DISCOVERY', 'FAILED', 'PAUSED'],
+  DISCOVERY: ['PLANNING', 'FAILED', 'PAUSED'],
+  PLANNING: ['ARCHITECTURE', 'FAILED', 'PAUSED'],
+  ARCHITECTURE: ['EXECUTION', 'FAILED', 'PAUSED'],
+  EXECUTION: ['REVIEW', 'FAILED', 'PAUSED'],
+  REVIEW: ['DEPLOYMENT_READY', 'FAILED', 'PAUSED', 'EXECUTION'],
+  DEPLOYMENT_READY: ['COMPLETED', 'FAILED', 'PAUSED'],
+  COMPLETED: [],
+  FAILED: ['DISCOVERY', 'PLANNING', 'ARCHITECTURE', 'EXECUTION', 'REVIEW', 'DEPLOYMENT_READY'],
+  PAUSED: ['DISCOVERY', 'PLANNING', 'ARCHITECTURE', 'EXECUTION', 'REVIEW', 'DEPLOYMENT_READY', 'FAILED'],
+};
+
+export function canTransition(from: ProjectPhase, to: ProjectPhase): boolean {
+  if (from === to) return true;
+  const allowed = VALID_TRANSITIONS[from];
+  return allowed ? allowed.includes(to) : false;
+}
+
+export type ProjectLifecycleState = ProjectPhase;
 
 export type CompanyEventType =
   | 'PROJECT_CREATED'
@@ -49,14 +81,14 @@ export interface ExecutionError {
   message: string;
   code: string;
   timestamp: number;
-  stage?: ProjectLifecycleState;
+  stage?: ProjectPhase;
   recoverable?: boolean;
 }
 
 export interface ExecutionState {
   projectId: string;
-  currentPhase: ProjectLifecycleState;
-  previousPhase?: ProjectLifecycleState;
+  currentPhase: ProjectPhase;
+  previousPhase?: ProjectPhase;
   currentMilestone?: string;
   currentTask?: string;
   activeAgents: string[];
@@ -83,7 +115,7 @@ export interface PipelineConfig {
 }
 
 export interface PipelineStageResult<T = any> {
-  stage: ProjectLifecycleState;
+  stage: ProjectPhase;
   success: boolean;
   data?: T;
   error?: string;

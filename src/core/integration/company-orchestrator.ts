@@ -1,6 +1,6 @@
 import type { ApiResult } from '@/types/common.types';
 import type { PipelineConfig } from './integration.types';
-import { CompanyEventBus } from './event-bus';
+import { companyEventBus } from './event-bus';
 import { LifecycleManager } from './lifecycle-manager';
 import { ExecutionStateService } from './execution-state.service';
 import { analyzeUserIdea } from '@/ai/agents/roles/ceo/ceo.service';
@@ -30,7 +30,7 @@ export class CompanyOrchestrator {
 
       ExecutionStateService.addActiveAgent(projectId, 'CEO');
       ExecutionStateService.setMilestoneAndTask(projectId, 'Product Discovery', 'Analyzing user idea');
-      await CompanyEventBus.publish('TASK_STARTED', projectId, { task: 'analyzeUserIdea', role: 'CEO' }, 'CompanyOrchestrator');
+      await companyEventBus.publish('TASK_STARTED', projectId, { task: 'analyzeUserIdea', role: 'CEO' }, 'CompanyOrchestrator');
       await recordTimelineEvent({ type: 'workflow.step', message: 'CEO analyzing user idea...', metadata: { projectId, step: 'discovery' } });
 
       const ceoResult = await analyzeUserIdea(projectId, userIdea);
@@ -48,7 +48,7 @@ export class CompanyOrchestrator {
       ExecutionStateService.removeActiveAgent(projectId, 'CEO');
       ExecutionStateService.completeTask(projectId, 'analyzeUserIdea', 'CEO');
 
-      await CompanyEventBus.publish('DISCOVERY_COMPLETED', projectId, { ceoResult: ceoResult.data }, 'CompanyOrchestrator');
+      await companyEventBus.publish('DISCOVERY_COMPLETED', projectId, { ceoResult: ceoResult.data }, 'CompanyOrchestrator');
       await recordTimelineEvent({ type: 'workflow.step.completed', message: 'CEO analysis completed', metadata: { projectId, step: 'discovery' } });
 
       return { success: true, data: ceoResult.data };
@@ -64,7 +64,7 @@ export class CompanyOrchestrator {
       ExecutionStateService.updatePhase(projectId, 'PLANNING');
       ExecutionStateService.addActiveAgent(projectId, 'PRODUCT_MANAGER');
       ExecutionStateService.setMilestoneAndTask(projectId, 'Requirements Refinement', 'Refining product specifications');
-      await CompanyEventBus.publish('TASK_STARTED', projectId, { task: 'refineRequirements', role: 'PRODUCT_MANAGER' }, 'CompanyOrchestrator');
+      await companyEventBus.publish('TASK_STARTED', projectId, { task: 'refineRequirements', role: 'PRODUCT_MANAGER' }, 'CompanyOrchestrator');
 
       const pmResult = await refineRequirements(projectId, ceoData);
       if (!pmResult.success) {
@@ -78,7 +78,7 @@ export class CompanyOrchestrator {
 
       ExecutionStateService.removeActiveAgent(projectId, 'PRODUCT_MANAGER');
       ExecutionStateService.completeTask(projectId, 'refineRequirements', 'PRODUCT_MANAGER');
-      await CompanyEventBus.publish('PRODUCT_APPROVED', projectId, { pmResult: pmResult.data }, 'CompanyOrchestrator');
+      await companyEventBus.publish('PRODUCT_APPROVED', projectId, { pmResult: pmResult.data }, 'CompanyOrchestrator');
       await recordTimelineEvent({ type: 'workflow.step.completed', message: 'Requirements refinement completed', metadata: { projectId, step: 'planning' } });
 
       return { success: true, data: pmResult.data };
@@ -94,7 +94,7 @@ export class CompanyOrchestrator {
       ExecutionStateService.updatePhase(projectId, 'ARCHITECTURE');
       ExecutionStateService.addActiveAgent(projectId, 'ARCHITECT');
       ExecutionStateService.setMilestoneAndTask(projectId, 'System Architecture', 'Designing system architecture and data models');
-      await CompanyEventBus.publish('TASK_STARTED', projectId, { task: 'designArchitecture', role: 'ARCHITECT' }, 'CompanyOrchestrator');
+      await companyEventBus.publish('TASK_STARTED', projectId, { task: 'designArchitecture', role: 'ARCHITECT' }, 'CompanyOrchestrator');
 
       const architectInput = {
         features: pmData.featureSpecs.map((fs: any) => ({ name: fs.name, description: fs.description })),
@@ -116,7 +116,7 @@ export class CompanyOrchestrator {
       await saveArchitectSummary(projectId, archResult.data).catch(() => {});
       ExecutionStateService.removeActiveAgent(projectId, 'ARCHITECT');
       ExecutionStateService.completeTask(projectId, 'designArchitecture', 'ARCHITECT');
-      await CompanyEventBus.publish('ARCHITECTURE_APPROVED', projectId, { archResult: archResult.data }, 'CompanyOrchestrator');
+      await companyEventBus.publish('ARCHITECTURE_APPROVED', projectId, { archResult: archResult.data }, 'CompanyOrchestrator');
       await recordTimelineEvent({ type: 'workflow.step.completed', message: 'Architecture design completed', metadata: { projectId, step: 'architecture' } });
 
       return { success: true, data: archResult.data };
@@ -132,7 +132,7 @@ export class CompanyOrchestrator {
       ExecutionStateService.updatePhase(projectId, 'EXECUTION');
       ExecutionStateService.addActiveAgent(projectId, 'DEVELOPER');
       ExecutionStateService.setMilestoneAndTask(projectId, 'Software Factory', 'Implementing code modules and services');
-      await CompanyEventBus.publish('TASK_STARTED', projectId, { task: 'implementArchitecture', role: 'DEVELOPER' }, 'CompanyOrchestrator');
+      await companyEventBus.publish('TASK_STARTED', projectId, { task: 'implementArchitecture', role: 'DEVELOPER' }, 'CompanyOrchestrator');
 
       // Execute via AI Runtime Engine
       await AIRuntimeEngine.executeTask({
@@ -152,7 +152,7 @@ export class CompanyOrchestrator {
       await saveDeveloperSummary(projectId, devResult.data).catch(() => {});
       ExecutionStateService.removeActiveAgent(projectId, 'DEVELOPER');
       ExecutionStateService.completeTask(projectId, 'implementArchitecture', 'DEVELOPER');
-      await CompanyEventBus.publish('BUILD_COMPLETED', projectId, { devResult: devResult.data }, 'CompanyOrchestrator');
+      await companyEventBus.publish('BUILD_COMPLETED', projectId, { devResult: devResult.data }, 'CompanyOrchestrator');
       await recordTimelineEvent({ type: 'workflow.step.completed', message: 'Implementation completed', metadata: { projectId, step: 'execution' } });
 
       return { success: true, data: devResult.data };
@@ -168,7 +168,7 @@ export class CompanyOrchestrator {
       ExecutionStateService.updatePhase(projectId, 'REVIEW');
       ExecutionStateService.addActiveAgent(projectId, 'QA');
       ExecutionStateService.setMilestoneAndTask(projectId, 'Quality Assurance', 'Running test suites and security scans');
-      await CompanyEventBus.publish('TASK_STARTED', projectId, { task: 'reviewImplementation', role: 'QA' }, 'CompanyOrchestrator');
+      await companyEventBus.publish('TASK_STARTED', projectId, { task: 'reviewImplementation', role: 'QA' }, 'CompanyOrchestrator');
 
       // Execute via AI Runtime Engine
       await AIRuntimeEngine.executeTask({
@@ -194,7 +194,7 @@ export class CompanyOrchestrator {
         throw new Error('Critical quality or security issues detected during QA review.');
       }
 
-      await CompanyEventBus.publish('REVIEW_COMPLETED', projectId, { qaResult: qaResult.data }, 'CompanyOrchestrator');
+      await companyEventBus.publish('REVIEW_COMPLETED', projectId, { qaResult: qaResult.data }, 'CompanyOrchestrator');
       await recordTimelineEvent({ type: 'workflow.step.completed', message: 'QA review completed', metadata: { projectId, step: 'review' } });
 
       return { success: true, data: qaResult.data };
@@ -217,7 +217,7 @@ export class CompanyOrchestrator {
       ExecutionStateService.setMilestoneAndTask(projectId, 'Project Completed', 'All deliverables completed successfully');
 
       await prisma.project.update({ where: { id: projectId }, data: { status: 'COMPLETED' } }).catch(() => {});
-      await CompanyEventBus.publish('PROJECT_COMPLETED', projectId, { resultData }, 'CompanyOrchestrator');
+      await companyEventBus.publish('PROJECT_COMPLETED', projectId, { resultData }, 'CompanyOrchestrator');
       await recordTimelineEvent({ type: 'workflow.completed', message: 'Full autonomous software company execution completed successfully.', metadata: { projectId } });
 
       return { success: true, data: resultData };
@@ -232,7 +232,7 @@ export class CompanyOrchestrator {
     config: PipelineConfig = { autoAdvance: true, maxRetries: 1, recoverOnFailure: true },
   ): Promise<ApiResult<any>> {
     ExecutionStateService.initState(projectId, 'CREATED');
-    await CompanyEventBus.publish('PROJECT_CREATED', projectId, { userIdea }, 'CompanyOrchestrator');
+    await companyEventBus.publish('PROJECT_CREATED', projectId, { userIdea }, 'CompanyOrchestrator');
 
     // Step 1: Discovery
     const discoveryRes = await this.executeWithRetry(() => this.executeDiscovery(projectId, userIdea), config, projectId, 'DISCOVERY');
@@ -281,7 +281,7 @@ export class CompanyOrchestrator {
 
       attempts++;
       if (config.recoverOnFailure && attempts <= maxRetries) {
-        await CompanyEventBus.publish('RECOVERY_ATTEMPTED', projectId, { stage, attempt: attempts }, 'CompanyOrchestrator');
+        await companyEventBus.publish('RECOVERY_ATTEMPTED', projectId, { stage, attempt: attempts }, 'CompanyOrchestrator');
         await new Promise((res) => setTimeout(res, config.retryDelayMs ?? 100));
       } else {
         return result;
@@ -306,7 +306,7 @@ export class CompanyOrchestrator {
       recoverable: true,
     });
 
-    await CompanyEventBus.publish('EXECUTION_FAILED', projectId, { stage, error: message }, 'CompanyOrchestrator');
+    await companyEventBus.publish('EXECUTION_FAILED', projectId, { stage, error: message }, 'CompanyOrchestrator');
     await recordTimelineEvent({ type: 'workflow.failed', message: `Stage ${stage} failed: ${message}`, metadata: { projectId, stage, error: message } });
 
     return {

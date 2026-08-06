@@ -1,5 +1,5 @@
 import type { ValidationResult } from './integration.types';
-import { CompanyEventBus } from './event-bus';
+import { companyEventBus } from './event-bus';
 import { LifecycleManager } from './lifecycle-manager';
 import { ExecutionStateService } from './execution-state.service';
 import { prisma } from '@/lib/prisma';
@@ -9,32 +9,29 @@ export class IntegrationValidator {
     const warnings: string[] = [];
     const errors: string[] = [];
 
-    // 1. Verify Core Integration Services Available
-    if (!CompanyEventBus) {
-      errors.push('CompanyEventBus is not initialized or available.');
+    if (!companyEventBus || typeof companyEventBus.publish !== 'function') {
+      errors.push('CompanyEventBus is not initialized or missing publish method.');
     }
-    if (!LifecycleManager) {
-      errors.push('LifecycleManager is not initialized or available.');
+    if (!LifecycleManager || typeof LifecycleManager.canTransition !== 'function') {
+      errors.push('LifecycleManager is not initialized or missing canTransition method.');
     }
-    if (!ExecutionStateService) {
-      errors.push('ExecutionStateService is not initialized or available.');
+    if (!ExecutionStateService || typeof ExecutionStateService.getState !== 'function') {
+      errors.push('ExecutionStateService is not initialized or missing getState method.');
     }
 
-    // 2. Verify Database Dependency / Connectivity
     try {
       if (!prisma) {
         errors.push('Prisma client instance is undefined.');
       } else {
-        // Quick check if prisma can query or if we just check object definition
-        if (typeof prisma.$queryRaw !== 'function' && typeof prisma.project?.findFirst !== 'function') {
-          warnings.push('Prisma client does not appear to have standard methods attached.');
+        const result = await prisma.$queryRaw`SELECT 1`;
+        if (!result) {
+          warnings.push('Prisma database query returned unexpected result.');
         }
       }
     } catch (err: any) {
       warnings.push(`Prisma database check generated a warning: ${err?.message || err}`);
     }
 
-    // 3. Verify Pipeline State & Transitions consistency
     const requiredTransitions = ['CREATED', 'DISCOVERY', 'PLANNING', 'ARCHITECTURE', 'EXECUTION', 'REVIEW', 'DEPLOYMENT_READY', 'COMPLETED'];
     for (let i = 0; i < requiredTransitions.length - 1; i++) {
       const from = requiredTransitions[i] as any;
@@ -42,14 +39,6 @@ export class IntegrationValidator {
       if (!LifecycleManager.canTransition(from, to)) {
         errors.push(`Pipeline consistency error: Cannot transition from ${from} to ${to}.`);
       }
-    }
-
-    // 4. Verify No Circular Dependencies or Missing Modules in core integration
-    if (typeof CompanyEventBus.publish !== 'function' || typeof CompanyEventBus.subscribe !== 'function') {
-      errors.push('CompanyEventBus is missing required event methods.');
-    }
-    if (typeof ExecutionStateService.getState !== 'function') {
-      errors.push('ExecutionStateService is missing required state tracking methods.');
     }
 
     return {

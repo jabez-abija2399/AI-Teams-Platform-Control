@@ -1,11 +1,11 @@
 import type { CompanyEvent, CompanyEventType, EventListener } from './integration.types';
 
 export class CompanyEventBus {
-  private static listeners: Map<string, Set<EventListener<any>>> = new Map();
-  private static history: CompanyEvent<any>[] = [];
-  private static maxHistory = 1000;
+  private listeners: Map<string, Set<EventListener<any>>> = new Map();
+  private history: CompanyEvent<any>[] = [];
+  private maxHistory = 1000;
 
-  public static async publish<T = Record<string, any>>(
+  public async publish<T = Record<string, any>>(
     type: CompanyEventType,
     projectId: string,
     payload: T = {} as T,
@@ -20,13 +20,11 @@ export class CompanyEventBus {
       source,
     };
 
-    // Store in history
     this.history.unshift(event);
     if (this.history.length > this.maxHistory) {
       this.history = this.history.slice(0, this.maxHistory);
     }
 
-    // Trigger specific listeners
     const typeListeners = this.listeners.get(type) || new Set();
     const wildcardListeners = this.listeners.get('*') || new Set();
     const allListeners = [...typeListeners, ...wildcardListeners];
@@ -44,7 +42,7 @@ export class CompanyEventBus {
     return event;
   }
 
-  public static subscribe<T = Record<string, any>>(
+  public subscribe<T = Record<string, any>>(
     type: CompanyEventType | '*',
     listener: EventListener<T>,
   ): () => void {
@@ -64,7 +62,7 @@ export class CompanyEventBus {
     };
   }
 
-  public static getHistory(
+  public getHistory(
     projectId?: string,
     type?: CompanyEventType,
     limit: number = 50,
@@ -78,7 +76,7 @@ export class CompanyEventBus {
       .slice(0, limit);
   }
 
-  public static clearHistory(projectId?: string): void {
+  public clearHistory(projectId?: string): void {
     if (projectId) {
       this.history = this.history.filter((evt) => evt.projectId !== projectId);
     } else {
@@ -86,7 +84,9 @@ export class CompanyEventBus {
     }
   }
 
-  public static resetListeners(): void {
+  public resetListeners(): void {
     this.listeners.clear();
   }
 }
+
+export const companyEventBus = new CompanyEventBus();

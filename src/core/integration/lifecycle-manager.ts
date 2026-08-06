@@ -1,5 +1,5 @@
 import type { ProjectLifecycleState } from './integration.types';
-import { CompanyEventBus } from './event-bus';
+import { companyEventBus } from './event-bus';
 
 export class LifecycleManager {
   private static readonly VALID_TRANSITIONS: Record<ProjectLifecycleState, ProjectLifecycleState[]> = {
@@ -37,13 +37,13 @@ export class LifecycleManager {
 
     // Publish event based on target state
     if (to === 'PAUSED') {
-      await CompanyEventBus.publish('EXECUTION_PAUSED', projectId, { from, reason }, 'LifecycleManager');
+      await companyEventBus.publish('EXECUTION_PAUSED', projectId, { from, reason }, 'LifecycleManager');
     } else if (to === 'FAILED') {
-      await CompanyEventBus.publish('EXECUTION_FAILED', projectId, { from, reason }, 'LifecycleManager');
+      await companyEventBus.publish('EXECUTION_FAILED', projectId, { from, reason }, 'LifecycleManager');
     } else if (from === 'PAUSED') {
-      await CompanyEventBus.publish('EXECUTION_RESUMED', projectId, { to, reason }, 'LifecycleManager');
+      await companyEventBus.publish('EXECUTION_RESUMED', projectId, { to, reason }, 'LifecycleManager');
     } else if (to === 'COMPLETED') {
-      await CompanyEventBus.publish('PROJECT_COMPLETED', projectId, { from }, 'LifecycleManager');
+      await companyEventBus.publish('PROJECT_COMPLETED', projectId, { from }, 'LifecycleManager');
     }
 
     return to;

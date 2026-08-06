@@ -1,5 +1,5 @@
 import type { CompanyProjectState } from './types';
-import { CompanyEventBus } from './company-event-bus';
+import { companyEventBus } from './company-event-bus';
 
 export class CompanyStateMachine {
   private static projectStates: Map<string, CompanyProjectState> = new Map();
@@ -15,7 +15,7 @@ export class CompanyStateMachine {
     EXECUTION: ['REVIEW', 'DEPLOYMENT', 'ARCHITECTURE', 'PLANNING', 'PAUSED', 'FAILED'],
     REVIEW: ['DEPLOYMENT', 'COMPLETED', 'EXECUTION', 'ARCHITECTURE', 'PAUSED', 'FAILED'],
     DEPLOYMENT: ['COMPLETED', 'REVIEW', 'EXECUTION', 'PAUSED', 'FAILED'],
-    COMPLETED: ['DEPLOYMENT', 'EXECUTION', 'DISCOVERY'],
+    COMPLETED: [],
     FAILED: ['DISCOVERY', 'CLARIFICATION', 'PRODUCT_APPROVAL', 'ARCHITECTURE', 'PLANNING', 'EXECUTION', 'REVIEW', 'DEPLOYMENT'],
     PAUSED: ['DISCOVERY', 'CLARIFICATION', 'PRODUCT_APPROVAL', 'ARCHITECTURE', 'PLANNING', 'EXECUTION', 'REVIEW', 'DEPLOYMENT'],
   };
@@ -66,9 +66,9 @@ export class CompanyStateMachine {
     this.projectStates.set(projectId, toState);
 
     if (toState === 'PAUSED') {
-      await CompanyEventBus.publish('EXECUTION_PAUSED', projectId, { from: currentState, reason }, 'CompanyStateMachine');
+      await companyEventBus.publish('EXECUTION_PAUSED', projectId, { from: currentState, reason }, 'CompanyStateMachine');
     } else if (currentState === 'PAUSED') {
-      await CompanyEventBus.publish('EXECUTION_RESUMED', projectId, { to: toState, reason }, 'CompanyStateMachine');
+      await companyEventBus.publish('EXECUTION_RESUMED', projectId, { to: toState, reason }, 'CompanyStateMachine');
     }
 
     return toState;

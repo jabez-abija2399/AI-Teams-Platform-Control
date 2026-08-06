@@ -584,7 +584,7 @@ export class PipelineOrchestrator {
     } else {
       return {
         success: false,
-        error: !res.success ? (typeof res.error === 'object' && res.error !== null && 'message' in res.error ? String((res.error as any).message) : String(res.error)) : 'Execution failed',
+        error: res.success ? 'Execution failed' : (typeof res.error === 'object' && res.error !== null && 'message' in res.error ? String((res.error as any).message) : String(res.error)),
       };
     }
   }

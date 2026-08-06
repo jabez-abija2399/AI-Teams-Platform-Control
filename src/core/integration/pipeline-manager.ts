@@ -3,7 +3,7 @@ import type { PipelineConfig, ProjectLifecycleState } from './integration.types'
 import { CompanyOrchestrator } from './company-orchestrator';
 import { LifecycleManager } from './lifecycle-manager';
 import { ExecutionStateService } from './execution-state.service';
-import { CompanyEventBus } from './event-bus';
+import { companyEventBus } from './event-bus';
 
 export class PipelineManager {
   public static async startProject(
@@ -119,7 +119,7 @@ export class PipelineManager {
     try {
       const state = ExecutionStateService.getState(projectId);
       ExecutionStateService.updatePhase(projectId, targetStage);
-      await CompanyEventBus.publish('TASK_COMPLETED', projectId, { skippedFrom: state.currentPhase, targetStage }, 'PipelineManager');
+      await companyEventBus.publish('TASK_COMPLETED', projectId, { skippedFrom: state.currentPhase, targetStage }, 'PipelineManager');
       return { success: true, data: targetStage };
     } catch (err: any) {
       return { success: false, error: { message: err?.message || 'Failed to skip stage', code: 'SKIP_FAILED' } };

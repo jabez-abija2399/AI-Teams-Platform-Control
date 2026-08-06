@@ -1,6 +1,6 @@
 import type { CompanyHealthReport, CompanyWorker, CompanyTask } from './types';
 import { CompanyHealthService } from './company-health.service';
-import { CompanyEventBus } from './company-event-bus';
+import { companyEventBus } from './company-event-bus';
 import { CompanyStateMachine } from './company-state-machine';
 
 export class CompanyHeartbeat {
@@ -21,20 +21,20 @@ export class CompanyHeartbeat {
     // If something is wrong, emit specific health events
     if (report.stalledWorkersCount > 0 && previousHealth.stalledWorkersCount === 0) {
       const stalled = activeWorkers.filter((w) => w.status === 'WORKING' && Date.now() - w.lastHeartbeat > 30000);
-      await CompanyEventBus.publish('WORKER_STALLED', projectId, { stalledWorkers: stalled, issues: report.issues }, 'CompanyHeartbeat');
+      await companyEventBus.publish('WORKER_STALLED', projectId, { stalledWorkers: stalled, issues: report.issues }, 'CompanyHeartbeat');
     }
 
     if (report.deadlocksDetected && !previousHealth.deadlocksDetected) {
-      await CompanyEventBus.publish('DEADLOCK_DETECTED', projectId, { queueCount: queue.length, issues: report.issues }, 'CompanyHeartbeat');
+      await companyEventBus.publish('DEADLOCK_DETECTED', projectId, { queueCount: queue.length, issues: report.issues }, 'CompanyHeartbeat');
     }
 
     if (report.failedRetriesCount > 0 && previousHealth.failedRetriesCount === 0) {
       const failed = queue.filter((t) => t.status === 'FAILED' || t.retries >= t.maxRetries);
-      await CompanyEventBus.publish('TASK_FAILED', projectId, { failedTasks: failed, issues: report.issues }, 'CompanyHeartbeat');
+      await companyEventBus.publish('TASK_FAILED', projectId, { failedTasks: failed, issues: report.issues }, 'CompanyHeartbeat');
     }
 
     // Emit regular heartbeat check pulse
-    await CompanyEventBus.publish('HEARTBEAT_CHECK', projectId, { report }, 'CompanyHeartbeat');
+    await companyEventBus.publish('HEARTBEAT_CHECK', projectId, { report }, 'CompanyHeartbeat');
 
     return report;
   }

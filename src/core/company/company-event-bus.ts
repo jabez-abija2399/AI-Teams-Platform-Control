@@ -2,15 +2,15 @@ import type { CompanyEvent, CompanyEventType, CompanyEventListener } from './typ
 import { CompanyEvents } from './company-events';
 
 export class CompanyEventBus {
-  private static listeners: Map<string, Set<CompanyEventListener<any>>> = new Map();
-  private static history: CompanyEvent<any>[] = [];
-  private static maxHistory = 5000;
+  private listeners: Map<string, Set<CompanyEventListener<any>>> = new Map();
+  private history: CompanyEvent<any>[] = [];
+  private maxHistory = 5000;
 
-  public static async publish<T = Record<string, any>>(
+  public async publish<T = Record<string, any>>(
     type: CompanyEventType,
     projectId: string,
     payload: T = {} as T,
-    source: string = 'CompanyOrchestrator'
+    source: string = 'CompanyOrchestrator',
   ): Promise<CompanyEvent<T>> {
     const event = CompanyEvents.createEvent<T>(type, projectId, payload, source);
 
@@ -23,7 +23,6 @@ export class CompanyEventBus {
     const wildcardListeners = this.listeners.get('*') || new Set();
     const allListeners = [...typeListeners, ...wildcardListeners];
 
-    // Execute listeners asynchronously and fault-tolerantly
     await Promise.all(
       allListeners.map(async (listener) => {
         try {
@@ -31,15 +30,15 @@ export class CompanyEventBus {
         } catch (err) {
           console.error(`[CompanyEventBus] Error in listener for event ${type} (${event.id}):`, err);
         }
-      })
+      }),
     );
 
     return event;
   }
 
-  public static subscribe<T = Record<string, any>>(
+  public subscribe<T = Record<string, any>>(
     type: CompanyEventType | '*',
-    listener: CompanyEventListener<T>
+    listener: CompanyEventListener<T>,
   ): () => void {
     if (!this.listeners.has(type)) {
       this.listeners.set(type, new Set());
@@ -57,10 +56,10 @@ export class CompanyEventBus {
     };
   }
 
-  public static getHistory(
+  public getHistory(
     projectId?: string,
     type?: CompanyEventType,
-    limit: number = 100
+    limit: number = 100,
   ): CompanyEvent<any>[] {
     return this.history
       .filter((evt) => {
@@ -71,12 +70,12 @@ export class CompanyEventBus {
       .slice(0, limit);
   }
 
-  public static getLatestEvent(projectId?: string, type?: CompanyEventType): CompanyEvent<any> | undefined {
+  public getLatestEvent(projectId?: string, type?: CompanyEventType): CompanyEvent<any> | undefined {
     const history = this.getHistory(projectId, type, 1);
     return history[0];
   }
 
-  public static clearHistory(projectId?: string): void {
+  public clearHistory(projectId?: string): void {
     if (projectId) {
       this.history = this.history.filter((evt) => evt.projectId !== projectId);
     } else {
@@ -84,7 +83,9 @@ export class CompanyEventBus {
     }
   }
 
-  public static resetListeners(): void {
+  public resetListeners(): void {
     this.listeners.clear();
   }
 }
+
+export const companyEventBus = new CompanyEventBus();

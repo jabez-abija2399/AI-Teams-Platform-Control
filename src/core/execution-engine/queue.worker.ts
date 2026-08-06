@@ -42,17 +42,15 @@ export class ExecutionQueueWorker {
           data: { status: 'CLAIMED', startedAt: new Date() }
         });
 
-        if (lockResult.count > 0) {
-          // Lock acquired, execute
+if (lockResult.count > 0) {
           this.visibility.emitEvent({
             projectId: task.projectId,
             type: 'INFO',
             stepId: 'worker_claim',
             message: `Worker claimed task ${task.id} (${task.agentRole})`,
           });
-          
+
           await this.executeTask(task.id, exec.projectId);
-          return true; // processed a task
         }
       }
     }

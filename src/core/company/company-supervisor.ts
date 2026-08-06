@@ -5,7 +5,7 @@ import type {
   CompanyStopwatchMetrics,
 } from './types';
 import { CompanyHealthService } from './company-health.service';
-import { CompanyEventBus } from './company-event-bus';
+import { companyEventBus } from './company-event-bus';
 import { CompanyStateMachine } from './company-state-machine';
 
 export class CompanySupervisor {
@@ -94,7 +94,7 @@ export class CompanySupervisor {
     // Emit event if critical recommendations generated
     const critical = recs.filter((r) => r.priority === 'CRITICAL' || r.priority === 'HIGH');
     if (critical.length > 0) {
-      await CompanyEventBus.publish(
+      await companyEventBus.publish(
         'SUPERVISOR_RECOMMENDATION',
         projectId,
         { recommendations: critical },

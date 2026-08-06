@@ -44,6 +44,7 @@ export async function GET(
           content: file.content,
           language: file.language ?? 'typescript',
           path: file.path,
+          reviewStatus: file.reviewStatus ?? 'accepted',
         },
       });
     }

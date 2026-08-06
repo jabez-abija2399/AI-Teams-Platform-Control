@@ -1,5 +1,5 @@
 import type { ExecutionState, ProjectLifecycleState, ExecutionHealth, CompanyEvent, ExecutionError } from './integration.types';
-import { CompanyEventBus } from './event-bus';
+import { companyEventBus } from './event-bus';
 
 export class ExecutionStateService {
   private static states: Map<string, ExecutionState> = new Map();
@@ -8,7 +8,7 @@ export class ExecutionStateService {
 
   private static ensureEventSubscription(): void {
     if (!this.eventSubscribed) {
-      CompanyEventBus.subscribe('*', (evt) => {
+      companyEventBus.subscribe('*', (evt) => {
         if (evt.projectId && this.states.has(evt.projectId)) {
           this.recordEvent(evt.projectId, evt);
         }
@@ -162,7 +162,7 @@ export class ExecutionStateService {
 
   public static getMissionControlData(projectId: string) {
     const state = this.getState(projectId);
-    const history = CompanyEventBus.getHistory(projectId, undefined, 20);
+    const history = companyEventBus.getHistory(projectId, undefined, 20);
     return {
       ...state,
       recentEvents: history,

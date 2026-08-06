@@ -6,7 +6,7 @@ import type {
   CompanyProjectState,
   CompanyEventType,
 } from './types';
-import { CompanyEventBus } from './company-event-bus';
+import { companyEventBus } from './company-event-bus';
 import { CompanyStateMachine } from './company-state-machine';
 import { CompanyStopwatch } from './company-stopwatch';
 import { CompanyHealthService } from './company-health.service';
@@ -27,7 +27,7 @@ export class ContinuousCompanyOrchestrator {
     if (this.isSubscribed) return;
     this.isSubscribed = true;
 
-    CompanyEventBus.subscribe('*', async (event: CompanyEvent) => {
+    companyEventBus.subscribe('*', async (event: CompanyEvent) => {
       await this.handleEvent(event);
     });
   }
@@ -110,7 +110,7 @@ export class ContinuousCompanyOrchestrator {
     );
 
     // Trigger initial event to start autonomous cascade
-    await CompanyEventBus.publish('PROJECT_CREATED', projectId, { userIdea, options }, 'ContinuousCompanyOrchestrator');
+    await companyEventBus.publish('PROJECT_CREATED', projectId, { userIdea, options }, 'ContinuousCompanyOrchestrator');
 
     return this.getStatus(projectId);
   }
@@ -164,7 +164,7 @@ export class ContinuousCompanyOrchestrator {
         break;
     }
 
-    CompanyEventBus.publish(resumeEvent, projectId, { resumed: true }, 'ContinuousCompanyOrchestrator').catch((err) => {
+    companyEventBus.publish(resumeEvent, projectId, { resumed: true }, 'ContinuousCompanyOrchestrator').catch((err) => {
       console.error(`[ContinuousCompanyOrchestrator] Error in resume cascade for project ${projectId}:`, err);
     });
     return this.getStatus(projectId);
@@ -184,7 +184,7 @@ export class ContinuousCompanyOrchestrator {
 
   private static async saveCheckpoint(projectId: string): Promise<void> {
     const state = CompanyStateMachine.getState(projectId);
-    const history = CompanyEventBus.getHistory(projectId);
+    const history = companyEventBus.getHistory(projectId);
     const workers = this.getWorkers(projectId);
     const queue = this.getQueue(projectId);
     const completedTasks = queue.filter((t) => t.status === 'COMPLETED').map((t) => t.id);
@@ -235,7 +235,7 @@ export class ContinuousCompanyOrchestrator {
           this.setWorkerStatus(projectId, 'CEO', 'IDLE');
           if (res.success) {
             this.saveStageData(projectId, 'ceoData', res.data);
-            await CompanyEventBus.publish('DISCOVERY_COMPLETED', projectId, { ceoData: res.data }, 'CEO_Worker');
+            await companyEventBus.publish('DISCOVERY_COMPLETED', projectId, { ceoData: res.data }, 'CEO_Worker');
           } else {
             await this.handleStageFailure(projectId, 'CEO', res.error?.message || 'Discovery failed');
           }
@@ -253,7 +253,7 @@ export class ContinuousCompanyOrchestrator {
 
           this.setWorkerStatus(projectId, 'CEO', 'IDLE');
           this.saveStageData(projectId, 'clarificationData', clarificationData);
-          await CompanyEventBus.publish('CLARIFICATION_COMPLETED', projectId, { clarificationData }, 'CEO_Worker');
+          await companyEventBus.publish('CLARIFICATION_COMPLETED', projectId, { clarificationData }, 'CEO_Worker');
           break;
         }
 
@@ -269,7 +269,7 @@ export class ContinuousCompanyOrchestrator {
           this.setWorkerStatus(projectId, 'PRODUCT_MANAGER', 'IDLE');
           if (res.success) {
             this.saveStageData(projectId, 'pmData', res.data);
-            await CompanyEventBus.publish('PRODUCT_APPROVED', projectId, { pmData: res.data }, 'PM_Worker');
+            await companyEventBus.publish('PRODUCT_APPROVED', projectId, { pmData: res.data }, 'PM_Worker');
           } else {
             await this.handleStageFailure(projectId, 'PRODUCT_MANAGER', res.error?.message || 'Product approval failed');
           }
@@ -288,7 +288,7 @@ export class ContinuousCompanyOrchestrator {
           this.setWorkerStatus(projectId, 'ARCHITECT', 'IDLE');
           if (res.success) {
             this.saveStageData(projectId, 'archData', res.data);
-            await CompanyEventBus.publish('ARCHITECTURE_APPROVED', projectId, { archData: res.data }, 'Architect_Worker');
+            await companyEventBus.publish('ARCHITECTURE_APPROVED', projectId, { archData: res.data }, 'Architect_Worker');
           } else {
             await this.handleStageFailure(projectId, 'ARCHITECT', res.error?.message || 'Architecture design failed');
           }
@@ -337,7 +337,7 @@ export class ContinuousCompanyOrchestrator {
           this.queues.set(projectId, tasks);
           this.setWorkerStatus(projectId, 'PRODUCT_MANAGER', 'IDLE');
 
-          await CompanyEventBus.publish('PLAN_READY', projectId, { taskCount: tasks.length }, 'PM_Worker');
+          await companyEventBus.publish('PLAN_READY', projectId, { taskCount: tasks.length }, 'PM_Worker');
           break;
         }
 
@@ -351,7 +351,7 @@ export class ContinuousCompanyOrchestrator {
           for (const t of queue) {
             t.status = 'IN_PROGRESS';
             t.startTime = Date.now();
-            await CompanyEventBus.publish('TASK_STARTED', projectId, { taskId: t.id, title: t.title }, 'Developer_Worker');
+            await companyEventBus.publish('TASK_STARTED', projectId, { taskId: t.id, title: t.title }, 'Developer_Worker');
           }
 
           const timerStop = CompanyStopwatch.startTimer(projectId, 'task', 'DEVELOPER');
@@ -364,10 +364,10 @@ export class ContinuousCompanyOrchestrator {
               t.status = 'COMPLETED';
               t.endTime = Date.now();
               t.durationMs = (t.endTime || Date.now()) - (t.startTime || Date.now());
-              await CompanyEventBus.publish('TASK_COMPLETED', projectId, { taskId: t.id, title: t.title }, 'Developer_Worker');
+              await companyEventBus.publish('TASK_COMPLETED', projectId, { taskId: t.id, title: t.title }, 'Developer_Worker');
             }
             this.saveStageData(projectId, 'execData', res.data);
-            await CompanyEventBus.publish('REVIEW_STARTED', projectId, { execData: res.data }, 'Developer_Worker');
+            await companyEventBus.publish('REVIEW_STARTED', projectId, { execData: res.data }, 'Developer_Worker');
           } else {
             for (const t of queue) {
               t.status = 'FAILED';
@@ -390,7 +390,7 @@ export class ContinuousCompanyOrchestrator {
           this.setWorkerStatus(projectId, 'QA', 'IDLE');
           if (res.success) {
             this.saveStageData(projectId, 'revData', res.data);
-            await CompanyEventBus.publish('REVIEW_COMPLETED', projectId, { revData: res.data }, 'QA_Worker');
+            await companyEventBus.publish('REVIEW_COMPLETED', projectId, { revData: res.data }, 'QA_Worker');
           } else {
             await this.handleStageFailure(projectId, 'QA', res.error?.message || 'Review failed');
           }
@@ -413,8 +413,8 @@ export class ContinuousCompanyOrchestrator {
 
           this.setWorkerStatus(projectId, 'DEVOPS', 'IDLE');
           this.saveStageData(projectId, 'deploymentData', deploymentData);
-          await CompanyEventBus.publish('DEPLOYMENT_STARTED', projectId, { deploymentData }, 'DevOps_Worker');
-          await CompanyEventBus.publish('DEPLOYMENT_COMPLETED', projectId, { deploymentData }, 'DevOps_Worker');
+          await companyEventBus.publish('DEPLOYMENT_STARTED', projectId, { deploymentData }, 'DevOps_Worker');
+          await companyEventBus.publish('DEPLOYMENT_COMPLETED', projectId, { deploymentData }, 'DevOps_Worker');
           break;
         }
 
@@ -433,7 +433,7 @@ export class ContinuousCompanyOrchestrator {
           CompanyHeartbeat.stopMonitor(projectId);
           await this.saveCheckpoint(projectId);
 
-          await CompanyEventBus.publish('PROJECT_FINISHED', projectId, { finalData }, 'ContinuousCompanyOrchestrator');
+          await companyEventBus.publish('PROJECT_FINISHED', projectId, { finalData }, 'ContinuousCompanyOrchestrator');
           break;
         }
       }
@@ -454,17 +454,17 @@ export class ContinuousCompanyOrchestrator {
       CompanyStateMachine.forceState(projectId, 'FAILED');
     }
     await this.saveCheckpoint(projectId);
-    await CompanyEventBus.publish('TASK_FAILED', projectId, { role, error: errorMsg }, 'ContinuousCompanyOrchestrator');
+    await companyEventBus.publish('TASK_FAILED', projectId, { role, error: errorMsg }, 'ContinuousCompanyOrchestrator');
   }
 
   public static getStatus(projectId: string): CompanyStatusReport {
     const currentState = CompanyStateMachine.getState(projectId);
-    const latestEvent = CompanyEventBus.getLatestEvent(projectId);
+    const latestEvent = companyEventBus.getLatestEvent(projectId);
     const workers = this.getWorkers(projectId);
     const queue = this.getQueue(projectId);
     const stopwatch = CompanyStopwatch.getMetrics(projectId);
     const healthReport = CompanyHealthService.evaluateHealth(projectId, workers, queue, currentState === 'PAUSED');
-    const timeline = CompanyEventBus.getHistory(projectId, undefined, 50);
+    const timeline = companyEventBus.getHistory(projectId, undefined, 50);
     const nextPlannedEvent = CompanyEvents.getNextExpectedState(latestEvent?.type || 'PROJECT_CREATED') as unknown as CompanyEventType | undefined;
 
     // Run supervisor recommendations without awaiting async events
@@ -497,7 +497,7 @@ export class ContinuousCompanyOrchestrator {
   }
 
   public static getEvents(projectId?: string, limit: number = 100): CompanyEvent[] {
-    return CompanyEventBus.getHistory(projectId, undefined, limit);
+    return companyEventBus.getHistory(projectId, undefined, limit);
   }
 
   public static getHeartbeat(projectId: string): CompanyStatusReport['heartbeat'] {
@@ -511,7 +511,7 @@ export class ContinuousCompanyOrchestrator {
     CompanyHealthService.clearProject(projectId);
     CompanySupervisor.clearProject(projectId);
     CompanyCheckpointService.clearCheckpoints(projectId).catch(() => {});
-    CompanyEventBus.clearHistory(projectId);
+    companyEventBus.clearHistory(projectId);
     this.projectsData.delete(projectId);
     this.workers.delete(projectId);
     this.queues.delete(projectId);
@@ -524,8 +524,8 @@ export class ContinuousCompanyOrchestrator {
     CompanyHealthService.resetAll();
     CompanySupervisor.resetAll();
     CompanyCheckpointService.resetAll();
-    CompanyEventBus.clearHistory();
-    CompanyEventBus.resetListeners();
+    companyEventBus.clearHistory();
+    companyEventBus.resetListeners();
     this.projectsData.clear();
     this.workers.clear();
     this.queues.clear();

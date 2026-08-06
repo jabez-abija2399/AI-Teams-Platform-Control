@@ -1,9 +1,13 @@
 import { prisma } from '@/lib/prisma';
 import { PIPELINE_PHASE_DEFINITIONS, type ProjectLifecycleState } from '@/core/company-orchestration/types';
+import { findWorkflowScalars } from '@/core/company-orchestration/workflow-state-access';
+import { WorkflowManager } from '@/core/company-orchestration/workflow-manager';
 
 export class ObservabilityService {
   async getProjectDashboard(projectId: string) {
-    const workflowState = await prisma.projectWorkflowState.findUnique({ where: { projectId } });
+    const workflowState = await findWorkflowScalars(projectId);
+    const statusRes = await WorkflowManager.getOrInitState(projectId);
+    const full = statusRes.success ? statusRes.data : null;
 
     const project = await prisma.project.findUnique({
       where: { id: projectId },
@@ -41,14 +45,14 @@ export class ObservabilityService {
       status: workflowState?.currentPhase === 'PAUSED' ? 'PAUSED' : workflowState?.currentPhase === 'COMPLETED' ? 'COMPLETED' : (execution?.status || 'IDLE'),
       currentPhase,
       activeAgents,
-      completedTasks: workflowState && Array.isArray(workflowState.completedPhases) ? (workflowState.completedPhases as any[]).length : completedTasks,
-      remainingTasks: workflowState ? Math.max(0, 13 - ((workflowState.completedPhases as any[])?.length || 0)) : totalTasks - completedTasks,
+      completedTasks: full ? full.completedPhases.length : completedTasks,
+      remainingTasks: full ? Math.max(0, 13 - full.completedPhases.length) : totalTasks - completedTasks,
       progress,
       currentDepartment,
       currentArtifact: workflowState?.currentArtifact || null,
       nextAction: workflowState?.nextAction || 'Awaiting task...',
-      waitingApprovals: (workflowState?.waitingApprovals as string[]) || [],
-      risks: (workflowState?.risks as string[]) || [],
+      waitingApprovals: full?.waitingApprovals || [],
+      risks: full?.risks || [],
     };
   }
 
