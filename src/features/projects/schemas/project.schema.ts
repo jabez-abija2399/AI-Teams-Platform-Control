@@ -4,6 +4,8 @@ export const createProjectSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters').max(100),
   description: z.string().max(500).optional(),
   organizationId: z.string().optional(),
+  /** User-confirmed delivery stack — Preview + agents share this from day one. */
+  stack: z.enum(['static-html', 'react', 'nextjs']).optional(),
 });
 
 export const updateProjectSchema = createProjectSchema.partial().extend({

@@ -42,15 +42,27 @@ export async function createProject(
     }
 
     // 2. Try creating project in DB
+    const { stack, ...projectData } = parsed.data;
     const project = await prisma.project.create({
-      data: { ...parsed.data, ownerId },
+      data: { ...projectData, ownerId },
     });
+
+    if (stack) {
+      try {
+        const { confirmProjectStack } = await import(
+          '@/core/project-stack/project-stack.service'
+        );
+        await confirmProjectStack(project.id, stack);
+      } catch (err) {
+        console.error('[ProjectService] Failed to confirm stack on create:', err);
+      }
+    }
 
     try {
       await prisma.activity.create({
         data: {
           userId: ownerId,
-          action: `Created project "${project.name}"`,
+          action: `Created project "${project.name}"${stack ? ` (${stack})` : ''}`,
         },
       });
     } catch {}
@@ -77,6 +89,15 @@ export async function createProject(
       githubRepoUrl: null,
       _count: { tasks: 8 },
     };
+
+    if (parsed.data.stack) {
+      try {
+        const { confirmProjectStack } = await import(
+          '@/core/project-stack/project-stack.service'
+        );
+        await confirmProjectStack(fallbackProject.id, parsed.data.stack);
+      } catch {}
+    }
 
     return { success: true, data: fallbackProject as any };
   }

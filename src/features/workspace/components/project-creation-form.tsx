@@ -1,178 +1,223 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { TeamAssemblyAnimation } from "@/features/workspace/components/company/team-assembly-animation";
+import { useMemo, useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { ArrowLeft, ArrowRight, Loader2, Sparkles } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
+import { ROUTES } from '@/config/constants';
+import { StackSelect } from './stack-select';
+import {
+  DEFAULT_PROJECT_STACK,
+  type ProjectStackId,
+} from '@/core/project-stack/stack-catalog';
 
-interface ProjectFormData {
-  name: string;
-  description: string;
-  businessGoal: string;
-  targetUsers: string;
-  technologyPreference: string;
+const EXAMPLES = [
+  {
+    title: 'Static login',
+    idea: 'Static HTML and CSS login and signup pages only — no backend, no framework.',
+    stack: 'static-html' as const,
+  },
+  {
+    title: 'Hotel booking',
+    idea: 'A hotel booking website where travelers search rooms, reserve stays, and hotel owners manage listings.',
+    stack: 'nextjs' as const,
+  },
+  {
+    title: 'Team tasks',
+    idea: 'A lightweight React task board for small teams with assignments and due dates.',
+    stack: 'react' as const,
+  },
+] as const;
+
+function deriveName(idea: string): string {
+  const cleaned = idea.trim().replace(/\s+/g, ' ');
+  if (!cleaned) return 'My AI Project';
+  const firstSentence = cleaned.split(/[.!?]/)[0] || cleaned;
+  return firstSentence.slice(0, 48).trim() || 'My AI Project';
 }
 
 export function ProjectCreationForm() {
   const router = useRouter();
-  const [phase, setPhase] = useState<"form" | "creating" | "ready">("form");
-  const [form, setForm] = useState<ProjectFormData>({
-    name: "",
-    description: "",
-    businessGoal: "",
-    targetUsers: "",
-    technologyPreference: "",
-  });
+  const [name, setName] = useState('');
+  const [idea, setIdea] = useState('');
+  const [stack, setStack] = useState<ProjectStackId | null>(DEFAULT_PROJECT_STACK);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const canSubmit = idea.trim().length >= 12 && stack !== null && stack !== 'unknown';
+  const previewName = useMemo(() => (name.trim() ? name.trim() : deriveName(idea)), [name, idea]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.name || !form.description || !form.businessGoal || !form.targetUsers) return;
+    if (!canSubmit || loading || !stack || stack === 'unknown') return;
 
-    setPhase("creating");
+    setError(null);
+    setLoading(true);
 
     try {
-      // Create project
-      const res = await fetch("/api/projects", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: form.name }),
-      });
-
-      if (!res.ok) throw new Error("Failed to create project");
-      const result = await res.json();
-      const projectId = result.data?.id ?? result.id;
-
-      if (!projectId) throw new Error("No project ID returned");
-
-      // Start lifecycle (wait for it)
-      const lifecycleRes = await fetch(`/api/projects/${projectId}/lifecycle/start`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const projectName = name.trim() || deriveName(idea);
+      const res = await fetch('/api/projects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userIdea: `${form.description}\n\nBusiness Goal: ${form.businessGoal}\nTarget Users: ${form.targetUsers}\nTechnology: ${form.technologyPreference || "Any"}`,
+          name: projectName,
+          description: idea.trim(),
+          stack,
         }),
       });
 
-      if (!lifecycleRes.ok) {
-        const err = await lifecycleRes.json().catch(() => ({}));
-        console.error("Lifecycle start failed:", err);
-        throw new Error("Failed to start AI pipeline");
+      const result = await res.json().catch(() => null);
+      if (!res.ok || !result?.success) {
+        throw new Error(result?.error?.message || 'Could not create project');
       }
 
-      // Show team assembly
-      setPhase("ready");
-      setTimeout(() => {
-        router.push(`/dashboard/projects/${projectId}/workspace`);
-      }, 2000);
-    } catch (error) {
-      console.error("Failed to create project:", error);
-      setPhase("form");
+      const projectId = result.data?.id;
+      if (!projectId) throw new Error('No project ID returned');
+
+      router.push(`/dashboard/projects/${projectId}/workspace`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+      setLoading(false);
     }
   };
 
-  if (phase === "creating" || phase === "ready") {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-[#09090b]">
-        <TeamAssemblyAnimation phase={phase === "creating" ? "creating" : "ready"} />
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-[#09090b] flex items-center justify-center p-4">
-      <div className="w-full max-w-lg">
-        {/* Header */}
-        <div className="mb-8 text-center">
-          <div className="flex h-16 w-16 mx-auto items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500/20 to-amber-600/10 text-3xl mb-4">
-            🏢
+    <div className="mx-auto w-full max-w-xl">
+      <Link
+        href={ROUTES.projects}
+        className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Back to projects
+      </Link>
+
+      <div className="mb-8">
+        <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
+          <Sparkles className="h-5 w-5" />
+        </div>
+        <h1 className="font-heading text-3xl font-semibold tracking-tight">What do you want to build?</h1>
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+          Describe your idea, then choose how it should be built. Mission Control, agents, and Preview
+          all share that stack from day one.
+        </p>
+      </div>
+
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-5 rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-7"
+      >
+        {error && (
+          <div className="rounded-xl border border-destructive/25 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+            {error}
           </div>
-          <h1 className="text-2xl font-bold text-white">Start Your AI Company</h1>
-          <p className="mt-2 text-sm text-zinc-400">
-            Describe your idea and our AI team will build it for you
+        )}
+
+        <div className="space-y-2">
+          <label htmlFor="project-idea" className="text-sm font-medium">
+            Your idea
+          </label>
+          <textarea
+            id="project-idea"
+            value={idea}
+            onChange={(e) => setIdea(e.target.value)}
+            placeholder="e.g. A hotel booking site with room search, reservations, and an owner dashboard…"
+            rows={5}
+            autoFocus
+            required
+            className="w-full resize-none rounded-xl border border-input bg-background px-3.5 py-3 text-sm leading-relaxed outline-none ring-ring focus:ring-2"
+          />
+          <p className="text-[11px] text-muted-foreground">
+            {idea.trim().length < 12
+              ? 'Add a bit more detail (at least a short sentence).'
+              : 'Looks good — pick a stack next.'}
           </p>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-xs font-medium text-zinc-400 mb-1.5">
-              Project Name <span className="text-rose-400">*</span>
-            </label>
-            <Input
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              placeholder="e.g., Hotel Booking Website"
-              className="bg-white/[0.03] border-white/[0.06] text-white placeholder:text-zinc-600"
-              required
-            />
+        <div className="space-y-2">
+          <label htmlFor="project-name" className="text-sm font-medium">
+            Project name <span className="font-normal text-muted-foreground">(optional)</span>
+          </label>
+          <Input
+            id="project-name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder={previewName}
+            className="h-11 rounded-xl"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <p className="text-sm font-medium">
+            Delivery stack <span className="font-normal text-destructive">*</span>
+          </p>
+          <p className="text-[11px] text-muted-foreground">
+            Chosen once here — Preview and agents reuse it (no re-ask). Not sure? Keep the
+            Recommended default.
+          </p>
+          <StackSelect value={stack} onChange={setStack} />
+        </div>
+
+        <div className="space-y-2">
+          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            Or try an example
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {EXAMPLES.map((ex) => (
+              <button
+                key={ex.title}
+                type="button"
+                onClick={() => {
+                  setIdea(ex.idea);
+                  setStack(ex.stack);
+                  if (!name.trim()) setName(ex.title);
+                }}
+                className={cn(
+                  'rounded-full border border-border bg-background px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors',
+                  'hover:border-primary/40 hover:bg-primary/5 hover:text-foreground',
+                )}
+              >
+                {ex.title}
+              </button>
+            ))}
           </div>
+        </div>
 
-          <div>
-            <label className="block text-xs font-medium text-zinc-400 mb-1.5">
-              Description <span className="text-rose-400">*</span>
-            </label>
-            <textarea
-              value={form.description}
-              onChange={(e) => setForm({ ...form, description: e.target.value })}
-              placeholder="Describe what you want to build..."
-              rows={3}
-              className="w-full rounded-lg border border-white/[0.06] bg-white/[0.03] px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-sky-500/50"
-              required
-            />
-          </div>
+        <Button
+          type="submit"
+          size="lg"
+          disabled={!canSubmit || loading}
+          className="h-11 w-full rounded-xl font-semibold"
+        >
+          {loading ? (
+            <span className="flex items-center gap-2">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Creating project…
+            </span>
+          ) : (
+            <span className="flex items-center gap-2">
+              Continue to Mission Control
+              <ArrowRight className="h-4 w-4" />
+            </span>
+          )}
+        </Button>
 
-          <div>
-            <label className="block text-xs font-medium text-zinc-400 mb-1.5">
-              Business Goal <span className="text-rose-400">*</span>
-            </label>
-            <Input
-              value={form.businessGoal}
-              onChange={(e) => setForm({ ...form, businessGoal: e.target.value })}
-              placeholder="e.g., Generate revenue through bookings"
-              className="bg-white/[0.03] border-white/[0.06] text-white placeholder:text-zinc-600"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-medium text-zinc-400 mb-1.5">
-              Target Users <span className="text-rose-400">*</span>
-            </label>
-            <Input
-              value={form.targetUsers}
-              onChange={(e) => setForm({ ...form, targetUsers: e.target.value })}
-              placeholder="e.g., Travelers looking for accommodations"
-              className="bg-white/[0.03] border-white/[0.06] text-white placeholder:text-zinc-600"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-medium text-zinc-400 mb-1.5">
-              Technology Preference <span className="text-zinc-600">(optional)</span>
-            </label>
-            <Input
-              value={form.technologyPreference}
-              onChange={(e) => setForm({ ...form, technologyPreference: e.target.value })}
-              placeholder="e.g., Next.js, React, Node.js"
-              className="bg-white/[0.03] border-white/[0.06] text-white placeholder:text-zinc-600"
-            />
-          </div>
-
-          <Button
-            type="submit"
-            className="w-full bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-semibold py-6 text-sm"
-          >
-            START YOUR AI COMPANY
-          </Button>
-        </form>
-
-        <p className="mt-4 text-center text-[10px] text-zinc-600">
-          11 AI employees will be assembled to build your product
-        </p>
-      </div>
+        <ol className="space-y-1.5 border-t border-border pt-4 text-xs text-muted-foreground">
+          <li>
+            <span className="font-medium text-foreground">1.</span> Idea + stack (saved for everyone)
+          </li>
+          <li>
+            <span className="font-medium text-foreground">2.</span> Start the AI pipeline in Mission
+            Control
+          </li>
+          <li>
+            <span className="font-medium text-foreground">3.</span> Approve milestones · Preview follows
+            your stack
+          </li>
+        </ol>
+      </form>
     </div>
   );
 }
