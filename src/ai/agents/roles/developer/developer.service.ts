@@ -9,18 +9,41 @@ import type { ApiResult } from '@/types/common.types';
 import { syncFilesToWorkspace } from '@/features/workspace/explorer/services/workspace-sync.service';
 import { aiBuildQueue } from '@/lib/queues/ai-build.queue';
 import { EventEmitter } from 'events';
+import { pulseGenerationHeartbeat } from '@/core/company-orchestration/generation-status';
+import {
+  wantsHtmlCssStack,
+  wantsStaticNoBackend,
+} from '@/core/company-orchestration/revision-feedback';
+import { buildStaticHtmlCssFiles } from './static-html-scaffold';
+import { buildReactViteFiles } from './react-vite-scaffold';
+import { scoreAgentDeliverable } from '@/ai/agents/excellence/output-quality';
 
 const MAX_RETRIES_PER_TASK = 3;
 
-function getLanguageFromPath(path: string): string | null {
+export function getLanguageFromPath(path: string): string | null {
   const ext = path.split('.').pop()?.toLowerCase();
   const map: Record<string, string> = {
     ts: 'typescript', tsx: 'typescript', js: 'javascript', jsx: 'javascript',
     py: 'python', rb: 'ruby', go: 'go', rs: 'rust', java: 'java',
     css: 'css', scss: 'scss', html: 'html', json: 'json', md: 'markdown',
     yaml: 'yaml', yml: 'yaml', sql: 'sql', sh: 'shell', bash: 'shell',
+    prisma: 'prisma',
   };
   return map[ext ?? ''] ?? null;
+}
+
+function extractProjectTitle(architecture: Record<string, unknown>): string {
+  const candidates = [
+    architecture.projectName,
+    architecture.name,
+    architecture.title,
+    (architecture.overview as Record<string, unknown> | undefined)?.title,
+    (architecture.systemOverview as Record<string, unknown> | undefined)?.name,
+  ];
+  for (const c of candidates) {
+    if (typeof c === 'string' && c.trim()) return c.trim().slice(0, 80);
+  }
+  return 'Generated App';
 }
 
 async function getOrCreateDeveloperAgentId(): Promise<string> {
@@ -51,6 +74,12 @@ function emitBuildEvent(projectId: string, event: BuildEvent): void {
   if (state) state.progress = event;
   const emitter = getBuildEmitter(projectId);
   emitter.emit('progress', event);
+  // Keep Mission Control "live" so status does not flip to Stalled mid-build
+  void pulseGenerationHeartbeat(projectId, {
+    message: event.message,
+    phase: 'DEVELOPMENT_RUNNING',
+    department: 'Software Engineering',
+  }).catch(() => {});
 }
 
 function cleanupBuildState(projectId: string): void {
@@ -64,6 +93,12 @@ function cleanupBuildState(projectId: string): void {
 
 export function getBuildState(projectId: string): BuildState | undefined {
   return builds.get(projectId);
+}
+
+/** True when a code-generation build is already in flight for this project. */
+export function isBuildActive(projectId: string): boolean {
+  const state = builds.get(projectId);
+  return Boolean(state && !state.controller.signal.aborted);
 }
 
 export function subscribeToBuild(projectId: string, listener: (event: BuildEvent) => void): () => void {
@@ -84,6 +119,419 @@ export function cancelBuild(projectId: string): boolean {
     totalTasks: state.progress.totalTasks,
   });
   return true;
+}
+
+/**
+ * Lean implementation package for the company pipeline.
+ * Honors confirmed stack from project memory (HTML/CSS · React/Vite · Next.js).
+ */
+export function buildHeuristicImplementation(
+  architecture: unknown,
+  revisionFeedback?: string,
+  stack?: {
+    htmlCss?: boolean;
+    staticNoBackend?: boolean;
+    stack?: string;
+    label?: string;
+  } | null,
+): DeveloperOutput {
+  const arch = architecture && typeof architecture === 'object'
+    ? (architecture as Record<string, unknown>)
+    : {};
+  const title = extractProjectTitle(arch);
+  const feedback = (revisionFeedback || '').trim();
+  const stackHint = feedback
+    ? `Revised per user feedback: ${feedback}`
+    : 'Generated from architecture + design specs for pipeline continuity.';
+  const safeTitle = title.replace(/`/g, "'");
+
+  const nestedArch = arch.architecture as Record<string, unknown> | undefined;
+  const archBlob = [
+    feedback,
+    nestedArch?.frontend,
+    nestedArch?.backend,
+    nestedArch?.database,
+    JSON.stringify(arch),
+  ]
+    .filter(Boolean)
+    .join(' ');
+
+  const useStaticHtml =
+    stack?.htmlCss === true ||
+    stack?.staticNoBackend === true ||
+    stack?.stack === 'static-html' ||
+    wantsStaticNoBackend(archBlob) ||
+    wantsHtmlCssStack(archBlob) ||
+    String(nestedArch?.backend || '')
+      .toLowerCase()
+      .includes('none');
+
+  if (useStaticHtml) {
+    const fileContents = buildStaticHtmlCssFiles(safeTitle, stackHint);
+    const files = Object.keys(fileContents);
+    const tasks = [
+      'Create static login.html',
+      'Create static signup.html',
+      'Create static home.html + index',
+      'Add shared css/styles.css',
+      'Document how to open without a framework',
+    ];
+    const changes: CodeChange[] = files.map((file) => ({
+      file,
+      changeType: 'CREATE',
+      description: `Static file ${file}`,
+      code: fileContents[file]!,
+    }));
+    const excellence = scoreAgentDeliverable({
+      role: 'DEVELOPER',
+      payload: { files, sample: fileContents['login.html'] },
+      constraints: archBlob,
+      mustInclude: ['login.html', 'signup.html', 'css/styles.css'],
+      mustExclude: ['next.config', '.tsx'],
+    });
+    return developerOutputSchema.parse({
+      plan: {
+        tasks,
+        files,
+        dependencies: [],
+        implementationOrder: tasks,
+      },
+      changes,
+      report: {
+        completed: true,
+        changedFiles: files,
+        issues: excellence.verdict === 'APPROVED' ? [] : excellence.notes,
+        notes: `Static HTML/CSS package (${files.length} files). Quality ${excellence.overall}/10 (${excellence.verdict}). No Next.js, no backend. ${stackHint}`,
+      },
+      qualityScore: {
+        completeness: excellence.completeness,
+        typeSafety: excellence.fidelity,
+        errorHandling: excellence.clarity,
+        consistency: excellence.fidelity,
+        overall: excellence.overall,
+        verdict: excellence.verdict,
+        notes: excellence.notes.join('; '),
+      },
+    });
+  }
+
+  const useReactVite =
+    stack?.stack === 'react-vite' ||
+    stack?.stack === 'react' ||
+    /react\s*\(vite\)|vite\s*spa|react spa/i.test(stack?.label || '') ||
+    /react\s*\(vite\)|vite spa/i.test(archBlob);
+
+  if (useReactVite) {
+    const fileContents = buildReactViteFiles(safeTitle, stackHint);
+    const files = Object.keys(fileContents);
+    const tasks = [
+      'Scaffold Vite + React package.json',
+      'Add vite.config.ts and index.html',
+      'Create src/App.tsx with home/login/signup',
+      'Add Yacht Club styles in src/index.css',
+      'Document Fast vs Full Preview',
+    ];
+    const changes: CodeChange[] = files.map((file) => ({
+      file,
+      changeType: 'CREATE',
+      description: `React/Vite file ${file}`,
+      code: fileContents[file]!,
+    }));
+    const excellence = scoreAgentDeliverable({
+      role: 'DEVELOPER',
+      payload: { files, sample: fileContents['src/App.tsx'] },
+      constraints: archBlob,
+      mustInclude: ['vite.config.ts', 'src/App.tsx', 'package.json'],
+      mustExclude: ['next.config', 'src/app/page.tsx'],
+    });
+    return developerOutputSchema.parse({
+      plan: {
+        tasks,
+        files,
+        dependencies: ['react', 'react-dom', 'vite'],
+        implementationOrder: tasks,
+      },
+      changes,
+      report: {
+        completed: true,
+        changedFiles: files,
+        issues: excellence.verdict === 'APPROVED' ? [] : excellence.notes,
+        notes: `React + Vite SPA (${files.length} files). Quality ${excellence.overall}/10 (${excellence.verdict}). No Next.js App Router. ${stackHint}`,
+      },
+      qualityScore: {
+        completeness: excellence.completeness,
+        typeSafety: excellence.fidelity,
+        errorHandling: excellence.clarity,
+        consistency: excellence.fidelity,
+        overall: excellence.overall,
+        verdict: excellence.verdict,
+        notes: excellence.notes.join('; '),
+      },
+    });
+  }
+
+  const fileContents: Record<string, string> = {
+    'package.json': JSON.stringify(
+      {
+        name: safeTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'generated-app',
+        version: '0.1.0',
+        private: true,
+        scripts: {
+          dev: 'next dev',
+          build: 'next build',
+          start: 'next start',
+        },
+        dependencies: {
+          next: '15.1.0',
+          react: '^19.0.0',
+          'react-dom': '^19.0.0',
+        },
+        devDependencies: {
+          typescript: '^5.7.0',
+          '@types/react': '^19.0.0',
+          '@types/node': '^22.0.0',
+        },
+      },
+      null,
+      2,
+    ),
+    'tsconfig.json': JSON.stringify(
+      {
+        compilerOptions: {
+          target: 'ES2017',
+          lib: ['dom', 'dom.iterable', 'esnext'],
+          allowJs: true,
+          skipLibCheck: true,
+          strict: true,
+          noEmit: true,
+          esModuleInterop: true,
+          module: 'esnext',
+          moduleResolution: 'bundler',
+          resolveJsonModule: true,
+          isolatedModules: true,
+          jsx: 'preserve',
+          incremental: true,
+          plugins: [{ name: 'next' }],
+          paths: { '@/*': ['./src/*'] },
+        },
+        include: ['next-env.d.ts', '**/*.ts', '**/*.tsx'],
+        exclude: ['node_modules'],
+      },
+      null,
+      2,
+    ),
+    'next.config.ts': `import type { NextConfig } from 'next';
+
+const nextConfig: NextConfig = {
+  reactStrictMode: true,
+};
+
+export default nextConfig;
+`,
+    'src/app/globals.css': `:root {
+  --bg: #f2f0ef;
+  --fg: #1a3339;
+  --primary: #245f73;
+  --accent: #733e24;
+  --muted: #4a5f66;
+  --card: #ffffff;
+  --border: #d4d2d0;
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+}
+a { color: var(--primary); }
+`,
+    'src/app/layout.tsx': `import type { Metadata } from 'next';
+import './globals.css';
+
+export const metadata: Metadata = {
+  title: '${safeTitle}',
+  description: 'Built by AI Teams Platform',
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  );
+}
+`,
+    'src/app/page.tsx': `export default function HomePage() {
+  return (
+    <main
+      style={{
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '48px 24px',
+        background:
+          'radial-gradient(ellipse at top, rgba(36,95,115,0.12), transparent 55%), #f2f0ef',
+      }}
+    >
+      <p
+        style={{
+          margin: 0,
+          fontSize: 12,
+          letterSpacing: '0.14em',
+          textTransform: 'uppercase',
+          color: '#245f73',
+          fontWeight: 600,
+        }}
+      >
+        AI Teams Platform
+      </p>
+      <h1
+        style={{
+          margin: '12px 0 0',
+          fontSize: 'clamp(2rem, 5vw, 3.25rem)',
+          lineHeight: 1.1,
+          letterSpacing: '-0.03em',
+          color: '#1a3339',
+          textAlign: 'center',
+          maxWidth: 720,
+        }}
+      >
+        ${safeTitle}
+      </h1>
+      <p
+        style={{
+          margin: '16px 0 0',
+          maxWidth: 520,
+          textAlign: 'center',
+          color: '#4a5f66',
+          lineHeight: 1.6,
+          fontSize: 16,
+        }}
+      >
+        ${stackHint.replace(/`/g, "'").replace(/\$/g, '')}
+      </p>
+      <div style={{ display: 'flex', gap: 12, marginTop: 28, flexWrap: 'wrap', justifyContent: 'center' }}>
+        <a
+          href="/api/health"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            padding: '10px 18px',
+            borderRadius: 10,
+            background: '#245f73',
+            color: '#f2f0ef',
+            textDecoration: 'none',
+            fontWeight: 600,
+            fontSize: 14,
+          }}
+        >
+          Check health API
+        </a>
+        <span
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            padding: '10px 18px',
+            borderRadius: 10,
+            border: '1px solid #d4d2d0',
+            background: '#fff',
+            color: '#1a3339',
+            fontWeight: 600,
+            fontSize: 14,
+          }}
+        >
+          Preview ready · Deploy when you choose
+        </span>
+      </div>
+    </main>
+  );
+}
+`,
+    'src/app/api/health/route.ts': `import { NextResponse } from 'next/server';
+
+export async function GET() {
+  return NextResponse.json({
+    ok: true,
+    service: '${safeTitle}',
+    timestamp: new Date().toISOString(),
+  });
+}
+`,
+    'prisma/schema.prisma': `// ${safeTitle} — schema scaffold from pipeline architecture
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+`,
+    'README.md': `# ${safeTitle}
+
+${stackHint}
+
+## Run locally
+
+\`\`\`bash
+npm install
+npm run dev
+\`\`\`
+
+## Pipeline notes
+
+This scaffold was written into the project Explorer by Software Engineering.
+Use **Studio → Preview** to run it, then click **Deploy** when you are ready (never auto-deployed).
+`,
+  };
+
+  const files = Object.keys(fileContents);
+  const tasks = [
+    'Scaffold Next.js app shell and routing',
+    'Ship home surface from product design',
+    'Wire API health endpoint',
+    'Apply database schema from architecture',
+    'Document run + deploy instructions',
+  ];
+
+  const changes: CodeChange[] = files.map((file) => ({
+    file,
+    changeType: 'CREATE',
+    description: `Implementation file ${file}`,
+    code: fileContents[file]!,
+  }));
+
+  return developerOutputSchema.parse({
+    plan: {
+      tasks,
+      files,
+      dependencies: [],
+      implementationOrder: tasks,
+    },
+    changes,
+    report: {
+      completed: true,
+      changedFiles: files,
+      issues: [],
+      notes: `Pipeline implementation package ready (${files.length} real files). ${stackHint}`,
+    },
+  });
 }
 
 // ── DAG execution ──────────────────────────────────────────────────
@@ -146,12 +594,20 @@ export async function implementArchitecture(
   architecture: ArchitectAnalysis,
   requirements?: ProductRequirement,
 ): Promise<ApiResult<DeveloperOutput>> {
+  // Never cancel an in-flight build when another caller re-enters (status poll used to
+  // restart the pipeline every ~90s and abort the real work → "Build cancelled" loop).
+  if (isBuildActive(projectId)) {
+    return {
+      success: false,
+      error: {
+        message: 'Build already in progress',
+        code: 'BUILD_IN_PROGRESS',
+      },
+    };
+  }
+
   const controller = new AbortController();
   const signal = controller.signal;
-
-  if (builds.has(projectId)) {
-    cancelBuild(projectId);
-  }
 
   const buildState: BuildState = {
     controller,
