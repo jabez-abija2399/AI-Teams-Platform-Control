@@ -93,6 +93,9 @@ async function fetchArchitectureFromDb(projectId: string): Promise<ArchitectAnal
       database: JSON.parse(dbDoc.content),
       api: JSON.parse(apiDoc.content),
       decisions: [],
+      fileStructure: [],
+      implementationTodos: [],
+      qaTodos: [],
     } as ArchitectAnalysis;
   } catch {
     return null;
@@ -141,8 +144,15 @@ export async function POST(request: Request) {
     }
   }
 
+  const architectureWithDefaults: ArchitectAnalysis = {
+    ...architecture,
+    fileStructure: (architecture as any)?.fileStructure ?? [],
+    implementationTodos: (architecture as any)?.implementationTodos ?? [],
+    qaTodos: (architecture as any)?.qaTodos ?? [],
+  };
+
   // Fire-and-forget: start build in background, return immediately
-  implementArchitecture(parsed.data.projectId, architecture, requirements ?? undefined).catch((err) => {
+  implementArchitecture(parsed.data.projectId, architectureWithDefaults, requirements ?? undefined).catch((err) => {
     console.error('[Developer] Background build failed:', err);
   });
 

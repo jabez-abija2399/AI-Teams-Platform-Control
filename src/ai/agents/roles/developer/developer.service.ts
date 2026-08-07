@@ -22,7 +22,7 @@ import {
   type ImplementationTodo,
   todosAllDone,
 } from '@/core/company-orchestration/architecture-delivery-plan';
-import type { DeliveryStack } from '@/core/company-orchestration/stack-intent';
+import type { DeliveryStack, StackIntent } from '@/core/company-orchestration/stack-intent';
 import {
   loadDeliveryPlan,
   persistDeliveryPlan,
@@ -619,12 +619,7 @@ function extractTitleFromArch(architecture: unknown): string {
 export async function implementFromArchitectureTodos(
   projectId: string,
   architecture: ArchitectAnalysis,
-  stack?: {
-    htmlCss?: boolean;
-    staticNoBackend?: boolean;
-    stack: DeliveryStack;
-    label?: string;
-  } | null,
+  stack?: Pick<StackIntent, 'htmlCss' | 'staticNoBackend' | 'stack'> | null,
   revisionFeedback?: string,
 ): Promise<ApiResult<DeveloperOutput>> {
   let plan =

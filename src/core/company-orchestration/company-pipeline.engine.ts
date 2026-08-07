@@ -619,7 +619,7 @@ export class CompanyPipelineEngine {
               stackIntent,
               revisionFeedback || undefined,
             );
-            if (todoRes.success && todoRes.data) {
+            if (todoRes.success) {
               implementation = todoRes.data;
             } else if (todoRes.error?.message) {
               if (strictMode || isBlockingProviderError(todoRes.error.message)) {
@@ -641,7 +641,7 @@ export class CompanyPipelineEngine {
                 architectureInput,
                 undefined,
               );
-              if (agentRes.success && agentRes.data) {
+              if (agentRes.success) {
                 implementation = agentRes.data;
                 const listed =
                   Array.isArray(implementation?.changes) ? implementation.changes.length : 0;

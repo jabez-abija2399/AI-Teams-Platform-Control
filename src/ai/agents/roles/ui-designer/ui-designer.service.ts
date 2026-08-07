@@ -11,6 +11,7 @@ import {
 import {
   wantsSimpler,
   withRevisionMeta,
+  wantsHtmlCssStack,
 } from '@/core/company-orchestration/revision-feedback';
 import { resolveStackIntent } from '@/core/company-orchestration/stack-intent';
 import type { ApiResult } from '@/types/common.types';

@@ -1,4 +1,5 @@
 import { handlers } from '@/lib/auth';
+import { NextRequest } from 'next/server';
 import {
   checkLoginEmailRateLimit,
   checkLoginIpRateLimit,
@@ -25,7 +26,7 @@ function rateLimitedResponse(result: ReturnType<typeof checkLoginIpRateLimit>) {
 /**
  * Rate-limit Auth.js POSTs (credential sign-in) by IP and email before handlers run.
  */
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   const ip = getClientIp(request);
   const ipLimited = checkLoginIpRateLimit(ip);
   if (!ipLimited.allowed) {

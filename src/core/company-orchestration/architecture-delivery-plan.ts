@@ -264,10 +264,10 @@ export function buildDeliveryPlanForStack(
   if (stack?.htmlCss || stack?.staticNoBackend || stack?.stack === 'static-html') {
     return buildStaticHtmlDeliveryPlan(title);
   }
-  if (stack?.stack === 'react-vite' || stack?.stack === 'react') {
+  if (stack?.stack === 'react-vite') {
     return buildReactViteDeliveryPlan(title);
   }
-  if (stack?.stack === 'nextjs' || stack?.stack === 'next') {
+  if (stack?.stack === 'nextjs') {
     return buildNextJsDeliveryPlan(title);
   }
   // Default: static HTML (product default stack)

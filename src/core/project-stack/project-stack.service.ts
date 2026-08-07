@@ -133,7 +133,7 @@ export async function getProjectStackState(projectId: string): Promise<ProjectSt
     effective,
     needsConfirmation,
     catalog: STACK_OPTIONS,
-    entry: getStackCatalogEntry(entryId === 'unknown' ? 'static-html' : entryId),
+    entry: getStackCatalogEntry(entryId),
   };
 }
 

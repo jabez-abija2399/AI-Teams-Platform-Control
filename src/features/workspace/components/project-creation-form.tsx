@@ -76,7 +76,7 @@ export function ProjectCreationForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!canSubmit || loading || !stack || stack === 'unknown') return;
+    if (!canSubmit || loading || !stack) return;
 
     setError(null);
     setLoading(true);

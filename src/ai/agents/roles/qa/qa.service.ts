@@ -7,6 +7,7 @@ import { QA_SYSTEM_PROMPT } from './qa.prompt';
 import { qaReportSpecSchema, type QaReportSpec } from './qa.types';
 import {
   withRevisionMeta,
+  wantsHtmlCssStack,
 } from '@/core/company-orchestration/revision-feedback';
 import { resolveStackIntent } from '@/core/company-orchestration/stack-intent';
 import type { ApiResult } from '@/types/common.types';

@@ -279,8 +279,6 @@ function CompanyWorkspaceInner({
                 'border-primary/20 bg-primary/10 text-primary',
               connectionStatus === 'reconnecting' &&
                 'border-border bg-muted/60 text-muted-foreground',
-              connectionStatus === 'offline' &&
-                'border-destructive/25 bg-destructive/10 text-destructive',
             )}
           >
             <span
@@ -288,20 +286,12 @@ function CompanyWorkspaceInner({
                 'h-1.5 w-1.5 rounded-full',
                 (connectionStatus === 'connected' || connectionStatus === 'polling') && 'bg-primary',
                 connectionStatus === 'reconnecting' && 'animate-soft-pulse bg-muted-foreground',
-                connectionStatus === 'offline' && 'bg-destructive',
               )}
             />
             {connectionStatus === 'connected' || connectionStatus === 'polling'
               ? 'Connected'
-              : connectionStatus === 'reconnecting'
-                ? 'Connecting…'
-                : 'Offline'}
+              : 'Connecting…'}
           </span>
-          {error && connectionStatus === 'offline' && (
-            <span className="hidden max-w-[140px] truncate text-[10px] text-destructive md:inline" title={error}>
-              {error}
-            </span>
-          )}
         </div>
 
         <div className="flex shrink-0 items-center gap-2 sm:gap-3">
