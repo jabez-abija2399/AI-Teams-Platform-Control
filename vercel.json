@@ -1,0 +1,4 @@
+{
+  "frameworkPreset": "nextjs",
+  "outputDirectory": ".next"
+}
