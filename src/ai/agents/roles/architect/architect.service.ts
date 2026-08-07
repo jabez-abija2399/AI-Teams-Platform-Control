@@ -17,6 +17,7 @@ import { resolveStackFromMemory } from '@/core/memory/persist-stack-constraints'
 import type { StackIntent } from '@/core/company-orchestration/stack-intent';
 import { buildDeliveryPlanForStack } from '@/core/company-orchestration/architecture-delivery-plan';
 import { persistDeliveryPlan } from '@/core/company-orchestration/implementation-todo.store';
+import { pulseGenerationHeartbeat } from '@/core/company-orchestration/generation-status';
 
 export { wantsHtmlCssStack, wantsStaticNoBackend };
 
@@ -433,55 +434,66 @@ export async function designArchitecture(
   try {
     // Honor stack chosen at project create (HTML/CSS · Saved), not only text keywords.
     const stack = await resolveStackFromMemory(projectId, requirements, feedback);
-    const analysis = buildHeuristicArchitecture(requirements, feedback, stack);
-    await persistArchitecture(projectId, agentId, analysis);
+    const respectUserStack = stack.htmlCss || wantsHtmlCssStack(requirements, feedback);
+
+    let analysis: ArchitectAnalysis;
+    let usedHeuristic = false;
+
+    if (respectUserStack) {
+      usedHeuristic = true;
+      analysis = buildHeuristicArchitecture(requirements, feedback, stack);
+    } else {
+      try {
+        await pulseGenerationHeartbeat(projectId, {
+          message: 'Architect is designing the system architecture…',
+          phase: 'ARCHITECTURE_RUNNING',
+          department: 'Architecture',
+        });
+
+        const req = requirements as ProductRequirement;
+        const architectureResult = await architectureDesignerTool.execute({
+          requirements: req,
+          projectId,
+          agentId,
+        });
+        if (!architectureResult.success) throw new Error(architectureResult.error || 'Architecture designer failed');
+
+        const databaseResult = await databaseDesignerTool.execute({
+          requirements: req,
+          projectId,
+          agentId,
+        });
+        if (!databaseResult.success) throw new Error(databaseResult.error || 'Database designer failed');
+
+        const apiResult = await apiDesignerTool.execute({
+          requirements: req,
+          database: databaseResult.data,
+          projectId,
+          agentId,
+        });
+        if (!apiResult.success) throw new Error(apiResult.error || 'API designer failed');
+
+        analysis = architectAnalysisSchema.parse({
+          architecture: architectureResult.data,
+          database: databaseResult.data,
+          api: apiResult.data,
+          decisions: buildHeuristicArchitecture(requirements, feedback, stack).decisions,
+        });
+      } catch (aiErr) {
+        console.warn('[Architect] AI enrichment failed, falling back to heuristic:', aiErr);
+        usedHeuristic = true;
+        analysis = buildHeuristicArchitecture(requirements, feedback, stack);
+      }
+    }
+
+    const withPlan = withDeliveryPlan(analysis, (analysis as any).title || 'Application', stack);
+    await persistArchitecture(projectId, agentId, withPlan);
 
     await prisma.document.deleteMany({ where: { projectId, type: 'ARCHITECT_IN_PROGRESS' } });
     await prisma.agent.update({ where: { id: agentId }, data: { status: 'IDLE' } });
-    await logAIEvent('ARCHITECT_ANALYSIS_COMPLETED', { projectId, stack: stack.label }, agentId);
+    await logAIEvent('ARCHITECT_ANALYSIS_COMPLETED', { projectId, stack: stack.label, fallback: usedHeuristic }, agentId);
 
-    // Never let LLM overwrite an explicit HTML/CSS / static stack
-    const respectUserStack = stack.htmlCss || wantsHtmlCssStack(requirements, feedback);
-    if (!respectUserStack) {
-      void (async () => {
-        try {
-          const req = requirements as ProductRequirement;
-          const architectureResult = await architectureDesignerTool.execute({
-            requirements: req,
-            projectId,
-            agentId,
-          });
-          if (!architectureResult.success) return;
-
-          const databaseResult = await databaseDesignerTool.execute({
-            requirements: req,
-            projectId,
-            agentId,
-          });
-          if (!databaseResult.success) return;
-
-          const apiResult = await apiDesignerTool.execute({
-            requirements: req,
-            database: databaseResult.data,
-            projectId,
-            agentId,
-          });
-          if (!apiResult.success) return;
-
-          const enriched = architectAnalysisSchema.parse({
-            architecture: architectureResult.data,
-            database: databaseResult.data,
-            api: apiResult.data,
-            decisions: analysis.decisions,
-          });
-          await persistArchitecture(projectId, agentId, enriched);
-        } catch {
-          // Enrichment is optional
-        }
-      })();
-    }
-
-    return { success: true, data: analysis };
+    return { success: true, data: withPlan };
   } catch (err) {
     try {
       const stack = await resolveStackFromMemory(projectId, requirements, feedback).catch(
