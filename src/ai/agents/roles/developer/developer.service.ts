@@ -725,28 +725,48 @@ export async function implementFromArchitectureTodos(
         },
       };
     }
-    try {
-      await syncFilesToWorkspace(
-        projectId,
-        todoChanges.map((c) => ({
-          path: c.file,
-          content: c.code,
-          language: getLanguageFromPath(c.file),
-        })),
-      );
-    } catch (err) {
+
+    const syncPaths = todoChanges.map((c) => c.file);
+    let syncOk = false;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        await syncFilesToWorkspace(
+          projectId,
+          todoChanges.map((c) => ({
+            path: c.file,
+            content: c.code,
+            language: getLanguageFromPath(c.file),
+          })),
+        );
+        syncOk = true;
+        break;
+      } catch (err) {
+        if (attempt === 3) throw err;
+        await new Promise((r) => setTimeout(r, 500 * attempt));
+      }
+    }
+
+    if (!syncOk) {
       todo.status = 'failed';
       await updateImplementationTodos(projectId, todos, plan.qaTodos);
       return {
         success: false,
         error: {
-          message:
-            err instanceof Error
-              ? `Failed writing files for "${todo.title}": ${err.message}`
-              : `Failed writing files for "${todo.title}"`,
+          message: `Failed writing files for "${todo.title}" after retries`,
           code: 'SYNC_FAILED',
         },
       };
+    }
+
+    // Verify files were actually persisted
+    try {
+      const { getProjectFileEvidence } = await import('@/core/company-orchestration/implementation-file-gate');
+      const evidence = await getProjectFileEvidence(projectId);
+      if (!evidence.ok && evidence.fileCount === 0) {
+        throw new Error('Files were not persisted to Explorer after sync');
+      }
+    } catch (verifyErr) {
+      console.warn('[Developer] Post-sync verification failed:', verifyErr);
     }
 
     for (const c of todoChanges) {
@@ -1099,30 +1119,38 @@ export async function implementArchitecture(
         language: getLanguageFromPath(c.file),
       }));
 
-    try {
-      await syncFilesToWorkspace(projectId, filesForWorkspace);
-      if (filesForWorkspace.length === 0) {
-        throw new Error('Developer agent produced no files to sync');
+    let syncOk = false;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        await syncFilesToWorkspace(projectId, filesForWorkspace);
+        if (filesForWorkspace.length === 0) {
+          throw new Error('Developer agent produced no files to sync');
+        }
+        await aiBuildQueue.add(`build-${projectId}-${Date.now()}`, {
+          projectId,
+          userPrompt: 'Developer AI Code Build',
+          filesToGenerate: filesForWorkspace.map((f) => ({ path: f.path, content: f.content })),
+        });
+        syncOk = true;
+        break;
+      } catch (err) {
+        if (attempt === 3) {
+          console.error('[Developer] Workspace sync or BullMQ enqueue failed after retries:', err);
+          cleanupBuildState(projectId);
+          await prisma.agent.update({ where: { id: agentId }, data: { status: 'IDLE' } }).catch(() => {});
+          return {
+            success: false,
+            error: {
+              message:
+                err instanceof Error
+                  ? `Failed to write project files: ${err.message}`
+                  : 'Failed to write project files',
+              code: 'SYNC_FAILED',
+            },
+          };
+        }
+        await new Promise((r) => setTimeout(r, 500 * attempt));
       }
-      await aiBuildQueue.add(`build-${projectId}-${Date.now()}`, {
-        projectId,
-        userPrompt: 'Developer AI Code Build',
-        filesToGenerate: filesForWorkspace.map((f) => ({ path: f.path, content: f.content })),
-      });
-    } catch (err) {
-      console.error('[Developer] Workspace sync or BullMQ enqueue failed:', err);
-      cleanupBuildState(projectId);
-      await prisma.agent.update({ where: { id: agentId }, data: { status: 'IDLE' } }).catch(() => {});
-      return {
-        success: false,
-        error: {
-          message:
-            err instanceof Error
-              ? `Failed to write project files: ${err.message}`
-              : 'Failed to write project files',
-          code: 'SYNC_FAILED',
-        },
-      };
     }
 
     await prisma.agent.update({ where: { id: agentId }, data: { status: 'IDLE' } });
