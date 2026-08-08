@@ -674,28 +674,43 @@ export async function implementFromArchitectureTodos(
     });
 
     const todoChanges: CodeChange[] = [];
-    for (const path of todo.files) {
-      const key = path.replace(/^\.\//, '');
-      const existing = fileMap.get(key);
-      if (existing) {
-        todoChanges.push(existing);
+    try {
+      const aiResult = await codeGeneratorTool.execute({
+        architecture,
+        task: todo.title,
+        projectId,
+      });
+      if (aiResult.success && aiResult.data && aiResult.data.length > 0) {
+        todoChanges.push(...aiResult.data);
+      } else if (!aiResult.success) {
+        throw new Error(aiResult.error || 'AI code generation returned no changes');
       } else {
-        // Minimal stub so the path exists — Architect described it; Developer fills it
-        const layerNote = plan.fileStructure.find((f) => f.path === key)?.description || todo.description;
-        todoChanges.push({
-          file: key,
-          changeType: 'CREATE',
-          description: todo.title,
-          code: key.endsWith('.md')
-            ? `# ${todo.title}\n\n${layerNote}\n`
-            : key.endsWith('.json')
-              ? '{}\n'
-              : key.endsWith('.css')
-                ? `/* ${todo.title} — ${layerNote} */\n`
-                : key.endsWith('.html')
-                  ? `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${todo.title}</title></head><body><h1>${todo.title}</h1><p>${layerNote}</p></body></html>\n`
-                  : `// ${todo.title}\n// ${layerNote}\nexport {};\n`,
-        });
+        throw new Error('AI code generation returned no changes');
+      }
+    } catch (aiErr) {
+      console.warn('[Developer] AI generation failed for todo, falling back to stub:', aiErr);
+      for (const path of todo.files) {
+        const key = path.replace(/^\\.\//, '');
+        const existing = fileMap.get(key);
+        if (existing) {
+          todoChanges.push(existing);
+        } else {
+          const layerNote = plan.fileStructure.find((f) => f.path === key)?.description || todo.description;
+          todoChanges.push({
+            file: key,
+            changeType: 'CREATE',
+            description: todo.title,
+            code: key.endsWith('.md')
+              ? `# ${todo.title}\n\n${layerNote}\n`
+              : key.endsWith('.json')
+                ? '{}\n'
+                : key.endsWith('.css')
+                  ? `/* ${todo.title} — ${layerNote} */\n`
+                  : key.endsWith('.html')
+                    ? `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${todo.title}</title></head><body><h1>${todo.title}</h1><p>${layerNote}</p></body></html>\n`
+                    : `// ${todo.title}\n// ${layerNote}\nexport {};\n`,
+          });
+        }
       }
     }
 
@@ -710,7 +725,6 @@ export async function implementFromArchitectureTodos(
         },
       };
     }
-
     try {
       await syncFilesToWorkspace(
         projectId,
