@@ -9,6 +9,7 @@ import {
   summarizeIntentForAgents,
 } from '@/core/company-orchestration/stack-intent';
 import { persistStackConstraints } from '@/core/memory/persist-stack-constraints';
+import { pulseGenerationHeartbeat } from '@/core/company-orchestration/generation-status';
 
 const CEO_ROLE_NAME = 'CEO AI';
 
@@ -124,10 +125,58 @@ export async function analyzeUserIdea(
   await logAIEvent('CEO_ANALYSIS_STARTED', { projectId }, agentId);
 
   try {
-    // Lean-first: never block Mission Control on 3 sequential LLM calls.
-    const analysis = buildHeuristicCEOAnalysis(userIdea);
-    await persistStackConstraints(projectId, userIdea, analysis.requirements.constraints);
+    await pulseGenerationHeartbeat(projectId, {
+      message: 'CEO is shaping product strategy…',
+      phase: 'STRATEGY_RUNNING',
+      department: 'Executive Strategy',
+    });
+
     const memory = getMemoryManager();
+    let analysis: CEOAnalysis;
+    let usedHeuristic = false;
+
+    try {
+      const priorMemory = await memory.search(agentId, projectId, 5);
+      const contextNote = priorMemory.length
+        ? `Note prior decisions for this project:\n${priorMemory.map((m) => `- ${m.content}`).join('\n')}`
+        : '';
+
+      const ideaWithContext = contextNote ? `${userIdea}\n\n${contextNote}` : userIdea;
+
+      const visionResult = await requirementBuilderTool.execute({
+        userIdea: ideaWithContext,
+        projectId,
+        agentId,
+      });
+      if (!visionResult.success) throw new Error(visionResult.error || 'Vision builder failed');
+
+      const requirementsResult = await featurePlannerTool.execute({
+        vision: visionResult.data,
+        projectId,
+        agentId,
+      });
+      if (!requirementsResult.success) throw new Error(requirementsResult.error || 'Feature planner failed');
+
+      const planResult = await roadmapGeneratorTool.execute({
+        requirements: requirementsResult.data,
+        projectId,
+        agentId,
+      });
+      if (!planResult.success) throw new Error(planResult.error || 'Roadmap generator failed');
+
+      analysis = ceoAnalysisSchema.parse({
+        vision: visionResult.data,
+        requirements: requirementsResult.data,
+        plan: planResult.data,
+        qualityScore: planResult.data.qualityScore,
+      });
+    } catch (aiErr) {
+      console.warn('[CEO] AI analysis failed, falling back to heuristic:', aiErr);
+      usedHeuristic = true;
+      analysis = buildHeuristicCEOAnalysis(userIdea);
+    }
+
+    await persistStackConstraints(projectId, userIdea, analysis.requirements.constraints);
 
     await Promise.all([
       prisma.document.create({ data: { projectId, type: 'VISION', title: 'Product Vision', content: JSON.stringify(analysis.vision) } }),
@@ -138,74 +187,7 @@ export async function analyzeUserIdea(
 
     await prisma.document.deleteMany({ where: { projectId, type: 'CEO_IN_PROGRESS' } });
     await prisma.agent.update({ where: { id: agentId }, data: { status: 'IDLE' } });
-    await logAIEvent('CEO_ANALYSIS_COMPLETED', { projectId }, agentId);
-
-    // Optional background enrichment — does not block the pipeline.
-    void (async () => {
-      try {
-        const priorMemory = await memory.search(agentId, projectId, 5);
-        const contextNote = priorMemory.length
-          ? `Note prior decisions for this project:\n${priorMemory.map((m) => `- ${m.content}`).join('\n')}`
-          : '';
-
-        const visionResult = await requirementBuilderTool.execute({
-          userIdea: contextNote ? `${userIdea}\n\n${contextNote}` : userIdea,
-          projectId,
-          agentId,
-        });
-        if (!visionResult.success) return;
-
-        const requirementsResult = await featurePlannerTool.execute({
-          vision: visionResult.data,
-          projectId,
-          agentId,
-        });
-        if (!requirementsResult.success) return;
-
-        const planResult = await roadmapGeneratorTool.execute({
-          requirements: requirementsResult.data,
-          projectId,
-          agentId,
-        });
-        if (!planResult.success) return;
-
-        const enriched = ceoAnalysisSchema.parse({
-          vision: visionResult.data,
-          requirements: requirementsResult.data,
-          plan: planResult.data,
-          qualityScore: planResult.data.qualityScore,
-        });
-
-        await Promise.all([
-          prisma.document.create({
-            data: {
-              projectId,
-              type: 'VISION',
-              title: 'Product Vision (enriched)',
-              content: JSON.stringify(enriched.vision),
-            },
-          }),
-          prisma.document.create({
-            data: {
-              projectId,
-              type: 'REQUIREMENTS',
-              title: 'Product Requirements (enriched)',
-              content: JSON.stringify(enriched.requirements),
-            },
-          }),
-          prisma.document.create({
-            data: {
-              projectId,
-              type: 'PLAN',
-              title: 'Development Plan (enriched)',
-              content: JSON.stringify(enriched.plan),
-            },
-          }),
-        ]);
-      } catch {
-        /* enrichment optional */
-      }
-    })();
+    await logAIEvent('CEO_ANALYSIS_COMPLETED', { projectId, fallback: usedHeuristic }, agentId);
 
     return { success: true, data: analysis };
   } catch (err) {
