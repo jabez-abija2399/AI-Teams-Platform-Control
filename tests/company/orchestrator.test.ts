@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
   ContinuousCompanyOrchestrator,
-  CompanyEventBus,
+  companyEventBus,
   CompanyStateMachine,
   CompanyStopwatch,
   CompanyHealthService,
@@ -16,8 +16,8 @@ describe('Phase 34 — Continuous Autonomous Company Orchestrator', () => {
 
   beforeEach(() => {
     ContinuousCompanyOrchestrator.resetAll();
-    CompanyEventBus.clearHistory();
-    CompanyEventBus.resetListeners();
+    companyEventBus.clearHistory();
+    companyEventBus.resetListeners();
     CompanyStateMachine.resetAll();
     CompanyStopwatch.resetAll();
     CompanyHealthService.resetAll();
@@ -59,7 +59,7 @@ describe('Phase 34 — Continuous Autonomous Company Orchestrator', () => {
 
   it('1. Automatically progresses from project creation to completion via event-driven cascade', async () => {
     const eventsCaptured: string[] = [];
-    CompanyEventBus.subscribe('*', (evt) => {
+    companyEventBus.subscribe('*', (evt) => {
       eventsCaptured.push(evt.type);
     });
 

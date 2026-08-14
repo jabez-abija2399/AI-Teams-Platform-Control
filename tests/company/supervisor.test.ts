@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
   CompanySupervisor,
   CompanyHealthService,
-  CompanyEventBus,
+  companyEventBus,
   CompanyStateMachine,
   CompanyStopwatch,
   type CompanyWorker,
@@ -17,8 +17,8 @@ describe('Phase 34 — Company Supervisor Service', () => {
     CompanyHealthService.resetAll();
     CompanyStateMachine.resetAll();
     CompanyStopwatch.resetAll();
-    CompanyEventBus.clearHistory();
-    CompanyEventBus.resetListeners();
+    companyEventBus.clearHistory();
+    companyEventBus.resetListeners();
   });
 
   it('1. Recommends REBALANCE_WORKERS when queue backlog exists with idle workers', async () => {
@@ -47,7 +47,7 @@ describe('Phase 34 — Company Supervisor Service', () => {
     const stopwatch = CompanyStopwatch.initProject(projectId);
 
     const listener = vi.fn();
-    CompanyEventBus.subscribe('SUPERVISOR_RECOMMENDATION', listener);
+    companyEventBus.subscribe('SUPERVISOR_RECOMMENDATION', listener);
 
     const recs = await CompanySupervisor.monitor(projectId, workers, queue, stopwatch);
 

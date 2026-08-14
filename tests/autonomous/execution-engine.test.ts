@@ -1,9 +1,23 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { ExecutionScheduler } from '../../src/core/autonomous/execution-scheduler';
 import { ParallelExecutionEngine } from '../../src/core/autonomous/parallel-execution.engine';
 import { ConflictDetector } from '../../src/core/autonomous/conflict-detector';
 import { RetryEngine } from '../../src/core/autonomous/retry-engine';
 import { ReviewPipeline } from '../../src/core/autonomous/review-pipeline';
+
+vi.mock('@/lib/prisma', () => ({ prisma: {} }));
+vi.mock('@/core/executive/executive-planner', () => ({
+  ExecutivePlanner: {
+    planProjectWork: vi.fn().mockResolvedValue({
+      milestones: [],
+      workPackages: [],
+      tasks: [],
+    }),
+  },
+}));
+vi.mock('@/core/executive/assignment-engine', () => ({ AssignmentEngine: { assignTask: vi.fn() } }));
+vi.mock('@/core/autonomous/execution-timeline.service', () => ({ ExecutionTimelineService: { recordTick: vi.fn() } }));
+vi.mock('@/core/integration/event-bus', () => ({ companyEventBus: { publish: vi.fn() } }));
 
 describe('Phase 27 — Autonomous Execution Engine', () => {
   const projectId = 'proj_autonomous_test';

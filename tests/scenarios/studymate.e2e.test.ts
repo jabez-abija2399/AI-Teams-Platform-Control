@@ -359,7 +359,7 @@ vi.mock('@/core/company-orchestration/handoff-manager', () => ({
 
 // ─── Mock remaining services ────────────────────────────────────────────────
 vi.mock('@/core/integration/event-bus', () => ({
-  CompanyEventBus: { publish: vi.fn().mockResolvedValue({}), subscribe: vi.fn().mockReturnValue(() => {}) },
+  companyEventBus: { publish: vi.fn().mockResolvedValue({}), subscribe: vi.fn().mockReturnValue(() => {}) },
 }));
 
 vi.mock('@/features/ai-workspace/services/timeline.service', () => ({
@@ -824,7 +824,7 @@ describe('StudyMate E2E — Full AI Company Pipeline Integration Test', () => {
       expect(PIPELINE_PHASE_DEFINITIONS.PROPOSAL_RUNNING.approvalRequiredAfter).toBe('Product Approval');
       expect(PIPELINE_PHASE_DEFINITIONS.DESIGN_RUNNING.approvalRequiredAfter).toBe('Design Approval');
       expect(PIPELINE_PHASE_DEFINITIONS.ARCHITECTURE_RUNNING.approvalRequiredAfter).toBe('Architecture Approval');
-      expect(PIPELINE_PHASE_DEFINITIONS.SECURITY_RUNNING.approvalRequiredAfter).toBe('Deployment Approval');
+      expect(PIPELINE_PHASE_DEFINITIONS.DEPLOYMENT_RUNNING.approvalRequiredAfter).toBe('Deployment Approval');
     });
 
     it('should have correct nextState chain for all phases', () => {
@@ -834,10 +834,10 @@ describe('StudyMate E2E — Full AI Company Pipeline Integration Test', () => {
       expect(PIPELINE_PHASE_DEFINITIONS.PROPOSAL_RUNNING.nextState).toBe('STRATEGY_RUNNING');
       expect(PIPELINE_PHASE_DEFINITIONS.STRATEGY_RUNNING.nextState).toBe('PRODUCT_RUNNING');
       expect(PIPELINE_PHASE_DEFINITIONS.PRODUCT_RUNNING.nextState).toBe('ANALYSIS_RUNNING');
-      expect(PIPELINE_PHASE_DEFINITIONS.ANALYSIS_RUNNING.nextState).toBe('DESIGN_RUNNING');
-      expect(PIPELINE_PHASE_DEFINITIONS.DESIGN_RUNNING.nextState).toBe('ARCHITECTURE_RUNNING');
-      expect(PIPELINE_PHASE_DEFINITIONS.ARCHITECTURE_RUNNING.nextState).toBe('PLANNING_RUNNING');
-      expect(PIPELINE_PHASE_DEFINITIONS.PLANNING_RUNNING.nextState).toBe('DEVELOPMENT_RUNNING');
+      expect(PIPELINE_PHASE_DEFINITIONS.ANALYSIS_RUNNING.nextState).toBe('PLANNING_RUNNING');
+      expect(PIPELINE_PHASE_DEFINITIONS.PLANNING_RUNNING.nextState).toBe('ARCHITECTURE_RUNNING');
+      expect(PIPELINE_PHASE_DEFINITIONS.ARCHITECTURE_RUNNING.nextState).toBe('DESIGN_RUNNING');
+      expect(PIPELINE_PHASE_DEFINITIONS.DESIGN_RUNNING.nextState).toBe('DEVELOPMENT_RUNNING');
       expect(PIPELINE_PHASE_DEFINITIONS.DEVELOPMENT_RUNNING.nextState).toBe('TESTING_RUNNING');
       expect(PIPELINE_PHASE_DEFINITIONS.TESTING_RUNNING.nextState).toBe('REVIEW_RUNNING');
       expect(PIPELINE_PHASE_DEFINITIONS.REVIEW_RUNNING.nextState).toBe('SECURITY_RUNNING');

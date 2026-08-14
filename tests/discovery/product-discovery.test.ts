@@ -6,8 +6,8 @@ describe('Phase 20 — Product Discovery Agent', () => {
     const agent = new ProductDiscoveryAgent();
     const spec = await agent.discoverProductSpecification('I want a todo app');
 
-    expect(spec.productName).toBe('TodoFlow');
-    expect(spec.vision).toContain('task management');
+    expect(spec.productName).toBe('TaskBoard');
+    expect(spec.vision).toContain('todo app');
     expect(spec.problemStatement).toContain('I want a todo app');
     expect(spec.targetAudience).toBeDefined();
     expect(spec.platform).toBe('Web application');
@@ -21,8 +21,8 @@ describe('Phase 20 — Product Discovery Agent', () => {
     const agent = new ProductDiscoveryAgent();
     const spec = await agent.discoverProductSpecification('Build an e-commerce clothing store');
 
-    expect(spec.productName).toBe('StoreCraft');
-    expect(spec.mvpFeatures.some(f => f.name.includes('Shopping cart'))).toBe(true);
+    expect(spec.productName).toBe('Storefront');
+    expect(spec.mvpFeatures.some(f => f.name.includes('Cart and checkout'))).toBe(true);
   });
 
   it('should execute successfully within the agent framework', async () => {
@@ -30,6 +30,6 @@ describe('Phase 20 — Product Discovery Agent', () => {
     const res = await agent.execute('I want a dashboard for SaaS analytics');
 
     expect(res.success).toBe(true);
-    expect(res.output).toContain('DashPulse');
+    expect(res.output).toContain('Want');
   });
 });

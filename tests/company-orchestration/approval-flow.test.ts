@@ -28,7 +28,7 @@ vi.mock('@/lib/prisma', () => ({
 }));
 
 vi.mock('@/core/integration/event-bus', () => ({
-  CompanyEventBus: {
+  companyEventBus: {
     publish: vi.fn().mockResolvedValue(true),
   },
 }));

@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
   CompanyHeartbeat,
   CompanyHealthService,
-  CompanyEventBus,
+  companyEventBus,
   CompanyStateMachine,
   type CompanyWorker,
   type CompanyTask,
@@ -15,8 +15,8 @@ describe('Phase 34 — Company Heartbeat Service', () => {
     CompanyHeartbeat.resetAll();
     CompanyHealthService.resetAll();
     CompanyStateMachine.resetAll();
-    CompanyEventBus.clearHistory();
-    CompanyEventBus.resetListeners();
+    companyEventBus.clearHistory();
+    companyEventBus.resetListeners();
   });
 
   it('1. Emits HEARTBEAT_CHECK pulse during routine evaluation', async () => {
@@ -26,7 +26,7 @@ describe('Phase 34 — Company Heartbeat Service', () => {
     const queue: CompanyTask[] = [];
 
     const listener = vi.fn();
-    CompanyEventBus.subscribe('HEARTBEAT_CHECK', listener);
+    companyEventBus.subscribe('HEARTBEAT_CHECK', listener);
 
     const report = await CompanyHeartbeat.check(projectId, workers, queue);
 
@@ -47,7 +47,7 @@ describe('Phase 34 — Company Heartbeat Service', () => {
     const queue: CompanyTask[] = [];
 
     const listener = vi.fn();
-    CompanyEventBus.subscribe('WORKER_STALLED', listener);
+    companyEventBus.subscribe('WORKER_STALLED', listener);
 
     const report = await CompanyHeartbeat.check(projectId, workers, queue);
 
@@ -81,7 +81,7 @@ describe('Phase 34 — Company Heartbeat Service', () => {
     ];
 
     const listener = vi.fn();
-    CompanyEventBus.subscribe('DEADLOCK_DETECTED', listener);
+    companyEventBus.subscribe('DEADLOCK_DETECTED', listener);
 
     const report = await CompanyHeartbeat.check(projectId, idleWorkers, queuedTasks);
 
@@ -107,7 +107,7 @@ describe('Phase 34 — Company Heartbeat Service', () => {
     ];
 
     const listener = vi.fn();
-    CompanyEventBus.subscribe('TASK_FAILED', listener);
+    companyEventBus.subscribe('TASK_FAILED', listener);
 
     const report = await CompanyHeartbeat.check(projectId, workers, failedQueue);
 

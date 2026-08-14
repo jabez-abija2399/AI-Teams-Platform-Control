@@ -123,6 +123,11 @@ export async function searchMemory(filter: MemoryFilter): Promise<MemoryRecord[]
       _dbOk = false;
       results = getInMemoryResults(filter);
     }
+
+    // Merge in-memory-only records (e.g. agent FK fallback writes)
+    const dbIds = new Set(results.map((r) => r.id));
+    const memOnly = getInMemoryResults(filter).filter((m) => !dbIds.has(m.id));
+    results = [...results, ...memOnly];
   } else {
     results = getInMemoryResults(filter);
   }

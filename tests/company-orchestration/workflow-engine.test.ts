@@ -4,6 +4,9 @@ import { WorkflowManager, PIPELINE_PHASE_DEFINITIONS } from '@/core/company-orch
 // Mock Prisma
 vi.mock('@/lib/prisma', () => ({
   prisma: {
+    project: {
+      findUnique: vi.fn().mockResolvedValue({ id: 'test-project', status: 'PLANNING' }),
+    },
     projectWorkflowState: {
       findUnique: vi.fn().mockResolvedValue({
         projectId: 'test-project',
