@@ -81,7 +81,7 @@ export class DecisionIntelligenceEngine {
         status: r.status as DecisionStatus,
         createdByAgent: r.createdByAgent,
         approvedByUser: r.approvedByUser,
-        timestamp: r.timestamp.toISOString(),
+        timestamp: r.timestamp instanceof Date ? r.timestamp.toISOString() : (r.timestamp ? String(r.timestamp) : new Date().toISOString()),
       }));
     }
 

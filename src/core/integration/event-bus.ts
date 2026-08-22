@@ -87,6 +87,30 @@ export class CompanyEventBus {
   public resetListeners(): void {
     this.listeners.clear();
   }
+
+  public static resetListeners(): void {
+    companyEventBus.resetListeners();
+  }
+
+  public static clearHistory(projectId?: string): void {
+    companyEventBus.clearHistory(projectId);
+  }
+
+  public static publish<T = Record<string, any>>(
+    type: CompanyEventType,
+    projectId: string,
+    payload: T = {} as T,
+    source: string = 'system',
+  ): Promise<CompanyEvent<T>> {
+    return companyEventBus.publish(type, projectId, payload, source);
+  }
+
+  public static subscribe<T = Record<string, any>>(
+    type: CompanyEventType | '*',
+    listener: EventListener<T>,
+  ): () => void {
+    return companyEventBus.subscribe(type, listener);
+  }
 }
 
 export const companyEventBus = new CompanyEventBus();

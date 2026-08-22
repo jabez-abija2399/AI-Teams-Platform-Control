@@ -42,7 +42,7 @@ export class ExecutionQueueWorker {
           data: { status: 'CLAIMED', startedAt: new Date() }
         });
 
-if (lockResult.count > 0) {
+        if (lockResult.count > 0) {
           this.visibility.emitEvent({
             projectId: task.projectId,
             type: 'INFO',
@@ -51,6 +51,7 @@ if (lockResult.count > 0) {
           });
 
           await this.executeTask(task.id, exec.projectId);
+          return true;
         }
       }
     }

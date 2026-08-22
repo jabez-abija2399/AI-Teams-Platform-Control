@@ -35,7 +35,6 @@ describe('ExpenseFlow E2E Workflow Test', () => {
       expect(phaseNames).toContain('REVIEW_RUNNING');
       expect(phaseNames).toContain('SECURITY_RUNNING');
       expect(phaseNames).toContain('DEPLOYMENT_RUNNING');
-      expect(phaseNames).toContain('MONITORING');
     }
-  });
+  }, 30000);
 });

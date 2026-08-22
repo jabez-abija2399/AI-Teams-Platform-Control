@@ -2,6 +2,8 @@ import { prisma } from '@/lib/prisma';
 import type { ProjectTaskEntity, TaskExecutionState, TaskPriorityLevel } from './types';
 import type { AgentRole } from '@/ai/agents/core/agent.types';
 
+const taskErrors = new Map<string, string>();
+
 export class TaskManagementEngine {
   async createTask(params: {
     id?: string;
@@ -76,7 +78,8 @@ export class TaskManagementEngine {
       include: { execution: true },
     });
     if (!task) return undefined;
-    return this.mapToEntity(task, task.execution.projectId, false);
+    const error = taskErrors.get(taskId);
+    return this.mapToEntity(task, task.execution?.projectId || '', false, undefined, error);
   }
 
   async getProjectTasks(projectId: string): Promise<ProjectTaskEntity[]> {
@@ -85,7 +88,7 @@ export class TaskManagementEngine {
       include: { execution: true },
       orderBy: { createdAt: 'asc' },
     });
-    return tasks.map(t => this.mapToEntity(t, t.execution.projectId, false));
+    return tasks.map(t => this.mapToEntity(t, t.execution?.projectId || '', false, undefined, taskErrors.get(t.id)));
   }
 
   async updateTaskStatus(
@@ -100,6 +103,10 @@ export class TaskManagementEngine {
   ): Promise<ProjectTaskEntity | undefined> {
     const current = await prisma.executionTask.findUnique({ where: { id: taskId }, include: { execution: true } });
     if (!current) return undefined;
+
+    if (metadata?.error) {
+      taskErrors.set(taskId, metadata.error);
+    }
 
     const data: any = { status };
     if (status === 'COMPLETED') {
@@ -124,7 +131,7 @@ export class TaskManagementEngine {
       include: { execution: true },
     });
 
-    return this.mapToEntity(updated, updated.execution.projectId, false, metadata?.error, metadata?.approvalReason);
+    return this.mapToEntity(updated, updated.execution?.projectId || current.execution?.projectId || '', false, metadata?.approvalReason, metadata?.error || taskErrors.get(taskId));
   }
 
   async getReadyTasks(projectId: string): Promise<ProjectTaskEntity[]> {
@@ -199,15 +206,15 @@ export class TaskManagementEngine {
       projectId,
       agentRole: task.agentRole as AgentRole,
       description: task.description,
-      priority: task.priority as TaskPriorityLevel,
-      dependencies: task.dependencies,
-      status: task.status as TaskExecutionState,
-      inputArtifacts: task.inputArtifacts,
-      outputArtifacts: task.outputArtifacts,
-      createdAt: task.createdAt,
+      priority: (task.priority ?? 'MEDIUM') as TaskPriorityLevel,
+      dependencies: task.dependencies ?? [],
+      status: (task.status ?? 'PENDING') as TaskExecutionState,
+      inputArtifacts: task.inputArtifacts ?? [],
+      outputArtifacts: task.outputArtifacts ?? [],
+      createdAt: task.createdAt ?? new Date(),
       completedAt: task.completedAt ?? undefined,
-      retryCount: task.attempts,
-      maxRetries: task.maxAttempts,
+      retryCount: task.attempts ?? 0,
+      maxRetries: task.maxAttempts ?? 3,
       requiresApproval,
       approvalReason,
       error,
