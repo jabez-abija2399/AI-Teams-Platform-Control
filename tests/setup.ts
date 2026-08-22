@@ -97,7 +97,7 @@ const modelHandler: ProxyHandler<Record<string, unknown>> = {
                 if (!task) return false;
                 const execStore = getModelStore('projectExecution');
                 const exec = execStore.get(task.executionId as string) as Record<string, unknown> | undefined;
-                const targetProjId = (v as any).execution?.projectId;
+                const targetProjId = (v as { execution?: { projectId?: string } }).execution?.projectId;
                 return exec?.projectId === targetProjId || task.executionId === targetProjId;
               }
               if (v && typeof v === 'object' && 'in' in v) {
