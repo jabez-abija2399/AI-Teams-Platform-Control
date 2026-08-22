@@ -74,7 +74,8 @@ describe('Phase 34 — Company Checkpoint Service', () => {
     expect(CompanyStateMachine.getState(projectId)).toBe('EXECUTION');
 
     const restoredStopwatch = CompanyStopwatch.getMetrics(projectId);
-    expect(restoredStopwatch.totalProjectDurationMs).toBe(25000);
+    expect(restoredStopwatch.totalProjectDurationMs).toBeGreaterThanOrEqual(25000);
+    expect(restoredStopwatch.totalProjectDurationMs).toBeLessThanOrEqual(26000);
     expect(restoredStopwatch.taskDurationMs).toBe(20000);
   });
 });

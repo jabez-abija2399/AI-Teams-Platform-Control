@@ -100,6 +100,11 @@ vi.mock('@/lib/prisma', () => ({
       ),
     },
     aIEventLog: { create: vi.fn().mockResolvedValue({}) },
+    $executeRawUnsafe: vi.fn().mockResolvedValue(1),
+    $executeRaw: vi.fn().mockResolvedValue(1),
+    $queryRawUnsafe: vi.fn().mockResolvedValue([]),
+    $queryRaw: vi.fn().mockResolvedValue([]),
+    $transaction: vi.fn().mockImplementation((cb: unknown) => typeof cb === 'function' ? cb({}) : Promise.resolve([])),
   },
 }));
 

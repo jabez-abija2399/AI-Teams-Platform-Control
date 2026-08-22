@@ -300,6 +300,19 @@ const modelHandler: ProxyHandler<Record<string, unknown>> = {
 // Proxy that returns model proxies for any property access
 const prismaProxy = new Proxy({} as Record<string, unknown>, {
   get(_target, prop: string) {
+    if (prop === '$executeRawUnsafe' || prop === '$executeRaw') {
+      return vi.fn().mockResolvedValue(1);
+    }
+    if (prop === '$queryRawUnsafe' || prop === '$queryRaw') {
+      return vi.fn().mockResolvedValue([]);
+    }
+    if (prop === '$transaction') {
+      return vi.fn().mockImplementation((cbOrPromises: unknown) => {
+        if (typeof cbOrPromises === 'function') return cbOrPromises(prismaProxy);
+        if (Array.isArray(cbOrPromises)) return Promise.all(cbOrPromises);
+        return Promise.resolve();
+      });
+    }
     if (prop.startsWith('$')) {
       return vi.fn().mockResolvedValue([]);
     }
