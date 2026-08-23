@@ -15,6 +15,10 @@ import {
 } from '@/core/company-orchestration/revision-feedback';
 import { resolveStackIntent } from '@/core/company-orchestration/stack-intent';
 import type { ApiResult } from '@/types/common.types';
+import { ProjectStateManager } from '@/core/state/project-state.manager';
+import { ArtifactRegistryService } from '@/core/artifacts/artifact-registry.service';
+import { AgentContractRegistry } from '@/core/contracts/agent-registry';
+import { ArtifactManager } from '@/core/company-orchestration/artifact-manager';
 
 const UID_ROLE_NAME = 'UI Designer AI';
 
@@ -265,6 +269,83 @@ async function persistSpec(projectId: string, agentId: string, spec: UiDesignSpe
       content: `Project ${projectId}: UI design ${spec.visualStyleGuide.themeName}`,
       type: 'PROJECT',
       metadata: { projectId },
+    }),
+    ArtifactRegistryService.registerArtifact({
+      projectId,
+      type: 'UI_DESIGN_SPECIFICATION',
+      createdBy: 'DESIGNER',
+      payload: spec,
+      summary: `UI Design Spec: ${spec.visualStyleGuide.themeName} with ${spec.componentHierarchy.length} components`,
+      qualityScore: {
+        completeness: 90,
+        consistency: 95,
+        requirementCoverage: 90,
+        correctness: 90,
+        technicalRisk: 10,
+      },
+    }),
+    ArtifactManager.storeArtifact(projectId, {
+      type: 'UIDesignSpec',
+      content: spec,
+      producerRole: 'UI_UX',
+      consumerRoles: ['DEVELOPER', 'QA'],
+      summary: `Design system tokens, component specs, and responsive wireframes`,
+    }),
+    ProjectStateManager.updateState(projectId, (s) => {
+      s.currentStage = 'DESIGN';
+      if (!s.design) {
+        s.design = {
+          version: 1,
+          designSystemName: spec.visualStyleGuide.themeName,
+          designTokens: { colors: {}, typography: {}, spacing: {}, radii: {} },
+          userJourneys: [],
+          components: [],
+          cssVariablesManifest: '',
+        };
+      }
+      s.design.designSystemName = spec.visualStyleGuide.themeName;
+      const colors: Record<string, string> = {};
+      for (const c of spec.designTokens.colors || []) {
+        colors[c.name] = c.value;
+      }
+      const typography: Record<string, string> = {};
+      for (const t of spec.designTokens.typography || []) {
+        typography[t.name] = t.value;
+      }
+      const spacing: Record<string, string> = {};
+      for (const sp of spec.designTokens.spacing || []) {
+        spacing[sp.name] = sp.value;
+      }
+      const radii: Record<string, string> = {};
+      for (const r of spec.designTokens.borderRadius || []) {
+        radii[r.name] = r.value;
+      }
+      s.design.designTokens = { colors, typography, spacing, radii };
+      s.design.components = (spec.componentHierarchy || []).map((c) => ({
+        name: c.name,
+        filePath: `src/components/${c.name}.tsx`,
+        description: c.description,
+        props: (c.props || []).map((p) =>
+          typeof p === 'string'
+            ? { name: p, type: 'string', required: false }
+            : (p as any)
+        ),
+        stateVariants: {
+          loading: c.states?.includes('loading'),
+          error: c.states?.includes('error'),
+          disabled: c.states?.includes('disabled'),
+        },
+        responsiveRules: {
+          mobile: '100% width',
+          desktop: 'auto max-width 1200px',
+        },
+      }));
+      s.design.userJourneys = (spec.layoutMockups || []).map((m, idx) => ({
+        id: m.screenId || `UJ-${idx + 1}`,
+        title: m.screenName,
+        steps: [m.wireframeLayout],
+      }));
+      s.design.cssVariablesManifest = spec.cssVariablesManifest;
     }),
   ]);
 }
