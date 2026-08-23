@@ -60,23 +60,23 @@
   --brand-teal: #245f73;
   --brand-brown: #733e24;
 
-  --background: var(--brand-cream);
+  --background: #f8f9fa;
   --foreground: #1a3339;
   --card: #ffffff;
   --card-foreground: #1a3339;
   --popover: #ffffff;
   --popover-foreground: #1a3339;
   --primary: var(--brand-teal);
-  --primary-foreground: var(--brand-cream);
-  --secondary: #e8e6e4;
+  --primary-foreground: #ffffff;
+  --secondary: #edf1f3;
   --secondary-foreground: #1a3339;
-  --muted: #e8e6e4;
-  --muted-foreground: #4a5f66;
+  --muted: #edf1f3;
+  --muted-foreground: #5a7178;
   --accent: var(--brand-brown);
-  --accent-foreground: var(--brand-cream);
-  --destructive: #b42318;
-  --border: #d4d2d0;
-  --input: #d4d2d0;
+  --accent-foreground: #ffffff;
+  --destructive: #dc2626;
+  --border: #e2e6e8;
+  --input: #e2e6e8;
   --ring: var(--brand-teal);
   --chart-1: var(--brand-teal);
   --chart-2: var(--brand-brown);
@@ -87,45 +87,45 @@
   --sidebar: #ffffff;
   --sidebar-foreground: #1a3339;
   --sidebar-primary: var(--brand-teal);
-  --sidebar-primary-foreground: var(--brand-cream);
-  --sidebar-accent: #e8e6e4;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #edf1f3;
   --sidebar-accent-foreground: #1a3339;
-  --sidebar-border: #d4d2d0;
+  --sidebar-border: #e2e6e8;
   --sidebar-ring: var(--brand-teal);
 }
 
 .dark {
-  --background: #152a30;
-  --foreground: var(--brand-cream);
-  --card: #1a3339;
-  --card-foreground: var(--brand-cream);
-  --popover: #1a3339;
-  --popover-foreground: var(--brand-cream);
-  --primary: #3a8fa8;
-  --primary-foreground: #152a30;
-  --secondary: #245f73;
-  --secondary-foreground: var(--brand-cream);
-  --muted: #245f73;
-  --muted-foreground: var(--brand-gray);
-  --accent: #a0624a;
-  --accent-foreground: var(--brand-cream);
-  --destructive: #f87171;
-  --border: rgba(242, 240, 239, 0.12);
-  --input: rgba(242, 240, 239, 0.15);
-  --ring: #3a8fa8;
-  --chart-1: #3a8fa8;
-  --chart-2: #a0624a;
-  --chart-3: var(--brand-gray);
-  --chart-4: var(--brand-teal);
-  --chart-5: var(--brand-brown);
-  --sidebar: #1a3339;
-  --sidebar-foreground: var(--brand-cream);
-  --sidebar-primary: #3a8fa8;
-  --sidebar-primary-foreground: #152a30;
-  --sidebar-accent: #245f73;
-  --sidebar-accent-foreground: var(--brand-cream);
-  --sidebar-border: rgba(242, 240, 239, 0.12);
-  --sidebar-ring: #3a8fa8;
+  --background: #0f1c20;
+  --foreground: #f2f5f6;
+  --card: #15272c;
+  --card-foreground: #f2f5f6;
+  --popover: #15272c;
+  --popover-foreground: #f2f5f6;
+  --primary: #38bdf8;
+  --primary-foreground: #082f49;
+  --secondary: #1e363d;
+  --secondary-foreground: #f2f5f6;
+  --muted: #1a3036;
+  --muted-foreground: #94a3b8;
+  --accent: #f97316;
+  --accent-foreground: #ffffff;
+  --destructive: #ef4444;
+  --border: rgba(255, 255, 255, 0.08);
+  --input: rgba(255, 255, 255, 0.1);
+  --ring: #38bdf8;
+  --chart-1: #38bdf8;
+  --chart-2: #f97316;
+  --chart-3: #94a3b8;
+  --chart-4: #0284c7;
+  --chart-5: #ea580c;
+  --sidebar: #122025;
+  --sidebar-foreground: #f2f5f6;
+  --sidebar-primary: #38bdf8;
+  --sidebar-primary-foreground: #082f49;
+  --sidebar-accent: #1e363d;
+  --sidebar-accent-foreground: #f2f5f6;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-ring: #38bdf8;
 }
 
 @layer base {
@@ -133,7 +133,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary;
   }
   html {
     @apply font-sans scroll-smooth;
@@ -144,6 +144,22 @@
   .font-heading {
     font-family: var(--font-heading), ui-serif, Georgia, serif;
   }
+
+  /* Sleek custom scrollbars */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(100, 116, 139, 0.25);
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(100, 116, 139, 0.4);
+  }
 }
 
 @layer utilities {
@@ -151,23 +167,61 @@
     text-wrap: balance;
   }
   .animate-fade-up {
-    animation: fade-up 0.7s ease-out both;
+    animation: fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
   .animate-fade-in {
-    animation: fade-in 0.6s ease-out both;
+    animation: fade-in 0.4s ease-out both;
   }
   .animate-soft-pulse {
     animation: soft-pulse 2.4s ease-in-out infinite;
   }
   .animate-drawer-in {
-    animation: drawer-in 0.22s ease-out both;
+    animation: drawer-in 0.24s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .animate-shimmer {
+    animation: shimmer 2s infinite linear;
+    background-size: 200% 100%;
+  }
+
+  /* Ultra-modern glass & glow effects */
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+  }
+  .dark .glass-panel {
+    background: rgba(21, 39, 44, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .glass-panel-elevated {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.04);
+  }
+  .dark .glass-panel-elevated {
+    background: rgba(21, 39, 44, 0.9);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  }
+
+  .glow-teal {
+    box-shadow: 0 0 20px -3px rgba(36, 95, 115, 0.35);
+  }
+  .dark .glow-teal {
+    box-shadow: 0 0 24px -3px rgba(56, 189, 248, 0.35);
   }
 }
 
 @keyframes fade-up {
   from {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateY(14px);
   }
   to {
     opacity: 1;
@@ -187,10 +241,12 @@
 @keyframes soft-pulse {
   0%,
   100% {
-    opacity: 0.55;
+    opacity: 0.6;
+    transform: scale(1);
   }
   50% {
     opacity: 1;
+    transform: scale(1.04);
   }
 }
 
@@ -205,3 +261,11 @@
   }
 }
 
+@keyframes shimmer {
+  from {
+    background-position: -200% 0;
+  }
+  to {
+    background-position: 200% 0;
+  }
+}

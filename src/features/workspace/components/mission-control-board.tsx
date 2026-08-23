@@ -3,7 +3,21 @@
 import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { FileText, Code2, Loader2, Play, Rocket } from 'lucide-react';
+import {
+  FileText,
+  Code2,
+  Loader2,
+  Play,
+  Rocket,
+  Crown,
+  ClipboardList,
+  Cpu,
+  ShieldCheck,
+  Sparkles,
+  CheckCircle2,
+  Activity,
+  ArrowRight,
+} from 'lucide-react';
 import type {
   PipelineActivity,
   PipelineApproval,
@@ -20,33 +34,43 @@ import { ImplementationTodoList } from './implementation-todo-list';
 import type { DeliverableCheckItem } from '@/features/workspace/hooks/use-pipeline';
 
 /**
- * Simplified Mission Control roster (landing + docs hierarchy).
+ * Simplified Mission Control roster with icon metadata.
  */
 export const COMPANY_ROSTER = [
-  { key: 'ceo', label: 'CEO · Vision', phases: ['discovery', 'strategy'] },
+  { key: 'ceo', label: 'CEO', sublabel: 'Vision & Strategy', icon: Crown, phases: ['discovery', 'strategy'] },
   {
     key: 'pm',
-    label: 'Product Manager · Requirements',
+    label: 'Product Manager',
+    sublabel: 'Requirements & Scope',
+    icon: ClipboardList,
     phases: ['clarification', 'proposal', 'product', 'analysis', 'planning'],
   },
   {
     key: 'architect',
-    label: 'Architect · System design',
+    label: 'Architect',
+    sublabel: 'System Design & APIs',
+    icon: Cpu,
     phases: ['architecture', 'design'],
   },
   {
     key: 'engineers',
-    label: 'Engineers · Implementation',
+    label: 'Developer Agent',
+    sublabel: 'Implementation & Code',
+    icon: Code2,
     phases: ['development'],
   },
   {
     key: 'qa',
-    label: 'QA · Verification',
+    label: 'QA Engineer',
+    sublabel: 'Verification & Quality',
+    icon: ShieldCheck,
     phases: ['testing', 'review', 'security'],
   },
   {
     key: 'devops',
-    label: 'DevOps · Release',
+    label: 'DevOps & Cloud',
+    sublabel: 'Release & Delivery',
+    icon: Rocket,
     phases: ['deployment'],
   },
 ] as const;
@@ -151,10 +175,10 @@ function phaseDisplayName(phases: PipelinePhase[], currentPhase: string): string
 type RightTab = 'now' | 'deliverables';
 
 /**
- * Cursor-style Mission Control:
- * - Full-width pipeline stepper (no empty middle column)
- * - Slim team rail (who is working)
- * - Main stage (what you do now)
+ * Ultra-Modern Mission Control Board:
+ * - High-contrast pipeline stepper with dynamic glowing nodes
+ * - Polished AI Employee rail with active status pulses & role avatars
+ * - Dynamic Main Stage with Decision Review & Real-time generation streaming
  */
 export function MissionControlBoard({
   projectId,
@@ -276,65 +300,89 @@ export function MissionControlBoard({
   return (
     <div
       className={cn(
-        'relative flex min-h-0 flex-1 flex-col overflow-hidden bg-card',
-        'before:pointer-events-none before:absolute before:inset-0 before:bg-[linear-gradient(to_right,rgba(36,95,115,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(36,95,115,0.03)_1px,transparent_1px)] before:bg-[size:28px_28px]',
+        'relative flex min-h-0 flex-1 flex-col overflow-hidden bg-background',
+        'before:pointer-events-none before:absolute before:inset-0 before:bg-[radial-gradient(#245f73_1px,transparent_1px)] before:opacity-[0.04] before:bg-[size:24px_24px]',
         className,
       )}
     >
-      {/* Status + full-width pipeline stepper (kills empty middle column) */}
-      <div className="relative z-[1] shrink-0 border-b border-border/80 bg-background/80 backdrop-blur-sm">
-        <div className="flex items-center gap-3 px-4 py-2.5 lg:px-6">
+      {/* Top Header & Pipeline Stepper */}
+      <div className="relative z-[1] shrink-0 border-b border-border/80 bg-card/60 backdrop-blur-md">
+        <div className="flex items-center justify-between gap-4 px-4 py-3 lg:px-6">
           <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <p className="truncate font-heading text-sm font-semibold tracking-tight text-foreground">
-                {phaseName}
-                <span className="ml-2 font-mono text-[12px] font-normal text-muted-foreground">
+            <div className="flex flex-wrap items-center gap-2.5">
+              <div className="flex items-center gap-2">
+                <span className="font-heading text-sm font-bold tracking-tight text-foreground">
+                  {phaseName}
+                </span>
+                <span className="rounded-md border border-primary/20 bg-primary/10 px-2 py-0.5 font-mono text-[11px] font-semibold text-primary">
                   {Math.round(progress)}%
                 </span>
-              </p>
+              </div>
+
               {!isWaiting && (
-                <span
+                <div
                   className={cn(
-                    'shrink-0 rounded-md px-2 py-0.5 text-[11px] font-medium',
-                    phaseStatus === 'approval' && 'bg-accent/15 text-accent',
-                    phaseStatus === 'running' && 'bg-primary/10 text-primary',
-                    phaseStatus === 'completed' && 'bg-primary/10 text-primary',
+                    'inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-semibold tracking-wide shadow-xs',
+                    phaseStatus === 'approval' && 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30',
+                    phaseStatus === 'running' && 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30',
+                    phaseStatus === 'completed' && 'bg-primary/15 text-primary border border-primary/30',
                     (phaseStatus === 'failed' || liveGeneration?.kind === 'credits') &&
-                      'bg-destructive/10 text-destructive',
-                    liveGeneration?.kind === 'stuck' && 'bg-accent/15 text-accent',
+                      'bg-destructive/15 text-destructive border border-destructive/30',
+                    liveGeneration?.kind === 'stuck' && 'bg-amber-500/15 text-amber-600 border border-amber-500/30',
                   )}
                 >
-                  {phaseStatus === 'approval'
-                    ? 'Needs your decision'
-                    : phaseStatus === 'completed'
-                      ? 'Complete'
-                      : phaseStatus === 'failed' || liveGeneration?.kind === 'credits'
-                        ? 'Needs attention'
-                        : liveGeneration?.kind === 'stuck'
-                          ? 'Stalled'
-                          : phaseStatus === 'running' || liveGeneration?.kind === 'regenerating'
-                            ? 'Live'
-                            : 'Ready'}
-                </span>
+                  <span
+                    className={cn(
+                      'h-1.5 w-1.5 rounded-full',
+                      phaseStatus === 'running' && 'animate-pulse bg-emerald-500',
+                      phaseStatus === 'approval' && 'bg-amber-500',
+                      phaseStatus === 'completed' && 'bg-primary',
+                      phaseStatus === 'failed' && 'bg-destructive',
+                    )}
+                  />
+                  <span>
+                    {phaseStatus === 'approval'
+                      ? 'Decision Required'
+                      : phaseStatus === 'completed'
+                        ? 'Completed'
+                        : phaseStatus === 'failed' || liveGeneration?.kind === 'credits'
+                          ? 'Needs Attention'
+                          : liveGeneration?.kind === 'stuck'
+                            ? 'Stalled'
+                            : phaseStatus === 'running' || liveGeneration?.kind === 'regenerating'
+                              ? 'Active Generation'
+                              : 'Ready'}
+                  </span>
+                </div>
               )}
+
               {activeEmployee && phaseStatus === 'running' && (
-                <span className="hidden text-[11px] text-muted-foreground sm:inline">
-                  {activeEmployee.label.split('·')[0]?.trim()} working
+                <span className="hidden items-center gap-1 text-xs text-muted-foreground sm:inline-flex">
+                  <Activity className="h-3 w-3 text-emerald-500 animate-pulse" />
+                  <span className="font-medium text-foreground">{activeEmployee.label}</span> is working
                 </span>
               )}
             </div>
-            <div className="mt-1.5 h-1 max-w-md overflow-hidden rounded-full bg-muted">
+
+            {/* Dynamic Shimmer Progress Bar */}
+            <div className="mt-2 h-1.5 max-w-md overflow-hidden rounded-full bg-secondary/80">
               <div
-                className="h-full rounded-full bg-primary transition-all duration-500"
+                className="h-full rounded-full bg-gradient-to-r from-primary to-primary/80 transition-all duration-500"
                 style={{ width: `${Math.max(isWaiting ? 0 : 2, Math.min(100, progress))}%` }}
               />
             </div>
           </div>
-          <p className="hidden truncate text-xs text-muted-foreground xl:block">{projectName}</p>
+
+          <div className="hidden shrink-0 items-center gap-2 xl:flex">
+            <span className="text-xs font-semibold text-foreground/80">{projectName}</span>
+            <span className="rounded-md border border-border bg-muted/50 px-2 py-0.5 font-mono text-[10px] text-muted-foreground">
+              Autonomous
+            </span>
+          </div>
         </div>
 
-        {/* Single pipeline story — where we are in the company workflow */}
-        <div className="flex gap-1 overflow-x-auto px-4 pb-3 lg:px-6">
+        {/* 10-Phase Pipeline Stepper */}
+        <div className="flex gap-1.5 overflow-x-auto px-4 pb-3 lg:px-6">
           {workflowSteps.map((step, idx) => {
             const status = workflowStepStatus(step, currentPhase, phaseStatus || 'waiting');
             return (
@@ -342,20 +390,22 @@ export function MissionControlBoard({
                 {idx > 0 && (
                   <span
                     className={cn(
-                      'mx-0.5 h-px w-3 sm:w-4',
-                      status === 'pending' ? 'bg-border' : 'bg-primary/40',
+                      'mx-0.5 h-px w-3 sm:w-4 transition-colors',
+                      status === 'pending' ? 'bg-border' : 'bg-primary/50',
                     )}
                   />
                 )}
                 <div
                   className={cn(
-                    'rounded-md px-2 py-1 text-[11px] font-medium whitespace-nowrap',
-                    status === 'active' && 'bg-primary text-primary-foreground shadow-sm',
-                    status === 'done' && 'bg-muted text-foreground/70',
-                    status === 'pending' && 'text-muted-foreground',
+                    'flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium whitespace-nowrap transition-all',
+                    status === 'active' && 'bg-primary text-primary-foreground shadow-sm ring-2 ring-primary/30',
+                    status === 'done' && 'bg-secondary/60 text-secondary-foreground hover:bg-secondary',
+                    status === 'pending' && 'text-muted-foreground/80 hover:text-foreground',
                   )}
                 >
-                  {step.label}
+                  {status === 'done' && <CheckCircle2 className="h-3 w-3 text-primary" />}
+                  {status === 'active' && <Sparkles className="h-3 w-3 animate-spin" />}
+                  <span>{step.label}</span>
                 </div>
               </div>
             );
@@ -363,44 +413,65 @@ export function MissionControlBoard({
         </div>
       </div>
 
-      {/* Two columns only: Team | Main work */}
+      {/* Main Grid: AI Team Rail | Action Stage */}
       <div
         className={cn(
           'relative z-[1] grid min-h-0 flex-1 overflow-hidden',
-          'grid-cols-1',
-          'md:grid-cols-[minmax(200px,240px)_minmax(0,1fr)]',
-          'xl:grid-cols-[260px_minmax(0,1fr)]',
+          'grid-cols-1 md:grid-cols-[minmax(220px,260px)_minmax(0,1fr)] xl:grid-cols-[280px_minmax(0,1fr)]',
         )}
       >
-        {/* Slim team rail — who is working (not a second pipeline) */}
-        <aside className="flex min-h-0 flex-col gap-3 overflow-y-auto border-b border-border p-4 md:border-b-0 md:border-r lg:p-5">
+        {/* Left AI Team Rail */}
+        <aside className="flex min-h-0 flex-col gap-4 overflow-y-auto border-b border-border/80 bg-card/30 p-4 backdrop-blur-xs md:border-b-0 md:border-r lg:p-5">
           <div>
-            <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-              Team
-            </p>
-            <p className="mt-0.5 text-[11px] text-muted-foreground">Who owns the current step</p>
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                AI Engineering Team
+              </p>
+              <span className="text-[10px] font-semibold text-primary">5 Agents</span>
+            </div>
+            <p className="mt-0.5 text-[11px] text-muted-foreground">Live autonomous workforce</p>
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             {COMPANY_ROSTER.map((row) => {
               const status = rosterStatus(row, currentPhase, phaseStatus);
+              const Icon = row.icon;
               return (
                 <div
                   key={row.key}
                   className={cn(
-                    'flex items-center justify-between rounded-lg px-2.5 py-2 transition-colors',
+                    'group flex items-center justify-between rounded-xl border p-2.5 transition-all',
                     status.active
-                      ? 'bg-primary/8 text-foreground'
-                      : 'text-muted-foreground hover:bg-muted/40',
+                      ? 'border-primary/30 bg-primary/10 shadow-xs ring-1 ring-primary/20'
+                      : 'border-border/60 bg-card/50 hover:border-border hover:bg-card',
                   )}
                 >
-                  <span className={cn('text-sm', status.active && 'font-medium text-foreground')}>
-                    {row.label}
-                  </span>
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div
+                      className={cn(
+                        'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border transition-colors',
+                        status.active
+                          ? 'border-primary/40 bg-primary/20 text-primary'
+                          : 'border-border bg-secondary text-muted-foreground group-hover:text-foreground',
+                      )}
+                    >
+                      <Icon className="h-4 w-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className={cn('truncate text-xs font-semibold', status.active ? 'text-foreground' : 'text-muted-foreground group-hover:text-foreground')}>
+                        {row.label}
+                      </p>
+                      <p className="truncate text-[10px] text-muted-foreground/80">{row.sublabel}</p>
+                    </div>
+                  </div>
+
                   <span
                     className={cn(
-                      'text-[10px] font-medium uppercase tracking-wide',
-                      status.active ? 'animate-soft-pulse text-primary' : 'text-muted-foreground/80',
+                      'shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider',
+                      status.active && 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 animate-pulse',
+                      status.label === 'Queued' && 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+                      status.label === 'Done' && 'bg-primary/10 text-primary',
+                      status.label === 'Standby' && 'text-muted-foreground/60',
                     )}
                   >
                     {status.label}
@@ -418,16 +489,16 @@ export function MissionControlBoard({
           />
 
           {activityLines.length > 0 && (
-            <div className="mt-auto space-y-2 border-t border-border pt-3">
-              <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                Activity
+            <div className="mt-auto space-y-2 border-t border-border/80 pt-4">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                Activity Stream
               </p>
               {activityLines.slice(0, 3).map((line, i) => (
                 <p
                   key={`${line}-${i}`}
                   className={cn(
                     'text-xs leading-snug',
-                    i === 0 ? 'text-foreground' : 'text-muted-foreground',
+                    i === 0 ? 'font-medium text-foreground' : 'text-muted-foreground',
                   )}
                 >
                   {line}
@@ -437,38 +508,38 @@ export function MissionControlBoard({
           )}
         </aside>
 
-        {/* Main stage — the only place decisions happen */}
-        <section className="flex min-h-0 flex-col gap-3 overflow-y-auto p-4 lg:p-6">
-          <div className="flex items-center gap-1 rounded-lg border border-border bg-muted/40 p-0.5">
+        {/* Right Stage: Decision Action Stage */}
+        <section className="flex min-h-0 flex-col gap-4 overflow-y-auto p-4 lg:p-6">
+          <div className="flex items-center gap-1.5 rounded-xl border border-border bg-card p-1 shadow-xs">
             <button
               type="button"
               onClick={() => setRightTab('now')}
               className={cn(
-                'flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-colors',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40',
+                'flex-1 rounded-lg px-4 py-2 text-xs font-semibold transition-all',
                 rightTab === 'now'
-                  ? 'bg-background text-foreground shadow-sm'
+                  ? 'bg-primary text-primary-foreground shadow-xs'
                   : 'text-muted-foreground hover:text-foreground',
               )}
             >
-              {phaseStatus === 'approval' ? 'Review' : isWaiting ? 'Start' : 'Now'}
+              {phaseStatus === 'approval' ? 'Review Deliverable' : isWaiting ? 'Start Pipeline' : 'Active Execution'}
             </button>
             <button
               type="button"
               onClick={() => setRightTab('deliverables')}
               className={cn(
-                'flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-colors',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40',
+                'flex-1 rounded-lg px-4 py-2 text-xs font-semibold transition-all',
                 rightTab === 'deliverables'
-                  ? 'bg-background text-foreground shadow-sm'
+                  ? 'bg-primary text-primary-foreground shadow-xs'
                   : 'text-muted-foreground hover:text-foreground',
               )}
             >
-              <span className="inline-flex items-center gap-1.5">
-                <FileText className="h-3 w-3" />
+              <span className="inline-flex items-center justify-center gap-1.5">
+                <FileText className="h-3.5 w-3.5" />
                 Deliverables
                 {docs.length > 0 && (
-                  <span className="tabular-nums text-muted-foreground">({docs.length})</span>
+                  <span className="rounded-full bg-background/30 px-1.5 py-0.2 text-[10px] font-bold">
+                    {docs.length}
+                  </span>
                 )}
               </span>
             </button>
@@ -483,35 +554,32 @@ export function MissionControlBoard({
           ) : (
             <>
               {isWaiting && onStart && (
-                <div className="mx-auto w-full max-w-xl rounded-2xl border border-border/80 bg-background/90 p-6 shadow-sm lg:p-8">
-                  <p className="font-heading text-xl font-semibold tracking-tight text-foreground">
-                    Ready when you are
-                  </p>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                    Start the AI company. Pipeline progress stays on top; this panel is only for
-                    decisions — start, review docs, approve, or request changes.
-                  </p>
-                  <p className="mt-3 text-[11px] text-muted-foreground">
-                    <kbd className="rounded border border-border bg-muted px-1 py-0.5 font-mono text-[10px]">
-                      ⌘K
-                    </kbd>{' '}
-                    opens commands anytime.
+                <div className="mx-auto w-full max-w-xl rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-8">
+                  <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                    <Play className="h-6 w-6 fill-current" />
+                  </div>
+                  <h2 className="font-heading text-xl font-bold tracking-tight text-foreground">
+                    Launch AI Software Team
+                  </h2>
+                  <p className="mt-2 text-xs leading-relaxed text-muted-foreground sm:text-sm">
+                    Click to start the autonomous pipeline. Your AI team will sequentially handle strategy, PRD, architecture, UI design, code implementation, and QA testing.
                   </p>
                   <Button
                     onClick={onStart}
                     disabled={starting}
                     size="lg"
-                    className="mt-6 h-11 w-full rounded-xl font-semibold shadow-sm sm:w-auto sm:min-w-[220px]"
+                    className="mt-6 h-12 w-full rounded-xl font-bold shadow-md transition-all hover:shadow-lg active:scale-98"
                   >
                     {starting ? (
                       <span className="flex items-center gap-2">
                         <Loader2 className="h-4 w-4 animate-spin" />
-                        Starting…
+                        Initiating Pipeline…
                       </span>
                     ) : (
                       <span className="flex items-center gap-2">
-                        <Play className="h-4 w-4" />
-                        Start building
+                        <Play className="h-4 w-4 fill-current" />
+                        Start Autonomous Pipeline
+                        <ArrowRight className="h-4 w-4 ml-1" />
                       </span>
                     )}
                   </Button>
@@ -519,54 +587,38 @@ export function MissionControlBoard({
               )}
 
               {!isWaiting && phaseStatus === 'completed' && (
-                <div className="mx-auto w-full max-w-xl rounded-2xl border border-primary/20 bg-primary/[0.04] p-6 shadow-sm lg:p-8">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/15 text-primary">
-                    <Rocket className="h-5 w-5" />
+                <div className="mx-auto w-full max-w-xl rounded-2xl border border-primary/30 bg-primary/5 p-6 shadow-sm sm:p-8">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/20 text-primary">
+                    <Rocket className="h-6 w-6" />
                   </div>
-                  <p className="mt-4 font-heading text-xl font-semibold tracking-tight text-foreground">
-                    Delivery complete
+                  <h2 className="mt-4 font-heading text-xl font-bold tracking-tight text-foreground">
+                    Product Delivery Complete
+                  </h2>
+                  <p className="mt-2 text-xs leading-relaxed text-muted-foreground sm:text-sm">
+                    All 5 AI departments have verified and committed deliverables. Your project files are ready in the Studio IDE for live preview and deployment.
                   </p>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                    Opening Studio with live Preview. Files are in Explorer — edit, run, then
-                    deploy only when you choose.
-                  </p>
-                  <div className="mt-6 flex flex-wrap gap-2">
+                  <div className="mt-6 flex flex-wrap gap-3">
                     {onOpenStudio && (
                       <Button
                         onClick={() => onOpenStudio({ focus: 'preview' })}
                         size="lg"
-                        className="h-11 rounded-xl font-semibold shadow-sm"
+                        className="h-11 rounded-xl font-bold shadow-sm"
                       >
                         <Code2 className="mr-2 h-4 w-4" />
-                        Open Studio + Preview
-                      </Button>
-                    )}
-                    {onOpenStudio && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="lg"
-                        className="h-11 rounded-xl font-semibold border-accent/40 text-accent hover:bg-accent/10"
-                        onClick={() => onOpenStudio({ focus: 'deploy' })}
-                      >
-                        <Rocket className="mr-2 h-4 w-4" />
-                        Deploy
+                        Open Studio IDE
                       </Button>
                     )}
                     <Button
                       type="button"
                       variant="outline"
                       size="lg"
-                      className="h-11 rounded-xl font-semibold"
+                      className="h-11 rounded-xl font-bold"
                       onClick={() => setRightTab('deliverables')}
                     >
                       <FileText className="mr-2 h-4 w-4" />
-                      View deliverables
+                      View Deliverables
                     </Button>
                   </div>
-                  <p className="mt-4 text-[11px] text-muted-foreground">
-                    Preview opens automatically · Deploy is always a deliberate click (never auto)
-                  </p>
                 </div>
               )}
 

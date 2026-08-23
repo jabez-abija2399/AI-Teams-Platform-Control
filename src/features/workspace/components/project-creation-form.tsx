@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { ArrowLeft, ArrowRight, KeyRound, Loader2, Sparkles } from 'lucide-react';
+import { ArrowLeft, ArrowRight, KeyRound, Loader2, Sparkles, Layers, CheckCircle2, Lightbulb } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
@@ -18,19 +18,19 @@ import { AiCredentialsForm } from '@/features/settings/components/ai-credentials
 
 const EXAMPLES = [
   {
-    title: 'Static login',
-    idea: 'Static HTML and CSS login and signup pages only — no backend, no framework.',
-    stack: 'static-html' as const,
+    title: 'Collaborative Kanban',
+    idea: 'A modern real-time task board for agile engineering teams with sprint tracking and analytics.',
+    stack: 'react' as const,
   },
   {
-    title: 'Hotel booking',
-    idea: 'A hotel booking website where travelers search rooms, reserve stays, and hotel owners manage listings.',
+    title: 'SaaS Booking Portal',
+    idea: 'A full-featured booking website where clients search availability, reserve slots, and owners manage listings.',
     stack: 'nextjs' as const,
   },
   {
-    title: 'Team tasks',
-    idea: 'A lightweight React task board for small teams with assignments and due dates.',
-    stack: 'react' as const,
+    title: 'Clean Static Portfolio',
+    idea: 'Static HTML and CSS landing page and contact form — sleek, lightweight, zero build framework required.',
+    stack: 'static-html' as const,
   },
 ] as const;
 
@@ -104,7 +104,7 @@ export function ProjectCreationForm() {
       const projectId = result.data?.id;
       if (!projectId) throw new Error('No project ID returned');
 
-      toast.success('Project created', { description: 'Opening Mission Control…' });
+      toast.success('Project initialized', { description: 'Opening Mission Control…' });
       router.push(`/dashboard/projects/${projectId}/workspace`);
     } catch (err) {
       const message =
@@ -116,46 +116,49 @@ export function ProjectCreationForm() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-xl">
+    <div className="mx-auto w-full max-w-2xl animate-fade-up">
       <Link
         href={ROUTES.projects}
-        className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+        className="group mb-6 inline-flex items-center gap-2 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
       >
-        <ArrowLeft className="h-4 w-4" />
+        <ArrowLeft className="h-3.5 w-3.5 transition-transform group-hover:-translate-x-1" />
         Back to projects
       </Link>
 
-      <div className="mb-8">
-        <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
-          <Sparkles className="h-5 w-5" />
+      <div className="relative mb-8 overflow-hidden rounded-2xl border border-border/80 bg-gradient-to-b from-card to-background p-6 shadow-sm sm:p-8">
+        <div className="absolute -right-12 -top-12 h-36 w-36 rounded-full bg-primary/10 blur-2xl" />
+        <div className="relative z-10">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+            <Sparkles className="h-3.5 w-3.5" />
+            AI Software Organization
+          </div>
+          <h1 className="font-heading text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+            {hasApiKey ? 'What software do you want to build?' : 'Set up your AI API key'}
+          </h1>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+            {hasApiKey
+              ? 'Your 5-agent engineering team (PM, Architect, Designer, Developer, QA) will collaborate to plan, design, code, and test your product.'
+              : 'Connect an AI provider to empower your autonomous team. Free tiers (Google Gemini, Groq) work out of the box.'}
+          </p>
         </div>
-        <h1 className="font-heading text-3xl font-semibold tracking-tight">
-          {hasApiKey ? 'What do you want to build?' : 'Set up your AI API key'}
-        </h1>
-        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-          {hasApiKey
-            ? 'Describe your idea, then choose how it should be built. Mission Control, agents, and Preview all share that stack from day one.'
-            : 'Before creating a project, connect an AI provider. Prefer Google Gemini or Groq for a free tier — no payment needed to start. Your AI company uses this key to plan, design, code, test, and deploy.'}
-        </p>
       </div>
 
       {checkingKey ? (
-        <div className="flex items-center justify-center gap-2 rounded-2xl border border-border/80 bg-card/80 py-16 text-sm text-muted-foreground">
-          <Loader2 className="h-4 w-4 animate-spin text-primary" />
-          Checking AI setup…
+        <div className="flex items-center justify-center gap-3 rounded-2xl border border-border/80 bg-card py-20 text-sm text-muted-foreground shadow-sm">
+          <Loader2 className="h-5 w-5 animate-spin text-primary" />
+          <span>Configuring autonomous workforce…</span>
         </div>
       ) : !hasApiKey ? (
         <div className="space-y-4">
-          <div className="rounded-2xl border border-accent/25 bg-accent/[0.06] p-4">
+          <div className="rounded-2xl border border-accent/25 bg-accent/[0.06] p-5 shadow-sm">
             <div className="flex gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent/15 text-accent">
-                <KeyRound className="h-4 w-4" />
+                <KeyRound className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-sm font-semibold">Step 1 of 2 — API key</p>
-                <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                  Pick a provider, follow the short guide, paste your key, then continue to describe
-                  your idea.
+                <p className="text-sm font-semibold text-foreground">Step 1 — Connect AI Provider</p>
+                <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                  Pick your favorite provider (OpenAI, Anthropic, Gemini, Groq), enter your key, and start building.
                 </p>
               </div>
             </div>
@@ -164,8 +167,8 @@ export function ProjectCreationForm() {
             embedded
             onConfigured={() => {
               setHasApiKey(true);
-              toast.success('API key ready', {
-                description: 'You can create your project now.',
+              toast.success('AI Provider Connected', {
+                description: 'You can now create your project.',
               });
             }}
           />
@@ -173,63 +176,42 @@ export function ProjectCreationForm() {
       ) : (
         <form
           onSubmit={handleSubmit}
-          className="space-y-5 rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-7"
+          className="space-y-6 rounded-2xl border border-border/90 bg-card p-6 shadow-sm sm:p-8"
         >
           {error && (
-            <div className="rounded-xl border border-destructive/25 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+            <div className="rounded-xl border border-destructive/25 bg-destructive/10 px-4 py-3 text-xs font-medium text-destructive">
               {error}
             </div>
           )}
 
+          {/* Prompt / Idea Field */}
           <div className="space-y-2">
-            <label htmlFor="project-idea" className="text-sm font-medium">
-              Your idea
-            </label>
+            <div className="flex items-center justify-between">
+              <label htmlFor="project-idea" className="text-sm font-semibold text-foreground">
+                Project Vision & Requirements
+              </label>
+              <span className="text-[11px] text-muted-foreground">
+                {idea.length}/1000 characters
+              </span>
+            </div>
             <textarea
               id="project-idea"
               value={idea}
               onChange={(e) => setIdea(e.target.value)}
-              placeholder="e.g. A hotel booking site with room search, reservations, and an owner dashboard…"
-              rows={5}
+              placeholder="Describe what you want to build in detail. E.g. A real-time team retrospective tool with live voting, action items, and automated export…"
+              rows={4}
               autoFocus
               required
-              className="w-full resize-none rounded-xl border border-input bg-background px-3.5 py-3 text-sm leading-relaxed outline-none ring-ring focus:ring-2"
-            />
-            <p className="text-[11px] text-muted-foreground">
-              {idea.trim().length < 12
-                ? 'Add a bit more detail (at least a short sentence).'
-                : 'Looks good — pick a stack next.'}
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <label htmlFor="project-name" className="text-sm font-medium">
-              Project name <span className="font-normal text-muted-foreground">(optional)</span>
-            </label>
-            <Input
-              id="project-name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder={previewName}
-              className="h-11 rounded-xl"
+              className="w-full resize-none rounded-xl border border-input bg-background/50 px-4 py-3 text-sm leading-relaxed outline-none transition-all placeholder:text-muted-foreground/60 focus:border-primary focus:bg-background focus:ring-2 focus:ring-primary/20"
             />
           </div>
 
+          {/* Quick Examples */}
           <div className="space-y-2">
-            <p className="text-sm font-medium">
-              Delivery stack <span className="font-normal text-destructive">*</span>
-            </p>
-            <p className="text-[11px] text-muted-foreground">
-              Chosen once here — Preview and agents reuse it (no re-ask). Not sure? Keep the
-              Recommended default.
-            </p>
-            <StackSelect value={stack} onChange={setStack} />
-          </div>
-
-          <div className="space-y-2">
-            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              Or try an example
-            </p>
+            <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+              <Lightbulb className="h-3.5 w-3.5 text-amber-500" />
+              <span>Or click an inspiration template:</span>
+            </div>
             <div className="flex flex-wrap gap-2">
               {EXAMPLES.map((ex) => (
                 <button
@@ -241,8 +223,8 @@ export function ProjectCreationForm() {
                     if (!name.trim()) setName(ex.title);
                   }}
                   className={cn(
-                    'rounded-full border border-border bg-background px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors',
-                    'hover:border-primary/40 hover:bg-primary/5 hover:text-foreground',
+                    'rounded-lg border border-border/80 bg-secondary/50 px-3 py-1.5 text-xs font-medium text-secondary-foreground transition-all',
+                    'hover:border-primary/50 hover:bg-primary/10 hover:text-primary active:scale-95',
                   )}
                 >
                   {ex.title}
@@ -251,37 +233,67 @@ export function ProjectCreationForm() {
             </div>
           </div>
 
+          {/* Project Name (Optional) */}
+          <div className="space-y-2">
+            <label htmlFor="project-name" className="text-sm font-semibold text-foreground">
+              Project Name <span className="text-xs font-normal text-muted-foreground">(Optional)</span>
+            </label>
+            <Input
+              id="project-name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder={previewName}
+              className="h-11 rounded-xl bg-background/50 text-sm focus:bg-background focus:ring-2 focus:ring-primary/20"
+            />
+          </div>
+
+          {/* Delivery Stack Selection */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-1.5">
+              <Layers className="h-4 w-4 text-primary" />
+              <p className="text-sm font-semibold text-foreground">
+                Target Architecture Stack <span className="text-destructive">*</span>
+              </p>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Architect and Developer agents will strictly generate files according to this technology standard.
+            </p>
+            <StackSelect value={stack} onChange={setStack} />
+          </div>
+
+          {/* Live Summary Pill */}
+          {idea.trim().length >= 12 && (
+            <div className="flex items-center gap-3 rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-xs text-foreground">
+              <CheckCircle2 className="h-4 w-4 shrink-0 text-primary" />
+              <div className="min-w-0 flex-1">
+                <p className="font-semibold text-primary">Ready to Launch</p>
+                <p className="truncate text-muted-foreground">
+                  <span className="font-medium text-foreground">{previewName}</span> · Stack:{' '}
+                  <span className="font-mono uppercase">{stack}</span>
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Primary Action CTA */}
           <Button
             type="submit"
             size="lg"
             disabled={!canSubmit || loading}
-            className="h-11 w-full rounded-xl font-semibold"
+            className="h-12 w-full rounded-xl font-semibold shadow-md transition-all hover:shadow-lg active:scale-[0.99]"
           >
             {loading ? (
               <span className="flex items-center gap-2">
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Creating project…
+                Initializing Project & AI Team…
               </span>
             ) : (
               <span className="flex items-center gap-2">
-                Continue to Mission Control
+                Create & Open Mission Control
                 <ArrowRight className="h-4 w-4" />
               </span>
             )}
           </Button>
-
-          <ol className="space-y-1.5 border-t border-border pt-4 text-xs text-muted-foreground">
-            <li>
-              <span className="font-medium text-foreground">1.</span> API key saved (Settings anytime)
-            </li>
-            <li>
-              <span className="font-medium text-foreground">2.</span> Idea + stack
-            </li>
-            <li>
-              <span className="font-medium text-foreground">3.</span> Start the AI pipeline in Mission
-              Control
-            </li>
-          </ol>
         </form>
       )}
     </div>
