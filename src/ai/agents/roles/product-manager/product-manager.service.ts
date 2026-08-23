@@ -13,6 +13,10 @@ import {
 import type { CEOAnalysis } from '@/ai/agents/roles/ceo/ceo.types';
 import type { ApiResult } from '@/types/common.types';
 import { resolveStackIntent } from '@/core/company-orchestration/stack-intent';
+import { ProjectStateManager } from '@/core/state/project-state.manager';
+import { ArtifactRegistryService } from '@/core/artifacts/artifact-registry.service';
+import { AgentContractRegistry } from '@/core/contracts/agent-registry';
+import { ArtifactManager } from '@/core/company-orchestration/artifact-manager';
 
 const PM_ROLE_NAME = 'Product Manager AI';
 
@@ -174,6 +178,66 @@ export async function refineRequirements(
         type: 'PROJECT',
         metadata: { projectId },
       }),
+      ArtifactRegistryService.registerArtifact({
+        projectId,
+        type: 'PRODUCT_REQUIREMENTS_DOC',
+        createdBy: 'PM',
+        payload: refined,
+        summary: `PRD with ${refined.userStories.length} stories`,
+        qualityScore: {
+          completeness: 90,
+          consistency: 90,
+          requirementCoverage: 90,
+          correctness: 90,
+          technicalRisk: 10,
+        },
+      }),
+      ArtifactManager.storeArtifact(projectId, {
+        type: 'RefinedRequirements',
+        content: refined,
+        producerRole: 'PRODUCT_MANAGER',
+        consumerRoles: ['ARCHITECT', 'BUSINESS_ANALYST', 'UI_UX'],
+        summary: `PRD with ${refined.userStories.length} stories and ${refined.featureSpecs.length} features`,
+      }),
+      ProjectStateManager.updateState(projectId, (s) => {
+        s.currentStage = 'REQUIREMENTS';
+        s.requirements.approvalStatus = 'APPROVED';
+        const visionObj = (ceoAnalysis.vision || {}) as Record<string, unknown>;
+        s.requirements.productScope.problem = String(visionObj.problem || visionObj.problemStatement || '');
+        s.requirements.productScope.targetUsers = Array.isArray(visionObj.targetUsers)
+          ? (visionObj.targetUsers as string[])
+          : [String(visionObj.targetAudience || 'Target Users')];
+        s.requirements.productScope.goals = visionObj.businessGoal
+          ? [String(visionObj.businessGoal)]
+          : [String(visionObj.coreValueProposition || 'Deliver core MVP')];
+        s.requirements.features = refined.featureSpecs.map((f, i) => ({
+          id: `feat_${i + 1}`,
+          name: f.name,
+          description: f.description,
+          linkedUserStories: f.userStories?.map((u) => u.id) || [`US-${String(i + 1).padStart(3, '0')}`],
+          acceptanceCriteria: f.userStories?.flatMap((u) => u.acceptanceCriteria || []) || [],
+          dependencies: f.dependencies || [],
+        }));
+        s.requirements.userStories = refined.userStories.map((u) => ({
+          id: u.id,
+          title: u.title,
+          role: u.asA || 'user',
+          goal: u.iWant || 'use feature',
+          benefit: u.soThat || 'achieve outcome',
+          acceptanceCriteria: u.acceptanceCriteria || [],
+          priority: (u.priority as any) || 'HIGH',
+          effort: u.estimatedEffort === 'LOW' ? 'S' : u.estimatedEffort === 'HIGH' ? 'L' : 'M',
+        }));
+        s.requirements.nonFunctionalRequirements = (refined.nonFunctionalRequirements || []).map((n, idx) => ({
+          id: `NFR-${idx + 1}`,
+          category: (['PERFORMANCE', 'SECURITY', 'ACCESSIBILITY', 'SCALABILITY', 'RELIABILITY'].includes(n.category.toUpperCase())
+            ? n.category.toUpperCase()
+            : 'RELIABILITY') as any,
+          requirement: n.requirement,
+          rationale: n.rationale,
+          verificationMethod: 'Automated verification',
+        }));
+      }),
     ]);
 
     await prisma.document.deleteMany({ where: { projectId, type: 'PM_IN_PROGRESS' } });
@@ -206,6 +270,7 @@ export async function refineRequirements(
 
     return { success: true, data: refined };
   } catch (err) {
+    console.error('[PM refineRequirements error]', err);
     await prisma.document.deleteMany({ where: { projectId, type: 'PM_IN_PROGRESS' } });
     await prisma.agent.update({ where: { id: agentId }, data: { status: 'ERROR' } });
     await logAIEvent('PM_REFINEMENT_FAILED', { projectId, error: String(err) }, agentId);
@@ -280,6 +345,61 @@ export async function generateProductRequirementsSpec(
         content: `Project ${projectId}: Generated complete Product Requirement Specification (PRD-001) with ${spec.stories.length} stories and ${spec.personas.length} personas.`,
         type: 'PROJECT',
         metadata: { projectId, prdTitle: spec.prd.title },
+      }),
+      ArtifactRegistryService.registerArtifact({
+        projectId,
+        type: 'PRODUCT_REQUIREMENTS_DOC',
+        createdBy: 'PM',
+        payload: spec,
+        summary: `Comprehensive PRD-001: ${spec.prd.title}`,
+        qualityScore: {
+          completeness: 95,
+          consistency: 95,
+          requirementCoverage: 95,
+          correctness: 95,
+          technicalRisk: 5,
+        },
+      }),
+      ArtifactManager.storeArtifact(projectId, {
+        type: 'ProductRequirementSpec',
+        content: spec,
+        producerRole: 'PRODUCT_MANAGER',
+        consumerRoles: ['ARCHITECT', 'DEVELOPER', 'QA'],
+        summary: `Comprehensive PRD-001: ${spec.prd.title}`,
+      }),
+      ProjectStateManager.updateState(projectId, (s) => {
+        s.currentStage = 'REQUIREMENTS';
+        s.requirements.approvalStatus = 'APPROVED';
+        s.requirements.productScope.problem = spec.prd.problemStatement;
+        s.requirements.productScope.targetUsers = [spec.prd.targetAudience];
+        s.requirements.productScope.nonGoals = spec.mvpScope?.outOfScope || [];
+        s.requirements.features = (spec.functionalRequirements || []).map((f) => ({
+          id: f.id,
+          name: f.module || f.requirement,
+          description: f.requirement,
+          linkedUserStories: spec.stories.filter((st) => st.title.includes(f.module || '')).map((st) => st.id),
+          acceptanceCriteria: spec.acceptanceCriteria?.[f.id] || [],
+          dependencies: [],
+        }));
+        s.requirements.userStories = spec.stories.map((st) => ({
+          id: st.id,
+          title: st.title,
+          role: st.asA || 'user',
+          goal: st.iWant || 'use feature',
+          benefit: st.soThat || 'achieve outcome',
+          acceptanceCriteria: Array.isArray(st.acceptanceCriteria) ? st.acceptanceCriteria : [String(st.acceptanceCriteria || '')],
+          priority: (st.priority as any) || 'HIGH',
+          effort: st.estimatedEffort === 'LOW' ? 'S' : st.estimatedEffort === 'HIGH' ? 'L' : 'M',
+        }));
+        s.requirements.nonFunctionalRequirements = (spec.nonFunctionalRequirements || []).map((n, idx) => ({
+          id: `NFR-${idx + 1}`,
+          category: (['PERFORMANCE', 'SECURITY', 'ACCESSIBILITY', 'SCALABILITY', 'RELIABILITY'].includes(n.category.toUpperCase())
+            ? n.category.toUpperCase()
+            : 'RELIABILITY') as any,
+          requirement: n.requirement,
+          rationale: n.rationale,
+          verificationMethod: 'Automated verification',
+        }));
       }),
     ]);
 

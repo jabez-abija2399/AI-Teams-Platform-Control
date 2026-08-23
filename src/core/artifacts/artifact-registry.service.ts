@@ -64,6 +64,21 @@ export class ArtifactRegistryService {
   /**
    * Stores a new versioned artifact envelope with parent lineage.
    */
+  public static async registerArtifact<T = unknown>(params: {
+    projectId: string;
+    type: ArtifactType;
+    createdBy: ArtifactMetadata['createdBy'];
+    payload: T;
+    sourceArtifactIds?: string[];
+    summary?: string;
+    modelUsed?: string;
+    agentVersion?: string;
+    qualityScore?: Partial<ArtifactQualityScore>;
+    validationStatus?: ArtifactValidationStatus;
+  }): Promise<ArtifactEnvelope<T>> {
+    return this.storeArtifact(params);
+  }
+
   public static async storeArtifact<T = unknown>(params: {
     projectId: string;
     type: ArtifactType;

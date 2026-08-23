@@ -316,9 +316,7 @@ const prismaProxy = new Proxy({} as Record<string, unknown>, {
     if (prop.startsWith('$')) {
       return vi.fn().mockResolvedValue([]);
     }
-    const modelProxy = new Proxy({}, modelHandler);
-    // Tag the proxy so modelHandler can read the model name
-    Object.defineProperty(modelProxy, '__modelName', { value: prop, configurable: true });
+    const modelProxy = new Proxy({ __modelName: prop }, modelHandler);
     return modelProxy;
   },
 });
