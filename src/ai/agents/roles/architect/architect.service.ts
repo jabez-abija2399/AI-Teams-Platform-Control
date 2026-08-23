@@ -448,10 +448,10 @@ async function persistArchitecture(
             constraints: [],
           })),
           relations: (analysis.database?.relationships || [])
-            .filter((r) => r.from === e.name || r.to === e.name)
-            .map((r) => ({
-              target: r.from === e.name ? r.to : r.from,
-              type: r.type,
+            .filter((r: any) => typeof r === 'object' && r !== null && (r.from === e.name || r.to === e.name))
+            .map((r: any) => ({
+              target: String(r.from === e.name ? r.to : r.from || ''),
+              type: String(r.type || 'one-to-many'),
             })),
         })),
         rawSchema: JSON.stringify(analysis.database || {}),
@@ -459,17 +459,30 @@ async function persistArchitecture(
       s.architecture.apiDesign = {
         endpoints: (analysis.api?.endpoints || []).map((ep) => ({
           path: ep.path,
-          method: ep.method as any,
-          description: ep.response || '',
-          requestSchema: ep.request || '',
-          responseSchema: ep.response || '',
+          method: (ep.method as any) || 'GET',
+          description: ep.response || `Endpoint ${ep.path}`,
+          requestBody: ep.request ? { body: ep.request } : undefined,
+          responseBody: ep.response ? { body: ep.response } : undefined,
+          authRequired: false,
         })),
       };
-      s.architecture.fileStructure = (analysis.fileStructure || []).map((item) =>
-        typeof item === 'string'
-          ? { path: item, purpose: 'Source file', agentOwner: 'DEVELOPER' as const }
-          : { path: (item as any).path || String(item), purpose: (item as any).purpose || 'Source file', agentOwner: 'DEVELOPER' as const }
-      );
+      s.architecture.fileStructure = (analysis.fileStructure || []).map((item) => {
+        const path = typeof item === 'string' ? item : (item as any).path || String(item);
+        const purpose = typeof item === 'string' ? 'Source file' : (item as any).purpose || 'Source file';
+        const layer: 'FRONTEND' | 'BACKEND' | 'DATABASE' | 'SHARED' | 'CONFIG' | 'TEST' =
+          path.startsWith('src/components') || path.startsWith('src/pages') || path.endsWith('.tsx') || path.endsWith('.html') || path.endsWith('.css')
+            ? 'FRONTEND'
+            : path.startsWith('src/api') || path.startsWith('src/server') || path.startsWith('src/services')
+              ? 'BACKEND'
+              : path.includes('prisma') || path.includes('db') || path.includes('database')
+                ? 'DATABASE'
+                : path.includes('test') || path.includes('spec')
+                  ? 'TEST'
+                  : path.endsWith('.json') || path.endsWith('.config.js') || path.endsWith('.config.ts')
+                    ? 'CONFIG'
+                    : 'SHARED';
+        return { path, purpose, layer };
+      });
       if (analysis.implementationTodos?.length && s.implementation) {
         s.implementation.pendingTodos = analysis.implementationTodos.map((t) => t.id || t.title);
       }

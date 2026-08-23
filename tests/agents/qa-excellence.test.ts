@@ -50,11 +50,11 @@ describe('QA Agent Excellence', () => {
     await generateQaReportSpec(projectId, sampleImplementation);
 
     const state = await ProjectStateManager.getState(projectId);
-    expect(state.currentStage).toBe('TESTING');
+    expect(state.currentStage).toBe('VERIFICATION');
     expect(state.qa.passed).toBe(true);
     expect(state.qa.overallScore).toBeGreaterThanOrEqual(80);
     expect(state.qa.evidence.testsPassed).toBe(true);
-    expect(state.qa.recommendation).toBe('SHIP_TO_PRODUCTION');
+    expect(state.qa.recommendation).toBe('PROCEED_TO_DEPLOY');
   });
 
   it('4. Registers versioned envelopes in ArtifactRegistryService with quality scores', async () => {

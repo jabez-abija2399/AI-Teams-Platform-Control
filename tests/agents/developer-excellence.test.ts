@@ -85,7 +85,7 @@ describe('Developer Agent Excellence', () => {
     await implementFromArchitectureTodos(projectId, sampleArchitecture as any);
 
     const state = await ProjectStateManager.getState(projectId);
-    expect(state.currentStage).toBe('DEVELOPMENT');
+    expect(state.currentStage).toBe('IMPLEMENTATION');
     expect(state.implementation.completedTodos.length).toBeGreaterThan(0);
     expect(state.implementation.pendingTodos.length).toBe(0);
     expect(Object.keys(state.implementation.files).length).toBeGreaterThan(0);

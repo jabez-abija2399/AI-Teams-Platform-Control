@@ -829,7 +829,7 @@ export async function implementFromArchitectureTodos(
       summary: `Generated ${output.changes.length} project files`,
     }),
     ProjectStateManager.updateState(projectId, (s) => {
-      s.currentStage = 'DEVELOPMENT';
+      s.currentStage = 'IMPLEMENTATION';
       if (!s.implementation) {
         s.implementation = {
           version: 1,

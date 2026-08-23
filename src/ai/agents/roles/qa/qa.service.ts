@@ -281,7 +281,7 @@ async function persistReport(projectId: string, agentId: string, spec: QaReportS
       summary: `QA Verification Report: ${spec.qualityReport.verdict}`,
     }),
     ProjectStateManager.updateState(projectId, (s) => {
-      s.currentStage = 'TESTING';
+      s.currentStage = 'VERIFICATION';
       const totalTests = (spec.unitTests?.length || 0) + (spec.integrationTests?.length || 0) + (spec.e2eTests?.length || 0);
       const failedTests = spec.bugReports?.length || 0;
       s.qa = {
@@ -301,15 +301,15 @@ async function persistReport(projectId: string, agentId: string, spec: QaReportS
           id: b.id || `BUG-${idx + 1}`,
           title: b.title || 'Defect',
           severity: (b.severity as any) || 'MEDIUM',
-          expectedBehavior: b.expected || '',
-          actualBehavior: b.actual || '',
-          affectedArea: b.module || 'Application',
-          evidence: b.stepsToReproduce?.join(' -> ') || '',
-          rootCauseHypothesis: b.rootCause || 'Implementation gap',
-          recommendedOwner: (b.owner as any) || 'DEVELOPER',
-          status: 'OPEN',
+          expectedBehavior: (b as any).suggestedSolution || (b as any).expected || 'Expected working functionality',
+          actualBehavior: (b as any).description || (b as any).actual || 'Observed defect',
+          affectedArea: (b as any).location || (b as any).module || 'Application',
+          evidence: (b as any).reproductionSteps?.join(' -> ') || (b as any).stepsToReproduce?.join(' -> ') || '',
+          rootCauseHypothesis: (b as any).solution || (b as any).rootCause || 'Implementation gap',
+          recommendedOwner: 'DEVELOPER' as const,
+          status: 'OPEN' as const,
         })),
-        recommendation: spec.qualityReport.verdict === 'APPROVED' ? 'SHIP_TO_PRODUCTION' : 'REWORK_IMPLEMENTATION',
+        recommendation: spec.qualityReport.verdict === 'APPROVED' ? 'PROCEED_TO_DEPLOY' : 'REWORK_IMPLEMENTATION',
       };
     }),
   ]);
