@@ -26,6 +26,11 @@ const modelHandler: ProxyHandler<Record<string, unknown>> = {
         const tableName = (model as unknown as Record<string, string>).__modelName;
         const s = getModelStore(tableName);
         let record = id ? (s.get(id) ?? null) : null;
+        if (!record && where) {
+          record = Array.from(s.values()).find((r) =>
+            Object.entries(where).every(([k, v]) => r[k] === v),
+          ) ?? null;
+        }
         if (record) {
           if (include?.execution && record.executionId) {
             const execStore = getModelStore('projectExecution');
@@ -221,13 +226,18 @@ const modelHandler: ProxyHandler<Record<string, unknown>> = {
         const model = _target as unknown as { __modelName: string };
         const tableName = (model as unknown as Record<string, string>).__modelName;
         const s = getModelStore(tableName);
-        const id = (create.id as string) || where?.id as string || generateId();
-        const existing = s.get(id);
+        let existing = where?.id ? s.get(where.id as string) : null;
+        if (!existing && where) {
+          existing = Array.from(s.values()).find((r) =>
+            Object.entries(where).every(([k, v]) => r[k] === v),
+          );
+        }
         if (existing) {
-          const updated = { ...existing, ...update, id };
-          s.set(id, updated);
+          const updated = { ...existing, ...update, updatedAt: new Date() };
+          s.set((existing.id as string) || generateId(), updated);
           return Promise.resolve(updated);
         }
+        const id = (create.id as string) || (where?.id as string) || generateId();
         const record = { ...create, id, createdAt: new Date(), updatedAt: new Date() };
         s.set(id, record);
         return Promise.resolve(record);

@@ -14,6 +14,7 @@ import {
   Loader2,
   Shield,
   Trash2,
+  Zap,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -27,10 +28,9 @@ import {
 import type { AiCredentialPublicStatus } from '@/features/ai-credentials/ai-credentials.types';
 
 const fieldClass =
-  'border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-11 w-full rounded-xl border border-border/80 bg-background px-3 text-sm outline-none focus-visible:ring-3';
+  'border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-11 w-full rounded-xl border border-border/80 bg-background px-3.5 text-sm outline-none focus-visible:ring-3 transition-all';
 
 interface AiCredentialsFormProps {
-  /** Compact embed for project-create gate */
   embedded?: boolean;
   onConfigured?: (status: AiCredentialPublicStatus) => void;
   className?: string;
@@ -39,6 +39,8 @@ interface AiCredentialsFormProps {
 export function AiCredentialsForm({ embedded = false, onConfigured, className }: AiCredentialsFormProps) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [testing, setTesting] = useState(false);
+  const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
   const [removing, setRemoving] = useState(false);
   const [status, setStatus] = useState<AiCredentialPublicStatus | null>(null);
   const [providers, setProviders] = useState<AiProviderCatalogEntry[]>([]);
@@ -52,16 +54,11 @@ export function AiCredentialsForm({ embedded = false, onConfigured, className }:
     [providers, provider],
   );
 
-  const freeProviders = useMemo(
-    () => providers.filter((p) => p.pricing === 'free_tier'),
-    [providers],
-  );
-
   const load = async () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/settings/ai-credentials', { cache: 'no-store' });
+      const res = await fetch('/api/settings/ai-credentials', { credentials: 'same-origin', cache: 'no-store' });
       const json = await res.json();
       if (!res.ok || !json.success) {
         throw new Error(json?.error?.message || 'Could not load AI settings');
@@ -88,18 +85,63 @@ export function AiCredentialsForm({ embedded = false, onConfigured, className }:
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const handleTestConnection = async () => {
+    if (!selected || testing) return;
+    setTesting(true);
+    setTestResult(null);
+    setError(null);
+
+    const keyToTest = apiKey.trim();
+
+    try {
+      const res = await fetch('/api/settings/ai-credentials/test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          provider: selected.id,
+          apiKey: keyToTest || undefined,
+          defaultModel: selected.defaultModel,
+        }),
+      });
+
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json?.error?.message || 'Connection test failed');
+      }
+
+      const msg = `Connected successfully (${json.data.model} in ${json.data.latencyMs}ms)`;
+      setTestResult({ success: true, message: msg });
+      toast.success('Connection Verified', { description: msg });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Verification failed';
+      setTestResult({ success: false, message: msg });
+      toast.error('Connection Test Failed', { description: msg });
+    } finally {
+      setTesting(false);
+    }
+  };
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selected || saving) return;
     setSaving(true);
     setError(null);
+    setTestResult(null);
+
+    const keyToSave = apiKey.trim();
+    if (keyToSave.length < 8) {
+      setError('Please paste a full API key (at least 8 characters).');
+      setSaving(false);
+      return;
+    }
+
     try {
       const res = await fetch('/api/settings/ai-credentials', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           provider: selected.id,
-          apiKey,
+          apiKey: keyToSave,
           defaultModel: selected.defaultModel,
         }),
       });
@@ -109,8 +151,8 @@ export function AiCredentialsForm({ embedded = false, onConfigured, className }:
       }
       setStatus(json.data);
       setApiKey('');
-      toast.success('API key saved', {
-        description: `${json.data.providerName} will be used for your AI company.`,
+      toast.success('API Key Saved', {
+        description: `${json.data.providerName} is now active for your AI company.`,
       });
       onConfigured?.(json.data);
     } catch (err) {
@@ -126,6 +168,7 @@ export function AiCredentialsForm({ embedded = false, onConfigured, className }:
     if (removing) return;
     setRemoving(true);
     setError(null);
+    setTestResult(null);
     try {
       const res = await fetch('/api/settings/ai-credentials', { method: 'DELETE' });
       const json = await res.json();
@@ -152,143 +195,142 @@ export function AiCredentialsForm({ embedded = false, onConfigured, className }:
 
   if (loading) {
     return (
-      <div className={cn('flex items-center justify-center gap-2 py-10 text-sm text-muted-foreground', className)}>
-        <Loader2 className="h-4 w-4 animate-spin text-primary" />
-        Loading AI settings…
+      <div className={cn('flex items-center justify-center gap-2 py-12 text-sm text-muted-foreground', className)}>
+        <Loader2 className="h-5 w-5 animate-spin text-primary" />
+        Loading AI credentials…
       </div>
     );
   }
 
   return (
-    <div className={cn('space-y-5', className)}>
-      <div className="rounded-2xl border border-primary/20 bg-primary/[0.04] p-4">
-        <div className="flex gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-            {embedded ? <Gift className="h-4 w-4" /> : <KeyRound className="h-4 w-4" />}
+    <div className={cn('space-y-6', className)}>
+      <div className="rounded-2xl border border-primary/20 bg-primary/[0.04] p-5 shadow-xs">
+        <div className="flex gap-3.5">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            {embedded ? <Gift className="h-5 w-5" /> : <KeyRound className="h-5 w-5" />}
           </div>
           <div>
-            <p className="text-sm font-semibold">
-              {embedded ? 'Start free — no payment needed' : 'Why an API key is required'}
+            <p className="font-heading text-base font-bold text-foreground">
+              {embedded ? 'Connect Your AI Provider (BYOK)' : 'Bring Your Own Key (BYOK)'}
             </p>
-            <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-              {embedded
-                ? 'Use Google Gemini or Groq free tiers to run your AI company without paying. Paid providers (OpenAI, Anthropic) are optional.'
-                : 'Your AI company calls LLM providers with your key. Prefer Gemini or Groq if you want a free tier — we store keys encrypted and never show them again after save.'}
+            <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+              Your AI company calls LLM providers securely using your API key. Keys are encrypted at rest with AES-256-GCM and never exposed to the client or project code.
             </p>
           </div>
         </div>
       </div>
 
-      {freeProviders.length > 0 && (
-        <div className="space-y-2">
-          <p className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
-            Recommended free
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {freeProviders.map((p) => (
-              <button
-                key={p.id}
-                type="button"
-                onClick={() => setProvider(p.id)}
-                className={cn(
-                  'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors',
-                  provider === p.id
-                    ? 'border-primary/40 bg-primary/10 text-primary'
-                    : 'border-border bg-background text-muted-foreground hover:border-primary/30 hover:text-foreground',
-                )}
-              >
-                {p.name}
-                <span className="rounded-full bg-primary/15 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
-                  Free
-                </span>
-              </button>
-            ))}
+      {status?.configured && (
+        <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/[0.05] p-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
+              <CheckCircle2 className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-foreground">
+                {status.providerName}
+                <span className="ml-2 font-mono text-xs text-muted-foreground">{status.keyHint}</span>
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Model: <span className="font-medium text-foreground">{status.defaultModel ?? 'default'}</span> · Status: Connected
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="gap-1.5 rounded-xl font-medium"
+              disabled={testing}
+              onClick={() => void handleTestConnection()}
+            >
+              {testing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Zap className="h-3.5 w-3.5 text-primary" />}
+              Test Connection
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="gap-1.5 rounded-xl text-destructive hover:bg-destructive/10 hover:text-destructive"
+              disabled={removing}
+              onClick={() => void handleRemove()}
+            >
+              {removing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
+              Remove
+            </Button>
           </div>
         </div>
       )}
 
-      {status?.configured && (
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border/80 bg-card/80 px-4 py-3">
-          <div className="flex items-center gap-2.5 text-sm">
-            <CheckCircle2 className="h-4 w-4 text-primary" />
-            <div>
-              <p className="font-medium">
-                {status.providerName} connected
-                {status.keyHint ? (
-                  <span className="ml-2 font-mono text-xs text-muted-foreground">{status.keyHint}</span>
-                ) : null}
-              </p>
-              <p className="text-[11px] text-muted-foreground">
-                Model: {status.defaultModel ?? 'default'} · Encrypted at rest
-              </p>
-            </div>
-          </div>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="gap-1.5 rounded-xl"
-            disabled={removing}
-            onClick={() => void handleRemove()}
-          >
-            {removing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
-            Remove
-          </Button>
+      {testResult && (
+        <div
+          className={cn(
+            'flex items-start gap-2.5 rounded-xl border p-3.5 text-xs',
+            testResult.success
+              ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300'
+              : 'border-destructive/30 bg-destructive/10 text-destructive',
+          )}
+        >
+          {testResult.success ? (
+            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
+          ) : (
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+          )}
+          <span className="font-medium">{testResult.message}</span>
         </div>
       )}
 
       {error && (
-        <div className="flex items-start gap-2 rounded-xl border border-destructive/25 bg-destructive/10 p-3 text-sm text-destructive">
+        <div className="flex items-start gap-2.5 rounded-xl border border-destructive/30 bg-destructive/10 p-3.5 text-xs text-destructive">
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
-      <form onSubmit={handleSave} className="space-y-4 rounded-2xl border border-border/80 bg-card/90 p-5 shadow-sm">
+      <form onSubmit={handleSave} className="space-y-4 rounded-2xl border border-border/80 bg-card p-5 shadow-xs">
         <div className="space-y-2">
-          <label htmlFor="ai-provider" className="text-sm font-medium">
-            Provider
+          <label htmlFor="ai-provider" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            Select Provider
           </label>
-          <select
-            id="ai-provider"
-            value={provider}
-            onChange={(e) => {
-              if (isUserAiProviderId(e.target.value)) setProvider(e.target.value);
-            }}
-            className={fieldClass}
-          >
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             {providers.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.pricing === 'free_tier' ? `${p.name} — Free tier` : `${p.name} — Paid`}
-              </option>
-            ))}
-          </select>
-          {selected && (
-            <div className="space-y-1.5">
-              <div className="flex flex-wrap items-center gap-2">
-                <span
-                  className={cn(
-                    'rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide',
-                    selected.pricing === 'free_tier'
-                      ? 'bg-primary/10 text-primary'
-                      : 'bg-accent/15 text-accent',
-                  )}
-                >
-                  {selected.pricingLabel}
-                </span>
-                {selected.recommendedFree && (
-                  <span className="text-[11px] font-medium text-primary">Best free start</span>
+              <button
+                key={p.id}
+                type="button"
+                onClick={() => {
+                  setProvider(p.id);
+                  setTestResult(null);
+                  setError(null);
+                }}
+                className={cn(
+                  'flex flex-col items-start p-3 rounded-xl border text-left transition-all',
+                  provider === p.id
+                    ? 'border-primary bg-primary/10 text-foreground ring-1 ring-primary'
+                    : 'border-border bg-background/50 hover:border-primary/40 text-muted-foreground hover:text-foreground',
                 )}
-              </div>
-              <p className="text-xs text-muted-foreground">{selected.description}</p>
-              <p className="text-xs leading-relaxed text-muted-foreground">{selected.pricingNote}</p>
-            </div>
+              >
+                <div className="flex w-full items-center justify-between">
+                  <span className="text-xs font-bold">{p.name}</span>
+                  {p.pricing === 'free_tier' && (
+                    <span className="rounded-full bg-emerald-500/15 px-1.5 py-0.5 text-[9px] font-bold text-emerald-600 dark:text-emerald-400">
+                      Free
+                    </span>
+                  )}
+                </div>
+                <span className="mt-1 text-[11px] text-muted-foreground line-clamp-1">{p.defaultModel}</span>
+              </button>
+            ))}
+          </div>
+
+          {selected && (
+            <p className="mt-1 text-xs text-muted-foreground">{selected.description} {selected.pricingNote}</p>
           )}
         </div>
 
-        <div className="space-y-2">
-          <label htmlFor="ai-api-key" className="text-sm font-medium">
-            {status?.configured ? 'Replace API key' : 'API key'}
+        <div className="space-y-2 pt-2">
+          <label htmlFor="ai-api-key" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            {status?.configured ? 'New / Replace API Key' : `${selected?.name || ''} API Key`}
           </label>
           <div className="relative">
             <input
@@ -297,9 +339,13 @@ export function AiCredentialsForm({ embedded = false, onConfigured, className }:
               required
               autoComplete="off"
               value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
+              onChange={(e) => {
+                setApiKey(e.target.value);
+                setTestResult(null);
+                setError(null);
+              }}
               placeholder={selected?.keyPlaceholder ?? 'Paste your API key'}
-              className={cn(fieldClass, 'pr-11')}
+              className={cn(fieldClass, 'pr-11 font-mono')}
             />
             <button
               type="button"
@@ -311,58 +357,69 @@ export function AiCredentialsForm({ embedded = false, onConfigured, className }:
             </button>
           </div>
           <p className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-            <Shield className="h-3 w-3" />
-            Encrypted with your server key. Never logged or shown in full after save.
+            <Shield className="h-3 w-3 text-emerald-500" />
+            AES-256-GCM encrypted. Complete key is never shown again after saving.
           </p>
         </div>
 
-        <Button type="submit" className="w-full rounded-xl" disabled={saving || apiKey.trim().length < 8}>
-          {saving ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Saving…
-            </>
-          ) : status?.configured ? (
-            'Update API key'
-          ) : (
-            'Save API key'
+        <div className="flex flex-wrap items-center gap-3 pt-2">
+          <Button
+            type="submit"
+            className="flex-1 rounded-xl font-bold h-11"
+            disabled={saving || apiKey.trim().length < 8}
+          >
+            {saving ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Encrypting & Saving…
+              </>
+            ) : status?.configured ? (
+              'Update API Key'
+            ) : (
+              'Save & Connect API Key'
+            )}
+          </Button>
+
+          {apiKey.trim().length >= 8 && (
+            <Button
+              type="button"
+              variant="outline"
+              className="h-11 rounded-xl font-medium px-4"
+              disabled={testing || saving}
+              onClick={() => void handleTestConnection()}
+            >
+              {testing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4 text-primary mr-1.5" />}
+              Test Before Saving
+            </Button>
           )}
-        </Button>
+        </div>
       </form>
 
       {selected && (
-        <div className="rounded-2xl border border-border/80 bg-background/80 p-5">
-          <div className="flex flex-wrap items-center gap-2">
-            <h3 className="text-sm font-semibold">How to get a {selected.name} API key</h3>
-            <span
-              className={cn(
-                'rounded-full px-2 py-0.5 text-[10px] font-semibold',
-                selected.pricing === 'free_tier'
-                  ? 'bg-primary/10 text-primary'
-                  : 'bg-accent/15 text-accent',
-              )}
+        <div className="rounded-2xl border border-border/80 bg-background/60 p-5">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              How to get a {selected.name} API key
+            </h3>
+            <a
+              href={selected.docsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
             >
-              {selected.pricingLabel}
-            </span>
+              Open {selected.name} Key Console
+              <ExternalLink className="h-3 w-3" />
+            </a>
           </div>
-          <ol className="mt-3 list-decimal space-y-2 pl-4 text-sm leading-relaxed text-muted-foreground">
+          <ol className="mt-3 list-decimal space-y-1.5 pl-4 text-xs leading-relaxed text-muted-foreground">
             {selected.steps.map((step) => (
               <li key={step}>{step}</li>
             ))}
           </ol>
-          <a
-            href={selected.docsUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
-          >
-            Open {selected.name} key page
-            <ExternalLink className="h-3.5 w-3.5" />
-          </a>
           {embedded && (
             <p className="mt-4 text-xs text-muted-foreground">
-              You can manage this later in{' '}
-              <Link href={ROUTES.settings} className="font-medium text-primary hover:underline">
+              You can manage or test this key anytime in{' '}
+              <Link href={ROUTES.settings} className="font-semibold text-primary hover:underline">
                 Settings
               </Link>
               .

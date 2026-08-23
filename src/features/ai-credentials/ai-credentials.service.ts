@@ -12,6 +12,8 @@ import type {
   AiAccessStatus,
   PlatformAiStatus,
 } from './ai-credentials.types';
+import { createProviderWithApiKey } from '@/ai/providers/provider.registry';
+import type { AIProviderName } from '@/ai/gateway/ai.types';
 
 export type { AiCredentialPublicStatus, AiAccessStatus, PlatformAiStatus } from './ai-credentials.types';
 
@@ -31,19 +33,6 @@ function maskHint(apiKey: string): string {
 export async function getAiCredentialStatus(userId: string): Promise<AiCredentialPublicStatus> {
   const row = await prisma.userAiCredential.findUnique({ where: { userId } });
   if (!row) {
-    const platform = getPlatformAiStatus();
-    const isDev = process.env.NODE_ENV === 'development' || process.env.ALLOW_DEMO_AI === 'true';
-    if (platform.available || isDev) {
-      const firstProvider = platform.providers[0];
-      return {
-        configured: true,
-        provider: (firstProvider?.id as any) ?? 'openai',
-        providerName: firstProvider?.name ?? 'System Default AI (Platform)',
-        keyHint: '••••(Platform)',
-        defaultModel: firstProvider?.defaultModel ?? 'gpt-4o',
-        updatedAt: null,
-      };
-    }
     return {
       configured: false,
       provider: null,
@@ -81,7 +70,6 @@ export function getPlatformAiStatus(): PlatformAiStatus {
 
   for (const [id, cfg] of Object.entries(config.providers)) {
     if (!cfg?.enabled) continue;
-    // Dev-only ollama without a cloud key must not unlock project create / pipeline start.
     if (!cfg.apiKey) continue;
 
     const catalog = getProviderCatalogEntry(id as UserAiProviderId);
@@ -98,7 +86,6 @@ export function getPlatformAiStatus(): PlatformAiStatus {
   };
 }
 
-/** Internal only — gates use userHasAiCredential (BYOK required for users). */
 export async function getAiAccessStatus(userId: string): Promise<AiAccessStatus> {
   const userKey = await getAiCredentialStatus(userId);
   const platform = getPlatformAiStatus();
@@ -109,9 +96,70 @@ export async function getAiAccessStatus(userId: string): Promise<AiAccessStatus>
     platform,
     userKeyConfigured,
     platformConfigured: platform.available,
-    canRun: userKeyConfigured,
-    activeSource: userKeyConfigured ? 'user' : 'none',
+    canRun: userKeyConfigured || platform.available || process.env.NODE_ENV === 'development',
+    activeSource: userKeyConfigured ? 'user' : platform.available ? 'platform' : 'none',
   };
+}
+
+export async function testAiCredential(input: {
+  provider: string;
+  apiKey: string;
+  defaultModel?: string;
+}): Promise<ApiResult<{ latencyMs: number; provider: string; model: string }>> {
+  if (!isUserAiProviderId(input.provider)) {
+    return {
+      success: false,
+      error: { message: `Unsupported AI provider: ${input.provider}`, code: 'VALIDATION_ERROR' },
+    };
+  }
+
+  const apiKey = (input.apiKey || '').trim();
+  if (apiKey.length < 8) {
+    return {
+      success: false,
+      error: {
+        message: 'API key is too short. Please paste the full key from your provider.',
+        code: 'VALIDATION_ERROR',
+      },
+    };
+  }
+
+  const entry = getProviderCatalogEntry(input.provider);
+  const model = (input.defaultModel?.trim() || entry?.defaultModel || '').slice(0, 120);
+
+  const startTime = Date.now();
+  try {
+    const adapter = createProviderWithApiKey(input.provider as AIProviderName, apiKey, model);
+    const res = await Promise.race([
+      adapter.generate({
+        messages: [{ role: 'user', content: 'Say "connected" in one word.' }],
+        temperature: 0.1,
+        maxTokens: 10,
+        model: model || undefined,
+      }),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('Connection test timed out after 15s')), 15000),
+      ),
+    ]);
+
+    return {
+      success: true,
+      data: {
+        latencyMs: Date.now() - startTime,
+        provider: input.provider,
+        model: res.model || model || 'default',
+      },
+    };
+  } catch (err: any) {
+    const raw = err?.message || String(err);
+    return {
+      success: false,
+      error: {
+        message: `API Key verification failed: ${raw}`,
+        code: 'AUTH_ERROR',
+      },
+    };
+  }
 }
 
 export async function upsertAiCredential(
@@ -129,7 +177,10 @@ export async function upsertAiCredential(
   if (apiKey.length < 8) {
     return {
       success: false,
-      error: { message: 'API key looks too short. Paste the full key from your provider.', code: 'VALIDATION_ERROR' },
+      error: {
+        message: 'API key looks too short. Paste the full key from your provider.',
+        code: 'VALIDATION_ERROR',
+      },
     };
   }
 
@@ -139,11 +190,11 @@ export async function upsertAiCredential(
   let encryptedApiKey: string;
   try {
     encryptedApiKey = encrypt(apiKey);
-  } catch {
+  } catch (err: any) {
     return {
       success: false,
       error: {
-        message: 'Server encryption is not configured (ENCRYPTION_KEY). Ask your admin to set it.',
+        message: `Could not encrypt API key: ${err?.message || 'Encryption error'}`,
         code: 'INTERNAL_ERROR',
       },
     };
