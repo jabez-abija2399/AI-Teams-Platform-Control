@@ -31,6 +31,19 @@ function maskHint(apiKey: string): string {
 export async function getAiCredentialStatus(userId: string): Promise<AiCredentialPublicStatus> {
   const row = await prisma.userAiCredential.findUnique({ where: { userId } });
   if (!row) {
+    const platform = getPlatformAiStatus();
+    const isDev = process.env.NODE_ENV === 'development' || process.env.ALLOW_DEMO_AI === 'true';
+    if (platform.available || isDev) {
+      const firstProvider = platform.providers[0];
+      return {
+        configured: true,
+        provider: (firstProvider?.id as any) ?? 'openai',
+        providerName: firstProvider?.name ?? 'System Default AI (Platform)',
+        keyHint: '••••(Platform)',
+        defaultModel: firstProvider?.defaultModel ?? 'gpt-4o',
+        updatedAt: null,
+      };
+    }
     return {
       configured: false,
       provider: null,
@@ -54,7 +67,11 @@ export async function getAiCredentialStatus(userId: string): Promise<AiCredentia
 
 export async function userHasAiCredential(userId: string): Promise<boolean> {
   const count = await prisma.userAiCredential.count({ where: { userId } });
-  return count > 0;
+  if (count > 0) return true;
+  const platform = getPlatformAiStatus();
+  if (platform.available) return true;
+  if (process.env.NODE_ENV === 'development' || process.env.ALLOW_DEMO_AI === 'true') return true;
+  return false;
 }
 
 /** Internal: server .env keys (never exposed in user-facing UI). */
