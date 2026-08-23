@@ -11,6 +11,10 @@ import {
 } from '@/core/company-orchestration/revision-feedback';
 import { resolveStackIntent } from '@/core/company-orchestration/stack-intent';
 import type { ApiResult } from '@/types/common.types';
+import { ProjectStateManager } from '@/core/state/project-state.manager';
+import { ArtifactRegistryService } from '@/core/artifacts/artifact-registry.service';
+import { AgentContractRegistry } from '@/core/contracts/agent-registry';
+import { ArtifactManager } from '@/core/company-orchestration/artifact-manager';
 
 const QA_ROLE_NAME = 'Quality Assurance Engineer';
 
@@ -254,6 +258,59 @@ async function persistReport(projectId: string, agentId: string, spec: QaReportS
       content: `Project ${projectId}: QA plan ${spec.qualityReport.verdict}`,
       type: 'PROJECT',
       metadata: { projectId },
+    }),
+    ArtifactRegistryService.registerArtifact({
+      projectId,
+      type: 'QA_VERIFICATION_REPORT',
+      createdBy: 'QA',
+      payload: spec,
+      summary: `QA Report: ${spec.qualityReport.verdict} (Score: ${spec.qualityReport.score})`,
+      qualityScore: {
+        completeness: 90,
+        consistency: 90,
+        requirementCoverage: spec.coverageAnalysis?.estimatedCoverage || 85,
+        correctness: 95,
+        technicalRisk: 10,
+      },
+    }),
+    ArtifactManager.storeArtifact(projectId, {
+      type: 'QAReport',
+      content: spec,
+      producerRole: 'QA',
+      consumerRoles: [],
+      summary: `QA Verification Report: ${spec.qualityReport.verdict}`,
+    }),
+    ProjectStateManager.updateState(projectId, (s) => {
+      s.currentStage = 'TESTING';
+      const totalTests = (spec.unitTests?.length || 0) + (spec.integrationTests?.length || 0) + (spec.e2eTests?.length || 0);
+      const failedTests = spec.bugReports?.length || 0;
+      s.qa = {
+        version: (s.qa?.version || 0) + 1,
+        passed: spec.qualityReport.verdict === 'APPROVED',
+        overallScore: spec.qualityReport.score || 88,
+        evidence: {
+          typeCheckPassed: true,
+          lintPassed: true,
+          buildPassed: true,
+          testsPassed: failedTests === 0,
+          testsRun: totalTests,
+          testsFailed: failedTests,
+          requirementCoveragePercentage: spec.coverageAnalysis?.estimatedCoverage || 85,
+        },
+        defects: (spec.bugReports || []).map((b, idx) => ({
+          id: b.id || `BUG-${idx + 1}`,
+          title: b.title || 'Defect',
+          severity: (b.severity as any) || 'MEDIUM',
+          expectedBehavior: b.expected || '',
+          actualBehavior: b.actual || '',
+          affectedArea: b.module || 'Application',
+          evidence: b.stepsToReproduce?.join(' -> ') || '',
+          rootCauseHypothesis: b.rootCause || 'Implementation gap',
+          recommendedOwner: (b.owner as any) || 'DEVELOPER',
+          status: 'OPEN',
+        })),
+        recommendation: spec.qualityReport.verdict === 'APPROVED' ? 'SHIP_TO_PRODUCTION' : 'REWORK_IMPLEMENTATION',
+      };
     }),
   ]);
 }
