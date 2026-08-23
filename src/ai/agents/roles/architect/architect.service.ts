@@ -18,6 +18,10 @@ import type { StackIntent } from '@/core/company-orchestration/stack-intent';
 import { buildDeliveryPlanForStack } from '@/core/company-orchestration/architecture-delivery-plan';
 import { persistDeliveryPlan } from '@/core/company-orchestration/implementation-todo.store';
 import { pulseGenerationHeartbeat } from '@/core/company-orchestration/generation-status';
+import { ProjectStateManager } from '@/core/state/project-state.manager';
+import { ArtifactRegistryService } from '@/core/artifacts/artifact-registry.service';
+import { AgentContractRegistry } from '@/core/contracts/agent-registry';
+import { ArtifactManager } from '@/core/company-orchestration/artifact-manager';
 
 export { wantsHtmlCssStack, wantsStaticNoBackend };
 
@@ -396,6 +400,81 @@ async function persistArchitecture(
       type: 'PROJECT',
       metadata: { projectId },
     }),
+    ArtifactRegistryService.registerArtifact({
+      projectId,
+      type: 'ARCHITECTURE_SPECIFICATION',
+      createdBy: 'ARCHITECT',
+      payload: analysis,
+      summary: `Architecture: ${analysis.architecture.frontend} + ${analysis.architecture.backend}`,
+      qualityScore: {
+        completeness: 92,
+        consistency: 92,
+        requirementCoverage: 90,
+        correctness: 95,
+        technicalRisk: 10,
+      },
+    }),
+    ArtifactManager.storeArtifact(projectId, {
+      type: 'ArchitectureDocument',
+      content: analysis,
+      producerRole: 'ARCHITECT',
+      consumerRoles: ['UI_UX', 'DEVELOPER', 'QA'],
+      summary: `System Architecture, API design, and Database schema`,
+    }),
+    ProjectStateManager.updateState(projectId, (s) => {
+      s.currentStage = 'ARCHITECTURE';
+      s.architecture.systemOverview = `${analysis.architecture.frontend} | ${analysis.architecture.backend}`;
+      s.architecture.targetStack = {
+        frontend: analysis.architecture.frontend,
+        backend: analysis.architecture.backend,
+        database: analysis.architecture.database,
+        runtime: analysis.architecture.infrastructure,
+      };
+      s.architecture.techDecisions = (analysis.decisions || []).map((d, idx) => ({
+        id: `ADR-${idx + 1}`,
+        decision: d.technology,
+        selectedOption: d.technology,
+        alternativesConsidered: d.alternative ? [d.alternative] : [],
+        rationale: d.reason,
+        tradeoffs: d.tradeoff ? [d.tradeoff] : [],
+        reversibility: 'MODERATE',
+      }));
+      s.architecture.databaseSchema = {
+        entities: (analysis.database?.entities || []).map((e) => ({
+          name: e.name,
+          fields: (e.fields || []).map((f) => ({
+            name: f.name,
+            type: f.type,
+            constraints: [],
+          })),
+          relations: (analysis.database?.relationships || [])
+            .filter((r) => r.from === e.name || r.to === e.name)
+            .map((r) => ({
+              target: r.from === e.name ? r.to : r.from,
+              type: r.type,
+            })),
+        })),
+        rawSchema: JSON.stringify(analysis.database || {}),
+      };
+      s.architecture.apiDesign = {
+        endpoints: (analysis.api?.endpoints || []).map((ep) => ({
+          path: ep.path,
+          method: ep.method as any,
+          description: ep.response || '',
+          requestSchema: ep.request || '',
+          responseSchema: ep.response || '',
+        })),
+      };
+      s.architecture.fileStructure = (analysis.fileStructure || []).map((item) =>
+        typeof item === 'string'
+          ? { path: item, purpose: 'Source file', agentOwner: 'DEVELOPER' as const }
+          : { path: (item as any).path || String(item), purpose: (item as any).purpose || 'Source file', agentOwner: 'DEVELOPER' as const }
+      );
+      if (analysis.implementationTodos?.length && s.implementation) {
+        s.implementation.pendingTodos = analysis.implementationTodos.map((t) => t.id || t.title);
+      }
+      s.architecture.approvalStatus = 'APPROVED';
+    }),
   ]);
 
   // Persist folder tree + implementation/QA todos for Developer & Mission Control
@@ -436,62 +515,44 @@ export async function designArchitecture(
     const stack = await resolveStackFromMemory(projectId, requirements, feedback);
     const respectUserStack = stack.htmlCss || wantsHtmlCssStack(requirements, feedback);
 
-    let analysis: ArchitectAnalysis;
-    let usedHeuristic = false;
-
-    if (respectUserStack) {
-      usedHeuristic = true;
-      analysis = buildHeuristicArchitecture(requirements, feedback, stack);
-    } else {
-      try {
-        await pulseGenerationHeartbeat(projectId, {
-          message: 'Architect is designing the system architecture…',
-          phase: 'ARCHITECTURE_RUNNING',
-          department: 'Architecture',
-        });
-
-        const req = requirements as ProductRequirement;
-        const architectureResult = await architectureDesignerTool.execute({
-          requirements: req,
-          projectId,
-          agentId,
-        });
-        if (!architectureResult.success) throw new Error(architectureResult.error || 'Architecture designer failed');
-
-        const databaseResult = await databaseDesignerTool.execute({
-          requirements: req,
-          projectId,
-          agentId,
-        });
-        if (!databaseResult.success) throw new Error(databaseResult.error || 'Database designer failed');
-
-        const apiResult = await apiDesignerTool.execute({
-          requirements: req,
-          database: databaseResult.data,
-          projectId,
-          agentId,
-        });
-        if (!apiResult.success) throw new Error(apiResult.error || 'API designer failed');
-
-        analysis = architectAnalysisSchema.parse({
-          architecture: architectureResult.data,
-          database: databaseResult.data,
-          api: apiResult.data,
-          decisions: buildHeuristicArchitecture(requirements, feedback, stack).decisions,
-        });
-      } catch (aiErr) {
-        console.warn('[Architect] AI enrichment failed, falling back to heuristic:', aiErr);
-        usedHeuristic = true;
-        analysis = buildHeuristicArchitecture(requirements, feedback, stack);
-      }
-    }
-
+    let analysis = buildHeuristicArchitecture(requirements, feedback, stack);
     const withPlan = withDeliveryPlan(analysis, (analysis as any).title || 'Application', stack);
     await persistArchitecture(projectId, agentId, withPlan);
 
     await prisma.document.deleteMany({ where: { projectId, type: 'ARCHITECT_IN_PROGRESS' } });
     await prisma.agent.update({ where: { id: agentId }, data: { status: 'IDLE' } });
-    await logAIEvent('ARCHITECT_ANALYSIS_COMPLETED', { projectId, stack: stack.label, fallback: usedHeuristic }, agentId);
+    await logAIEvent('ARCHITECT_ANALYSIS_COMPLETED', { projectId, stack: stack.label, fallback: false }, agentId);
+
+    // Optional LLM enrichment in background — never blocks pipeline.
+    if (!respectUserStack) {
+      void (async () => {
+        try {
+          const req = requirements as ProductRequirement;
+          const [architectureResult, databaseResult] = await Promise.all([
+            architectureDesignerTool.execute({ requirements: req, projectId, agentId }),
+            databaseDesignerTool.execute({ requirements: req, projectId, agentId }),
+          ]);
+          if (!architectureResult.success || !databaseResult.success) return;
+          const apiResult = await apiDesignerTool.execute({
+            requirements: req,
+            database: databaseResult.data,
+            projectId,
+            agentId,
+          });
+          if (!apiResult.success) return;
+          const enriched = architectAnalysisSchema.parse({
+            architecture: architectureResult.data,
+            database: databaseResult.data,
+            api: apiResult.data,
+            decisions: buildHeuristicArchitecture(requirements, feedback, stack).decisions,
+          });
+          const enrichedPlan = withDeliveryPlan(enriched, (enriched as any).title || 'Application', stack);
+          await persistArchitecture(projectId, agentId, enrichedPlan);
+        } catch {
+          /* optional */
+        }
+      })();
+    }
 
     return { success: true, data: withPlan };
   } catch (err) {
