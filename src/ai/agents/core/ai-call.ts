@@ -4,7 +4,7 @@ import type { AgentModelConfig } from '../roles/ceo/ceo.config';
 import { loadKnowledgeForAgent } from './knowledge-loader';
 import { composeWorldClassSystemPrompt } from '../excellence/world-class-charter';
 
-const AI_CALL_TIMEOUT = 120_000;
+const AI_CALL_TIMEOUT = process.env.NODE_ENV === 'test' ? 500 : 120_000;
 
 async function tryRoute<T>(
   model: string,

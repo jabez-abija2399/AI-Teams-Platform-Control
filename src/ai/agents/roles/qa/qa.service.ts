@@ -326,52 +326,47 @@ export async function generateQaReportSpec(
   await logAIEvent('QA_REPORT_STARTED', { projectId }, agentId);
 
   try {
-    const spec = buildHeuristicQaReport(inputData, feedback);
-    await persistReport(projectId, agentId, spec);
+    let spec: QaReportSpec;
+    let usedHeuristic = false;
 
-    if (!feedback?.trim() && !wantsHtmlCssStack(inputData, feedback)) {
-      void (async () => {
-        try {
-          const prompt = `Input:\n${JSON.stringify(inputData, null, 2).slice(0, 5000)}\n\nGenerate lean QA JSON. Respond ONLY with valid JSON.`;
-          const raw = await Promise.race([
-            aiCall<unknown>(prompt, QA_SYSTEM_PROMPT, 'QA', qaConfig, projectId, agentId),
-            new Promise<never>((_, reject) =>
-              setTimeout(() => reject(new Error('QA LLM budget exceeded')), 25_000),
-            ),
-          ]);
-          const parsed = qaReportSpecSchema.safeParse(raw);
-          if (parsed.success) await persistReport(projectId, agentId, parsed.data);
-        } catch {
-          // optional
-        }
-      })();
+    try {
+      const prompt = `Input:\n${JSON.stringify(inputData, null, 2).slice(0, 6000)}\n\nGenerate comprehensive QA verification report JSON with unitTests, integrationTests, e2eTests, regressionPlan, coverageAnalysis, riskMatrix, bugReports, testSuites, performanceTests, accessibilityTests, securityTests, qualityReport (verdict, score, summary). Respond ONLY with valid JSON.`;
+      const raw = await Promise.race([
+        aiCall<unknown>(prompt, QA_SYSTEM_PROMPT, 'QA', qaConfig, projectId, agentId),
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('QA verification LLM call timed out')), 60_000),
+        ),
+      ]);
+      const parsed = qaReportSpecSchema.safeParse(raw);
+      if (parsed.success) {
+        spec = parsed.data;
+      } else {
+        throw new Error('QA Engineer produced invalid JSON schema');
+      }
+    } catch (aiErr) {
+      console.warn('[QA] AI verification failed:', aiErr);
+      if (process.env.NODE_ENV === 'test' || process.env.ALLOW_HEURISTIC_MOCK === 'true') {
+        usedHeuristic = true;
+        spec = buildHeuristicQaReport(inputData, feedback);
+      } else {
+        throw aiErr;
+      }
     }
 
+    await persistReport(projectId, agentId, spec);
     await prisma.agent.update({ where: { id: agentId }, data: { status: 'IDLE' } });
-    await logAIEvent('QA_REPORT_COMPLETED', { projectId }, agentId);
+    await logAIEvent('QA_REPORT_COMPLETED', { projectId, fallback: usedHeuristic }, agentId);
     return { success: true, data: spec };
   } catch (err) {
-    try {
-      const fallback = buildHeuristicQaReport(inputData, feedback);
-      await persistReport(projectId, agentId, fallback);
-      await prisma.agent.update({ where: { id: agentId }, data: { status: 'IDLE' } });
-      return { success: true, data: fallback };
-    } catch (fallbackErr) {
-      await prisma.agent.update({ where: { id: agentId }, data: { status: 'ERROR' } });
-      await logAIEvent('QA_REPORT_FAILED', { projectId, error: String(err) }, agentId);
-      return {
-        success: false,
-        error: {
-          message:
-            fallbackErr instanceof Error
-              ? fallbackErr.message
-              : err instanceof Error
-                ? err.message
-                : 'QA report generation failed',
-          code: 'AI_ERROR',
-        },
-      };
-    }
+    await prisma.agent.update({ where: { id: agentId }, data: { status: 'ERROR' } });
+    await logAIEvent('QA_REPORT_FAILED', { projectId, error: String(err) }, agentId);
+    return {
+      success: false,
+      error: {
+        message: err instanceof Error ? err.message : 'QA report generation failed',
+        code: 'AI_ERROR',
+      },
+    };
   }
 }
 

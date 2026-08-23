@@ -361,61 +361,54 @@ export async function generateUiDesignSpec(
   await logAIEvent('UID_DESIGN_STARTED', { projectId }, agentId);
 
   try {
-    // Always start from a feedback-aware heuristic so regenerate is correct and fast
-    const spec = buildHeuristicUiDesignSpec(ujw, feedback);
-    await persistSpec(projectId, agentId, spec);
+    let spec: UiDesignSpec;
+    let usedHeuristic = false;
 
-    await prisma.agent.update({ where: { id: agentId }, data: { status: 'IDLE' } });
-    await logAIEvent('UID_DESIGN_COMPLETED', { projectId }, agentId);
-
-    // Optional LLM enrichment only when user did not lock stack to HTML/CSS
-    if (!wantsHtmlCssStack(ujw, feedback) && !feedback?.trim()) {
-      void (async () => {
-        try {
-          const prompt = `UX input:\n${JSON.stringify(ujw, null, 2).slice(0, 6000)}\n\nGenerate lean UI design JSON. Respond ONLY with valid JSON.`;
-          const raw = await Promise.race([
-            aiCall<unknown>(
-              prompt,
-              UI_DESIGNER_SYSTEM_PROMPT,
-              'UI_DESIGNER',
-              uiDesignerConfig,
-              projectId,
-              agentId,
-            ),
-            new Promise<never>((_, reject) =>
-              setTimeout(() => reject(new Error('UI LLM budget exceeded')), 25_000),
-            ),
-          ]);
-          const parsed = uiDesignSpecSchema.safeParse(raw);
-          if (parsed.success) await persistSpec(projectId, agentId, parsed.data);
-        } catch {
-          // optional
-        }
-      })();
+    try {
+      const prompt = `UX input:\n${JSON.stringify(ujw, null, 2).slice(0, 6000)}\n\nGenerate comprehensive UI design specification JSON with designTokens (colors, typography, spacing, borderRadius), visualStyleGuide, componentHierarchy, layoutMockups, accessibilityVisualTokens, and cssVariablesManifest. Respond ONLY with valid JSON.`;
+      const raw = await Promise.race([
+        aiCall<unknown>(
+          prompt,
+          UI_DESIGNER_SYSTEM_PROMPT,
+          'UI_DESIGNER',
+          uiDesignerConfig,
+          projectId,
+          agentId,
+        ),
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('UI Designer LLM call timed out')), 60_000),
+        ),
+      ]);
+      const parsed = uiDesignSpecSchema.safeParse(raw);
+      if (parsed.success) {
+        spec = parsed.data;
+      } else {
+        throw new Error('UI Designer produced invalid JSON schema');
+      }
+    } catch (aiErr) {
+      console.warn('[UI Designer] AI generation failed:', aiErr);
+      if (process.env.NODE_ENV === 'test' || process.env.ALLOW_HEURISTIC_MOCK === 'true') {
+        usedHeuristic = true;
+        spec = buildHeuristicUiDesignSpec(ujw, feedback);
+      } else {
+        throw aiErr;
+      }
     }
+
+    await persistSpec(projectId, agentId, spec);
+    await prisma.agent.update({ where: { id: agentId }, data: { status: 'IDLE' } });
+    await logAIEvent('UID_DESIGN_COMPLETED', { projectId, fallback: usedHeuristic }, agentId);
 
     return { success: true, data: spec };
   } catch (err) {
-    try {
-      const fallback = buildHeuristicUiDesignSpec(ujw, feedback);
-      await persistSpec(projectId, agentId, fallback);
-      await prisma.agent.update({ where: { id: agentId }, data: { status: 'IDLE' } });
-      return { success: true, data: fallback };
-    } catch (fallbackErr) {
-      await prisma.agent.update({ where: { id: agentId }, data: { status: 'ERROR' } });
-      await logAIEvent('UID_DESIGN_FAILED', { projectId, error: String(err) }, agentId);
-      return {
-        success: false,
-        error: {
-          message:
-            fallbackErr instanceof Error
-              ? fallbackErr.message
-              : err instanceof Error
-                ? err.message
-                : 'UI design failed',
-          code: 'AI_ERROR',
-        },
-      };
-    }
+    await prisma.agent.update({ where: { id: agentId }, data: { status: 'ERROR' } });
+    await logAIEvent('UID_DESIGN_FAILED', { projectId, error: String(err) }, agentId);
+    return {
+      success: false,
+      error: {
+        message: err instanceof Error ? err.message : 'UI design failed',
+        code: 'AI_ERROR',
+      },
+    };
   }
 }

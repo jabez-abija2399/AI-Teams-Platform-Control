@@ -13,31 +13,31 @@ import { resolveUserAiCredentialForProject } from '@/features/ai-credentials/ai-
 function translateError(raw: string): { message: string; code: string } {
   const lower = raw.toLowerCase();
   if (/429|rate.?limit|too many request/.test(lower)) {
-    return { message: 'AI service is busy. Please wait 30 seconds and try again.', code: 'RATE_LIMITED' };
+    return { message: `AI Rate Limit: ${raw}. Please wait 30 seconds and retry.`, code: 'RATE_LIMITED' };
   }
   if (/401|unauthorized|invalid.*key|api.?key/.test(lower)) {
-    return { message: 'AI authentication failed. Check your API key in Settings.', code: 'AUTH_ERROR' };
+    return { message: `AI Authentication Failed: ${raw}. Please check your API key in Settings.`, code: 'AUTH_ERROR' };
   }
   if (/403|forbidden|access.?denied/.test(lower)) {
-    return { message: 'AI access denied. Check your API key permissions in Settings.', code: 'ACCESS_DENIED' };
+    return { message: `AI Access Denied: ${raw}. Please check your API key permissions and model access.`, code: 'ACCESS_DENIED' };
   }
   if (/402|payment|billing|insufficient_credit/.test(lower)) {
     return {
-      message: 'Your AI provider needs payment or credits. Top up the account that owns this API key.',
+      message: `AI Billing/Credit Required: ${raw}. Please top up credits with your AI provider.`,
       code: 'PAYMENT_REQUIRED',
     };
   }
   if (/quota|limit.*exceeded/.test(lower)) {
-    return { message: 'AI usage quota reached. Check billing with your provider or try again later.', code: 'QUOTA_EXCEEDED' };
+    return { message: `AI Quota Exceeded: ${raw}. Please check usage limits with your provider.`, code: 'QUOTA_EXCEEDED' };
   }
   if (/timeout|etimedout|timed.?out/.test(lower)) {
-    return { message: 'Request timed out. The AI model may be overloaded. Please try again.', code: 'TIMEOUT' };
+    return { message: `AI Request Timed Out: ${raw}. The model took too long to respond.`, code: 'TIMEOUT' };
   }
   if (/500|502|503|service.?unavailable|internal.?error/.test(lower)) {
-    return { message: 'AI service is temporarily unavailable. Please try again later.', code: 'SERVICE_ERROR' };
+    return { message: `AI Service Unavailable: ${raw}. The provider is experiencing issues.`, code: 'SERVICE_ERROR' };
   }
   if (/network|fetch.*fail|econnrefused|econnreset/.test(lower)) {
-    return { message: 'Could not reach the AI service. Please check your connection.', code: 'NETWORK_ERROR' };
+    return { message: `AI Network Error: ${raw}. Could not connect to provider.`, code: 'NETWORK_ERROR' };
   }
   if (/no ai providers are configured/.test(lower)) {
     return {
@@ -45,7 +45,7 @@ function translateError(raw: string): { message: string; code: string } {
       code: 'NO_API_KEY',
     };
   }
-  return { message: 'Something went wrong with the AI service.', code: 'AI_ERROR' };
+  return { message: raw || 'Something went wrong with the AI service.', code: 'AI_ERROR' };
 }
 
 async function resolveUserKey(projectId?: string) {

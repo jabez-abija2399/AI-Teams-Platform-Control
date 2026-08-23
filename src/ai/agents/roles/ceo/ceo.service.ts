@@ -171,9 +171,13 @@ export async function analyzeUserIdea(
         qualityScore: planResult.data.qualityScore,
       });
     } catch (aiErr) {
-      console.warn('[CEO] AI analysis failed, falling back to heuristic:', aiErr);
-      usedHeuristic = true;
-      analysis = buildHeuristicCEOAnalysis(userIdea);
+      console.warn('[CEO] AI analysis failed:', aiErr);
+      if (process.env.NODE_ENV === 'test' || process.env.ALLOW_HEURISTIC_MOCK === 'true') {
+        usedHeuristic = true;
+        analysis = buildHeuristicCEOAnalysis(userIdea);
+      } else {
+        throw aiErr;
+      }
     }
 
     await persistStackConstraints(projectId, userIdea, analysis.requirements.constraints);

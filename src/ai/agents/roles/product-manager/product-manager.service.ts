@@ -158,8 +158,31 @@ export async function refineRequirements(
   await logAIEvent('PM_REFINEMENT_STARTED', { projectId }, agentId);
 
   try {
-    // Lean-first — same pattern as Architect / BA / Development.
-    const refined = buildHeuristicRefinedRequirements(ceoAnalysis);
+    let refined: RefinedRequirements;
+    let usedHeuristic = false;
+
+    try {
+      const result = await requirementRefinementTool.execute({
+        ceoAnalysis,
+        projectId,
+        agentId,
+      });
+      if (result.success && result.data) {
+        refined = refinedRequirementsSchema.parse(result.data);
+      } else {
+        const errorMsg = !result.success ? result.error : 'Requirement refinement tool failed';
+        throw new Error(errorMsg || 'Requirement refinement tool failed');
+      }
+    } catch (aiErr) {
+      console.warn('[PM] AI refinement failed:', aiErr);
+      if (process.env.NODE_ENV === 'test' || process.env.ALLOW_HEURISTIC_MOCK === 'true') {
+        usedHeuristic = true;
+        refined = buildHeuristicRefinedRequirements(ceoAnalysis);
+      } else {
+        throw aiErr;
+      }
+    }
+
     const memory = getMemoryManager();
 
     await Promise.all([
@@ -242,31 +265,7 @@ export async function refineRequirements(
 
     await prisma.document.deleteMany({ where: { projectId, type: 'PM_IN_PROGRESS' } });
     await prisma.agent.update({ where: { id: agentId }, data: { status: 'IDLE' } });
-    await logAIEvent('PM_REFINEMENT_COMPLETED', { projectId }, agentId);
-
-    // Optional LLM enrichment in background — never blocks pipeline.
-    void (async () => {
-      try {
-        const result = await requirementRefinementTool.execute({
-          ceoAnalysis,
-          projectId,
-          agentId,
-        });
-        if (!result.success) return;
-        const enriched = refinedRequirementsSchema.parse(result.data);
-        await prisma.document.create({
-          data: {
-            projectId,
-            type: 'REFINED_REQUIREMENTS',
-            title: 'Refined Requirements (enriched)',
-            content: JSON.stringify(enriched),
-            author: 'Product Manager AI',
-          },
-        });
-      } catch {
-        /* optional */
-      }
-    })();
+    await logAIEvent('PM_REFINEMENT_COMPLETED', { projectId, fallback: usedHeuristic }, agentId);
 
     return { success: true, data: refined };
   } catch (err) {
@@ -275,19 +274,13 @@ export async function refineRequirements(
     await prisma.agent.update({ where: { id: agentId }, data: { status: 'ERROR' } });
     await logAIEvent('PM_REFINEMENT_FAILED', { projectId, error: String(err) }, agentId);
 
-    // Last-resort heuristic so PRODUCT_RUNNING never fails the pipeline.
-    try {
-      const fallback = buildHeuristicRefinedRequirements(ceoAnalysis);
-      return { success: true, data: fallback };
-    } catch {
-      return {
-        success: false,
-        error: {
-          message: err instanceof Error ? err.message : 'PM refinement failed',
-          code: 'AI_ERROR',
-        },
-      };
-    }
+    return {
+      success: false,
+      error: {
+        message: err instanceof Error ? err.message : 'PM refinement failed',
+        code: 'AI_ERROR',
+      },
+    };
   }
 }
 

@@ -524,78 +524,68 @@ export async function designArchitecture(
   await logAIEvent('ARCHITECT_ANALYSIS_STARTED', { projectId }, agentId);
 
   try {
-    // Honor stack chosen at project create (HTML/CSS · Saved), not only text keywords.
     const stack = await resolveStackFromMemory(projectId, requirements, feedback);
-    const respectUserStack = stack.htmlCss || wantsHtmlCssStack(requirements, feedback);
+    let analysis: ArchitectAnalysis;
+    let usedHeuristic = false;
 
-    let analysis = buildHeuristicArchitecture(requirements, feedback, stack);
+    try {
+      const req = requirements as ProductRequirement;
+      const [architectureResult, databaseResult] = await Promise.all([
+        architectureDesignerTool.execute({ requirements: req, projectId, agentId }),
+        databaseDesignerTool.execute({ requirements: req, projectId, agentId }),
+      ]);
+      if (!architectureResult.success || !databaseResult.success) {
+        const err1 = !architectureResult.success ? architectureResult.error : '';
+        const err2 = !databaseResult.success ? databaseResult.error : '';
+        throw new Error(
+          err1 || err2 || 'Architecture AI tools failed',
+        );
+      }
+      const apiResult = await apiDesignerTool.execute({
+        requirements: req,
+        database: databaseResult.data,
+        projectId,
+        agentId,
+      });
+      if (!apiResult.success) {
+        throw new Error(apiResult.error || 'API Designer AI tool failed');
+      }
+
+      analysis = architectAnalysisSchema.parse({
+        architecture: architectureResult.data,
+        database: databaseResult.data,
+        api: apiResult.data,
+        decisions: buildHeuristicArchitecture(requirements, feedback, stack).decisions,
+      });
+    } catch (aiErr) {
+      console.warn('[Architect] AI analysis failed:', aiErr);
+      if (process.env.NODE_ENV === 'test' || process.env.ALLOW_HEURISTIC_MOCK === 'true') {
+        usedHeuristic = true;
+        analysis = buildHeuristicArchitecture(requirements, feedback, stack);
+      } else {
+        throw aiErr;
+      }
+    }
+
     const withPlan = withDeliveryPlan(analysis, (analysis as any).title || 'Application', stack);
     await persistArchitecture(projectId, agentId, withPlan);
 
     await prisma.document.deleteMany({ where: { projectId, type: 'ARCHITECT_IN_PROGRESS' } });
     await prisma.agent.update({ where: { id: agentId }, data: { status: 'IDLE' } });
-    await logAIEvent('ARCHITECT_ANALYSIS_COMPLETED', { projectId, stack: stack.label, fallback: false }, agentId);
-
-    // Optional LLM enrichment in background — never blocks pipeline.
-    if (!respectUserStack) {
-      void (async () => {
-        try {
-          const req = requirements as ProductRequirement;
-          const [architectureResult, databaseResult] = await Promise.all([
-            architectureDesignerTool.execute({ requirements: req, projectId, agentId }),
-            databaseDesignerTool.execute({ requirements: req, projectId, agentId }),
-          ]);
-          if (!architectureResult.success || !databaseResult.success) return;
-          const apiResult = await apiDesignerTool.execute({
-            requirements: req,
-            database: databaseResult.data,
-            projectId,
-            agentId,
-          });
-          if (!apiResult.success) return;
-          const enriched = architectAnalysisSchema.parse({
-            architecture: architectureResult.data,
-            database: databaseResult.data,
-            api: apiResult.data,
-            decisions: buildHeuristicArchitecture(requirements, feedback, stack).decisions,
-          });
-          const enrichedPlan = withDeliveryPlan(enriched, (enriched as any).title || 'Application', stack);
-          await persistArchitecture(projectId, agentId, enrichedPlan);
-        } catch {
-          /* optional */
-        }
-      })();
-    }
+    await logAIEvent('ARCHITECT_ANALYSIS_COMPLETED', { projectId, stack: stack.label, fallback: usedHeuristic }, agentId);
 
     return { success: true, data: withPlan };
   } catch (err) {
-    try {
-      const stack = await resolveStackFromMemory(projectId, requirements, feedback).catch(
-        () => null,
-      );
-      const fallback = buildHeuristicArchitecture(requirements, feedback, stack);
-      await persistArchitecture(projectId, agentId, fallback);
-      await prisma.document.deleteMany({ where: { projectId, type: 'ARCHITECT_IN_PROGRESS' } });
-      await prisma.agent.update({ where: { id: agentId }, data: { status: 'IDLE' } });
-      await logAIEvent('ARCHITECT_ANALYSIS_COMPLETED', { projectId, fallback: true }, agentId);
-      return { success: true, data: fallback };
-    } catch (fallbackErr) {
-      await prisma.document.deleteMany({ where: { projectId, type: 'ARCHITECT_IN_PROGRESS' } });
-      await prisma.agent.update({ where: { id: agentId }, data: { status: 'ERROR' } });
-      await logAIEvent('ARCHITECT_ANALYSIS_FAILED', { projectId, error: String(err) }, agentId);
-      return {
-        success: false,
-        error: {
-          message:
-            fallbackErr instanceof Error
-              ? fallbackErr.message
-              : err instanceof Error
-                ? err.message
-                : 'Architecture design failed',
-          code: 'AI_ERROR',
-        },
-      };
-    }
+    await prisma.document.deleteMany({ where: { projectId, type: 'ARCHITECT_IN_PROGRESS' } });
+    await prisma.agent.update({ where: { id: agentId }, data: { status: 'ERROR' } });
+    await logAIEvent('ARCHITECT_ANALYSIS_FAILED', { projectId, error: String(err) }, agentId);
+    return {
+      success: false,
+      error: {
+        message: err instanceof Error ? err.message : 'Architecture design failed',
+        code: 'AI_ERROR',
+      },
+    };
   }
 }
 
