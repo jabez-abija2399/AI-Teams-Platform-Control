@@ -118,26 +118,33 @@ export function resolveAgentFailure<T>(opts: {
   const msg = opts.errorMessage || 'Agent step failed';
   const classified = classifyAiError(msg);
 
-  // In test environment or explicitly enabled demo mode, allow fallback for test runners
-  if (process.env.NODE_ENV === 'test' || process.env.ALLOW_HEURISTIC_MOCK === 'true') {
-    try {
-      const data = opts.fallback();
-      const gate = validatePhaseDeliverable(opts.phase, data);
-      if (!gate.ok) {
-        return { success: false, error: gate.message };
-      }
-      return { success: true, data };
-    } catch (err) {
-      return {
-        success: false,
-        error: err instanceof Error ? err.message : 'Fallback deliverable failed',
-      };
-    }
+  // Blocking errors (credits, token exhaustion, rate limit, auth) must hard stop
+  if (isBlockingProviderError(msg)) {
+    return {
+      success: false,
+      error: `${classified.title}: ${classified.message} — Details: ${msg}`,
+    };
   }
 
-  // Production & Live Generation: Hard stop with clear, actionable error!
-  return {
-    success: false,
-    error: `${classified.title}: ${classified.message} — Details: ${msg}`,
-  };
+  // Strict mode: never use heuristics
+  if (opts.strictMode) {
+    return {
+      success: false,
+      error: `Strict mode: ${opts.phase} failed (${msg}). Resume after fixing.`,
+    };
+  }
+
+  try {
+    const data = opts.fallback();
+    const gate = validatePhaseDeliverable(opts.phase, data);
+    if (!gate.ok) {
+      return { success: false, error: gate.message };
+    }
+    return { success: true, data };
+  } catch (err) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : 'Fallback deliverable failed',
+    };
+  }
 }

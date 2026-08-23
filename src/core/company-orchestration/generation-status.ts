@@ -41,18 +41,18 @@ const STUCK_AFTER_MS = 75_000;
 
 export function classifyAiError(raw: string): ClassifiedAiError {
   const lower = (raw || '').toLowerCase();
+  const rawSnippet = raw ? ` (${raw.trim().slice(0, 180)})` : '';
 
   if (
-    /402|payment|billing|insufficient.?credit|credit.?balance|out of credits|quota.*exceed|usage.?limit|spend.?limit/.test(
+    /402|payment|billing|insufficient.?credit|credit.?balance|out of credits|credits?.(are)?\s*(finished|exhausted|depleted)|quota.*exceed|usage.?limit|spend.?limit|token.*(exceed|limit|exhaust|finish|deplet|budget)|out of tokens|context.*(length|limit|maximum)|tokens? finished/.test(
       lower,
     )
   ) {
     return {
       kind: 'credits',
       code: 'CREDITS_EXHAUSTED',
-      title: 'AI credits unavailable',
-      message:
-        'The AI provider reports that credits or billing are exhausted. Add credits or update billing, then tap Resume to continue from this exact step.',
+      title: 'AI Tokens / Credits Finished',
+      message: `Your AI provider tokens or billing quota have finished${rawSnippet}. Please top up your provider credits or add a new API key in Settings, then click Resume.`,
       actionLabel: 'Resume pipeline',
     };
   }

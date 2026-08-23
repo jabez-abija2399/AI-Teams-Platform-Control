@@ -10,7 +10,10 @@ describe('QA Agent Excellence', () => {
   const sampleImplementation = {
     title: 'Enterprise Task Manager',
     files: [
-      { path: 'src/App.tsx', content: 'export default function App() { return <div>Tasks</div>; }' },
+      { path: 'package.json', content: JSON.stringify({ name: 'task-mgr', version: '1.0.0', scripts: { dev: 'next dev', build: 'next build' } }) },
+      { path: 'tsconfig.json', content: JSON.stringify({ compilerOptions: { target: 'es5' } }) },
+      { path: 'src/app/layout.tsx', content: 'export default function RootLayout({ children }: { children: React.ReactNode }) { return <html><body>{children}</body></html>; }' },
+      { path: 'src/app/page.tsx', content: 'export default function Page() { return <div>Tasks</div>; }' },
       { path: 'src/components/TaskList.tsx', content: 'export function TaskList() { return <ul><li>Task 1</li></ul>; }' },
     ],
   };
