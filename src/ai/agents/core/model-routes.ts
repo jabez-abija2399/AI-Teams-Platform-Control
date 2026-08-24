@@ -1,12 +1,11 @@
 import type { AIProviderName, ModelRoute } from '@/ai/gateway/ai.types';
 
 export const DEFAULT_MODELS: ModelRoute[] = [
-  { provider: 'gemini' as AIProviderName, model: 'gemini-2.5-flash' },
-  { provider: 'gemini' as AIProviderName, model: 'gemini-3.5-flash-lite' },
-  { provider: 'gemini' as AIProviderName, model: 'gemini-3.6-flash' },
-  { provider: 'openrouter' as AIProviderName, model: 'openai/gpt-4o-mini' },
-  { provider: 'groq' as AIProviderName, model: 'llama-3.3-70b-versatile' },
   { provider: 'gemini' as AIProviderName, model: 'gemini-2.0-flash' },
+  { provider: 'gemini' as AIProviderName, model: 'gemini-1.5-flash' },
+  { provider: 'groq' as AIProviderName, model: 'llama-3.3-70b-versatile' },
+  { provider: 'openrouter' as AIProviderName, model: 'openai/gpt-4o-mini' },
+  { provider: 'openai' as AIProviderName, model: 'gpt-4o-mini' },
 ];
 
 export function envModels(prefix: string): ModelRoute[] {
@@ -20,7 +19,7 @@ export function envModels(prefix: string): ModelRoute[] {
     return [envRoute, ...uniqueDefaults];
   }
   if (provider) {
-    const firstModel = DEFAULT_MODELS[0]?.model ?? 'gemini-2.5-flash';
+    const firstModel = DEFAULT_MODELS[0]?.model ?? 'gemini-2.0-flash';
     const envRoute: ModelRoute = { provider, model: firstModel };
     const uniqueDefaults = DEFAULT_MODELS.filter(
       (r) => !(r.provider === provider && r.model === envRoute.model),

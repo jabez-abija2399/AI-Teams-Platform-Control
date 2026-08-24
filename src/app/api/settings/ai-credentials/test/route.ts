@@ -19,14 +19,23 @@ export async function POST(request: Request) {
   let apiKey = body.apiKey;
   let defaultModel = body.defaultModel;
 
-  // If no apiKey in request, test with user's saved credential
+  // If no apiKey in request, only test with saved credential if provider matches
   if (!apiKey) {
     const saved = await resolveUserAiCredential(session.user.id);
     if (!saved) {
       return NextResponse.json(
         {
           success: false,
-          error: { message: 'No API key provided or saved to test.', code: 'VALIDATION_ERROR' },
+          error: { message: 'No API key provided to test. Please enter your key.', code: 'VALIDATION_ERROR' },
+        },
+        { status: 400 },
+      );
+    }
+    if (provider && saved.provider !== provider) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: { message: `Please enter your ${provider} API key before testing.`, code: 'VALIDATION_ERROR' },
         },
         { status: 400 },
       );

@@ -9,7 +9,7 @@ export class GeminiProvider extends BaseProvider {
     super({
       apiKey: options.apiKey ?? process.env.GEMINI_API_KEY,
       baseUrl: 'https://generativelanguage.googleapis.com',
-      defaultModel: options.defaultModel ?? 'gemini-3.5-flash',
+      defaultModel: options.defaultModel ?? 'gemini-2.0-flash',
       timeout: options.timeout,
     });
   }
@@ -51,8 +51,15 @@ export class GeminiProvider extends BaseProvider {
     );
 
     if (!response.ok) {
+      let detail = `${response.status} ${response.statusText}`;
+      try {
+        const errJson = (await response.json()) as { error?: { message?: string } };
+        if (errJson?.error?.message) {
+          detail = `${response.status} (${errJson.error.message})`;
+        }
+      } catch {}
       throw new ProviderRequestError(
-        `Gemini request failed: ${response.status}`,
+        `Gemini request failed: ${detail}`,
         this.name,
         response.status,
       );

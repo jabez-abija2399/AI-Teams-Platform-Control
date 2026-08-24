@@ -35,7 +35,7 @@ export const AI_PROVIDER_CATALOG: readonly AiProviderCatalogEntry[] = [
     id: 'gemini',
     name: 'Google Gemini',
     description: 'Fast Gemini models — recommended free starting point for this platform.',
-    defaultModel: 'gemini-2.5-flash',
+    defaultModel: 'gemini-2.0-flash',
     keyPlaceholder: 'AIza...',
     docsUrl: 'https://aistudio.google.com/apikey',
     pricing: 'free_tier',

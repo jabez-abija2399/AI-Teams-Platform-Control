@@ -26,8 +26,15 @@ export class OpenAICompatProvider extends BaseProvider {
     });
 
     if (!response.ok) {
+      let detail = `${response.status} ${response.statusText}`;
+      try {
+        const errJson = (await response.json()) as { error?: { message?: string } };
+        if (errJson?.error?.message) {
+          detail = `${response.status} (${errJson.error.message})`;
+        }
+      } catch {}
       throw new ProviderRequestError(
-        `OpenAI-compat request failed: ${response.status}`,
+        `${this.name} request failed: ${detail}`,
         this.name,
         response.status,
       );
