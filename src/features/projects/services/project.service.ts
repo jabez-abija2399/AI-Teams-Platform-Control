@@ -7,12 +7,13 @@ import {
 } from '@/features/projects/schemas/project.schema';
 import type { ApiResult } from '@/types/common.types';
 import type { Project, Task } from '../../../../prisma/generated/prisma/client';
+import { checkProjectAccess } from '@/lib/project-access';
+import { ensureDatabaseSchema } from '@/lib/db-schema-sync';
 
 export type ProjectWithTasks = Project & {
   tasks?: Task[];
   _count?: { tasks: number };
 };
-import { checkProjectAccess } from '@/lib/project-access';
 
 export async function createProject(
   ownerId: string,
@@ -29,6 +30,9 @@ export async function createProject(
       },
     };
   }
+
+  // Ensure DB columns exist if remote DB is unmigrated
+  await ensureDatabaseSchema().catch(() => {});
 
   try {
     // 1. Ensure owner user exists in DB
@@ -69,23 +73,48 @@ export async function createProject(
           : 'nextjs-fullstack-v1';
 
     // 2. Create project record in DB
-    const project = await prisma.project.create({
-      data: {
-        ...projectData,
-        slug,
-        ownerId,
-        organizationId: validOrgId,
-        selectedStackId,
-        selectedStackVersion: '1.0.0',
-        stackSource: 'PLATFORM_TEMPLATE',
-        status: 'IN_PROGRESS',
-        favorite: true,
-      },
-      include: {
-        tasks: true,
-        _count: { select: { tasks: true } },
-      },
-    });
+    let project: Project;
+    try {
+      project = await prisma.project.create({
+        data: {
+          ...projectData,
+          slug,
+          ownerId,
+          organizationId: validOrgId,
+          selectedStackId,
+          selectedStackVersion: '1.0.0',
+          stackSource: 'PLATFORM_TEMPLATE',
+          status: 'IN_PROGRESS',
+          favorite: true,
+        },
+        include: {
+          tasks: true,
+          _count: { select: { tasks: true } },
+        },
+      });
+    } catch (createErr: any) {
+      // If error mentions missing column, run auto-sync and retry
+      console.warn('[ProjectService] First create attempt failed, running schema sync & retry:', createErr?.message);
+      await ensureDatabaseSchema().catch(() => {});
+
+      project = await prisma.project.create({
+        data: {
+          ...projectData,
+          slug,
+          ownerId,
+          organizationId: validOrgId,
+          selectedStackId,
+          selectedStackVersion: '1.0.0',
+          stackSource: 'PLATFORM_TEMPLATE',
+          status: 'IN_PROGRESS',
+          favorite: true,
+        },
+        include: {
+          tasks: true,
+          _count: { select: { tasks: true } },
+        },
+      });
+    }
 
     if (stack) {
       try {
