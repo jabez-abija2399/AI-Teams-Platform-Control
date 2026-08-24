@@ -7,13 +7,13 @@ interface RoutePreference {
 }
 
 const TASK_ROUTING: Record<TaskCategory, RoutePreference[]> = {
-  CODING: [{ provider: 'groq', model: 'llama-3.3-70b-versatile' }, { provider: 'openrouter', model: 'openai/gpt-4o-mini' }],
-  ARCHITECTURE: [{ provider: 'groq', model: 'llama-3.3-70b-versatile' }, { provider: 'gemini', model: 'gemini-2.0-flash' }],
-  PLANNING: [{ provider: 'groq', model: 'llama-3.3-70b-versatile' }, { provider: 'gemini', model: 'gemini-2.0-flash' }],
-  TESTING: [{ provider: 'groq', model: 'llama-3.3-70b-versatile' }, { provider: 'gemini', model: 'gemini-2.0-flash' }],
-  DOCUMENTATION: [{ provider: 'groq', model: 'llama-3.3-70b-versatile' }, { provider: 'gemini', model: 'gemini-2.0-flash' }],
-  ANALYSIS: [{ provider: 'gemini', model: 'gemini-2.0-flash' }, { provider: 'groq', model: 'llama-3.3-70b-versatile' }],
-  CONVERSATION: [{ provider: 'groq', model: 'llama-3.3-70b-versatile' }, { provider: 'gemini', model: 'gemini-2.0-flash' }],
+  CODING: [{ provider: 'gemini', model: 'gemini-2.5-flash' }, { provider: 'groq', model: 'openai/gpt-oss-120b' }],
+  ARCHITECTURE: [{ provider: 'gemini', model: 'gemini-2.5-flash' }, { provider: 'groq', model: 'openai/gpt-oss-120b' }],
+  PLANNING: [{ provider: 'gemini', model: 'gemini-2.5-flash' }, { provider: 'groq', model: 'openai/gpt-oss-120b' }],
+  TESTING: [{ provider: 'gemini', model: 'gemini-2.5-flash' }, { provider: 'groq', model: 'openai/gpt-oss-120b' }],
+  DOCUMENTATION: [{ provider: 'gemini', model: 'gemini-2.5-flash' }, { provider: 'groq', model: 'openai/gpt-oss-120b' }],
+  ANALYSIS: [{ provider: 'gemini', model: 'gemini-2.5-flash' }, { provider: 'groq', model: 'openai/gpt-oss-120b' }],
+  CONVERSATION: [{ provider: 'gemini', model: 'gemini-2.5-flash' }, { provider: 'groq', model: 'openai/gpt-oss-120b' }],
 };
 
 export function routeForTask(category: TaskCategory, overrideProvider?: AIProviderName): RoutePreference[] {

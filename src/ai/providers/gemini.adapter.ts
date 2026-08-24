@@ -9,7 +9,7 @@ export class GeminiProvider extends BaseProvider {
     super({
       apiKey: options.apiKey ?? process.env.GEMINI_API_KEY,
       baseUrl: 'https://generativelanguage.googleapis.com',
-      defaultModel: options.defaultModel ?? 'gemini-2.0-flash',
+      defaultModel: options.defaultModel ?? 'gemini-2.5-flash',
       timeout: options.timeout,
     });
   }

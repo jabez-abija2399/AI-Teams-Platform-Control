@@ -30,13 +30,13 @@ function getProviderConfig(): AIServiceConfig {
       },
       gemini: {
         apiKey: process.env.GEMINI_API_KEY,
-        defaultModel: 'gemini-3.5-flash-lite',
+        defaultModel: 'gemini-2.5-flash',
         enabled: !!process.env.GEMINI_API_KEY,
       },
       groq: {
         apiKey: process.env.GROQ_API_KEY,
         baseUrl: 'https://api.groq.com/openai/v1',
-        defaultModel: 'llama-3.3-70b-versatile',
+        defaultModel: 'openai/gpt-oss-120b',
         enabled: !!process.env.GROQ_API_KEY,
       },
       openrouter: {

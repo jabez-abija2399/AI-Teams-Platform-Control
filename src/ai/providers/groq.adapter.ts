@@ -7,7 +7,7 @@ export class GroqProvider extends OpenAICompatProvider {
     super({
       apiKey: options.apiKey ?? process.env.GROQ_API_KEY,
       baseUrl: 'https://api.groq.com/openai/v1',
-      defaultModel: options.defaultModel ?? 'llama-3.3-70b-versatile',
+      defaultModel: options.defaultModel ?? 'openai/gpt-oss-120b',
       timeout: options.timeout,
     });
   }
