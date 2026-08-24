@@ -4,10 +4,11 @@ import { ListTodo } from 'lucide-react';
 import type { Project, Task } from '../../../../prisma/generated/prisma/client';
 
 interface ProjectDetailsProps {
-  project: Project & { tasks: Task[] };
+  project: Project & { tasks?: Task[] };
 }
 
 export function ProjectDetails({ project }: ProjectDetailsProps) {
+  const tasks = project.tasks || [];
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
@@ -20,7 +21,7 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
 
       <div>
         <h2 className="mb-3 text-sm font-medium">Tasks</h2>
-        {project.tasks.length === 0 ? (
+        {tasks.length === 0 ? (
           <EmptyState
             icon={ListTodo}
             title="No tasks yet"
@@ -28,7 +29,7 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
           />
         ) : (
           <ul className="space-y-2">
-            {project.tasks.map((t) => (
+            {tasks.map((t) => (
               <li key={t.id} className="rounded-md border p-3 text-sm">
                 {t.title}
               </li>

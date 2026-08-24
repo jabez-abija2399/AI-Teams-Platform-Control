@@ -6,7 +6,12 @@ import {
   type UpdateProjectInput,
 } from '@/features/projects/schemas/project.schema';
 import type { ApiResult } from '@/types/common.types';
-import type { Project } from '../../../../prisma/generated/prisma/client';
+import type { Project, Task } from '../../../../prisma/generated/prisma/client';
+
+export type ProjectWithTasks = Project & {
+  tasks?: Task[];
+  _count?: { tasks: number };
+};
 import { checkProjectAccess } from '@/lib/project-access';
 
 export async function createProject(
@@ -154,7 +159,7 @@ export async function listProjects(ownerId: string): Promise<Project[]> {
       where: {
         OR: [
           { ownerId },
-          { organization: { memberships: { some: { userId: ownerId } } } },
+          { organization: { members: { some: { userId: ownerId } } } },
         ],
         status: { not: 'ARCHIVED' },
       },
@@ -169,14 +174,14 @@ export async function listProjects(ownerId: string): Promise<Project[]> {
   }
 }
 
-export async function getProject(projectId: string, ownerId: string): Promise<Project | null> {
+export async function getProject(projectId: string, ownerId: string): Promise<ProjectWithTasks | null> {
   try {
     const project = await prisma.project.findFirst({
       where: {
         id: projectId,
         OR: [
           { ownerId },
-          { organization: { memberships: { some: { userId: ownerId } } } },
+          { organization: { members: { some: { userId: ownerId } } } },
         ],
       },
       include: {
