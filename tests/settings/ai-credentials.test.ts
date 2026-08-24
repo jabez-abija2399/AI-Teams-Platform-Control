@@ -81,4 +81,24 @@ describe('AI Credentials & BYOK Security', () => {
       expect(shortResult.error.message).toMatch(/too short/i);
     }
   });
+
+  it('5. Rejects non-key passwords with descriptive prefix guidance', async () => {
+    const groqPassword = await testAiCredential({
+      provider: 'groq',
+      apiKey: 'Abija@2399',
+    });
+    expect(groqPassword.success).toBe(false);
+    if (!groqPassword.success) {
+      expect(groqPassword.error.message).toMatch(/Invalid Groq API key.*gsk_/i);
+    }
+
+    const geminiPassword = await testAiCredential({
+      provider: 'gemini',
+      apiKey: 'Abija@2399',
+    });
+    expect(geminiPassword.success).toBe(false);
+    if (!geminiPassword.success) {
+      expect(geminiPassword.error.message).toMatch(/Invalid Google Gemini API key/i);
+    }
+  });
 });

@@ -4,6 +4,8 @@ import type { ApiResult } from '@/types/common.types';
 const ERROR_STATUS: Record<string, number> = {
   VALIDATION_ERROR: 400,
   API_KEY_REQUIRED: 400,
+  AUTH_ERROR: 400,
+  INVALID_CREDENTIALS: 400,
   NOT_FOUND: 404,
   UNAUTHORIZED: 401,
   FORBIDDEN: 403,
@@ -11,6 +13,8 @@ const ERROR_STATUS: Record<string, number> = {
   CONFLICT: 409,
   INVALID_STATE: 409,
   RATE_LIMITED: 429,
+  PAYMENT_REQUIRED: 402,
+  QUOTA_EXCEEDED: 429,
 };
 
 export function toResponse<T>(result: ApiResult<T>, successStatus = 200) {

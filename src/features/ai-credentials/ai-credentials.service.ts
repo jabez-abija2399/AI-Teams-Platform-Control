@@ -124,6 +124,39 @@ export async function testAiCredential(input: {
     };
   }
 
+  if (input.provider === 'groq' && !apiKey.startsWith('gsk_')) {
+    return {
+      success: false,
+      error: {
+        message:
+          'Invalid Groq API key. Groq keys start with "gsk_". Please copy your key from console.groq.com/keys.',
+        code: 'VALIDATION_ERROR',
+      },
+    };
+  }
+
+  if (input.provider === 'gemini' && !apiKey.startsWith('AIza') && !apiKey.startsWith('AQ.')) {
+    return {
+      success: false,
+      error: {
+        message:
+          'Invalid Google Gemini API key. Gemini keys start with "AIza…" or "AQ…". Please copy your key from aistudio.google.com/apikey.',
+        code: 'VALIDATION_ERROR',
+      },
+    };
+  }
+
+  if (input.provider === 'openrouter' && !apiKey.startsWith('sk-or-')) {
+    return {
+      success: false,
+      error: {
+        message:
+          'Invalid OpenRouter API key. OpenRouter keys start with "sk-or-". Please copy your key from openrouter.ai/keys.',
+        code: 'VALIDATION_ERROR',
+      },
+    };
+  }
+
   const entry = getProviderCatalogEntry(input.provider);
   const primaryModel = (input.defaultModel?.trim() || entry?.defaultModel || '').slice(0, 120);
 
@@ -202,6 +235,39 @@ export async function upsertAiCredential(
       success: false,
       error: {
         message: 'API key looks too short. Paste the full key from your provider.',
+        code: 'VALIDATION_ERROR',
+      },
+    };
+  }
+
+  if (input.provider === 'groq' && !apiKey.startsWith('gsk_')) {
+    return {
+      success: false,
+      error: {
+        message:
+          'Invalid Groq API key. Groq keys start with "gsk_". Please copy your key from console.groq.com/keys.',
+        code: 'VALIDATION_ERROR',
+      },
+    };
+  }
+
+  if (input.provider === 'gemini' && !apiKey.startsWith('AIza') && !apiKey.startsWith('AQ.')) {
+    return {
+      success: false,
+      error: {
+        message:
+          'Invalid Google Gemini API key. Gemini keys start with "AIza…" or "AQ…". Please copy your key from aistudio.google.com/apikey.',
+        code: 'VALIDATION_ERROR',
+      },
+    };
+  }
+
+  if (input.provider === 'openrouter' && !apiKey.startsWith('sk-or-')) {
+    return {
+      success: false,
+      error: {
+        message:
+          'Invalid OpenRouter API key. OpenRouter keys start with "sk-or-". Please copy your key from openrouter.ai/keys.',
         code: 'VALIDATION_ERROR',
       },
     };
