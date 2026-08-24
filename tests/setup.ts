@@ -66,6 +66,11 @@ const modelHandler: ProxyHandler<Record<string, unknown>> = {
           return Promise.resolve(rec);
         }
         let match = records.find((r) => {
+          if (Array.isArray(where.OR)) {
+            return where.OR.some((subWhere: Record<string, unknown>) =>
+              Object.entries(subWhere).every(([k, v]) => r[k] === v),
+            );
+          }
           return Object.entries(where).every(([k, v]) => {
             if (k === 'execution' && v && typeof v === 'object' && 'projectId' in v) {
               const execStore = getModelStore('projectExecution');
@@ -178,10 +183,20 @@ const modelHandler: ProxyHandler<Record<string, unknown>> = {
         const model = _target as unknown as { __modelName: string };
         const tableName = (model as unknown as Record<string, string>).__modelName;
         const s = getModelStore(tableName);
-        const id = where?.id as string;
-        const existing = s.get(id) ?? {};
-        let updated = { ...existing, ...data, id };
-        if (id) s.set(id, updated);
+        let existingKey = where?.id as string | undefined;
+        let existing = existingKey ? s.get(existingKey) : null;
+        if (!existing && where) {
+          for (const [k, v] of Array.from(s.entries())) {
+            if (Object.entries(where).every(([wk, wv]) => (v as any)[wk] === wv)) {
+              existingKey = k;
+              existing = v;
+              break;
+            }
+          }
+        }
+        const recordKey = existingKey || (where?.id as string) || (data?.id as string) || (where?.projectId as string) || generateId();
+        let updated = { ...(existing ?? {}), ...data, id: recordKey };
+        s.set(recordKey, updated);
         if (include?.execution && updated.executionId) {
           const execStore = getModelStore('projectExecution');
           updated = { ...updated, execution: execStore.get(updated.executionId as string) || { id: updated.executionId, projectId: 'mock-proj' } };

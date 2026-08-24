@@ -134,6 +134,11 @@ export class ArchitectureApprovalService {
    * Gets current architecture approval status
    */
   public static async getApprovalStatus(projectId: string): Promise<ArchitectureApprovalStatus | 'PENDING'> {
+    const memStatus = inMemoryArchStatusStore.get(projectId);
+    if (memStatus === 'ARCHITECTURE_REJECTED') {
+      return 'ARCHITECTURE_REJECTED';
+    }
+
     const record = await prisma.architectureProposal.findUnique({
       where: { projectId },
     }).catch(() => null);
@@ -142,6 +147,6 @@ export class ArchitectureApprovalService {
       return record.approved ? 'ARCHITECTURE_APPROVED' : 'WAITING_FOR_ARCHITECTURE_APPROVAL';
     }
 
-    return inMemoryArchStatusStore.get(projectId) ?? 'PENDING';
+    return memStatus ?? 'PENDING';
   }
 }
