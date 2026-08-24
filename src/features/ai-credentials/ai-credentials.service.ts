@@ -125,41 +125,64 @@ export async function testAiCredential(input: {
   }
 
   const entry = getProviderCatalogEntry(input.provider);
-  const model = (input.defaultModel?.trim() || entry?.defaultModel || '').slice(0, 120);
+  const primaryModel = (input.defaultModel?.trim() || entry?.defaultModel || '').slice(0, 120);
+
+  const fallbackCandidateMap: Record<string, string[]> = {
+    gemini: ['gemini-2.5-flash', 'gemini-3.5-flash', 'gemini-3.5-flash-lite'],
+    groq: ['openai/gpt-oss-120b', 'openai/gpt-oss-20b', 'qwen/qwen3.6-27b', 'groq/compound'],
+    openrouter: ['openai/gpt-4o-mini', 'anthropic/claude-3.5-sonnet'],
+    openai: ['gpt-4o-mini', 'gpt-4o'],
+    anthropic: ['claude-3-5-sonnet-20241022', 'claude-3-5-haiku-20241022'],
+    deepseek: ['deepseek-chat'],
+  };
+
+  const candidateModels = Array.from(
+    new Set([primaryModel, ...(fallbackCandidateMap[input.provider] || [])]),
+  ).filter(Boolean);
 
   const startTime = Date.now();
-  try {
-    const adapter = createProviderWithApiKey(input.provider as AIProviderName, apiKey, model);
-    const res = await Promise.race([
-      adapter.generate({
-        messages: [{ role: 'user', content: 'Say "connected" in one word.' }],
-        temperature: 0.1,
-        maxTokens: 10,
-        model: model || undefined,
-      }),
-      new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error('Connection test timed out after 15s')), 15000),
-      ),
-    ]);
+  let lastError: Error | null = null;
 
-    return {
-      success: true,
-      data: {
-        latencyMs: Date.now() - startTime,
-        provider: input.provider,
-        model: res.model || model || 'default',
-      },
-    };
-  } catch (err: any) {
-    const raw = err?.message || String(err);
-    return {
-      success: false,
-      error: {
-        message: `API Key verification failed: ${raw}`,
-        code: 'AUTH_ERROR',
-      },
-    };
+  for (const modelToTest of candidateModels) {
+    try {
+      const adapter = createProviderWithApiKey(input.provider as AIProviderName, apiKey, modelToTest);
+      const res = await Promise.race([
+        adapter.generate({
+          messages: [{ role: 'user', content: 'Say "connected" in one word.' }],
+          temperature: 0.1,
+          maxTokens: 10,
+          model: modelToTest || undefined,
+        }),
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('Connection test timed out after 15s')), 15000),
+        ),
+      ]);
+
+      return {
+        success: true,
+        data: {
+          latencyMs: Date.now() - startTime,
+          provider: input.provider,
+          model: res.model || modelToTest || 'default',
+        },
+      };
+    } catch (err: any) {
+      lastError = err instanceof Error ? err : new Error(String(err));
+      // If error is 401/auth failure, don't keep trying models with an invalid key
+      if (/401|unauthorized|invalid.*key/i.test(lastError.message)) {
+        break;
+      }
+    }
   }
+
+  const raw = lastError?.message || 'Connection test failed';
+  return {
+    success: false,
+    error: {
+      message: `API Key verification failed: ${raw}`,
+      code: 'AUTH_ERROR',
+    },
+  };
 }
 
 export async function upsertAiCredential(

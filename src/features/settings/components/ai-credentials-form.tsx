@@ -40,7 +40,7 @@ export function AiCredentialsForm({ embedded = false, onConfigured, className }:
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState(false);
-  const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
+  const [testResult, setTestResult] = useState<{ success: boolean; message: string; model?: string; latencyMs?: number } | null>(null);
   const [removing, setRemoving] = useState(false);
   const [status, setStatus] = useState<AiCredentialPublicStatus | null>(null);
   const [providers, setProviders] = useState<AiProviderCatalogEntry[]>([]);
@@ -85,13 +85,21 @@ export function AiCredentialsForm({ embedded = false, onConfigured, className }:
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleTestConnection = async () => {
+  const handleTestConnection = async (explicitKey?: string) => {
     if (!selected || testing) return;
     setTesting(true);
     setTestResult(null);
     setError(null);
 
-    const keyToTest = apiKey.trim();
+    const keyToTest = (explicitKey ?? apiKey).trim();
+
+    if (!keyToTest && (!status?.configured || status?.provider !== selected.id)) {
+      const msg = `Please enter your ${selected.name} API key in the field below before testing.`;
+      setError(msg);
+      toast.error('API Key Required', { description: msg });
+      setTesting(false);
+      return;
+    }
 
     try {
       const res = await fetch('/api/settings/ai-credentials/test', {
@@ -109,8 +117,13 @@ export function AiCredentialsForm({ embedded = false, onConfigured, className }:
         throw new Error(json?.error?.message || 'Connection test failed');
       }
 
-      const msg = `Connected successfully (${json.data.model} in ${json.data.latencyMs}ms)`;
-      setTestResult({ success: true, message: msg });
+      const msg = `Successfully connected to ${selected.name} (${json.data.model} · ${json.data.latencyMs}ms)`;
+      setTestResult({
+        success: true,
+        message: msg,
+        model: json.data.model,
+        latencyMs: json.data.latencyMs,
+      });
       toast.success('Connection Verified', { description: msg });
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Verification failed';
@@ -151,8 +164,8 @@ export function AiCredentialsForm({ embedded = false, onConfigured, className }:
       }
       setStatus(json.data);
       setApiKey('');
-      toast.success('API Key Saved', {
-        description: `${json.data.providerName} is now active for your AI company.`,
+      toast.success('API Key Saved & Connected', {
+        description: `${json.data.providerName} is now active and powering your AI software company.`,
       });
       onConfigured?.(json.data);
     } catch (err) {
@@ -246,7 +259,7 @@ export function AiCredentialsForm({ embedded = false, onConfigured, className }:
               onClick={() => void handleTestConnection()}
             >
               {testing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Zap className="h-3.5 w-3.5 text-primary" />}
-              Test Connection
+              Test Saved Connection
             </Button>
             <Button
               type="button"
@@ -266,18 +279,21 @@ export function AiCredentialsForm({ embedded = false, onConfigured, className }:
       {testResult && (
         <div
           className={cn(
-            'flex items-start gap-2.5 rounded-xl border p-3.5 text-xs',
+            'flex items-start gap-2.5 rounded-xl border p-4 text-xs transition-all',
             testResult.success
-              ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300'
-              : 'border-destructive/30 bg-destructive/10 text-destructive',
+              ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-800 dark:text-emerald-200'
+              : 'border-destructive/40 bg-destructive/10 text-destructive',
           )}
         >
           {testResult.success ? (
-            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
+            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
           ) : (
             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
           )}
-          <span className="font-medium">{testResult.message}</span>
+          <div className="flex-1">
+            <span className="font-semibold">{testResult.success ? 'API Connection Verified' : 'Connection Test Failed'}</span>
+            <p className="mt-0.5 font-normal leading-relaxed opacity-90">{testResult.message}</p>
+          </div>
         </div>
       )}
 
@@ -330,13 +346,13 @@ export function AiCredentialsForm({ embedded = false, onConfigured, className }:
 
         <div className="space-y-2 pt-2">
           <label htmlFor="ai-api-key" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-            {status?.configured ? 'New / Replace API Key' : `${selected?.name || ''} API Key`}
+            {status?.configured && status.provider === selected?.id ? 'Update API Key' : `${selected?.name || ''} API Key`}
           </label>
           <div className="relative">
             <input
               id="ai-api-key"
               type={showKey ? 'text' : 'password'}
-              required
+              required={!status?.configured}
               autoComplete="off"
               value={apiKey}
               onChange={(e) => {
@@ -366,32 +382,30 @@ export function AiCredentialsForm({ embedded = false, onConfigured, className }:
           <Button
             type="submit"
             className="flex-1 rounded-xl font-bold h-11"
-            disabled={saving || apiKey.trim().length < 8}
+            disabled={saving || (apiKey.trim().length < 8 && !status?.configured)}
           >
             {saving ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Encrypting & Saving…
               </>
-            ) : status?.configured ? (
-              'Update API Key'
+            ) : status?.configured && status.provider === selected?.id ? (
+              'Update Saved Key'
             ) : (
               'Save & Connect API Key'
             )}
           </Button>
 
-          {apiKey.trim().length >= 8 && (
-            <Button
-              type="button"
-              variant="outline"
-              className="h-11 rounded-xl font-medium px-4"
-              disabled={testing || saving}
-              onClick={() => void handleTestConnection()}
-            >
-              {testing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4 text-primary mr-1.5" />}
-              Test Before Saving
-            </Button>
-          )}
+          <Button
+            type="button"
+            variant="outline"
+            className="h-11 rounded-xl font-medium px-4 gap-1.5"
+            disabled={testing || saving}
+            onClick={() => void handleTestConnection()}
+          >
+            {testing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4 text-primary" />}
+            {apiKey.trim().length >= 8 ? 'Test API Key' : 'Test Connection'}
+          </Button>
         </div>
       </form>
 
