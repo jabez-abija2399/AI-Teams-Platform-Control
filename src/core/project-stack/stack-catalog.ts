@@ -33,9 +33,9 @@ export const DEFAULT_PROJECT_STACK: Exclude<ProjectStackId, 'unknown'> = 'static
 export const STACK_CATALOG: Record<Exclude<ProjectStackId, 'unknown'>, StackCatalogEntry> = {
   'static-html': {
     id: 'static-html',
-    label: 'HTML + CSS (static)',
+    label: 'HTML5 + CSS3 + JS (Static Site)',
     shortLabel: 'HTML/CSS',
-    description: 'Plain pages — login.html, signup.html, styles.css. No framework.',
+    description: 'Zero-framework pure web pages: semantic HTML, modern CSS, and vanilla JavaScript.',
     plainLanguage: 'Simple website pages. Best if you are not sure — no setup, instant Preview.',
     honesty:
       'Preview is instant in the browser (srcDoc). No install, no WebContainer. Best for static demos.',
@@ -47,9 +47,9 @@ export const STACK_CATALOG: Record<Exclude<ProjectStackId, 'unknown'>, StackCata
   },
   react: {
     id: 'react',
-    label: 'React (Vite SPA)',
-    shortLabel: 'React',
-    description: 'React SPA with Vite — full app preview in WebContainer when package.json exists.',
+    label: 'React + Vite (Frontend SPA)',
+    shortLabel: 'React SPA',
+    description: 'Interactive client-side single-page application with Vite, React 19, and Tailwind CSS.',
     plainLanguage: 'Interactive single-page app. Choose this when you want richer UI behavior.',
     honesty:
       'WebContainer runs Vite (~20–60s first boot). If Vite files are missing, we fall back to fast Babel for a single component.',
@@ -59,15 +59,15 @@ export const STACK_CATALOG: Record<Exclude<ProjectStackId, 'unknown'>, StackCata
   },
   nextjs: {
     id: 'nextjs',
-    label: 'Next.js (App Router)',
-    shortLabel: 'Next.js',
-    description: 'Next.js app with package.json, app router, and optional APIs.',
+    label: 'Next.js 15 (Full Stack Golden Path)',
+    shortLabel: 'Next.js 15',
+    description: 'Production full-stack: App Router, TypeScript, Tailwind CSS, shadcn/ui, PostgreSQL + Prisma, and Vitest.',
     plainLanguage: 'Full web app with server features. For teams that need APIs and routing.',
     honesty:
       'Real Next.dev runs in WebContainer — expect ~30–90s first boot (npm install). Babel fallback shows UI sooner but is not a full Next server.',
     previewStrategy: 'webcontainer',
     usesWebContainer: true,
-    speed: '~30–90s first boot',
+    speed: 'Golden Path',
   },
 };
 

@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { ProjectLifecycleService } from '@/core/company-orchestration';
 import { prisma } from '@/lib/prisma';
-import { getProject } from '@/features/projects/services/project.service';
+import { createProject, getProject } from '@/features/projects/services/project.service';
 
 describe('Pipeline Start & Project Resilience', () => {
   const testOwnerId = 'test-owner-123';
@@ -19,16 +19,23 @@ describe('Pipeline Start & Project Resilience', () => {
     });
   });
 
-  it('1. getProject auto-persists project so it exists in database', async () => {
-    const project = await getProject(testProjectId, testOwnerId);
-    expect(project).toBeDefined();
-    expect(project.id).toBe(testProjectId);
-
-    const dbRecord = await prisma.project.findUnique({
-      where: { id: testProjectId },
+  it('1. createProject persists authentic project name, description and stack', async () => {
+    const created = await createProject(testOwnerId, {
+      name: 'Custom SaaS Billing Platform',
+      description: 'A full subscription billing portal with invoice downloads',
+      stack: 'nextjs',
     });
-    expect(dbRecord).not.toBeNull();
-    expect(dbRecord?.id).toBe(testProjectId);
+
+    expect(created.success).toBe(true);
+    if (created.success) {
+      expect(created.data.name).toBe('Custom SaaS Billing Platform');
+      expect(created.data.description).toBe('A full subscription billing portal with invoice downloads');
+      expect(created.data.selectedStackId).toBe('nextjs-fullstack-v1');
+
+      const fetched = await getProject(created.data.id, testOwnerId);
+      expect(fetched).not.toBeNull();
+      expect(fetched?.name).toBe('Custom SaaS Billing Platform');
+    }
   });
 
   it('2. startLifecycle starts pipeline without "Project not found" error', async () => {
