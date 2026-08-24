@@ -7,39 +7,48 @@ interface Params {
 }
 
 export async function GET(_request: Request, { params }: Params) {
+  try {
+    const { id } = await params;
 
-  const { id } = await params;
+    // Check in-memory build state first (fast path)
+    const buildState = getBuildState(id);
+    if (buildState) {
+      return NextResponse.json({
+        success: true,
+        data: {
+          exists: false,
+          running: true,
+          progress: buildState.progress,
+        },
+      });
+    }
 
-  // Check in-memory build state first (fast path)
-  const buildState = getBuildState(id);
-  if (buildState) {
-    return NextResponse.json({
-      success: true,
-      data: {
-        exists: false,
-        running: true,
-        progress: buildState.progress,
-      },
-    });
+    // Fall back to DB for completed builds
+    const doc = await prisma.document
+      .findFirst({ where: { projectId: id, type: 'DEVELOPMENT_SUMMARY' } })
+      .catch(() => null);
+
+    if (doc) {
+      const tasks = await prisma.developmentTask
+        .findMany({ where: { projectId: id }, include: { codeChanges: true } })
+        .catch(() => []);
+
+      return NextResponse.json({
+        success: true,
+        data: {
+          exists: true,
+          running: false,
+          summary: doc.content,
+          taskCount: tasks.length,
+          changeCount: tasks.reduce((sum, t) => sum + t.codeChanges.length, 0),
+          files: [...new Set(tasks.flatMap((t) => t.codeChanges.map((c) => c.file)))],
+        },
+      });
+    }
+
+    return NextResponse.json({ success: true, data: { exists: false, running: false } });
+  } catch (err: any) {
+    console.error('[API developer-status GET] Error:', err);
+    return NextResponse.json({ success: true, data: { exists: false, running: false } });
   }
-
-  // Fall back to DB for completed builds
-  const doc = await prisma.document.findFirst({ where: { projectId: id, type: 'DEVELOPMENT_SUMMARY' } });
-
-  if (doc) {
-    const tasks = await prisma.developmentTask.findMany({ where: { projectId: id }, include: { codeChanges: true } });
-    return NextResponse.json({
-      success: true,
-      data: {
-        exists: true,
-        running: false,
-        summary: doc.content,
-        taskCount: tasks.length,
-        changeCount: tasks.reduce((sum, t) => sum + t.codeChanges.length, 0),
-        files: [...new Set(tasks.flatMap((t) => t.codeChanges.map((c) => c.file)))],
-      },
-    });
-  }
-
-  return NextResponse.json({ success: true, data: { exists: false, running: false } });
 }
