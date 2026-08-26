@@ -176,6 +176,10 @@ export class ArtifactRegistryService {
       },
     }).catch(() => null);
 
+    if (version > 1 || type === 'USER_REVISION_FEEDBACK') {
+      void this.invalidateDownstreamArtifacts(projectId, type);
+    }
+
     return envelope;
   }
 
@@ -249,5 +253,72 @@ export class ArtifactRegistryService {
     }
 
     return trace;
+  }
+
+  /** Dependency graph of artifacts for automated stale invalidation */
+  public static readonly ARTIFACT_DEPENDENCY_GRAPH: Record<ArtifactType, ArtifactType[]> = {
+    PRODUCT_REQUIREMENTS_DOC: [
+      'ARCHITECTURE_SPECIFICATION',
+      'UI_DESIGN_SPECIFICATION',
+      'IMPLEMENTATION_DELIVERABLE',
+      'QA_VERIFICATION_REPORT',
+      'DEPLOYMENT_PACKAGE',
+    ],
+    ARCHITECTURE_SPECIFICATION: [
+      'IMPLEMENTATION_DELIVERABLE',
+      'QA_VERIFICATION_REPORT',
+      'DEPLOYMENT_PACKAGE',
+    ],
+    UI_DESIGN_SPECIFICATION: [
+      'IMPLEMENTATION_DELIVERABLE',
+      'QA_VERIFICATION_REPORT',
+    ],
+    IMPLEMENTATION_DELIVERABLE: [
+      'QA_VERIFICATION_REPORT',
+      'DEPLOYMENT_PACKAGE',
+    ],
+    QA_VERIFICATION_REPORT: ['DEPLOYMENT_PACKAGE'],
+    SECURITY_AUDIT_REPORT: ['DEPLOYMENT_PACKAGE'],
+    DEPLOYMENT_PACKAGE: [],
+    USER_REVISION_FEEDBACK: [
+      'PRODUCT_REQUIREMENTS_DOC',
+      'ARCHITECTURE_SPECIFICATION',
+      'UI_DESIGN_SPECIFICATION',
+      'IMPLEMENTATION_DELIVERABLE',
+      'QA_VERIFICATION_REPORT',
+    ],
+  };
+
+  /**
+   * Automatically marks all downstream dependent artifacts as STALE when an upstream artifact changes.
+   */
+  public static async invalidateDownstreamArtifacts(
+    projectId: string,
+    upstreamType: ArtifactType
+  ): Promise<ArtifactType[]> {
+    const downstream = this.ARTIFACT_DEPENDENCY_GRAPH[upstreamType] || [];
+    if (downstream.length === 0) return [];
+
+    const list = inMemoryArtifacts.get(projectId) || [];
+    for (const art of list) {
+      if (downstream.includes(art.metadata.type)) {
+        art.metadata.validationStatus = 'STALE';
+      }
+    }
+
+    // Persist stale status to DB
+    try {
+      await prisma.artifactLifecycleRecord.updateMany({
+        where: {
+          projectId,
+          artifactType: { in: downstream },
+        },
+        data: {
+          status: 'STALE',
+        },
+      });
+    } catch {}
+
+    return downstream;
   }
 }

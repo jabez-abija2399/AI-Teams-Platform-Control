@@ -72,4 +72,40 @@ describe('ArtifactRegistryService & Lineage Graph', () => {
     expect(lowQuality.overall).toBeLessThan(60);
     expect(lowQuality.verdict).toBe('REJECTED');
   });
+
+  it('should automatically invalidate downstream artifacts when an upstream artifact is revised', async () => {
+    const projId = 'proj_invalidation_test_99';
+
+    const prd1 = await ArtifactRegistryService.storeArtifact({
+      projectId: projId,
+      type: 'PRODUCT_REQUIREMENTS_DOC',
+      createdBy: 'PM',
+      payload: { version: 1, title: 'App v1' },
+      validationStatus: 'VALID',
+    });
+
+    const arch1 = await ArtifactRegistryService.storeArtifact({
+      projectId: projId,
+      type: 'ARCHITECTURE_SPECIFICATION',
+      createdBy: 'ARCHITECT',
+      payload: { stack: 'Next.js' },
+      sourceArtifactIds: [prd1.metadata.artifactId],
+      validationStatus: 'VALID',
+    });
+
+    expect(arch1.metadata.validationStatus).toBe('VALID');
+
+    // Revising PRD creates v2 and invalidates downstream architecture
+    await ArtifactRegistryService.storeArtifact({
+      projectId: projId,
+      type: 'PRODUCT_REQUIREMENTS_DOC',
+      createdBy: 'PM',
+      payload: { version: 2, title: 'App v2 with major scope change' },
+      validationStatus: 'VALID',
+    });
+
+    // Check arch1 status in registry
+    const latestArch = await ArtifactRegistryService.getLatestArtifact(projId, 'ARCHITECTURE_SPECIFICATION');
+    expect(latestArch?.metadata.validationStatus).toBe('STALE');
+  });
 });

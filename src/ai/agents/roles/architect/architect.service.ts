@@ -22,6 +22,7 @@ import { ProjectStateManager } from '@/core/state/project-state.manager';
 import { ArtifactRegistryService } from '@/core/artifacts/artifact-registry.service';
 import { AgentContractRegistry } from '@/core/contracts/agent-registry';
 import { ArtifactManager } from '@/core/company-orchestration/artifact-manager';
+import { RuntimeContractService } from '@/core/runtime-contract/runtime-contract.service';
 
 export { wantsHtmlCssStack, wantsStaticNoBackend };
 
@@ -421,6 +422,11 @@ async function persistArchitecture(
       consumerRoles: ['UI_UX', 'DEVELOPER', 'QA'],
       summary: `System Architecture, API design, and Database schema`,
     }),
+    RuntimeContractService.establishRuntimeContract({
+      projectId,
+      projectType: 'FULL_STACK',
+      stackId: 'nextjs-fullstack-v1',
+    }).catch(() => null),
     ProjectStateManager.updateState(projectId, (s) => {
       s.currentStage = 'ARCHITECTURE';
       s.architecture.systemOverview = `${analysis.architecture.frontend} | ${analysis.architecture.backend}`;

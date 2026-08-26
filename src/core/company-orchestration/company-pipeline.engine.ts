@@ -24,6 +24,7 @@ import {
   validatePhaseDeliverable,
 } from './phase-gate';
 import { updateWorkflowScalars, findWorkflowScalars } from './workflow-state-access';
+import { RootCauseDiagnoser } from '@/core/root-cause/root-cause-diagnoser';
 
 const phaseLoaders = {
   DISCOVERY_RUNNING: () => import('@/ai/agents/roles/product-discovery.agent'),
@@ -952,6 +953,8 @@ export class CompanyPipelineEngine {
     }
 
     const classified = classifyAiError(message);
+    const diagnosis = RootCauseDiagnoser.diagnose({ failureReason: message });
+
     await pulseGenerationHeartbeat(projectId, {
       message: classified.message,
       phase,
@@ -967,6 +970,7 @@ export class CompanyPipelineEngine {
       meta.resumePhase = phase;
       meta.blockedReason = classified.kind;
       meta.blockedAt = new Date().toISOString();
+      meta.rootCauseDiagnosis = diagnosis;
       meta.lastGenerationError = {
         message: classified.message,
         code: classified.code,

@@ -12,7 +12,7 @@ export type ArtifactType =
   | 'DEPLOYMENT_PACKAGE'
   | 'USER_REVISION_FEEDBACK';
 
-export type ArtifactValidationStatus = 'UNVALIDATED' | 'VALID' | 'INVALID' | 'FLAGGED';
+export type ArtifactValidationStatus = 'UNVALIDATED' | 'VALID' | 'INVALID' | 'FLAGGED' | 'STALE';
 
 export interface ArtifactQualityScore {
   completeness: number; // 0 - 100
