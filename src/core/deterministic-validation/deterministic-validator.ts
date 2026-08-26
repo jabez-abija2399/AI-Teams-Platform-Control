@@ -136,4 +136,69 @@ export class DeterministicValidator {
       rawFilesCount: fileEntries.length,
     };
   }
+
+  public static async validateAll(projectId: string): Promise<{
+    overallPassed: boolean;
+    results: ValidationStepResult[];
+  }> {
+    const { prisma } = await import('@/lib/prisma');
+    const files = await prisma.file.findMany({
+      where: { repository: { projectId } },
+      select: { path: true, content: true },
+    }).catch(() => []);
+
+    const fileMap: Record<string, string> = {};
+    for (const f of files) {
+      fileMap[f.path] = f.content;
+    }
+
+    const contract: ProjectRuntimeContract = {
+      schemaVersion: '1.0.0',
+      stackId: 'nextjs-fullstack-v1',
+      stackVersion: '1.0.0',
+      stackName: 'Next.js Fullstack',
+      projectType: 'FULL_STACK',
+      capabilities: {
+        frontend: true,
+        backend: true,
+        database: true,
+        authentication: true,
+        realtime: false,
+        backgroundJobs: false,
+        mobile: false,
+      },
+      runtime: {
+        language: 'typescript',
+        packageManager: 'npm',
+      },
+      services: [],
+      validation: {
+        typecheckCommand: 'npx tsc --noEmit',
+        buildCommand: 'npm run build',
+        testCommand: 'npm test',
+      },
+      preview: {
+        type: 'WEB',
+        defaultPort: 3000,
+        primaryServiceId: 'frontend',
+      },
+      filesystemStructure: {
+        requiredFiles: [],
+        entryPoints: { main: 'src/app/page.tsx' },
+      },
+      environmentRequirements: [],
+      resolvedAt: new Date().toISOString(),
+    };
+
+    const evidence = await this.validateFiles({
+      projectId,
+      files: fileMap,
+      contract,
+    });
+
+    return {
+      overallPassed: evidence.allPassed,
+      results: evidence.steps,
+    };
+  }
 }

@@ -471,6 +471,46 @@ export class ProjectLifecycleService {
   }
 
   /**
+   * Pauses an active lifecycle run safely at the current phase checkpoint.
+   */
+  public static async pauseLifecycle(
+    projectId: string,
+    reason?: string,
+  ): Promise<ApiResult<MissionControlStatus>> {
+    CompanyPipelineEngine.forceReleaseLock(projectId);
+    return WorkflowManager.transitionState(
+      projectId,
+      'PAUSED',
+      reason || 'Paused by user request',
+    );
+  }
+
+  /**
+   * Retries or re-executes a phase.
+   */
+  public static async retryFromPhase(
+    projectId: string,
+    targetPhase?: ProjectLifecycleState,
+  ): Promise<ApiResult<MissionControlStatus>> {
+    CompanyPipelineEngine.forceReleaseLock(projectId);
+    const phase = targetPhase || 'DISCOVERY_RUNNING';
+    const reopenRes = await WorkflowManager.forceReopenPhase(
+      projectId,
+      phase,
+      'User requested retry/reopen',
+    );
+    if (!reopenRes.success) return reopenRes;
+
+    setTimeout(() => {
+      CompanyPipelineEngine.runPipeline(projectId).catch((err) => {
+        console.error('[ProjectLifecycleService] retry runPipeline error:', err);
+      });
+    }, 50);
+
+    return reopenRes;
+  }
+
+  /**
    * Retrieves the comprehensive timeline of artifacts, handoffs, and approvals for a project.
    */
   public static async getTimeline(projectId: string): Promise<ApiResult<any>> {

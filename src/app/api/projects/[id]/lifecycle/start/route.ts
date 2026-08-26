@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { toResponse, unauthorizedResponse } from '@/lib/api-response';
-import { ProjectLifecycleService } from '@/core/company-orchestration';
+import { canonicalOrchestrator } from '@/core/canonical-orchestrator/canonical-core-orchestrator';
 import { userHasAiCredential } from '@/features/ai-credentials/ai-credentials.service';
 import { prisma } from '@/lib/prisma';
 
@@ -78,6 +78,6 @@ export async function POST(request: Request, { params }: Params) {
     // Body is optional
   }
 
-  const result = await ProjectLifecycleService.startLifecycle(id, userIdea);
+  const result = await canonicalOrchestrator.startMission(id, { userIdea });
   return toResponse(result);
 }
