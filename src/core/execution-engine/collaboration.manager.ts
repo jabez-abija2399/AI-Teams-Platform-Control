@@ -25,11 +25,11 @@ export class CollaborationManager {
   public async getRecentContext(projectId: string, limit = 10) {
     const messages = await prisma.agentMessage.findMany({
       where: { projectId },
-      orderBy: { createdAt: 'desc' },
+      orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
       take: limit,
     });
 
-    return messages.reverse().map((m) => ({
+    return messages.map((m) => ({
       from: m.sender,
       to: m.receiver,
       message: m.message,
