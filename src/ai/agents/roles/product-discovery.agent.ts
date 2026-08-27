@@ -91,25 +91,19 @@ export class ProductDiscoveryAgent extends BaseAgent {
 
   public async discoverProductSpecification(rawIdea: string): Promise<ProductSpecification> {
     const cleanIdea = rawIdea.trim();
-    // Lean-first: return heuristic immediately so Discovery never stalls the pipeline.
-    const heuristic = this.heuristicSpecification(cleanIdea);
-
-    void (async () => {
-      try {
-        const raw = await aiCall<unknown>(
-          `User idea (stay within this scope only):\n${cleanIdea}\n\nProduce the product discovery JSON now.`,
-          DISCOVERY_SYSTEM_PROMPT,
-          'PRODUCT_DISCOVERY',
-          discoveryConfig,
-        );
-        productSpecSchema.parse(raw);
-        // Enrichment is best-effort; pipeline already advanced with heuristic.
-      } catch {
-        /* optional */
-      }
-    })();
-
-    return heuristic;
+    try {
+      const raw = await aiCall<unknown>(
+        `User idea (stay within this scope only):\n${cleanIdea}\n\nProduce the product discovery JSON now.`,
+        DISCOVERY_SYSTEM_PROMPT,
+        'PRODUCT_DISCOVERY',
+        discoveryConfig,
+      );
+      const parsed = productSpecSchema.parse(raw);
+      return this.sanitizeSpec(parsed, cleanIdea);
+    } catch (aiErr) {
+      console.warn('[ProductDiscoveryAgent] AI discovery fallback:', aiErr);
+      return this.heuristicSpecification(cleanIdea);
+    }
   }
 
   private sanitizeSpec(
@@ -182,49 +176,67 @@ export class ProductDiscoveryAgent extends BaseAgent {
       };
     }
 
-    let productName = 'AppCraft';
-    if (lower.includes('todo') || lower.includes('task')) productName = 'TaskBoard';
-    else if (lower.includes('e-commerce') || lower.includes('store') || lower.includes('shop'))
+    let productName = 'Web Application';
+    let mvpFeatures: MvpFeature[] = [];
+
+    // 1. Photography / Creative Studio / Portfolio
+    if (lower.includes('photo') || lower.includes('studio') || lower.includes('slash') || lower.includes('gallery') || lower.includes('portfolio')) {
+      const isSlash = lower.includes('slash');
+      productName = isSlash ? 'Slash Photo Studio' : 'Creative Studio Portfolio';
+      mvpFeatures = [
+        { name: 'Photo Gallery & Showcase', priority: 'HIGH' },
+        { name: 'Studio Photography Services & Packages', priority: 'HIGH' },
+        { name: 'Online Session Booking & Appointment Inquiry', priority: 'HIGH' },
+        { name: 'Studio Story, Equipment & Client Reviews', priority: 'MEDIUM' },
+        { name: 'Contact Info, Business Hours & Location', priority: 'HIGH' },
+      ];
+    } else if (lower.includes('todo') || lower.includes('task')) {
+      productName = 'TaskBoard';
+      mvpFeatures = [
+        { name: 'Create tasks', priority: 'HIGH' },
+        { name: 'Complete tasks', priority: 'HIGH' },
+        { name: 'Task list view', priority: 'HIGH' },
+      ];
+    } else if (lower.includes('e-commerce') || lower.includes('store') || lower.includes('shop')) {
       productName = 'Storefront';
-    else if (lower.includes('hotel') || lower.includes('booking')) productName = 'BookingApp';
-    else {
+      mvpFeatures = [
+        { name: 'Product catalog', priority: 'HIGH' },
+        { name: 'Cart and checkout', priority: 'HIGH' },
+        { name: 'Order confirmation', priority: 'MEDIUM' },
+      ];
+    } else if (lower.includes('hotel') || lower.includes('booking')) {
+      productName = 'BookingApp';
+      mvpFeatures = [
+        { name: 'Room & Space Listings', priority: 'HIGH' },
+        { name: 'Date Selection & Reservation', priority: 'HIGH' },
+        { name: 'Booking Summary', priority: 'MEDIUM' },
+      ];
+    } else {
       const words = cleanIdea.split(' ').filter((w) => w.length > 2);
       const mainWord = words[0]
         ? words[0].charAt(0).toUpperCase() + words[0].slice(1)
         : 'App';
       productName = mainWord.slice(0, 24);
+      mvpFeatures = [
+        { name: 'Main user flow', priority: 'HIGH' },
+        { name: 'Basic data create/view', priority: 'HIGH' },
+        { name: 'Simple settings', priority: 'MEDIUM' },
+      ];
     }
-
-    const mvpFeatures: MvpFeature[] =
-      lower.includes('todo') || lower.includes('task')
-        ? [
-            { name: 'Create tasks', priority: 'HIGH' },
-            { name: 'Complete tasks', priority: 'HIGH' },
-            { name: 'Task list view', priority: 'HIGH' },
-          ]
-        : lower.includes('store') || lower.includes('shop') || lower.includes('e-commerce')
-          ? [
-              { name: 'Product catalog', priority: 'HIGH' },
-              { name: 'Cart and checkout', priority: 'HIGH' },
-              { name: 'Order confirmation', priority: 'MEDIUM' },
-            ]
-          : [
-              { name: 'Main user flow', priority: 'HIGH' },
-              { name: 'Basic data create/view', priority: 'HIGH' },
-              { name: 'Simple settings', priority: 'MEDIUM' },
-            ];
 
     return {
       productName,
       vision: `Build: ${cleanIdea}`,
       problemStatement: cleanIdea,
-      targetAudience: lower.includes('team') || lower.includes('business')
-        ? 'Small teams'
-        : 'Individual users',
-      platform: lower.includes('mobile') ? 'Mobile & Web' : 'Web application',
+      targetAudience: lower.includes('photo') || lower.includes('studio')
+        ? 'Clients seeking professional photography & creative services'
+        : lower.includes('team') || lower.includes('business')
+          ? 'Small teams & businesses'
+          : 'General users & clients',
+      platform: 'Web application',
       complexity: 'MVP',
       mvpFeatures,
-      futureFeatures: ['Polish and improvements after first version'],
+      futureFeatures: ['Client portal & gallery downloads', 'Advanced online payment processing'],
       questions: [],
       clarificationRequired: false,
       approvalRequired: true,

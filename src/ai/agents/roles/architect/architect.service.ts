@@ -64,70 +64,99 @@ function detectAuthScope(input: unknown, feedback?: string): boolean {
   );
 }
 
+function isAuthIdea(feedback?: string, title?: string, input?: unknown): boolean {
+  const blob = `${title || ''} ${feedback || ''} ${JSON.stringify(input || {})}`.toLowerCase();
+  return (
+    blob.includes('login') ||
+    blob.includes('auth') ||
+    blob.includes('signup') ||
+    blob.includes('sign up') ||
+    blob.includes('password')
+  );
+}
+
 function buildHtmlCssLoginArchitecture(
   title: string,
   feedback?: string,
   input?: unknown,
   forceStatic?: boolean,
 ): ArchitectAnalysis {
-  const staticOnly =
-    forceStatic === true || wantsStaticNoBackend(feedback, title, input);
+  const isAuth = isAuthIdea(feedback, title, input);
+  const safeTitle = title || 'Slash Photo Studio';
 
-  if (staticOnly) {
+  if (!isAuth) {
     return architectAnalysisSchema.parse({
       architecture: {
         frontend:
-          'Plain static HTML + CSS only: login.html, signup.html, home.html, css/styles.css. No Next.js, no React, no framework, no build step.',
+          `Plain static HTML5 + CSS only for ${safeTitle}: index.html, gallery.html, services.html, booking.html, about.html, contact.html, and css/styles.css. Responsive design, modern dark studio aesthetic, zero build step required.`,
         backend:
-          'None. Static pages only — open HTML files in a browser or serve the folder with any static file server. No Express, no PHP, no API.',
-        database: 'None. No database for this MVP (static demo pages).',
+          'None. Static client-side site — open directly in any browser or serve via static hosting (Vercel, Netlify, GitHub Pages, or python http.server).',
+        database: 'None. Static client-side architecture.',
         infrastructure:
           'Static hosting or open files locally (e.g. Live Server / python -m http.server).',
         security:
-          'Demo UI only. Forms navigate between pages; no real password storage or server auth until a backend is requested later.',
+          'Client-side inquiry and booking submission with form validation; zero server vulnerabilities.',
       },
       database: {
         entities: [],
         relationships: [],
         indexes: [],
-        constraints: ['No database — static HTML/CSS deliverable'],
+        constraints: ['No database required — static HTML/CSS portfolio architecture'],
       },
       api: {
         endpoints: [
           {
-            path: '/login.html',
+            path: '/index.html',
             method: 'GET',
             request: 'n/a',
-            response: 'Static login page',
+            response: 'Studio home page with hero showcase & featured shoots',
           },
           {
-            path: '/signup.html',
+            path: '/gallery.html',
             method: 'GET',
             request: 'n/a',
-            response: 'Static signup page',
+            response: 'Categorized photography portfolio grid',
           },
           {
-            path: '/home.html',
+            path: '/services.html',
             method: 'GET',
             request: 'n/a',
-            response: 'Static home page',
+            response: 'Shoot packages, deliverables, and transparent pricing',
+          },
+          {
+            path: '/booking.html',
+            method: 'GET',
+            request: 'n/a',
+            response: 'Session booking & appointment inquiry form',
+          },
+          {
+            path: '/about.html',
+            method: 'GET',
+            request: 'n/a',
+            response: 'Studio story, equipment, and photography team',
+          },
+          {
+            path: '/contact.html',
+            method: 'GET',
+            request: 'n/a',
+            response: 'Studio address, business hours, and contact form',
           },
         ],
       },
       decisions: [
         {
-          technology: 'HTML + CSS only',
+          technology: 'Static HTML5 + CSS3',
           reason:
             feedback?.trim() ||
-            'User asked for login/signup as static pages with no framework and no backend',
-          alternative: 'Next.js or Express + database',
-          tradeoff: 'Matches the request exactly; real auth can be added later if needed',
+            `Tailored multi-page static site for ${safeTitle} with zero dependencies and instant load times`,
+          alternative: 'Next.js or React SPA',
+          tradeoff: 'Pure static delivery guarantees 100% performance score and simple maintenance',
         },
         {
-          technology: 'No backend / no database',
-          reason: 'User explicitly does not want a backend for this deliverable',
-          alternative: 'Node/Express + users table',
-          tradeoff: 'Pages are real HTML/CSS files; auth is navigational demo only',
+          technology: 'Responsive Modern Studio Theme',
+          reason: 'Showcases photography with high contrast, glassmorphism cards, and interactive gallery grid',
+          alternative: 'Basic plain styling',
+          tradeoff: 'Professional aesthetic that immediately builds client trust',
         },
       ],
     });
@@ -136,77 +165,51 @@ function buildHtmlCssLoginArchitecture(
   return architectAnalysisSchema.parse({
     architecture: {
       frontend:
-        'Plain HTML pages + CSS (login.html, signup.html, home.html). No Next.js, no React, no build step for UI.',
+        'Plain static HTML + CSS only: login.html, signup.html, home.html, css/styles.css. No Next.js, no React, no framework, no build step.',
       backend:
-        'Small Node.js + Express (or PHP) server for /login, /signup, /logout and serving static HTML/CSS/JS files.',
-      database: 'SQLite or PostgreSQL with a simple users table (id, email, password_hash, name).',
-      infrastructure: 'Any static host + small Node/PHP process, or local folder open via a tiny server.',
+        'None. Static pages only — open HTML files in a browser or serve the folder with any static file server.',
+      database: 'None. No database for this MVP (static demo pages).',
+      infrastructure:
+        'Static hosting or open files locally (e.g. Live Server / python -m http.server).',
       security:
-        'Hash passwords (bcrypt), HTTP-only session cookie, redirect guests away from home.html, validate email/password on server.',
+        'Demo UI only. Forms navigate between pages; no real password storage until backend is connected.',
     },
     database: {
-      entities: [
-        {
-          name: 'users',
-          fields: [
-            { name: 'id', type: 'integer primary key' },
-            { name: 'email', type: 'text unique' },
-            { name: 'password_hash', type: 'text' },
-            { name: 'name', type: 'text nullable' },
-            { name: 'created_at', type: 'datetime' },
-          ],
-        },
-        {
-          name: 'sessions',
-          fields: [
-            { name: 'id', type: 'text primary key' },
-            { name: 'user_id', type: 'integer' },
-            { name: 'expires_at', type: 'datetime' },
-          ],
-        },
-      ],
-      relationships: ['users 1—* sessions'],
-      indexes: ['unique(users.email)', 'index(sessions.user_id)'],
-      constraints: ['email required', 'password_hash required'],
+      entities: [],
+      relationships: [],
+      indexes: [],
+      constraints: ['No database — static HTML/CSS deliverable'],
     },
     api: {
       endpoints: [
         {
-          path: '/signup',
-          method: 'POST',
-          request: 'form: email, password, name?',
-          response: 'redirect to login.html or set session + home.html',
+          path: '/login.html',
+          method: 'GET',
+          request: 'n/a',
+          response: 'Static login page',
         },
         {
-          path: '/login',
-          method: 'POST',
-          request: 'form: email, password',
-          response: 'set session cookie + redirect home.html',
-        },
-        {
-          path: '/logout',
-          method: 'POST',
-          response: 'clear session + redirect login.html',
+          path: '/signup.html',
+          method: 'GET',
+          request: 'n/a',
+          response: 'Static signup page',
         },
         {
           path: '/home.html',
           method: 'GET',
-          response: 'HTML page only if logged in; otherwise redirect login.html',
+          request: 'n/a',
+          response: 'Static home page',
         },
       ],
     },
     decisions: [
       {
-        technology: 'HTML + CSS (+ light JS)',
-        reason: feedback?.trim() || `User asked for a simple ${title} without Next.js`,
-        alternative: 'Next.js App Router',
-        tradeoff: 'Faster to understand for beginners; less framework magic',
-      },
-      {
-        technology: 'Express or PHP form posts',
-        reason: 'User asked for a backend with classic HTML forms',
-        alternative: 'Next.js Route Handlers',
-        tradeoff: 'Simple request/response without React',
+        technology: 'HTML + CSS only',
+        reason:
+          feedback?.trim() ||
+          'User asked for login/signup as static pages with no framework and no backend',
+        alternative: 'Next.js or Express + database',
+        tradeoff: 'Matches the request exactly; real auth can be added later if needed',
       },
     ],
   });

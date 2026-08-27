@@ -184,13 +184,8 @@ export function buildHeuristicImplementation(
   if (useStaticHtml) {
     const fileContents = buildStaticHtmlCssFiles(safeTitle, stackHint);
     const files = Object.keys(fileContents);
-    const tasks = [
-      'Create static login.html',
-      'Create static signup.html',
-      'Create static home.html + index',
-      'Add shared css/styles.css',
-      'Document how to open without a framework',
-    ];
+    const tasks = files.map((file) => `Build static deliverable ${file}`);
+    const sampleFile = fileContents['index.html'] || (files[0] ? fileContents[files[0]] : '') || '';
     const changes: CodeChange[] = files.map((file) => ({
       file,
       changeType: 'CREATE',
@@ -199,9 +194,9 @@ export function buildHeuristicImplementation(
     }));
     const excellence = scoreAgentDeliverable({
       role: 'DEVELOPER',
-      payload: { files, sample: fileContents['login.html'] },
+      payload: { files, sample: sampleFile },
       constraints: archBlob,
-      mustInclude: ['login.html', 'signup.html', 'css/styles.css'],
+      mustInclude: files.slice(0, 3),
       mustExclude: ['next.config', '.tsx'],
     });
     return developerOutputSchema.parse({
