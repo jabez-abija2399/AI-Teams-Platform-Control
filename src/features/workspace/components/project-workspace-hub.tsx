@@ -58,10 +58,19 @@ export function ProjectWorkspaceHub({
       if (!projectId || projectId === 'undefined') return;
 
       setCurrentProject(projectId);
+      if (opts?.agentTab) {
+        useWorkspaceStore.getState().setActiveAgentTab(opts.agentTab);
+      }
       enterStudioFocus({
         activity: opts?.focus === 'deploy' ? 'deployment' : 'explorer',
         openDeploy: opts?.focus === 'deploy',
       });
+      if (opts?.focus === 'ai') {
+        const currentLayout = useWorkspaceStore.getState().layout;
+        if (currentLayout.aiPanelCollapsed) {
+          useWorkspaceStore.getState().toggleAIPanel();
+        }
+      }
       setStudioReady(false);
       setStudioStatus('Loading project files…');
       setView('studio');

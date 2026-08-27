@@ -254,7 +254,7 @@ export function MissionControlBoard({
   regenerating?: boolean;
   retrying?: boolean;
   isWaiting?: boolean;
-  onOpenStudio?: (opts?: { focus?: 'preview' | 'deploy' }) => void;
+  onOpenStudio?: (opts?: { focus?: 'preview' | 'deploy' | 'editor' | 'ai'; agentTab?: string }) => void;
   className?: string;
 }) {
   const phaseName = phaseDisplayName(phases, currentPhase);
@@ -436,14 +436,18 @@ export function MissionControlBoard({
             {COMPANY_ROSTER.map((row) => {
               const status = rosterStatus(row, currentPhase, phaseStatus);
               const Icon = row.icon;
+              const agentTabKey = row.key === 'engineers' ? 'developer' : row.key;
               return (
-                <div
+                <button
+                  type="button"
                   key={row.key}
+                  onClick={() => onOpenStudio?.({ focus: 'ai', agentTab: agentTabKey })}
+                  title={`Click to open direct chat with ${row.label}`}
                   className={cn(
-                    'group flex items-center justify-between rounded-xl border p-2.5 transition-all',
+                    'group flex w-full items-center justify-between rounded-xl border p-2.5 text-left transition-all cursor-pointer',
                     status.active
-                      ? 'border-primary/30 bg-primary/10 shadow-xs ring-1 ring-primary/20'
-                      : 'border-border/60 bg-card/50 hover:border-border hover:bg-card',
+                      ? 'border-primary/30 bg-primary/10 shadow-xs ring-1 ring-primary/20 hover:bg-primary/15'
+                      : 'border-border/60 bg-card/50 hover:border-border hover:bg-card/80 hover:shadow-xs',
                   )}
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
@@ -452,7 +456,7 @@ export function MissionControlBoard({
                         'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border transition-colors',
                         status.active
                           ? 'border-primary/40 bg-primary/20 text-primary'
-                          : 'border-border bg-secondary text-muted-foreground group-hover:text-foreground',
+                          : 'border-border bg-secondary text-muted-foreground group-hover:text-foreground group-hover:border-primary/30',
                       )}
                     >
                       <Icon className="h-4 w-4" />
@@ -476,7 +480,7 @@ export function MissionControlBoard({
                   >
                     {status.label}
                   </span>
-                </div>
+                </button>
               );
             })}
           </div>

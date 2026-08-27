@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { toast } from 'sonner';
-import { ArrowLeft, Building2, Code2, Command, Sparkles } from 'lucide-react';
+import { ArrowLeft, Building2, Code2, Command, Sparkles, Bot, Eye } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PipelineProvider, usePipelineContext } from '../components/pipeline-provider';
 import { MissionControlBoard } from './mission-control-board';
@@ -339,21 +339,44 @@ function CompanyWorkspaceInner({
           </button>
 
           {onOpenStudio && (
-            <button
-              type="button"
-              onClick={() => onOpenStudio({ focus: 'preview' })}
-              className={cn(
-                'inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-[11px] font-semibold transition-colors',
-                state.phaseStatus === 'completed'
-                  ? 'border-primary bg-primary text-primary-foreground shadow-sm'
-                  : 'border-border bg-background text-muted-foreground hover:border-primary/30 hover:text-foreground',
-              )}
-            >
-              <Code2 className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">
-                {state.phaseStatus === 'completed' ? 'Open Studio' : 'Studio'}
-              </span>
-            </button>
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => onOpenStudio({ focus: 'preview' })}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-2.5 py-1 text-[11px] font-semibold text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+                title="Open live app preview"
+              >
+                <Eye className="h-3.5 w-3.5 text-primary" />
+                <span className="hidden sm:inline">Preview</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => onOpenStudio({ focus: 'editor' })}
+                className={cn(
+                  'inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-[11px] font-semibold transition-colors',
+                  state.phaseStatus === 'completed'
+                    ? 'border-primary bg-primary text-primary-foreground shadow-sm'
+                    : 'border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground',
+                )}
+                title="Open code editor & files"
+              >
+                <Code2 className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">
+                  {state.phaseStatus === 'completed' ? 'Open Studio' : 'Code Studio'}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => onOpenStudio({ focus: 'ai' })}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-2.5 py-1 text-[11px] font-semibold text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+                title="Chat with AI agents"
+              >
+                <Bot className="h-3.5 w-3.5 text-accent" />
+                <span className="hidden sm:inline">Agent Chat</span>
+              </button>
+            </div>
           )}
 
           {onOpenStudio && state.phaseStatus === 'completed' && (
