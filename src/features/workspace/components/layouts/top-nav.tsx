@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import {
   ArrowLeft,
+  Building2,
   Columns2,
   Command,
   Eye,
@@ -50,11 +51,11 @@ export function TopNav({
           <button
             type="button"
             onClick={onBackToMission}
-            className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px] font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-            title="Back to Mission Control"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background/80 px-2.5 py-1 text-[11px] font-semibold text-foreground shadow-xs transition-colors hover:border-primary/40 hover:bg-muted"
+            title="Return to AI Company Mission Control"
           >
-            <ArrowLeft className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">Mission</span>
+            <Building2 className="h-3.5 w-3.5 text-primary" />
+            <span className="hidden sm:inline">Mission Control</span>
           </button>
         ) : (
           <Link
