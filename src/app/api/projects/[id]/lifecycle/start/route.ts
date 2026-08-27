@@ -78,6 +78,9 @@ export async function POST(request: Request, { params }: Params) {
     // Body is optional
   }
 
-  const result = await canonicalOrchestrator.startMission(id, { userIdea });
+  const result = await canonicalOrchestrator.startMission(id, {
+    userIdea: userIdea || project.description || project.name,
+    missionTitle: project.name,
+  });
   return toResponse(result);
 }
