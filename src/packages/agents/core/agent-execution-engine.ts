@@ -63,4 +63,33 @@ export class AgentExecutionEngine {
       };
     }
   }
+
+  /**
+   * Dispatches task to registered agent or fallback executor.
+   */
+  public static async executeTask(params: {
+    projectId: string;
+    role: string;
+    taskTitle?: string;
+    taskType?: string;
+    inputData?: unknown;
+  }): Promise<{ success: boolean; data?: any; error?: string; tokensUsed?: number }> {
+    const roleId = params.role.toLowerCase().replace(/_/g, '-');
+    const result = await this.executeAgent(roleId, {
+      projectId: params.projectId,
+      visionPrompt: typeof params.inputData === 'string' ? params.inputData : JSON.stringify(params.inputData || {}),
+      parameters: { taskTitle: params.taskTitle, taskType: params.taskType },
+    });
+
+    return {
+      success: result.success,
+      data: result.data,
+      error: result.error,
+      tokensUsed: 150,
+    };
+  }
+}
+
+export function getExecutionEngine() {
+  return AgentExecutionEngine;
 }

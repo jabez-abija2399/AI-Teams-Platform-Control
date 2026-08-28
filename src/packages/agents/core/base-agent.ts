@@ -36,6 +36,36 @@ export abstract class BaseAgent<TDeliverable = unknown> {
   public abstract readonly deliverableType: string;
   public abstract readonly contract: AgentContract;
 
+  private _customName?: string;
+  private _customRole?: string;
+
+  constructor(customName?: string) {
+    this._customName = customName;
+  }
+
+  public get role(): string {
+    if (this._customRole) return this._customRole;
+    const r = this.roleId.toUpperCase().replace(/-/g, '_');
+    if (r === 'PRODUCT_MANAGER') return 'PRODUCT_MANAGER';
+    if (r === 'QA_ENGINEER') return 'QA';
+    if (r === 'SECURITY_AUDITOR') return 'SECURITY';
+    if (r === 'DEVOPS_ENGINEER') return 'DEVOPS';
+    if (r === 'UI_DESIGNER') return 'UI_DESIGNER';
+    return r;
+  }
+
+  public set role(val: string) {
+    this._customRole = val;
+  }
+
+  public get name(): string {
+    return this._customName || this.displayName;
+  }
+
+  public set name(val: string) {
+    this._customName = val;
+  }
+
   /**
    * Primary entry point for executing the agent's responsibilities.
    */

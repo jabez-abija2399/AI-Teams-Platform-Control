@@ -122,3 +122,25 @@ export const QAVerificationReportSchema = z.object({
   releaseReadinessVerdict: z.enum(['PASSED', 'NEEDS_FIXES', 'FAILED']),
 });
 export type QAVerificationReport = z.infer<typeof QAVerificationReportSchema>;
+
+export const SecurityAuditReportSchema = z.object({
+  overallScore: z.number().min(0).max(100),
+  vulnerabilitiesFound: z.array(z.object({
+    severity: z.enum(['CRITICAL', 'HIGH', 'MEDIUM', 'LOW']),
+    category: z.string(),
+    description: z.string(),
+    remediation: z.string(),
+  })),
+  owaspCompliance: z.record(z.string(), z.boolean()),
+  verdict: z.enum(['PASSED', 'NEEDS_FIXES', 'FAILED']),
+});
+export type SecurityAuditReport = z.infer<typeof SecurityAuditReportSchema>;
+
+export const DeploymentRecipeSchema = z.object({
+  targetPlatform: z.string(),
+  environmentVariablesRequired: z.array(z.string()),
+  buildCommands: z.array(z.string()),
+  startCommand: z.string(),
+  dockerfile: z.string().optional(),
+});
+export type DeploymentRecipe = z.infer<typeof DeploymentRecipeSchema>;
