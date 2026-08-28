@@ -107,96 +107,77 @@ export default function BuilderDemoPage() {
   }, []);
 
   return (
-    <div style={{ maxWidth: '800px', margin: '40px auto', fontFamily: 'system-ui, sans-serif', padding: '24px', backgroundColor: '#0f172a', color: '#f8fafc', borderRadius: '12px' }}>
-      <h1 style={{ fontSize: '24px', marginBottom: '8px', color: '#38bdf8' }}>
-        BullMQ + E2B Sandbox Real-Time Build Monitor
-      </h1>
-      <p style={{ color: '#94a3b8', fontSize: '14px', marginBottom: '24px' }}>
-        Test real-time event streaming and background microVM build execution directly in your browser.
-      </p>
+    <div className="mx-auto max-w-3xl p-6 sm:p-10 space-y-6">
+      <div>
+        <span className="rounded-md border border-primary/30 bg-primary/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">
+          Developer Mode
+        </span>
+        <h1 className="mt-2 font-heading text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+          BullMQ & SSE Streaming Build Harness
+        </h1>
+        <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+          Live stream test harness for background AI Developer worker jobs, step dispatch, and self-healing loop.
+        </p>
+      </div>
 
-      <div style={{ display: 'grid', gap: '16px', marginBottom: '24px' }}>
+      <div className="rounded-2xl border border-border/80 glass-card p-6 shadow-sm space-y-4">
         <div>
-          <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#cbd5e1', marginBottom: '4px' }}>
-            Project ID
+          <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1.5">
+            Target Project ID
           </label>
           <input
             type="text"
             value={projectId}
             onChange={(e) => setProjectId(e.target.value)}
-            style={{ width: '100%', padding: '10px', backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '6px', color: '#fff' }}
+            className="w-full rounded-xl border border-border/70 bg-background/80 px-3.5 py-2.5 text-xs font-mono text-foreground outline-none transition-shadow focus:border-primary focus:ring-1 focus:ring-primary"
           />
         </div>
 
         <div>
-          <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#cbd5e1', marginBottom: '4px' }}>
-            User Prompt
+          <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1.5">
+            Software Vision Prompt
           </label>
           <input
             type="text"
             value={userPrompt}
             onChange={(e) => setUserPrompt(e.target.value)}
-            style={{ width: '100%', padding: '10px', backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '6px', color: '#fff' }}
+            className="w-full rounded-xl border border-border/70 bg-background/80 px-3.5 py-2.5 text-xs text-foreground outline-none transition-shadow focus:border-primary focus:ring-1 focus:ring-primary"
           />
         </div>
 
         <button
           onClick={startBuild}
           disabled={isBuilding}
-          style={{
-            padding: '12px',
-            backgroundColor: isBuilding ? '#475569' : '#0284c7',
-            color: '#fff',
-            border: 'none',
-            borderRadius: '6px',
-            fontWeight: 600,
-            cursor: isBuilding ? 'not-allowed' : 'pointer',
-            marginTop: '8px',
-          }}
+          className="w-full rounded-xl bg-primary px-4 py-3 text-xs font-bold text-primary-foreground shadow-md transition-all duration-200 hover:bg-primary/90 disabled:opacity-50"
         >
-          {isBuilding ? 'Running Build Task in Background...' : '🚀 Trigger AI Build Job'}
+          {isBuilding ? '⚡ Running Build Task in Background...' : '🚀 Trigger AI Build Job'}
         </button>
       </div>
 
       {/* Progress Section */}
-      <div style={{ backgroundColor: '#1e293b', padding: '16px', borderRadius: '8px', marginBottom: '24px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-          <span style={{ fontSize: '14px', fontWeight: 600, color: '#e2e8f0' }}>
-            Status: <span style={{ color: '#38bdf8' }}>{currentStep}</span>
+      <div className="rounded-2xl border border-border/80 glass-card p-5 shadow-sm space-y-3">
+        <div className="flex items-center justify-between text-xs font-bold">
+          <span className="text-foreground">
+            Status: <span className="text-primary font-mono">{currentStep}</span>
           </span>
-          <span style={{ fontSize: '14px', fontWeight: 600, color: '#38bdf8' }}>{progress}%</span>
+          <span className="text-primary font-mono">{progress}%</span>
         </div>
-        <div style={{ width: '100%', height: '8px', backgroundColor: '#334155', borderRadius: '4px', overflow: 'hidden' }}>
+        <div className="h-2 w-full rounded-full bg-secondary/80 overflow-hidden">
           <div
-            style={{
-              width: `${progress}%`,
-              height: '100%',
-              backgroundColor: '#0284c7',
-              transition: 'width 0.3s ease',
-            }}
+            className="h-full rounded-full bg-primary transition-all duration-300"
+            style={{ width: `${progress}%` }}
           />
         </div>
       </div>
 
       {/* Terminal Logs */}
-      <div>
-        <h3 style={{ fontSize: '14px', color: '#cbd5e1', marginBottom: '8px' }}>SSE Live Stream Terminal Output</h3>
-        <div
-          style={{
-            backgroundColor: '#020617',
-            border: '1px solid #1e293b',
-            borderRadius: '8px',
-            padding: '16px',
-            height: '240px',
-            overflowY: 'auto',
-            fontFamily: 'monospace',
-            fontSize: '12px',
-            lineHeight: '1.6',
-            color: '#4ade80',
-          }}
-        >
+      <div className="space-y-2">
+        <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+          SSE Live Stream Terminal Output
+        </h3>
+        <div className="h-64 overflow-y-auto rounded-2xl border border-border/80 bg-slate-950 p-4 font-mono text-xs leading-relaxed text-emerald-400 shadow-inner">
           {logs.length === 0 ? (
-            <span style={{ color: '#64748b' }}>Click "Trigger AI Build Job" to observe live events...</span>
+            <span className="text-slate-500">Click &quot;Trigger AI Build Job&quot; to observe live events...</span>
           ) : (
             logs.map((log, index) => <div key={index}>{log}</div>)
           )}
