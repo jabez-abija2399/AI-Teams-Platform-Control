@@ -1,34 +1,25 @@
-import { redirect, notFound } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import { getAuthSession } from '@/lib/session-helper';
-import { getProject } from '@/features/projects/services/project.service';
-import { CommandPaletteProvider } from '@/features/editor';
-import { ProjectInitializer } from '@/features/workspace/components/project-initializer';
-import { WorkspaceBuildSync } from '@/features/workspace/components/workspace-build-sync';
-import { CompanyWorkspaceWrapper } from './company-workspace-wrapper';
+import { prisma } from '@/lib/prisma';
+import { ROUTES } from '@/config/constants';
+import { WorkspaceClientShell } from '@/features/workspace/components/workspace-client-shell';
 
-export default async function WorkspacePage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
+export default async function WorkspacePage({ params }: { params: Promise<{ id: string }> }) {
   const session = await getAuthSession();
   if (!session?.user?.id) redirect('/login');
 
-  const project = await getProject(id, session.user.id);
-  if (!project) notFound();
+  const { id } = await params;
+
+  const project = await prisma.project.findUnique({
+    where: { id, ownerId: session.user.id },
+  });
+
+  if (!project) redirect(ROUTES.dashboard);
 
   return (
-    <CommandPaletteProvider>
-      <ProjectInitializer projectId={id}>
-        <WorkspaceBuildSync projectId={id} />
-        <CompanyWorkspaceWrapper
-          projectId={id}
-          projectName={project.name}
-          projectDescription={project.description || ''}
-          userName={session.user.name ?? 'User'}
-        />
-      </ProjectInitializer>
-    </CommandPaletteProvider>
+    <WorkspaceClientShell
+      projectId={project.id}
+      projectName={project.name}
+    />
   );
 }
