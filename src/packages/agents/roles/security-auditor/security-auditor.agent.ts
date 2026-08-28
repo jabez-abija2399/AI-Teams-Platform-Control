@@ -56,3 +56,17 @@ export class SecurityAuditorAgent extends BaseAgent<SecurityAuditReport> {
     }
   }
 }
+
+/**
+ * @legacy SecurityAgent — backwards-compatible alias for tests expecting role='SECURITY'.
+ */
+export class SecurityAgent extends SecurityAuditorAgent {
+  constructor(name = 'Security Engineer') {
+    super();
+    (this as any)._role = 'SECURITY';
+    (this as any)._name = name;
+  }
+
+  override get role(): any { return 'SECURITY'; }
+  override get name(): string { return (this as any)._name; }
+}

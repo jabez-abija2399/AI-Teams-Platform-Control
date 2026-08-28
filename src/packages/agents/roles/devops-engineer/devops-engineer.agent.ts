@@ -56,3 +56,17 @@ export class DevopsEngineerAgent extends BaseAgent<DeploymentRecipe> {
     }
   }
 }
+
+/**
+ * @legacy DevOpsAgent — backwards-compatible alias for tests expecting role='DEVOPS'.
+ */
+export class DevOpsAgent extends DevopsEngineerAgent {
+  constructor(name = 'DevOps') {
+    super();
+    (this as any)._role = 'DEVOPS';
+    (this as any)._name = name;
+  }
+
+  override get role(): any { return 'DEVOPS'; }
+  override get name(): string { return (this as any)._name; }
+}

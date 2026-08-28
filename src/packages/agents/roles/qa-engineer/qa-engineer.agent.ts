@@ -56,3 +56,18 @@ export class QaEngineerAgent extends BaseAgent<QAVerificationReport> {
     }
   }
 }
+
+/**
+ * @legacy QAAgent — backwards-compatible alias for tests expecting role='QA'.
+ */
+export class QAAgent extends QaEngineerAgent {
+  constructor(name = 'Quality Assurance Engineer') {
+    super();
+    (this as any)._role = 'QA';
+    (this as any)._name = name;
+  }
+
+  override get role(): any { return 'QA'; }
+  override get name(): string { return (this as any)._name; }
+}
+
