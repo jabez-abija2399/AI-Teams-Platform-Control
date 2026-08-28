@@ -31,10 +31,10 @@ export function Navbar({ userName, userImage }: NavbarProps) {
     .toUpperCase();
 
   return (
-    <header className="flex h-14 shrink-0 items-center justify-between border-b border-border/70 bg-card/50 px-4 backdrop-blur-md md:px-6">
+    <header className="flex h-16 shrink-0 items-center justify-between border-b border-border/80 glass-panel px-4 backdrop-blur-md md:px-8">
       <div className="flex items-center gap-2">
         <MobileMenu />
-        <p className="hidden text-sm text-muted-foreground sm:block md:hidden">Menu</p>
+        <p className="hidden text-xs font-bold uppercase tracking-wider text-muted-foreground sm:block md:hidden">Menu</p>
       </div>
       <div className="flex flex-1 items-center justify-end gap-2 sm:gap-3">
         <NotificationBell />

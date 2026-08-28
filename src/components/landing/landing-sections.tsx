@@ -174,13 +174,31 @@ export function LandingHero() {
           </Link>
         </div>
 
+        <div
+          className="animate-fade-up mt-6 flex flex-wrap items-center justify-center gap-2 text-xs"
+          style={{ animationDelay: '210ms' }}
+        >
+          <span className="text-muted-foreground/80 font-medium">Try building:</span>
+          {['SaaS Kanban Board', 'Photo Studio Portfolio', 'AI Billing Dashboard', 'Realtime Chat Hub'].map(
+            (tag) => (
+              <Link
+                key={tag}
+                href={`${ROUTES.projects}/new`}
+                className="rounded-full border border-border/70 glass-card px-3 py-1 font-medium text-foreground transition-all duration-200 hover:border-primary/40 hover:text-primary hover:shadow-xs"
+              >
+                ✨ {tag}
+              </Link>
+            ),
+          )}
+        </div>
+
         <ul
           className="animate-fade-up mt-8 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-muted-foreground sm:text-[13px]"
-          style={{ animationDelay: '240ms' }}
+          style={{ animationDelay: '250ms' }}
         >
           {TRUST.map((item) => (
-            <li key={item} className="flex items-center gap-1.5">
-              <CheckCircle2 className="h-3.5 w-3.5 text-primary/70" />
+            <li key={item} className="flex items-center gap-1.5 font-medium">
+              <CheckCircle2 className="h-3.5 w-3.5 text-primary" />
               {item}
             </li>
           ))}
@@ -199,39 +217,39 @@ export function LandingCompany() {
     <section id="company" className="border-t border-border/60 py-20 sm:py-24">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="font-heading text-3xl font-semibold tracking-tight sm:text-4xl">
+          <h2 className="font-heading text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             Meet your AI software company
           </h2>
-          <p className="mt-4 text-muted-foreground">
+          <p className="mt-4 text-muted-foreground text-sm sm:text-base">
             Specialized roles that collaborate the way a real product team does — with you as product
             owner.
           </p>
         </div>
 
-        <div className="mt-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="mt-12 grid gap-3.5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {TEAM.map((member) => (
             <div
               key={member.role}
-              className="group rounded-2xl border border-border/80 bg-card/60 p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-[0_16px_40px_-28px_rgba(36,95,115,0.5)]"
+              className="group relative overflow-hidden rounded-2xl border border-border/80 glass-card p-5 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg"
             >
               <div className="flex items-start justify-between gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 font-heading text-sm font-semibold text-primary">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 font-heading text-sm font-bold text-primary border border-primary/20 transition-all duration-200 group-hover:scale-105 group-hover:bg-primary group-hover:text-primary-foreground">
                   {member.role
                     .split(' ')
                     .map((w) => w[0])
                     .slice(0, 2)
                     .join('')}
                 </div>
-                <span className="flex items-center gap-1.5 text-[11px] font-medium text-primary">
-                  <span className="h-1.5 w-1.5 animate-soft-pulse rounded-full bg-primary" />
-                  Online
+                <span className="flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+                  ONLINE
                 </span>
               </div>
-              <h3 className="mt-4 font-heading text-lg font-semibold tracking-tight">{member.role}</h3>
-              <p className="mt-1 text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
+              <h3 className="mt-4 font-heading text-base font-bold tracking-tight text-foreground">{member.role}</h3>
+              <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                 {member.dept}
               </p>
-              <p className="mt-3 text-sm text-muted-foreground">{member.focus}</p>
+              <p className="mt-2.5 text-xs leading-relaxed text-muted-foreground line-clamp-2">{member.focus}</p>
             </div>
           ))}
         </div>
@@ -245,10 +263,10 @@ export function LandingShowcase() {
     <section id="workspace" className="border-t border-border/60 bg-card/35 py-20 sm:py-24">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="font-heading text-3xl font-semibold tracking-tight sm:text-4xl">
+          <h2 className="font-heading text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             One workspace for the whole company
           </h2>
-          <p className="mt-4 text-muted-foreground">
+          <p className="mt-4 text-muted-foreground text-sm sm:text-base">
             Mission Control, Studio IDE, Explorer, preview, and deploy — the same surfaces your AI
             team uses to ship.
           </p>
@@ -258,7 +276,7 @@ export function LandingShowcase() {
           {SHOWCASE_PANES.map(({ id, label, icon: Icon }) => (
             <span
               key={id}
-              className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/80 px-3.5 py-1.5 text-xs font-medium text-muted-foreground"
+              className="inline-flex items-center gap-2 rounded-full border border-border/70 glass-card px-4 py-1.5 text-xs font-semibold text-muted-foreground"
             >
               <Icon className="h-3.5 w-3.5 text-primary" />
               {label}
@@ -266,24 +284,24 @@ export function LandingShowcase() {
           ))}
         </div>
 
-        <div className="mt-10 overflow-hidden rounded-2xl border border-border/80 bg-background shadow-[0_28px_80px_-40px_rgba(36,95,115,0.5)]">
-          <div className="flex items-center gap-2 border-b border-border/70 bg-muted/25 px-4 py-3">
-            <span className="h-2.5 w-2.5 rounded-full bg-brand-gray/80" />
-            <span className="h-2.5 w-2.5 rounded-full bg-brand-gray/80" />
-            <span className="h-2.5 w-2.5 rounded-full bg-brand-gray/80" />
-            <span className="ml-3 text-xs font-medium text-muted-foreground">Studio · Project workspace</span>
-            <span className="ml-auto hidden text-[11px] text-muted-foreground sm:inline">
+        <div className="mt-10 overflow-hidden rounded-2xl border border-border/80 glass-card shadow-2xl">
+          <div className="flex items-center gap-2 border-b border-border/70 bg-muted/30 px-4 py-3">
+            <span className="h-3 w-3 rounded-full bg-destructive/60" />
+            <span className="h-3 w-3 rounded-full bg-amber-500/60" />
+            <span className="h-3 w-3 rounded-full bg-emerald-500/60" />
+            <span className="ml-3 text-xs font-bold text-foreground/80">Studio · Project Workspace</span>
+            <span className="ml-auto hidden text-[11px] font-mono text-muted-foreground sm:inline">
               Preview · Git · Deploy
             </span>
           </div>
 
           <div className="grid min-h-[320px] lg:grid-cols-[200px_1fr_220px]">
             <aside className="hidden border-r border-border/60 p-4 lg:block">
-              <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                 Explorer
               </p>
-              <ul className="mt-3 space-y-1.5 font-mono text-[12px] text-muted-foreground">
-                <li className="rounded-md bg-primary/10 px-2 py-1.5 text-foreground">src/</li>
+              <ul className="mt-3 space-y-1 font-mono text-xs text-muted-foreground">
+                <li className="rounded-md bg-primary/10 px-2 py-1.5 font-semibold text-primary">src/</li>
                 <li className="px-2 py-1 pl-5">app/page.tsx</li>
                 <li className="px-2 py-1 pl-5">components/</li>
                 <li className="px-2 py-1 pl-5">api/routes.ts</li>
@@ -294,10 +312,10 @@ export function LandingShowcase() {
 
             <div className="flex flex-col border-b border-border/60 lg:border-b-0 lg:border-r">
               <div className="flex items-center gap-2 border-b border-border/50 px-4 py-2 text-[11px] text-muted-foreground">
-                <span className="rounded bg-primary/10 px-2 py-0.5 font-medium text-primary">page.tsx</span>
-                <span>api/routes.ts</span>
+                <span className="rounded-md bg-primary/15 px-2 py-0.5 font-mono text-xs font-semibold text-primary">page.tsx</span>
+                <span className="font-mono text-xs">api/routes.ts</span>
               </div>
-              <pre className="flex-1 overflow-hidden p-4 font-mono text-[12px] leading-6 text-muted-foreground">
+              <pre className="flex-1 overflow-hidden p-4 font-mono text-xs leading-6 text-muted-foreground">
                 <code>
                   <span className="text-primary/80">{'// Generated by Frontend Engineer'}</span>
                   {'\n'}
@@ -318,37 +336,40 @@ export function LandingShowcase() {
                   {'    '}
                   <span className="text-accent">{'</main>'}</span>
                   {'\n'}
+                  {'  '}
+                  <span className="text-foreground">{'}'}</span>
+                  {'\n'}
                   <span className="text-foreground">{'}'}</span>
                 </code>
               </pre>
-              <div className="border-t border-border/50 bg-muted/20 px-4 py-2.5 font-mono text-[11px] text-muted-foreground">
-                <span className="text-primary">➜</span> npm run build · ready in 1.2s
+              <div className="border-t border-border/50 bg-muted/20 px-4 py-2 font-mono text-[11px] text-muted-foreground">
+                <span className="text-emerald-500 font-bold">✓</span> npm run build · ready in 1.2s
               </div>
             </div>
 
             <aside className="space-y-4 p-4">
               <div>
-                <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                   Activity
                 </p>
-                <ul className="mt-3 space-y-2.5 text-left text-sm">
-                  <li className="flex gap-2 text-foreground">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 animate-soft-pulse rounded-full bg-primary" />
+                <ul className="mt-3 space-y-2.5 text-left text-xs">
+                  <li className="flex gap-2 text-foreground font-medium">
+                    <span className="mt-1 h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-primary" />
                     Architect updated system diagram
                   </li>
                   <li className="flex gap-2 text-muted-foreground">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-gray" />
+                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-gray" />
                     QA queued regression suite
                   </li>
                   <li className="flex gap-2 text-muted-foreground">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-gray" />
+                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-gray" />
                     Preview synced to Studio
                   </li>
                 </ul>
               </div>
-              <div className="rounded-xl border border-border/70 bg-card/80 p-3">
-                <p className="text-[11px] font-medium text-muted-foreground">Deploy</p>
-                <p className="mt-1 text-sm font-medium">Staging · ready</p>
+              <div className="rounded-xl border border-border/70 glass-card p-3">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Deploy</p>
+                <p className="mt-1 text-xs font-semibold text-foreground">Staging · Ready</p>
                 <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-muted">
                   <div className="h-full w-[72%] rounded-full bg-primary" />
                 </div>
@@ -366,10 +387,10 @@ export function LandingFeatures() {
     <section id="features" className="border-t border-border/60 py-20 sm:py-24">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="font-heading text-3xl font-semibold tracking-tight sm:text-4xl">
+          <h2 className="font-heading text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             Built like a company, not a chat window
           </h2>
-          <p className="mt-4 text-muted-foreground">
+          <p className="mt-4 text-muted-foreground text-sm sm:text-base">
             Structure, memory, approvals, and delivery — the pieces you need to trust software built by
             AI.
           </p>
@@ -378,13 +399,13 @@ export function LandingFeatures() {
           {FEATURES.map(({ icon: Icon, title, description }) => (
             <div
               key={title}
-              className="group rounded-2xl border border-border/80 bg-background/80 p-7 transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-[0_20px_48px_-32px_rgba(36,95,115,0.55)]"
+              className="group relative overflow-hidden rounded-2xl border border-border/80 glass-card p-7 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl"
             >
-              <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+              <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20 transition-all duration-200 group-hover:scale-105 group-hover:bg-primary group-hover:text-primary-foreground">
                 <Icon className="h-5 w-5" />
               </div>
-              <h3 className="font-heading text-xl font-semibold">{title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{description}</p>
+              <h3 className="font-heading text-lg font-bold text-foreground">{title}</h3>
+              <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{description}</p>
             </div>
           ))}
         </div>
@@ -398,10 +419,10 @@ export function LandingHowItWorks() {
     <section id="how-it-works" className="border-t border-border/60 py-20 sm:py-24">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="font-heading text-3xl font-semibold tracking-tight sm:text-4xl">
+          <h2 className="font-heading text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             From idea to production
           </h2>
-          <p className="mt-4 text-muted-foreground">
+          <p className="mt-4 text-muted-foreground text-sm sm:text-base">
             A clear lifecycle with you in the loop — AI handles the heavy lifting between approvals.
           </p>
         </div>
@@ -409,7 +430,7 @@ export function LandingHowItWorks() {
           {STEPS.map(({ step, title, detail }, i) => (
             <div
               key={step}
-              className="relative rounded-2xl border border-border/80 bg-card/50 p-6 shadow-[0_1px_0_rgba(36,95,115,0.04)]"
+              className="relative rounded-2xl border border-border/80 glass-card p-6 shadow-sm transition-all duration-200 hover:border-primary/30"
             >
               {i < STEPS.length - 1 && (
                 <span
@@ -417,9 +438,9 @@ export function LandingHowItWorks() {
                   aria-hidden
                 />
               )}
-              <span className="font-heading text-4xl font-semibold text-accent/20">{step}</span>
-              <h3 className="mt-3 text-base font-semibold">{title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{detail}</p>
+              <span className="font-heading text-3xl font-extrabold text-primary/30">{step}</span>
+              <h3 className="mt-3 text-sm font-bold text-foreground">{title}</h3>
+              <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">{detail}</p>
             </div>
           ))}
         </div>
