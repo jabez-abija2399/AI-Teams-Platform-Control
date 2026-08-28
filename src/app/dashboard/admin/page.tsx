@@ -57,12 +57,12 @@ export default async function AdminAnalyticsPage() {
         {cards.map((card) => (
           <div
             key={card.label}
-            className="rounded-xl border border-border/70 bg-card/80 px-4 py-4"
+            className="rounded-2xl border border-border/80 glass-card p-5 shadow-sm transition-all duration-200 hover:border-primary/30"
           >
-            <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
               {card.label}
             </p>
-            <p className="mt-2 font-mono text-3xl font-semibold tabular-nums text-foreground">
+            <p className="mt-2 font-heading text-3xl font-bold tabular-nums text-foreground">
               {card.value}
             </p>
           </div>
@@ -72,9 +72,9 @@ export default async function AdminAnalyticsPage() {
       <div className="flex flex-wrap gap-3">
         <Link
           href={ROUTES.adminUsers}
-          className="inline-flex rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium text-foreground transition-colors hover:border-primary/30"
+          className="inline-flex items-center rounded-xl border border-border/80 glass-card px-4 py-2 text-xs font-bold text-foreground transition-all duration-200 hover:border-primary/40 hover:text-primary hover:shadow-xs"
         >
-          View users
+          View Users Roster →
         </Link>
       </div>
     </div>

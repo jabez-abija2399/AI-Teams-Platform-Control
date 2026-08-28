@@ -21,15 +21,15 @@ export function MobileMenu() {
       >
         <Menu className="h-5 w-5" />
       </SheetTrigger>
-      <SheetContent side="left" className="w-64 p-0">
-        <div className="flex h-14 items-center gap-2.5 border-b border-border/70 px-5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Sparkles className="h-3.5 w-3.5" />
+      <SheetContent side="left" className="w-64 p-0 glass-card border-r border-border/80">
+        <div className="flex h-16 items-center gap-3 border-b border-border/70 px-5">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-md">
+            <Sparkles className="h-4 w-4" />
           </div>
-          <span className="font-heading text-sm font-semibold tracking-tight">{APP_NAME}</span>
+          <span className="font-heading text-sm font-bold tracking-tight text-foreground">{APP_NAME}</span>
         </div>
-        <nav className="space-y-0.5 p-3">
-          <p className="mb-2 px-2.5 text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+        <nav className="space-y-1 p-3.5">
+          <p className="mb-2.5 px-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
             Workspace
           </p>
           {DASHBOARD_NAV_ITEMS.map(({ href, label, icon: Icon, exact }) => {
@@ -41,9 +41,9 @@ export function MobileMenu() {
                 onClick={() => setOpen(false)}
                 aria-current={active ? 'page' : undefined}
                 className={cn(
-                  'flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors',
+                  'flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs font-semibold transition-all duration-200',
                   active
-                    ? 'bg-primary/10 text-primary'
+                    ? 'border border-primary/30 bg-primary/10 text-primary shadow-xs glow-teal'
                     : 'text-muted-foreground hover:bg-muted/70 hover:text-foreground',
                 )}
               >

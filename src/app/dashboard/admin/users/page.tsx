@@ -64,32 +64,34 @@ export default async function AdminUsersPage() {
         </p>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-border/70 bg-card/80">
-        <table className="w-full text-left text-sm">
-          <thead className="border-b border-border/70 bg-muted/40 text-[11px] uppercase tracking-wider text-muted-foreground">
+      <div className="overflow-hidden rounded-2xl border border-border/80 glass-card shadow-sm">
+        <table className="w-full text-left text-xs">
+          <thead className="border-b border-border/70 bg-muted/30 text-[10px] uppercase tracking-wider text-muted-foreground font-bold">
             <tr>
-              <th className="px-4 py-3 font-medium">Name</th>
-              <th className="px-4 py-3 font-medium">Email</th>
-              <th className="px-4 py-3 font-medium">Role</th>
-              <th className="px-4 py-3 font-medium">Joined</th>
+              <th className="px-5 py-3.5">Name</th>
+              <th className="px-5 py-3.5">Email</th>
+              <th className="px-5 py-3.5">Platform Role</th>
+              <th className="px-5 py-3.5">Joined</th>
             </tr>
           </thead>
           <tbody>
             {users.length === 0 ? (
               <tr>
-                <td colSpan={4} className="px-4 py-8 text-center text-muted-foreground">
+                <td colSpan={4} className="px-5 py-8 text-center text-muted-foreground">
                   No users found (or database unavailable).
                 </td>
               </tr>
             ) : (
               users.map((u) => (
-                <tr key={u.id} className="border-b border-border/50 last:border-0">
-                  <td className="px-4 py-3 font-medium text-foreground">{u.name}</td>
-                  <td className="px-4 py-3 text-muted-foreground">{u.email}</td>
-                  <td className="px-4 py-3 font-mono text-xs">
-                    {u.platformRole || 'USER'}
+                <tr key={u.id} className="border-b border-border/50 transition-colors hover:bg-muted/30 last:border-0">
+                  <td className="px-5 py-3 font-semibold text-foreground">{u.name}</td>
+                  <td className="px-5 py-3 text-muted-foreground">{u.email}</td>
+                  <td className="px-5 py-3">
+                    <span className="rounded-md border border-primary/20 bg-primary/10 px-2 py-0.5 font-mono text-[10px] font-bold text-primary">
+                      {u.platformRole || 'USER'}
+                    </span>
                   </td>
-                  <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
+                  <td className="px-5 py-3 font-mono text-[11px] text-muted-foreground">
                     {u.createdAt.toISOString().slice(0, 10)}
                   </td>
                 </tr>

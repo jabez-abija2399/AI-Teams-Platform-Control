@@ -69,28 +69,32 @@ export function NotificationBell() {
         </div>
       </Button>
       {open && (
-        <div className="absolute right-0 top-full z-50 mt-2 w-80 rounded-lg border bg-card shadow-xl">
-          <div className="flex items-center justify-between border-b px-3 py-2">
-            <span className="text-xs font-medium">Notifications</span>
+        <div className="absolute right-0 top-full z-50 mt-2 w-80 rounded-2xl border border-border/80 glass-card shadow-2xl backdrop-blur-xl">
+          <div className="flex items-center justify-between border-b border-border/70 px-4 py-3">
+            <span className="text-xs font-bold text-foreground">Notifications</span>
             {unreadCount > 0 && (
-              <span className="text-muted-foreground text-xs">{unreadCount} unread</span>
+              <span className="rounded-full bg-destructive/15 px-2 py-0.5 text-[10px] font-bold text-destructive">
+                {unreadCount} unread
+              </span>
             )}
           </div>
-          <div className="max-h-80 overflow-y-auto">
+          <div className="max-h-80 overflow-y-auto divide-y divide-border/50">
             {notifications.length === 0 ? (
-              <p className="text-muted-foreground p-4 text-center text-xs">No notifications yet</p>
+              <p className="p-6 text-center text-xs text-muted-foreground">No notifications yet</p>
             ) : (
               notifications.slice(0, 10).map((n) => (
                 <button
                   key={n.id}
                   onClick={() => markRead(n.id)}
                   className={cn(
-                    'flex w-full flex-col gap-0.5 border-b px-3 py-2 text-left text-xs hover:bg-muted/50',
-                    !n.read && 'bg-muted/30',
+                    'flex w-full flex-col gap-1 px-4 py-3 text-left text-xs transition-colors hover:bg-muted/40',
+                    !n.read && 'bg-primary/5',
                   )}
                 >
-                  <span className={cn(!n.read && 'font-medium')}>{n.message}</span>
-                  <span className="text-muted-foreground text-[10px]">
+                  <span className={cn('text-xs leading-relaxed', !n.read ? 'font-bold text-foreground' : 'text-muted-foreground')}>
+                    {n.message}
+                  </span>
+                  <span className="text-[10px] font-mono text-muted-foreground/80">
                     {new Date(n.createdAt).toLocaleDateString()}
                   </span>
                 </button>
