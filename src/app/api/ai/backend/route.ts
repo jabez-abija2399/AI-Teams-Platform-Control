@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { toResponse, unauthorizedResponse } from '@/lib/api-response';
-import { generateBackendDesignSpec } from '@/ai/agents/roles/backend/backend.service';
+import { generateBackendDesignSpec } from '@/packages/agents/roles/backend/backend.service';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 

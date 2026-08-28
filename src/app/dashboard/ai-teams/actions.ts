@@ -1,7 +1,7 @@
 'use server';
 
-import { getAgentSummaries } from '@/ai/agents/manager/agent.manager';
-import type { AgentRole, AgentStatus } from '@/ai/agents/core/agent.types';
+import { getAgentSummaries } from '@/packages/agents/manager/agent.manager';
+import type { AgentRole, AgentStatus } from '@/packages/agents/core/agent.types';
 
 export interface AgentSummaryData {
   id: string;

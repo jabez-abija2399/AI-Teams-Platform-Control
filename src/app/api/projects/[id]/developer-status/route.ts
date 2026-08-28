@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getBuildState } from '@/ai/agents/roles/developer/developer.service';
+import { getBuildState } from '@/packages/agents/roles/developer/developer.service';
 
 interface Params {
   params: Promise<{ id: string }>;

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { toResponse, unauthorizedResponse } from '@/lib/api-response';
-import { generateUxResearchSpec } from '@/ai/agents/roles/ux-researcher/ux-researcher.service';
+import { generateUxResearchSpec } from '@/packages/agents/roles/ux-researcher/ux-researcher.service';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 

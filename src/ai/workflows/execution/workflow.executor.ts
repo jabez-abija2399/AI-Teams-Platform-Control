@@ -1,9 +1,9 @@
 import type { WorkflowStep } from '../core/workflow.types';
-import { analyzeUserIdea } from '../../agents/roles/ceo/ceo.service';
-import { designArchitecture } from '../../agents/roles/architect/architect.service';
-import { implementArchitecture } from '../../agents/roles/developer/developer.service';
-import { reviewImplementation } from '../../agents/roles/qa/qa.service';
-import { getMemoryManager } from '../../agents/memory/memory.manager';
+import { analyzeUserIdea } from '@/packages/agents/roles/ceo/ceo.service';
+import { designArchitecture } from '@/packages/agents/roles/architect/architect.service';
+import { implementArchitecture } from '@/packages/agents/roles/developer/developer.service';
+import { reviewImplementation } from '@/packages/agents/roles/qa-engineer/qa-engineer.service';
+import { getMemoryManager } from '@/packages/agents/memory/memory.manager';
 
 export interface StepExecutionResult {
   success: boolean;

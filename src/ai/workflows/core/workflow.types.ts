@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { AgentRole } from '../../agents/core/agent.types';
+import type { AgentRole } from '@/packages/agents/core/agent.types';
 
 export const WorkflowStatusSchema = z.enum([
   'PENDING',

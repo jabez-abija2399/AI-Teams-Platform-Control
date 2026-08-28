@@ -1,4 +1,4 @@
-import type { AgentRole } from '../agents/core/agent.types';
+import type { AgentRole } from '@/packages/agents/core/agent.types';
 import type { AgentQualityScore, EvaluationMetricRecord, AgentAnalyticsSummary } from './evaluation.types';
 
 export class ScoringEngine {

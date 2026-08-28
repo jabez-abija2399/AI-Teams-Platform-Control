@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { toResponse, unauthorizedResponse } from '@/lib/api-response';
-import { generateDevopsPlanSpec } from '@/ai/agents/roles/devops/devops.service';
+import { generateDevopsPlanSpec } from '@/packages/agents/roles/devops-engineer/devops-engineer.service';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 

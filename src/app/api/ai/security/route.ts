@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { toResponse, unauthorizedResponse } from '@/lib/api-response';
-import { generateSecurityReportSpec } from '@/ai/agents/roles/security/security.service';
+import { generateSecurityReportSpec } from '@/packages/agents/roles/security-auditor/security-auditor.service';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 

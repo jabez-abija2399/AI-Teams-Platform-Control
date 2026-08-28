@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { toResponse, unauthorizedResponse } from '@/lib/api-response';
-import { generateSoftwareRequirementSpec } from '@/ai/agents/roles/business-analyst/business-analyst.service';
+import { generateSoftwareRequirementSpec } from '@/packages/agents/roles/business-analyst/business-analyst.service';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 

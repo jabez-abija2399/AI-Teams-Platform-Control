@@ -1,4 +1,4 @@
-import { AgentRole } from '@/ai/agents/core/agent.types';
+import { AgentRole } from '@/packages/agents/core/agent.types';
 
 export type TaskCategory = 'CODING' | 'PLANNING' | 'ARCHITECTURE' | 'TESTING' | 'DOCUMENTATION' | 'ANALYSIS' | 'CONVERSATION';
 

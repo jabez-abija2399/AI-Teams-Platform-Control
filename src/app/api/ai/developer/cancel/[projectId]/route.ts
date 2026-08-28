@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { cancelBuild, getBuildState } from '@/ai/agents/roles/developer/developer.service';
+import { cancelBuild, getBuildState } from '@/packages/agents/roles/developer/developer.service';
 
 interface Params {
   params: Promise<{ projectId: string }>;

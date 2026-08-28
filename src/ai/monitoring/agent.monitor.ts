@@ -1,4 +1,4 @@
-import type { IAgent } from '../agents/core/agent.interface';
+import type { IAgent } from '@/packages/agents/core/agent.interface';
 
 export interface AgentHealth {
   agentId: string;

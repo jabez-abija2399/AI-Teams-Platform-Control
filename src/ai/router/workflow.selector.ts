@@ -1,4 +1,4 @@
-import type { AgentRole } from '../agents/core/agent.types';
+import type { AgentRole } from '@/packages/agents/core/agent.types';
 import { getWorkflow } from '../../core/workflow-engine/workflow.registry';
 
 export interface SelectedWorkflowResult {

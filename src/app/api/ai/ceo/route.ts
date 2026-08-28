@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
-import { toResponse, unauthorizedResponse } from '@/lib/api-response';
-import { analyzeUserIdea } from '@/ai/agents/roles/ceo/ceo.service';
+import { toResponse } from '@/lib/api-response';
+import { analyzeUserIdea } from '@/packages/agents/roles/ceo/ceo.service';
 import { z } from 'zod';
 
 const requestSchema = z.object({
@@ -10,9 +9,6 @@ const requestSchema = z.object({
 });
 
 export async function POST(request: Request) {
-  // const session = await auth();
-  // if (!session?.user?.id) return unauthorizedResponse();
-
   const body = await request.json();
   const parsed = requestSchema.safeParse(body);
   if (!parsed.success) {

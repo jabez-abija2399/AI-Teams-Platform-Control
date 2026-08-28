@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { toResponse, unauthorizedResponse } from '@/lib/api-response';
-import { reviewImplementation } from '@/ai/agents/roles/qa/qa.service';
+import { reviewImplementation } from '@/packages/agents/roles/qa-engineer/qa-engineer.service';
 import { z } from 'zod';
 
 const requestSchema = z.object({

@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { unauthorizedResponse } from '@/lib/api-response';
-import { implementArchitecture } from '@/ai/agents/roles/developer/developer.service';
+import { implementArchitecture } from '@/packages/agents/roles/developer/developer.service';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
-import { productRequirementSchema } from '@/ai/agents/roles/ceo/ceo.types';
-import type { ArchitectAnalysis } from '@/ai/agents/roles/architect/architect.types';
-import type { ProductRequirement } from '@/ai/agents/roles/ceo/ceo.types';
+import { productRequirementSchema } from '@/packages/agents/roles/ceo/ceo.types';
+import type { ArchitectAnalysis } from '@/packages/agents/roles/architect/architect.types';
+import type { ProductRequirement } from '@/packages/agents/roles/ceo/ceo.types';
 
 const endpointSchema = z.object({
   path: z.string(),

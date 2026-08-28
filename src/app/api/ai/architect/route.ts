@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { toResponse, unauthorizedResponse } from '@/lib/api-response';
-import { designArchitecture } from '@/ai/agents/roles/architect/architect.service';
+import { designArchitecture } from '@/packages/agents/roles/architect/architect.service';
 import { prisma } from '@/lib/prisma';
-import { productRequirementSchema } from '@/ai/agents/roles/ceo/ceo.types';
+import { productRequirementSchema } from '@/packages/agents/roles/ceo/ceo.types';
 import { z } from 'zod';
 
 const requestSchema = z.object({

@@ -11,7 +11,7 @@ import { QAChat } from '@/features/qa-ai/components/qa-chat';
 import { DeploymentPanel } from '@/features/deployment/components/deployment-panel';
 import { WorkspaceBuildSync } from '@/features/workspace/components/workspace-build-sync';
 import { Loader2, Rocket, CheckCircle, XCircle, Clock } from 'lucide-react';
-import type { CEOAnalysis } from '@/ai/agents/roles/ceo/ceo.types';
+import type { CEOAnalysis } from '@/packages/agents/roles/ceo/ceo.types';
 import { MissionControlDashboard } from '@/features/observability/components/mission-control-dashboard';
 import { MissionControlWorkspace } from '@/components/workspace/mission-control-workspace';
 

@@ -658,7 +658,7 @@ export async function GET(
         ) {
           try {
             const { regenerateArchitectureForConfirmedStack } = await import(
-              '@/ai/agents/roles/architect/architect.service'
+              '@/packages/agents/roles/architect/architect.service'
             );
             const fixed = await regenerateArchitectureForConfirmedStack(projectId);
             if (fixed) {
