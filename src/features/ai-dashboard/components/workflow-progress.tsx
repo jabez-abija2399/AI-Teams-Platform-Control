@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { AgentAvatar } from '@/features/onboarding/components/agent-avatar';
 import type { WorkflowProgress } from '@/ai/workflows/core/workflow.types';
+import { cn } from '@/lib/utils';
 
 interface WorkflowProgressProps {
   projectId: string;
@@ -31,58 +32,59 @@ export function WorkflowProgressCard({ projectId }: WorkflowProgressProps) {
   }, [projectId]);
 
   const statusColor: Record<string, string> = {
-    PENDING: 'bg-gray-100 text-gray-800',
-    RUNNING: 'bg-blue-100 text-blue-800',
-    COMPLETED: 'bg-green-100 text-green-800',
-    FAILED: 'bg-red-100 text-red-800',
-    PAUSED: 'bg-yellow-100 text-yellow-800',
-    CANCELLED: 'bg-gray-100 text-gray-800',
+    PENDING: 'bg-muted text-muted-foreground',
+    RUNNING: 'bg-primary/15 text-primary border border-primary/30',
+    COMPLETED: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30',
+    FAILED: 'bg-destructive/15 text-destructive border border-destructive/30',
+    PAUSED: 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30',
+    CANCELLED: 'bg-muted text-muted-foreground',
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Workflow Progress</CardTitle>
+    <Card className="rounded-2xl border border-border/80 glass-card shadow-sm">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base font-bold text-foreground">Workflow Progress</CardTitle>
       </CardHeader>
       <CardContent>
         {workflows.length === 0 ? (
-          <p className="text-muted-foreground text-sm">No workflows running.</p>
+          <p className="text-muted-foreground text-xs">No workflows running.</p>
         ) : (
           <div className="space-y-4">
             {workflows.map((wf) => (
-              <div key={wf.workflowId} className="rounded-lg border p-3">
-                <div className="mb-2 flex items-center justify-between">
-                  <span className="font-medium">Workflow</span>
-                  <Badge variant="secondary" className={statusColor[wf.status] ?? ''}>
+              <div key={wf.workflowId} className="rounded-xl border border-border/70 glass-card p-4">
+                <div className="mb-2.5 flex items-center justify-between">
+                  <span className="text-xs font-bold text-foreground">Active Lifecycle</span>
+                  <Badge variant="secondary" className={cn('rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider', statusColor[wf.status] ?? '')}>
                     {wf.status}
                   </Badge>
                 </div>
-                <div className="mb-2 h-2 w-full rounded-full bg-gray-200">
+                <div className="mb-3 h-1.5 w-full rounded-full bg-secondary/80 overflow-hidden">
                   <div
-                    className="h-2 rounded-full bg-blue-600 transition-all"
+                    className="h-full rounded-full bg-primary transition-all duration-500"
                     style={{ width: `${wf.percentComplete}%` }}
                   />
                 </div>
-                <div className="space-y-1">
+                <div className="space-y-1.5">
                   {wf.steps.map((step, i) => (
                     <div
                       key={`${wf.workflowId}-step-${i}`}
-                      className="flex items-center gap-2 text-xs"
+                      className="flex items-center gap-2.5 rounded-lg px-2 py-1 text-xs transition-colors hover:bg-muted/40"
                     >
                       <AgentAvatar role={step.agentRole as 'CEO' | 'ARCHITECT' | 'DEVELOPER' | 'QA'} size="sm" />
-                      <span className="text-muted-foreground">
+                      <span className="text-xs font-medium text-foreground">
                         {step.name}
                       </span>
                       <span
-                        className={`ml-auto h-2 w-2 rounded-full ${
+                        className={cn(
+                          'ml-auto h-2 w-2 rounded-full',
                           step.status === 'COMPLETED'
-                            ? 'bg-green-500'
+                            ? 'bg-emerald-500'
                             : step.status === 'RUNNING'
-                              ? 'bg-blue-500'
+                              ? 'bg-primary animate-pulse'
                               : step.status === 'FAILED'
-                                ? 'bg-red-500'
-                                : 'bg-gray-300'
-                        }`}
+                                ? 'bg-destructive'
+                                : 'bg-muted-foreground/30',
+                        )}
                       />
                     </div>
                   ))}

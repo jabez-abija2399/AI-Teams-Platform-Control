@@ -34,22 +34,22 @@ export function ConversationPanel({ projectId }: ConversationPanelProps) {
   }, [projectId]);
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Agent Communication</CardTitle>
+    <Card className="rounded-2xl border border-border/80 glass-card shadow-sm">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base font-bold text-foreground">Agent Inter-Communication</CardTitle>
       </CardHeader>
       <CardContent>
         {messages.length === 0 ? (
-          <p className="text-muted-foreground text-sm">No agent communication yet.</p>
+          <p className="text-muted-foreground text-xs">No agent communication yet.</p>
         ) : (
-          <div className="max-h-64 space-y-2 overflow-y-auto">
+          <div className="max-h-64 space-y-2.5 overflow-y-auto">
             {messages.map((msg) => (
-              <div key={msg.id} className="rounded border p-2">
+              <div key={msg.id} className="rounded-xl border border-border/70 glass-card p-3 transition-all duration-200 hover:border-primary/30">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-medium">{msg.senderName}</span>
-                  <span className="text-muted-foreground text-xs">({msg.senderRole})</span>
+                  <span className="text-xs font-bold text-foreground">{msg.senderName}</span>
+                  <span className="text-muted-foreground text-[10px] font-medium uppercase tracking-wider">({msg.senderRole})</span>
                 </div>
-                <p className="mt-1 text-sm">{msg.content}</p>
+                <p className="mt-1 text-xs leading-relaxed text-foreground/90">{msg.content}</p>
               </div>
             ))}
           </div>
