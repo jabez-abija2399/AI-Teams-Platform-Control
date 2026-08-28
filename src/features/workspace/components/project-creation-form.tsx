@@ -141,8 +141,23 @@ export function ProjectCreationForm() {
       const projectId = result.data?.id;
       if (!projectId) throw new Error('No project ID returned from server');
 
-      toast.success('Project Created', {
-        description: `"${projectName}" initialized. Entering workspace…`,
+      // Automatically trigger the build/execution pipeline so it starts building right away
+      try {
+        const startRes = await fetch(`/api/projects/${projectId}/lifecycle/start`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userIdea: idea.trim() }),
+        });
+        const startResult = await startRes.json().catch(() => null);
+        if (!startRes.ok || !startResult?.success) {
+          console.warn('Pipeline automatic trigger failed, but project was successfully created:', startResult?.error);
+        }
+      } catch (startErr) {
+        console.warn('Network error while triggering pipeline:', startErr);
+      }
+
+      toast.success('Project Created & Team Assembled', {
+        description: `"${projectName}" is now being built by your AI workforce.`,
       });
       router.push(`/dashboard/projects/${projectId}/workspace`);
     } catch (err) {

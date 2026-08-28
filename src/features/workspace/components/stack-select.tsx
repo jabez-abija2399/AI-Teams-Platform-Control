@@ -75,6 +75,11 @@ export function StackSelect({
 
               {/* Status / Recommended Tags */}
               <div className="flex items-center gap-1.5">
+                {opt.isDefault && (
+                  <span className="rounded-full bg-success/20 text-success border border-success/30 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider shadow-sm">
+                    Default
+                  </span>
+                )}
                 {opt.recommended && (
                   <span className="rounded-full bg-gradient-to-r from-primary to-secondary px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white shadow-sm">
                     Recommended
