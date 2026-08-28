@@ -15,10 +15,10 @@ import {
   Shield,
   Trash2,
   Zap,
+  Sparkles,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { ROUTES } from '@/config/constants';
+import { GlassCard, NeonButton, StatusBadge } from '@/packages/ui';
 import {
   DEFAULT_FREE_PROVIDER_ID,
   isUserAiProviderId,
@@ -27,15 +27,16 @@ import {
 } from '@/features/ai-credentials/ai-provider-catalog';
 import type { AiCredentialPublicStatus } from '@/features/ai-credentials/ai-credentials.types';
 
-const fieldClass =
-  'border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-11 w-full rounded-xl border border-border/80 bg-background px-3.5 text-sm outline-none focus-visible:ring-3 transition-all';
-
 interface AiCredentialsFormProps {
   embedded?: boolean;
   onConfigured?: (status: AiCredentialPublicStatus) => void;
   className?: string;
 }
 
+/**
+ * Ultra-Modern Cyber Void AI Credentials Configuration Suite.
+ * Handles secure BYOK (Bring-Your-Own-Key) credentials for Google Gemini, Groq, OpenAI, Anthropic, and OpenRouter.
+ */
 export function AiCredentialsForm({ embedded = false, onConfigured, className }: AiCredentialsFormProps) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -102,33 +103,37 @@ export function AiCredentialsForm({ embedded = false, onConfigured, className }:
     }
 
     try {
-      const res = await fetch('/api/settings/ai-credentials/test', {
+      const res = await fetch('/api/settings/ai-credentials', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           provider: selected.id,
           apiKey: keyToTest || undefined,
-          defaultModel: selected.defaultModel,
+          action: 'test',
         }),
       });
 
       const json = await res.json();
+
       if (!res.ok || !json.success) {
         throw new Error(json?.error?.message || 'Connection test failed');
       }
 
-      const msg = `Successfully connected to ${selected.name} (${json.data.model} · ${json.data.latencyMs}ms)`;
       setTestResult({
         success: true,
-        message: msg,
-        model: json.data.model,
-        latencyMs: json.data.latencyMs,
+        message: json.data?.message || 'Connection verified successfully',
+        model: json.data?.model,
+        latencyMs: json.data?.latencyMs,
       });
-      toast.success('Connection Verified', { description: msg });
+
+      toast.success('Connection Successful', {
+        description: `Connected to ${selected.name} · ${json.data?.latencyMs ?? 0}ms latency`,
+      });
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Verification failed';
-      setTestResult({ success: false, message: msg });
-      toast.error('Connection Test Failed', { description: msg });
+      const message = err instanceof Error ? err.message : 'Connection test failed';
+      setTestResult({ success: false, message });
+      setError(message);
+      toast.error('Connection Test Failed', { description: message });
     } finally {
       setTesting(false);
     }
@@ -137,37 +142,41 @@ export function AiCredentialsForm({ embedded = false, onConfigured, className }:
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selected || saving) return;
+
+    const trimmedKey = apiKey.trim();
+    if (!trimmedKey) {
+      setError('Please enter an API key');
+      return;
+    }
+
     setSaving(true);
     setError(null);
     setTestResult(null);
 
-    const keyToSave = apiKey.trim();
-    if (keyToSave.length < 8) {
-      setError('Please paste a full API key (at least 8 characters).');
-      setSaving(false);
-      return;
-    }
-
     try {
       const res = await fetch('/api/settings/ai-credentials', {
-        method: 'PUT',
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           provider: selected.id,
-          apiKey: keyToSave,
-          defaultModel: selected.defaultModel,
+          apiKey: trimmedKey,
         }),
       });
+
       const json = await res.json();
+
       if (!res.ok || !json.success) {
         throw new Error(json?.error?.message || 'Could not save API key');
       }
-      setStatus(json.data);
+
+      setStatus(json.data.status);
       setApiKey('');
-      toast.success('API Key Saved & Connected', {
-        description: `${json.data.providerName} is now active and powering your AI software company.`,
+      setShowKey(false);
+      onConfigured?.(json.data.status);
+
+      toast.success('API Key Saved & Encrypted', {
+        description: `${selected.name} configured. Ready to run projects.`,
       });
-      onConfigured?.(json.data);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Could not save API key';
       setError(message);
@@ -182,12 +191,17 @@ export function AiCredentialsForm({ embedded = false, onConfigured, className }:
     setRemoving(true);
     setError(null);
     setTestResult(null);
+
     try {
-      const res = await fetch('/api/settings/ai-credentials', { method: 'DELETE' });
+      const res = await fetch('/api/settings/ai-credentials', {
+        method: 'DELETE',
+      });
+
       const json = await res.json();
       if (!res.ok || !json.success) {
         throw new Error(json?.error?.message || 'Could not remove API key');
       }
+
       setStatus({
         configured: false,
         provider: null,
@@ -196,6 +210,7 @@ export function AiCredentialsForm({ embedded = false, onConfigured, className }:
         defaultModel: null,
         updatedAt: null,
       });
+
       toast.success('API key removed');
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Could not remove API key';
@@ -208,239 +223,208 @@ export function AiCredentialsForm({ embedded = false, onConfigured, className }:
 
   if (loading) {
     return (
-      <div className={cn('flex items-center justify-center gap-2 py-12 text-sm text-muted-foreground', className)}>
+      <GlassCard className="flex items-center justify-center gap-3 py-16 text-sm text-white/50">
         <Loader2 className="h-5 w-5 animate-spin text-primary" />
-        Loading AI credentials…
-      </div>
+        <span>Loading AI credentials telemetry…</span>
+      </GlassCard>
     );
   }
 
   return (
     <div className={cn('space-y-6', className)}>
-      <div className="rounded-2xl border border-primary/20 bg-primary/[0.04] p-5 shadow-xs">
-        <div className="flex gap-3.5">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+      {/* Information Header Card */}
+      <GlassCard className="p-6 border-primary/20 bg-gradient-to-r from-surface-glass/80 to-primary/5">
+        <div className="flex gap-4">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/20 text-primary border border-primary/40 shadow-[0_0_15px_rgba(99,102,241,0.3)]">
             {embedded ? <Gift className="h-5 w-5" /> : <KeyRound className="h-5 w-5" />}
           </div>
           <div>
-            <p className="font-heading text-base font-bold text-foreground">
+            <p className="text-base font-bold text-white tracking-tight">
               {embedded ? 'Connect Your AI Provider (BYOK)' : 'Bring Your Own Key (BYOK)'}
             </p>
-            <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-              Your AI company calls LLM providers securely using your API key. Keys are encrypted at rest with AES-256-GCM and never exposed to the client or project code.
+            <p className="mt-1 text-xs leading-relaxed text-white/60">
+              Your AI company calls LLM providers securely using your API key. Keys are encrypted at rest with AES-256-GCM and never exposed to client code.
             </p>
           </div>
         </div>
-      </div>
+      </GlassCard>
 
+      {/* Active Connected Status Card */}
       {status?.configured && (
-        <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/[0.05] p-4">
+        <GlassCard className="p-5 border-success/30 bg-success/5 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-success/20 text-success border border-success/40 shadow-[0_0_15px_rgba(16,185,129,0.3)]">
               <CheckCircle2 className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-foreground">
+              <p className="text-sm font-bold text-white">
                 {status.providerName}
-                <span className="ml-2 font-mono text-xs text-muted-foreground">{status.keyHint}</span>
+                <span className="ml-2 font-mono text-xs text-white/50">{status.keyHint}</span>
               </p>
-              <p className="text-xs text-muted-foreground">
-                Model: <span className="font-medium text-foreground">{status.defaultModel ?? 'default'}</span> · Status: Connected
+              <p className="text-xs text-white/50">
+                Model: <span className="font-medium text-white/80">{status.defaultModel ?? 'default'}</span>
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button
+            <button
               type="button"
-              variant="outline"
-              size="sm"
-              className="gap-1.5 rounded-xl font-medium"
               disabled={testing}
               onClick={() => void handleTestConnection()}
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-primary border border-primary/30 bg-primary/10 hover:bg-primary/20 transition-all"
             >
-              {testing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Zap className="h-3.5 w-3.5 text-primary" />}
-              Test Saved Connection
-            </Button>
-            <Button
+              {testing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Zap className="h-3.5 w-3.5" />}
+              Test Connection
+            </button>
+            <button
               type="button"
-              variant="ghost"
-              size="sm"
-              className="gap-1.5 rounded-xl text-destructive hover:bg-destructive/10 hover:text-destructive"
               disabled={removing}
               onClick={() => void handleRemove()}
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-danger border border-danger/30 bg-danger/10 hover:bg-danger/20 transition-all"
             >
               {removing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
               Remove
-            </Button>
+            </button>
           </div>
-        </div>
+        </GlassCard>
       )}
 
+      {/* Test Result Alert Banner */}
       {testResult && (
         <div
           className={cn(
-            'flex items-start gap-2.5 rounded-xl border p-4 text-xs transition-all',
+            'flex items-start gap-3 rounded-2xl border p-4 text-xs transition-all backdrop-blur-xl',
             testResult.success
-              ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-800 dark:text-emerald-200'
-              : 'border-destructive/40 bg-destructive/10 text-destructive',
+              ? 'border-success/40 bg-success/10 text-success'
+              : 'border-danger/40 bg-danger/10 text-danger',
           )}
         >
           {testResult.success ? (
-            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
           ) : (
             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
           )}
           <div className="flex-1">
-            <span className="font-semibold">{testResult.success ? 'API Connection Verified' : 'Connection Test Failed'}</span>
-            <p className="mt-0.5 font-normal leading-relaxed opacity-90">{testResult.message}</p>
+            <span className="font-bold">{testResult.success ? 'API Connection Verified' : 'Connection Test Failed'}</span>
+            <p className="mt-0.5 leading-relaxed opacity-90">{testResult.message}</p>
           </div>
         </div>
       )}
 
+      {/* Error Alert */}
       {error && (
-        <div className="flex items-start gap-2.5 rounded-xl border border-destructive/30 bg-destructive/10 p-3.5 text-xs text-destructive">
-          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
-          <span>{error}</span>
+        <div className="rounded-xl border border-danger/30 bg-danger/10 p-4 text-xs font-medium text-danger">
+          {error}
         </div>
       )}
 
-      <form onSubmit={handleSave} className="space-y-4 rounded-2xl border border-border/80 glass-card p-6 shadow-xs">
-        <div className="space-y-2.5">
-          <label htmlFor="ai-provider" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-            Select AI Provider
-          </label>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-            {providers.map((p) => (
-              <button
-                key={p.id}
-                type="button"
-                onClick={() => {
-                  setProvider(p.id);
-                  setTestResult(null);
-                  setError(null);
-                }}
-                className={cn(
-                  'flex flex-col items-start p-3 rounded-xl border text-left transition-all',
-                  provider === p.id
-                    ? 'border-primary bg-primary/10 text-foreground ring-1 ring-primary'
-                    : 'border-border bg-background/50 hover:border-primary/40 text-muted-foreground hover:text-foreground',
-                )}
-              >
-                <div className="flex w-full items-center justify-between">
-                  <span className="text-xs font-bold">{p.name}</span>
-                  {p.pricing === 'free_tier' && (
-                    <span className="rounded-full bg-emerald-500/15 px-1.5 py-0.5 text-[9px] font-bold text-emerald-600 dark:text-emerald-400">
-                      Free
-                    </span>
-                  )}
-                </div>
-                <span className="mt-1 text-[11px] text-muted-foreground line-clamp-1">{p.defaultModel}</span>
-              </button>
-            ))}
+      {/* Main Credentials Form */}
+      <form onSubmit={handleSave} className="space-y-6">
+        <GlassCard className="p-6 space-y-6 border-white/10 shadow-xl">
+          {/* Provider Selection Grid */}
+          <div className="space-y-3">
+            <label className="text-xs font-bold uppercase tracking-wider text-white/70">
+              Select AI Provider
+            </label>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {providers.map((p) => {
+                const isSelected = provider === p.id;
+                return (
+                  <button
+                    key={p.id}
+                    type="button"
+                    onClick={() => {
+                      setProvider(p.id);
+                      setTestResult(null);
+                    }}
+                    className={cn(
+                      'p-3.5 rounded-xl border text-left transition-all duration-200 backdrop-blur-md',
+                      isSelected
+                        ? 'border-primary/80 bg-primary/20 shadow-[0_0_15px_rgba(99,102,241,0.25)] ring-1 ring-primary/60'
+                        : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10'
+                    )}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-bold text-white">{p.name}</span>
+                      {p.pricing === 'free_tier' && (
+                        <span className="rounded-full bg-success/20 text-success border border-success/30 px-1.5 py-0.2 text-[9px] font-mono font-bold uppercase">
+                          Free
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[10px] text-white/50 line-clamp-1">{p.defaultModel}</p>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
-          {selected && (
-            <p className="mt-1 text-xs text-muted-foreground">{selected.description} {selected.pricingNote}</p>
-          )}
-        </div>
+          {/* API Key Input */}
+          <div className="space-y-2.5">
+            <div className="flex items-center justify-between">
+              <label htmlFor="api-key" className="text-xs font-bold uppercase tracking-wider text-white/70">
+                {selected?.name} API Key
+              </label>
+              {selected?.docsUrl && (
+                <a
+                  href={selected.docsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary hover:underline"
+                >
+                  Get an API key
+                  <ExternalLink className="h-3 w-3" />
+                </a>
+              )}
+            </div>
+            <div className="relative flex items-center">
+              <input
+                id="api-key"
+                type={showKey ? 'text' : 'password'}
+                value={apiKey}
+                onChange={(e) => setApiKey(e.target.value)}
+                placeholder={selected?.keyPlaceholder ?? 'Enter API Key'}
+                className="w-full h-11 rounded-xl border border-white/10 bg-white/5 px-4 pr-12 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/20 backdrop-blur-md transition-all font-mono"
+              />
+              <button
+                type="button"
+                onClick={() => setShowKey(!showKey)}
+                className="absolute right-3 text-white/40 hover:text-white transition-colors"
+              >
+                {showKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+          </div>
 
-        <div className="space-y-2 pt-2">
-          <label htmlFor="ai-api-key" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-            {status?.configured && status.provider === selected?.id ? 'Update API Key' : `${selected?.name || ''} API Key`}
-          </label>
-          <div className="relative">
-            <input
-              id="ai-api-key"
-              type={showKey ? 'text' : 'password'}
-              required={!status?.configured}
-              autoComplete="off"
-              value={apiKey}
-              onChange={(e) => {
-                setApiKey(e.target.value);
-                setTestResult(null);
-                setError(null);
-              }}
-              placeholder={selected?.keyPlaceholder ?? 'Paste your API key'}
-              className={cn(fieldClass, 'pr-11 font-mono')}
-            />
+          {/* Security Guarantee Pill */}
+          <div className="flex items-center gap-2 text-xs text-white/50 font-mono">
+            <Shield className="w-4 h-4 text-primary shrink-0" />
+            <span>Encrypted with AES-256-GCM. Stored in isolated database partition.</span>
+          </div>
+
+          {/* Save Action */}
+          <div className="pt-2 flex flex-col sm:flex-row gap-3">
+            <NeonButton
+              type="submit"
+              variant="primary"
+              isLoading={saving}
+              disabled={saving || !apiKey.trim()}
+              className="flex-1 h-11 text-xs font-bold"
+            >
+              Save & Activate Provider
+            </NeonButton>
             <button
               type="button"
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-              onClick={() => setShowKey((v) => !v)}
-              aria-label={showKey ? 'Hide API key' : 'Show API key'}
+              disabled={testing || !apiKey.trim()}
+              onClick={() => void handleTestConnection()}
+              className="h-11 px-5 rounded-xl border border-white/10 bg-white/5 text-white/80 hover:bg-white/10 hover:text-white text-xs font-bold transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
-              {showKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              {testing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5 text-primary" />}
+              Test Input Key
             </button>
           </div>
-          <p className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-            <Shield className="h-3 w-3 text-emerald-500" />
-            AES-256-GCM encrypted. Complete key is never shown again after saving.
-          </p>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-3 pt-2">
-          <Button
-            type="submit"
-            className="flex-1 rounded-xl font-bold h-11"
-            disabled={saving || (apiKey.trim().length < 8 && !status?.configured)}
-          >
-            {saving ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Encrypting & Saving…
-              </>
-            ) : status?.configured && status.provider === selected?.id ? (
-              'Update Saved Key'
-            ) : (
-              'Save & Connect API Key'
-            )}
-          </Button>
-
-          <Button
-            type="button"
-            variant="outline"
-            className="h-11 rounded-xl font-medium px-4 gap-1.5"
-            disabled={testing || saving}
-            onClick={() => void handleTestConnection()}
-          >
-            {testing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4 text-primary" />}
-            {apiKey.trim().length >= 8 ? 'Test API Key' : 'Test Connection'}
-          </Button>
-        </div>
+        </GlassCard>
       </form>
-
-      {selected && (
-        <div className="rounded-2xl border border-border/80 bg-background/60 p-5">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-              How to get a {selected.name} API key
-            </h3>
-            <a
-              href={selected.docsUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
-            >
-              Open {selected.name} Key Console
-              <ExternalLink className="h-3 w-3" />
-            </a>
-          </div>
-          <ol className="mt-3 list-decimal space-y-1.5 pl-4 text-xs leading-relaxed text-muted-foreground">
-            {selected.steps.map((step) => (
-              <li key={step}>{step}</li>
-            ))}
-          </ol>
-          {embedded && (
-            <p className="mt-4 text-xs text-muted-foreground">
-              You can manage or test this key anytime in{' '}
-              <Link href={ROUTES.settings} className="font-semibold text-primary hover:underline">
-                Settings
-              </Link>
-              .
-            </p>
-          )}
-        </div>
-      )}
     </div>
   );
 }
