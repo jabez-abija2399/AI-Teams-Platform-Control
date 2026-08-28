@@ -444,42 +444,44 @@ export function MissionControlBoard({
                   onClick={() => onOpenStudio?.({ focus: 'ai', agentTab: agentTabKey })}
                   title={`Click to open direct chat with ${row.label}`}
                   className={cn(
-                    'group flex w-full items-center justify-between rounded-xl border p-2.5 text-left transition-all cursor-pointer',
+                    'group relative flex w-full items-center justify-between rounded-xl border p-3 text-left transition-all duration-200 cursor-pointer',
                     status.active
-                      ? 'border-primary/30 bg-primary/10 shadow-xs ring-1 ring-primary/20 hover:bg-primary/15'
-                      : 'border-border/60 bg-card/50 hover:border-border hover:bg-card/80 hover:shadow-xs',
+                      ? 'border-primary/40 bg-primary/10 shadow-md ring-1 ring-primary/30 glow-teal hover:bg-primary/15'
+                      : 'border-border/60 bg-card/60 hover:border-primary/30 hover:bg-card/90 hover:shadow-sm',
                   )}
                 >
-                  <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="flex items-center gap-3 min-w-0">
                     <div
                       className={cn(
-                        'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border transition-colors',
+                        'flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border transition-all duration-200',
                         status.active
-                          ? 'border-primary/40 bg-primary/20 text-primary'
-                          : 'border-border bg-secondary text-muted-foreground group-hover:text-foreground group-hover:border-primary/30',
+                          ? 'border-primary/40 bg-primary/20 text-primary shadow-xs'
+                          : 'border-border/80 bg-secondary/80 text-muted-foreground group-hover:text-primary group-hover:border-primary/30 group-hover:bg-primary/5',
                       )}
                     >
-                      <Icon className="h-4 w-4" />
+                      <Icon className="h-4.5 w-4.5" />
                     </div>
                     <div className="min-w-0">
-                      <p className={cn('truncate text-xs font-semibold', status.active ? 'text-foreground' : 'text-muted-foreground group-hover:text-foreground')}>
+                      <p className={cn('truncate text-xs font-bold tracking-tight', status.active ? 'text-foreground' : 'text-muted-foreground group-hover:text-foreground')}>
                         {row.label}
                       </p>
-                      <p className="truncate text-[10px] text-muted-foreground/80">{row.sublabel}</p>
+                      <p className="truncate text-[10px] font-medium text-muted-foreground/80">{row.sublabel}</p>
                     </div>
                   </div>
 
-                  <span
-                    className={cn(
-                      'shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider',
-                      status.active && 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 animate-pulse',
-                      status.label === 'Queued' && 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
-                      status.label === 'Done' && 'bg-primary/10 text-primary',
-                      status.label === 'Standby' && 'text-muted-foreground/60',
-                    )}
-                  >
-                    {status.label}
-                  </span>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <span
+                      className={cn(
+                        'rounded-md px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider transition-colors',
+                        status.active && 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 animate-pulse border border-emerald-500/30',
+                        status.label === 'Queued' && 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/20',
+                        status.label === 'Done' && 'bg-primary/15 text-primary border border-primary/20',
+                        status.label === 'Standby' && 'text-muted-foreground/60 border border-transparent',
+                      )}
+                    >
+                      {status.label}
+                    </span>
+                  </div>
                 </button>
               );
             })}
