@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { toast } from 'sonner';
 import {
   ArrowLeft,
   FolderGit2,
@@ -16,6 +17,7 @@ import {
   CheckCircle,
   Loader2,
   Network,
+  Sparkles,
 } from 'lucide-react';
 import { CodeViewer } from './code-viewer';
 import { AgentChat } from './agent-chat';
@@ -52,6 +54,7 @@ export function WorkspaceClientShell({ projectId, projectName }: WorkspaceClient
   const [isGitHubModalOpen, setIsGitHubModalOpen] = useState(false);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [editorTheme, setEditorTheme] = useState<string>('cyber-void');
+  const [isTriggering, setIsTriggering] = useState(false);
 
   // File explorer states
   const [files, setFiles] = useState<ProjectFile[]>([]);
@@ -162,6 +165,32 @@ export function WorkspaceClientShell({ projectId, projectName }: WorkspaceClient
       }
     } catch {
       // Ignore
+    }
+  };
+
+  const handleStartPipeline = async () => {
+    setIsTriggering(true);
+    try {
+      const res = await fetch(`/api/projects/${projectId}/lifecycle/start`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const json = await res.json().catch(() => null);
+      if (res.ok && json?.success) {
+        toast.success('Build Pipeline Dispatched', {
+          description: 'Your autonomous team is starting the spec design and file output.',
+        });
+      } else {
+        toast.error('Trigger Failed', {
+          description: json?.error?.message || 'Could not start build pipeline.',
+        });
+      }
+    } catch {
+      toast.error('Network Error', {
+        description: 'Failed to contact the build gateway.',
+      });
+    } finally {
+      setIsTriggering(false);
     }
   };
 
@@ -362,15 +391,33 @@ export function WorkspaceClientShell({ projectId, projectName }: WorkspaceClient
               </div>
 
               {/* Monaco Code Viewer Container */}
-              <div className="flex-1 h-full shadow-[0_0_50px_rgba(0,0,0,0.5)] rounded-2xl overflow-hidden">
-                <CodeViewer
-                  code={displayCode}
-                  language={selectedFile?.language || 'typescript'}
-                  isStreaming={isStreaming}
-                  streamStatus={latestStatus}
-                  tokenCount={tokenCount}
-                  editorTheme={editorTheme}
-                />
+              <div className="flex-1 h-full shadow-[0_0_50px_rgba(0,0,0,0.5)] rounded-2xl overflow-hidden flex flex-col">
+                {files.length === 0 && !isStreaming ? (
+                  <div className="flex-grow flex flex-col items-center justify-center p-8 bg-surface-glass/40 border border-white/10 rounded-2xl text-center backdrop-blur-xl">
+                    <Sparkles className="w-12 h-12 text-primary animate-pulse mb-4" />
+                    <h3 className="text-lg font-bold text-white mb-2">Assemble Team & Launch Build</h3>
+                    <p className="text-xs text-white/50 max-w-sm mb-6 leading-relaxed">
+                      Your autonomous developer team is configured and waiting for the launch command to start code generation.
+                    </p>
+                    <NeonButton
+                      onClick={handleStartPipeline}
+                      isLoading={isTriggering}
+                      className="w-full max-w-[280px] h-12 text-xs font-bold"
+                    >
+                      <Play className="w-3.5 h-3.5 mr-2 fill-current" />
+                      <span>Start Autonomous Build</span>
+                    </NeonButton>
+                  </div>
+                ) : (
+                  <CodeViewer
+                    code={displayCode}
+                    language={selectedFile?.language || 'typescript'}
+                    isStreaming={isStreaming}
+                    streamStatus={latestStatus}
+                    tokenCount={tokenCount}
+                    editorTheme={editorTheme}
+                  />
+                )}
               </div>
             </div>
 
