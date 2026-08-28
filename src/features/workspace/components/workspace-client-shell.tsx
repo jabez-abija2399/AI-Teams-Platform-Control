@@ -18,6 +18,9 @@ import {
   Loader2,
   Network,
   Sparkles,
+  ShieldCheck,
+  AlertCircle,
+  MessageSquareDashed,
 } from 'lucide-react';
 import { CodeViewer } from './code-viewer';
 import { AgentChat } from './agent-chat';
@@ -26,7 +29,8 @@ import { GitHubExportModal } from './github-export-modal';
 import { ArchitectureVisualizerPanel } from './architecture-visualizer-panel';
 import { ImageGeneratorModal } from './image-generator-modal';
 import { useGenerationStream } from '../hooks/use-generation-stream';
-import { NeonButton } from '@/packages/ui';
+import { useWorkspaceStatus } from '../hooks/use-workspace-status';
+import { NeonButton, GlassCard } from '@/packages/ui';
 
 interface ChatMessage {
   id: string;
@@ -55,6 +59,18 @@ export function WorkspaceClientShell({ projectId, projectName }: WorkspaceClient
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [editorTheme, setEditorTheme] = useState<string>('cyber-void');
   const [isTriggering, setIsTriggering] = useState(false);
+  const [approvalFeedback, setApprovalFeedback] = useState('');
+  const [isApproving, setIsApproving] = useState(false);
+
+  // Poll real-time pipeline status and checkpoint approvals
+  const {
+    currentPhase,
+    phaseStatus,
+    progress,
+    approvalRequests,
+    pendingDocument,
+    refetchStatus,
+  } = useWorkspaceStatus(projectId);
 
   // File explorer states
   const [files, setFiles] = useState<ProjectFile[]>([]);
@@ -191,6 +207,42 @@ export function WorkspaceClientShell({ projectId, projectName }: WorkspaceClient
       });
     } finally {
       setIsTriggering(false);
+    }
+  };
+  const handleApprovePipeline = async (action: 'approve' | 'request_changes') => {
+    if (approvalRequests.length === 0) return;
+    setIsApproving(true);
+    try {
+      const res = await fetch(`/api/projects/${projectId}/pipeline/approve`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          approvalType: approvalRequests[0]?.artifactName || '',
+          action,
+          comments: approvalFeedback || undefined,
+        }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        toast.success(action === 'approve' ? 'Checkpoint Approved!' : 'Changes Requested', {
+          description: action === 'approve'
+            ? 'Pipeline resuming. The next generation stage has started.'
+            : 'AI agents are revising the specifications.',
+        });
+        setApprovalFeedback('');
+        refetchStatus();
+        fetchFiles();
+      } else {
+        toast.error('Approval Action Failed', {
+          description: json?.error?.message || 'Failed to submit pipeline checkpoint.',
+        });
+      }
+    } catch {
+      toast.error('Network Error', {
+        description: 'Failed to contact the approval gateway.',
+      });
+    } finally {
+      setIsApproving(false);
     }
   };
 
@@ -392,7 +444,91 @@ export function WorkspaceClientShell({ projectId, projectName }: WorkspaceClient
 
               {/* Monaco Code Viewer Container */}
               <div className="flex-1 h-full shadow-[0_0_50px_rgba(0,0,0,0.5)] rounded-2xl overflow-hidden flex flex-col">
-                {files.length === 0 && !isStreaming ? (
+                {approvalRequests.length > 0 && !isStreaming ? (
+                  <div className="flex-grow flex flex-col lg:flex-row h-full gap-4 p-4 bg-surface-glass/40 border border-white/10 rounded-2xl backdrop-blur-xl overflow-hidden">
+                    {/* Left: Pending Document Review Pane */}
+                    <div className="flex-[6] flex flex-col h-full bg-black/25 border border-white/5 rounded-xl p-6 overflow-hidden">
+                      <div className="flex items-center gap-2 mb-4 shrink-0">
+                        <AlertCircle className="w-5 h-5 text-warning" />
+                        <h3 className="text-base font-bold text-white tracking-tight">
+                          {pendingDocument?.title || approvalRequests[0]?.title || 'Pending Approval'}
+                        </h3>
+                      </div>
+                      <div className="flex-1 overflow-y-auto scrollbar-hide bg-white/[0.02] border border-white/5 rounded-lg p-4">
+                        {pendingDocument?.content ? (
+                          typeof pendingDocument.content === 'string' ? (
+                            <div className="whitespace-pre-wrap font-sans text-sm text-white/80 leading-relaxed">
+                              {pendingDocument.content}
+                            </div>
+                          ) : (
+                            <pre className="font-mono text-xs text-primary/80 bg-black/40 p-4 rounded-xl overflow-x-auto">
+                              {JSON.stringify(pendingDocument.content, null, 2)}
+                            </pre>
+                          )
+                        ) : (
+                          <div className="text-white/40 text-xs italic py-10 text-center">
+                            No document details available for review.
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Right: Approval Actions Control Card */}
+                    <div className="flex-[4] flex flex-col justify-between h-full bg-black/45 border border-white/10 rounded-xl p-5 overflow-hidden">
+                      <div className="space-y-4">
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-warning/10 border border-warning/30">
+                          <span className="w-1.5 h-1.5 rounded-full bg-warning animate-pulse" />
+                          <span className="text-[9px] font-mono text-warning font-bold uppercase tracking-wider">
+                            Executive Checkpoint
+                          </span>
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-bold text-white mb-1">
+                            {approvalRequests[0]?.title || 'Approval'} Required
+                          </h4>
+                          <p className="text-xs text-white/50 leading-relaxed">
+                            Sarah has assembled the requirements. Please review the documents and cast your executive validation vote.
+                          </p>
+                        </div>
+
+                        {/* Optional Feedback Comments */}
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-mono font-bold text-white/40 uppercase tracking-widest flex items-center gap-1">
+                            <MessageSquareDashed className="w-3 h-3" />
+                            Revision Feedback (Optional)
+                          </label>
+                          <textarea
+                            value={approvalFeedback}
+                            onChange={(e) => setApprovalFeedback(e.target.value)}
+                            placeholder="Add guidelines or request specific modifications..."
+                            className="w-full h-24 p-3 rounded-xl border border-white/10 bg-white/5 text-xs text-white/80 placeholder-white/20 focus:outline-none focus:border-primary/50 resize-none font-sans"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Approval Submission Buttons */}
+                      <div className="space-y-2.5 mt-4 shrink-0">
+                        <NeonButton
+                          onClick={() => handleApprovePipeline('approve')}
+                          isLoading={isApproving}
+                          className="w-full h-11 text-xs font-bold"
+                        >
+                          <ShieldCheck className="w-4 h-4 mr-2" />
+                          <span>Approve & Proceed</span>
+                        </NeonButton>
+
+                        <button
+                          type="button"
+                          onClick={() => handleApprovePipeline('request_changes')}
+                          disabled={isApproving}
+                          className="w-full h-11 rounded-xl border border-white/10 hover:bg-white/5 text-white/70 hover:text-white text-xs font-bold transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                        >
+                          Request Changes
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ) : files.length === 0 && !isStreaming ? (
                   <div className="flex-grow flex flex-col items-center justify-center p-8 bg-surface-glass/40 border border-white/10 rounded-2xl text-center backdrop-blur-xl">
                     <Sparkles className="w-12 h-12 text-primary animate-pulse mb-4" />
                     <h3 className="text-lg font-bold text-white mb-2">Assemble Team & Launch Build</h3>
