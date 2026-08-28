@@ -362,17 +362,16 @@ export function VibePreview({ projectId }: { projectId: string }) {
           <RefreshCw className={cn('h-3.5 w-3.5', loading && 'animate-spin')} />
         </button>
 
-        {iframeSrc && (
-          <a
-            href={iframeSrc}
-            target="_blank"
-            rel="noreferrer"
-            title="Open in new tab"
-            className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-          >
-            <ExternalLink className="h-3.5 w-3.5" />
-          </a>
-        )}
+        <a
+          href={iframeSrc || `/preview/${projectId}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Open preview in new tab"
+          className="inline-flex items-center gap-1.5 rounded-lg border border-border/80 bg-background/80 px-2.5 py-1 text-xs font-semibold text-foreground transition-all duration-200 hover:border-primary/40 hover:text-primary shadow-xs"
+        >
+          <ExternalLink className="h-3.5 w-3.5" />
+          <span className="hidden sm:inline text-[11px]">New Tab</span>
+        </a>
 
         <button
           type="button"

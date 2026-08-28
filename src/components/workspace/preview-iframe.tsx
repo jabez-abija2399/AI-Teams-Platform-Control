@@ -219,17 +219,16 @@ export function PreviewIframe({ previewUrl, status, progress, currentStep, proje
           >
             <RefreshCw className={clsx('w-3.5 h-3.5', apiStatus === 'loading' && 'animate-spin')} />
           </button>
-          {effectiveUrl && (
-            <a
-              href={effectiveUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-1.5 text-slate-500 hover:text-slate-300 rounded transition-colors"
-              title="Open in New Tab"
-            >
-              <ExternalLink className="w-3.5 h-3.5" />
-            </a>
-          )}
+          <a
+            href={effectiveUrl || (projectId ? `/preview/${projectId}` : '#')}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 px-2 py-1 text-slate-300 hover:text-white rounded-lg border border-slate-800 hover:border-slate-700 bg-slate-900/90 transition-colors text-xs font-semibold shadow-xs"
+            title="Open preview in new tab"
+          >
+            <ExternalLink className="w-3.5 h-3.5" />
+            <span className="text-[10px] hidden sm:inline">New Tab</span>
+          </a>
         </div>
       </div>
 

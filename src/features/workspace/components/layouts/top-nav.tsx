@@ -6,6 +6,7 @@ import {
   Building2,
   Columns2,
   Command,
+  ExternalLink,
   Eye,
   Play,
   Rocket,
@@ -25,6 +26,7 @@ export function TopNav({
   onBackToMission?: () => void;
 }) {
   const {
+    currentProjectId,
     togglePreviewSplit,
     layout,
     setActivity,
@@ -120,6 +122,19 @@ export function TopNav({
           <span className="hidden sm:inline">Preview</span>
           <Eye className="h-3 w-3 sm:hidden" />
         </button>
+
+        {currentProjectId && (
+          <a
+            href={`/preview/${currentProjectId}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-2.5 py-1 text-[11px] font-semibold text-foreground shadow-xs transition-colors hover:border-primary/40 hover:text-primary"
+            title="Open live preview in new tab"
+          >
+            <ExternalLink className="h-3 w-3" />
+            <span className="hidden sm:inline">New Tab</span>
+          </a>
+        )}
 
         <button
           type="button"
