@@ -67,9 +67,9 @@ export function LoginForm() {
         </p>
       </div>
 
-      <div className="rounded-2xl border border-border/80 bg-card/90 p-7 shadow-[0_24px_60px_-36px_rgba(36,95,115,0.45)]">
+      <div className="rounded-2xl border border-border/80 glass-card p-7 shadow-xl">
         {error && (
-          <div className="mb-5 flex items-center gap-2 rounded-xl border border-destructive/25 bg-destructive/10 p-3 text-sm text-destructive">
+          <div className="mb-5 flex items-center gap-2.5 rounded-xl border border-destructive/30 bg-destructive/10 p-3.5 text-xs font-medium text-destructive">
             <AlertCircle className="h-4 w-4 shrink-0" />
             <span>{error}</span>
           </div>

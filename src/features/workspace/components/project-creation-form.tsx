@@ -194,10 +194,10 @@ export function ProjectCreationForm() {
       ) : (
         <form
           onSubmit={handleSubmit}
-          className="space-y-6 rounded-3xl border border-border/80 bg-card p-6 shadow-sm sm:p-8"
+          className="space-y-6 rounded-3xl border border-border/80 glass-card p-6 shadow-xl sm:p-8"
         >
           {error && (
-            <div className="rounded-xl border border-destructive/25 bg-destructive/10 px-4 py-3 text-xs font-medium text-destructive">
+            <div className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-xs font-medium text-destructive">
               {error}
             </div>
           )}

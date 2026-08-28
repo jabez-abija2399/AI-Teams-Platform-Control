@@ -37,23 +37,23 @@ export function ProjectCard({ project }: { project: Project }) {
   return (
     <Link
       href={`${ROUTES.projects}/${project.id}/workspace`}
-      className="group flex h-full flex-col rounded-2xl border border-border/80 bg-card/90 p-5 shadow-[0_1px_0_rgba(36,95,115,0.04)] transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md"
+      className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border/80 glass-card p-5 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 items-center gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-            <FolderKanban className="h-4 w-4" />
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20 transition-all duration-200 group-hover:scale-105 group-hover:bg-primary group-hover:text-primary-foreground">
+            <FolderKanban className="h-4.5 w-4.5" />
           </div>
           <div className="min-w-0">
-            <h3 className="truncate text-sm font-semibold tracking-tight">{project.name}</h3>
-            <p className="mt-0.5 text-[11px] text-muted-foreground">
+            <h3 className="truncate text-sm font-bold tracking-tight text-foreground">{project.name}</h3>
+            <p className="mt-0.5 text-xs text-muted-foreground/80">
               Updated {formatRelativeTime(project.updatedAt)}
             </p>
           </div>
         </div>
         <span
           className={cn(
-            'shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium',
+            'shrink-0 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider',
             status.className,
           )}
         >
@@ -62,16 +62,16 @@ export function ProjectCard({ project }: { project: Project }) {
       </div>
 
       {project.description ? (
-        <p className="mt-4 flex-1 text-sm leading-relaxed text-muted-foreground">
+        <p className="mt-4 flex-1 text-xs leading-relaxed text-muted-foreground line-clamp-2">
           {truncate(project.description, 110)}
         </p>
       ) : (
-        <p className="mt-4 flex-1 text-sm italic text-muted-foreground/70">No description yet</p>
+        <p className="mt-4 flex-1 text-xs italic text-muted-foreground/60">No description yet</p>
       )}
 
-      <div className="mt-5 flex items-center gap-1.5 text-xs font-medium text-primary">
+      <div className="mt-5 flex items-center gap-1.5 text-xs font-bold text-primary group-hover:underline">
         Open Mission Control
-        <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+        <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-1" />
       </div>
     </Link>
   );

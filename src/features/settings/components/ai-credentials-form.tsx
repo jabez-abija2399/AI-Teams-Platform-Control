@@ -304,12 +304,12 @@ export function AiCredentialsForm({ embedded = false, onConfigured, className }:
         </div>
       )}
 
-      <form onSubmit={handleSave} className="space-y-4 rounded-2xl border border-border/80 bg-card p-5 shadow-xs">
-        <div className="space-y-2">
+      <form onSubmit={handleSave} className="space-y-4 rounded-2xl border border-border/80 glass-card p-6 shadow-xs">
+        <div className="space-y-2.5">
           <label htmlFor="ai-provider" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-            Select Provider
+            Select AI Provider
           </label>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
             {providers.map((p) => (
               <button
                 key={p.id}

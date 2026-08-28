@@ -81,16 +81,16 @@ export function SignupForm() {
         </p>
       </div>
 
-      <div className="rounded-2xl border border-border/80 bg-card/90 p-7 shadow-[0_24px_60px_-36px_rgba(36,95,115,0.45)]">
+      <div className="rounded-2xl border border-border/80 glass-card p-7 shadow-xl">
         {error && (
-          <div className="mb-5 flex items-center gap-2 rounded-xl border border-destructive/25 bg-destructive/10 p-3 text-sm text-destructive">
+          <div className="mb-5 flex items-center gap-2.5 rounded-xl border border-destructive/30 bg-destructive/10 p-3.5 text-xs font-medium text-destructive">
             <AlertCircle className="h-4 w-4 shrink-0" />
             <span>{error}</span>
           </div>
         )}
         {success && (
-          <div className="mb-5 flex items-center gap-2 rounded-xl border border-primary/25 bg-primary/10 p-3 text-sm text-primary">
-            <CheckCircle2 className="h-4 w-4 shrink-0" />
+          <div className="mb-5 flex items-center gap-2.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3.5 text-xs font-medium text-emerald-800 dark:text-emerald-300">
+            <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
             <span>{success}</span>
           </div>
         )}
