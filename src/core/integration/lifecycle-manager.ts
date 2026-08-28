@@ -1,28 +1,12 @@
 import type { ProjectLifecycleState } from './integration.types';
 import { companyEventBus } from './event-bus';
 
-export class LifecycleManager {
-  private static readonly VALID_TRANSITIONS: Record<ProjectLifecycleState, ProjectLifecycleState[]> = {
-    CREATED: ['DISCOVERY', 'FAILED', 'PAUSED'],
-    DISCOVERY: ['PLANNING', 'FAILED', 'PAUSED'],
-    PLANNING: ['ARCHITECTURE', 'FAILED', 'PAUSED'],
-    ARCHITECTURE: ['EXECUTION', 'FAILED', 'PAUSED'],
-    EXECUTION: ['REVIEW', 'FAILED', 'PAUSED'],
-    REVIEW: ['DEPLOYMENT_READY', 'EXECUTION', 'FAILED', 'PAUSED'], // EXECUTION if rejected and needs revision
-    DEPLOYMENT_READY: ['COMPLETED', 'FAILED', 'PAUSED'],
-    COMPLETED: [],
-    FAILED: ['CREATED', 'DISCOVERY', 'PLANNING', 'ARCHITECTURE', 'EXECUTION', 'REVIEW', 'DEPLOYMENT_READY'], // Retry allowed
-    PAUSED: ['CREATED', 'DISCOVERY', 'PLANNING', 'ARCHITECTURE', 'EXECUTION', 'REVIEW', 'DEPLOYMENT_READY'], // Resume allowed
-  };
+import { VALID_TRANSITIONS, canTransition } from './integration.types';
 
-  public static canTransition(from: ProjectLifecycleState, to: ProjectLifecycleState): boolean {
-    if (from === to) return true;
-    const allowed = this.VALID_TRANSITIONS[from];
-    return allowed ? allowed.includes(to) : false;
-  }
+export class LifecycleManager {
 
   public static validateTransition(from: ProjectLifecycleState, to: ProjectLifecycleState): void {
-    if (!this.canTransition(from, to)) {
+    if (!canTransition(from, to)) {
       throw new Error(`Invalid lifecycle transition from "${from}" to "${to}".`);
     }
   }

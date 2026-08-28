@@ -2,6 +2,7 @@ import type { ValidationResult } from './integration.types';
 import { companyEventBus } from './event-bus';
 import { LifecycleManager } from './lifecycle-manager';
 import { ExecutionStateService } from './execution-state.service';
+import { canTransition } from './integration.types';
 import { prisma } from '@/lib/prisma';
 
 export class IntegrationValidator {
@@ -11,9 +12,6 @@ export class IntegrationValidator {
 
     if (!companyEventBus || typeof companyEventBus.publish !== 'function') {
       errors.push('CompanyEventBus is not initialized or missing publish method.');
-    }
-    if (!LifecycleManager || typeof LifecycleManager.canTransition !== 'function') {
-      errors.push('LifecycleManager is not initialized or missing canTransition method.');
     }
     if (!ExecutionStateService || typeof ExecutionStateService.getState !== 'function') {
       errors.push('ExecutionStateService is not initialized or missing getState method.');
@@ -36,7 +34,7 @@ export class IntegrationValidator {
     for (let i = 0; i < requiredTransitions.length - 1; i++) {
       const from = requiredTransitions[i] as any;
       const to = requiredTransitions[i + 1] as any;
-      if (!LifecycleManager.canTransition(from, to)) {
+      if (!canTransition(from, to)) {
         errors.push(`Pipeline consistency error: Cannot transition from ${from} to ${to}.`);
       }
     }
