@@ -444,7 +444,7 @@ export function WorkspaceClientShell({ projectId, projectName }: WorkspaceClient
 
               {/* Monaco Code Viewer Container */}
               <div className="flex-1 h-full shadow-[0_0_50px_rgba(0,0,0,0.5)] rounded-2xl overflow-hidden flex flex-col">
-                {approvalRequests.length > 0 && !isStreaming ? (
+                {approvalRequests.length > 0 ? (
                   <div className="flex-grow flex flex-col lg:flex-row h-full gap-4 p-4 bg-surface-glass/40 border border-white/10 rounded-2xl backdrop-blur-xl overflow-hidden">
                     {/* Left: Pending Document Review Pane */}
                     <div className="flex-[6] flex flex-col h-full bg-black/25 border border-white/5 rounded-xl p-6 overflow-hidden">
