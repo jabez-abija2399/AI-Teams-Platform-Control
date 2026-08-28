@@ -1,62 +1,13 @@
+import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
+import { buildPreview } from '@/features/workspace/preview/services/preview-builder.service';
+import { Sparkles, ArrowRight, Layers, Bot } from 'lucide-react';
+import { ROUTES } from '@/config/constants';
 
-function buildBabelHtml(code: string, projectName: string): string {
-  const clean = code
-    .replace(/'use client';\n?/g, '')
-    .replace(/import\s+.*?from\s+['"].*?['"];?\n?/g, '')
-    .replace(/export\s+default\s+function\s+(\w+)/g, 'function $1')
-    .replace(/export\s+default\s+(\w+);?/g, 'const __defaultExport__ = $1;')
-    .replace(/export\s+function\s+(\w+)/g, 'function $1')
-    .replace(/export\s+const\s+(\w+)/g, 'const $1')
-    .replace(/:\s*(string|number|boolean|null|void|any|never|Date|React\.\w+|Priority|Filter|Todo|Record<[^>]+>)\s*([=,)\]>])/g, '$2')
-    .replace(/<[A-Z]\w*(\[\])?>/g, '')
-    .replace(/interface\s+\w+\s*\{[^}]*\}/gs, '')
-    .replace(/type\s+\w+\s*=[^;]+;/g, '');
-
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${projectName} — Preview</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: system-ui, -apple-system, sans-serif; }
-  </style>
-</head>
-<body>
-  <div id="root"></div>
-  <script type="text/babel" data-presets="react">
-    const { useState, useEffect, useRef, useCallback } = React;
-    try {
-      ${clean}
-
-      const App =
-        typeof __defaultExport__ !== 'undefined' ? __defaultExport__ :
-        typeof TodoApp !== 'undefined' ? TodoApp :
-        typeof SimpleAuthApp !== 'undefined' ? SimpleAuthApp :
-        typeof App !== 'undefined' ? App :
-        typeof Home !== 'undefined' ? Home :
-        typeof Page !== 'undefined' ? Page : null;
-
-      if (App) {
-        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
-      } else {
-        document.getElementById('root').innerHTML =
-          '<div style="padding:2rem;color:#94a3b8;font-size:13px;background:#020617;min-height:100vh">Component loaded — no default export found.</div>';
-      }
-    } catch(err) {
-      document.getElementById('root').innerHTML =
-        '<pre style="color:#f87171;font-family:monospace;font-size:11px;padding:1rem;background:#1e0a0a;min-height:100vh;white-space:pre-wrap">' + String(err) + '</pre>';
-    }
-  </script>
-</body>
-</html>`;
-}
+export const metadata = {
+  title: 'Live Preview | AI Teams Platform',
+  description: 'Live standalone preview of your generated software project.',
+};
 
 export default async function ProjectPreviewPage({
   params,
@@ -66,60 +17,88 @@ export default async function ProjectPreviewPage({
   const { projectId } = await params;
 
   let projectName = 'Project Preview';
-  let mainFileContent: string | null = null;
+  let previewHtml: string | null = null;
 
   try {
     const project = await prisma.project.findUnique({
       where: { id: projectId },
-      select: { name: true, description: true },
+      select: { name: true, description: true, status: true },
     });
     if (project?.name) projectName = project.name;
 
-    const repo = await prisma.repository.findUnique({
-      where: { projectId },
-      include: { files: true },
+    const preview = await buildPreview(projectId, {
+      preferFast: true,
+      skipConfirmation: true,
+      smoke: false,
     });
 
-    if (repo?.files?.length) {
-      const priority = ['src/components/todo-app.tsx', 'src/app/page.tsx', 'src/components/app.tsx', 'src/app/page.jsx'];
-      for (const p of priority) {
-        const found = repo.files.find((f) => f.path === p);
-        if (found) { mainFileContent = found.content; break; }
-      }
-      if (!mainFileContent) {
-        const tsx = repo.files.find((f) => f.path.endsWith('.tsx') || f.path.endsWith('.jsx'));
-        if (tsx) mainFileContent = tsx.content;
+    if (preview.type === 'HTML' && preview.html) {
+      previewHtml = preview.html;
+    } else if (preview.files) {
+      // Check for direct index.html
+      const indexCandidate = preview.files['index.html'] || preview.files['public/index.html'] || preview.files['src/index.html'];
+      if (indexCandidate) {
+        previewHtml = indexCandidate;
       }
     }
-  } catch {}
-
-  if (!mainFileContent) {
-    // Never fall back to platform source files (src/app/page.tsx) — that leaked other projects' UI.
+  } catch (err) {
+    console.error('Error generating preview in ProjectPreviewPage:', err);
   }
 
-  const html = mainFileContent
-    ? buildBabelHtml(mainFileContent, projectName)
-    : `<!DOCTYPE html>
-<html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>${projectName}</title></head>
-<body style="margin:0;background:#020617;color:#f1f5f9;font-family:system-ui,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center">
-<div style="background:#0f172a;border:1px solid #1e293b;border-radius:1rem;padding:2rem;max-width:420px;width:100%;text-align:center">
-<h2 style="font-size:18px;font-weight:700;color:#f8fafc;margin-bottom:8px">${projectName}</h2>
-<p style="font-size:12px;color:#475569;line-height:1.6">No files in this project yet.<br>
-Resume Development so the Developer agent creates files here.<br>
-<span style="color:#38bdf8;font-family:monospace;font-size:11px">ID: ${projectId}</span></p>
-</div>
-</body>
-</html>`;
+  if (previewHtml) {
+    return (
+      <main className="h-screen w-screen m-0 p-0 overflow-hidden bg-background">
+        <iframe
+          srcDoc={previewHtml}
+          className="h-full w-full border-none"
+          title={`${projectName} Preview`}
+          sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-popups allow-presentation"
+        />
+      </main>
+    );
+  }
 
   return (
-    <div style={{ width: '100vw', height: '100vh', margin: 0, padding: 0, overflow: 'hidden' }}>
-      <iframe
-        srcDoc={html}
-        style={{ width: '100%', height: '100%', border: 'none' }}
-        title="Project Preview"
-        sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-      />
-    </div>
+    <main className="flex min-h-screen w-screen flex-col items-center justify-center bg-slate-950 p-4 font-sans text-slate-100">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_120%_70%_at_50%_-15%,rgba(56,189,248,0.15),transparent_60%)]" />
+      
+      <div className="relative z-10 w-full max-w-md rounded-3xl border border-slate-800 bg-slate-900/90 p-8 text-center shadow-2xl backdrop-blur-xl">
+        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-sky-500/10 text-sky-400 border border-sky-500/20 shadow-md">
+          <Sparkles className="h-6 w-6" />
+        </div>
+
+        <h1 className="font-heading text-xl font-bold tracking-tight text-white sm:text-2xl">
+          {projectName}
+        </h1>
+
+        <p className="mt-2 text-xs leading-relaxed text-slate-400">
+          No previewable files built in this project yet. Your autonomous AI team is ready to plan, architect, and generate the code.
+        </p>
+
+        <div className="mt-6 flex flex-col gap-3">
+          <Link
+            href={`${ROUTES.projects}/${projectId}/workspace`}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-sky-500 px-4 py-2.5 text-xs font-bold text-slate-950 shadow-md transition-all duration-200 hover:bg-sky-400"
+          >
+            <Bot className="h-4 w-4" />
+            <span>Open Mission Control</span>
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+
+          <Link
+            href={ROUTES.projects}
+            className="inline-flex w-full items-center justify-center rounded-xl border border-slate-800 bg-slate-900 px-4 py-2.5 text-xs font-semibold text-slate-300 transition-colors hover:bg-slate-800 hover:text-white"
+          >
+            Back to Projects Portfolio
+          </Link>
+        </div>
+
+        <div className="mt-6 border-t border-slate-800/80 pt-4">
+          <p className="font-mono text-[10px] text-slate-500">
+            Project ID: <span className="text-sky-400">{projectId}</span>
+          </p>
+        </div>
+      </div>
+    </main>
   );
 }
