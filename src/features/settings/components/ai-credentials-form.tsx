@@ -103,7 +103,7 @@ export function AiCredentialsForm({ embedded = false, onConfigured, className }:
     }
 
     try {
-      const res = await fetch('/api/settings/ai-credentials', {
+      const res = await fetch('/api/settings/ai-credentials/test', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -155,7 +155,7 @@ export function AiCredentialsForm({ embedded = false, onConfigured, className }:
 
     try {
       const res = await fetch('/api/settings/ai-credentials', {
-        method: 'POST',
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           provider: selected.id,
