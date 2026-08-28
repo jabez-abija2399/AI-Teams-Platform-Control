@@ -10,6 +10,6 @@ export interface AgentSummaryData {
   status: AgentStatus;
 }
 
-export async function fetchAgentSummaries(): Promise<AgentSummaryData[]> {
-  return getAgentSummaries();
+export async function fetchAgentSummaries(projectId: string): Promise<AgentSummaryData[]> {
+  return getAgentSummaries(projectId);
 }

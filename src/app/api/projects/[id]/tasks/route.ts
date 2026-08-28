@@ -7,27 +7,53 @@ interface Params {
   params: Promise<{ id: string }>;
 }
 
+import { ExecutionStateService } from '@/core/integration/execution-state.service';
+
 export async function GET(_request: Request, { params }: Params) {
   const session = await auth();
   if (!session?.user?.id) return unauthorizedResponse();
 
   const { id } = await params;
-  const tasks = await listTasks(id, session.user.id);
-  if (tasks === null) {
-    return NextResponse.json(
-      {
-        success: false,
-        error: {
-          message: 'Project not found',
-          code: 'NOT_FOUND',
-        },
-      },
-      { status: 404 },
-    );
+  
+  const state = ExecutionStateService.getState(id);
+  const currentPhase = state.currentPhase;
+  
+  const tasksDef = [
+    { id: 't1', title: 'Define Product Requirements', phase: 'PLANNING', assignedRole: 'PRODUCT_MANAGER' },
+    { id: 't2', title: 'Design System Architecture', phase: 'ARCHITECTURE', assignedRole: 'ARCHITECT' },
+    { id: 't3', title: 'Create UI/UX Design System', phase: 'DESIGN', assignedRole: 'UI_DESIGNER' },
+    { id: 't4', title: 'Implement Architecture', phase: 'EXECUTION', assignedRole: 'DEVELOPER' },
+    { id: 't5', title: 'Debate Code Implementation', phase: 'DEBATE', assignedRole: 'ARCHITECT' }
+  ];
+
+  let currentStepIndex = tasksDef.findIndex(t => t.phase === currentPhase);
+  if (currentPhase === 'COMPLETED' || currentPhase === 'DEPLOYMENT_READY') {
+    currentStepIndex = tasksDef.length;
+  } else if (currentStepIndex === -1) {
+    currentStepIndex = 0;
   }
+
+  const tasks = tasksDef.map((t, i) => {
+    let tStatus = 'TODO';
+    if (i < currentStepIndex) tStatus = 'DONE';
+    else if (i === currentStepIndex) {
+      if (state.executionHealth === 'PAUSED') tStatus = 'BLOCKED';
+      else if (state.executionHealth === 'FAILED') tStatus = 'BLOCKED';
+      else tStatus = 'IN_PROGRESS';
+    }
+    
+    return {
+      id: t.id,
+      title: t.title,
+      status: tStatus,
+      assignedRole: t.assignedRole,
+      priority: 'HIGH'
+    };
+  });
+
   return NextResponse.json({
     success: true,
-    data: tasks,
+    tasks // return tasks directly to fix the UI task-board bug
   });
 }
 
