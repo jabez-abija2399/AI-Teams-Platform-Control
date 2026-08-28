@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { databaseDesignSpecSchema } from '../../src/ai/agents/roles/database/database.types';
-import { DatabaseAgent } from '../../src/ai/agents/roles/database.agent';
-import { createAgent } from '../../src/ai/agents/manager/agent.registry';
+import { databaseDesignSpecSchema } from '../../src/packages/agents/roles/database/database.types';
+import { DatabaseAgent } from '../../src/packages/agents/roles/database/database.agent';
+import { createAgent } from '../../src/packages/agents/manager/agent.registry';
 
 describe('Database Engineer AI Specialist', () => {
   it('should instantiate via direct class and registry', () => {

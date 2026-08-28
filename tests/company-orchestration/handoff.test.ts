@@ -19,7 +19,7 @@ vi.mock('@/lib/prisma', () => ({
   },
 }));
 
-vi.mock('@/ai/agents/memory/memory.manager', () => ({
+vi.mock('@/packages/agents/memory/memory.manager', () => ({
   getMemoryManager: () => ({
     remember: vi.fn().mockResolvedValue(true),
   }),

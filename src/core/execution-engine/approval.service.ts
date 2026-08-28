@@ -1,5 +1,5 @@
 import type { ApprovalRequest } from './types';
-import type { AgentRole } from '@/ai/agents/core/agent.types';
+import type { AgentRole } from '@/packages/agents/core/agent.types';
 import { getTaskManagementEngine } from './task.engine';
 import { getProjectExecutionService } from './project.service';
 

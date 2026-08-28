@@ -2,12 +2,12 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { CompanyOrchestrator } from '../../src/core/integration/company-orchestrator';
 import { ExecutionStateService } from '../../src/core/integration/execution-state.service';
 import { CompanyEventBus } from '../../src/core/integration/event-bus';
-import * as ceoService from '../../src/ai/agents/roles/ceo/ceo.service';
-import * as pmService from '../../src/ai/agents/roles/product-manager/product-manager.service';
-import * as archService from '../../src/ai/agents/roles/architect/architect.service';
-import * as devService from '../../src/ai/agents/roles/developer/developer.service';
-import * as qaService from '../../src/ai/agents/roles/qa/qa.service';
-import * as reviewerService from '../../src/ai/agents/roles/reviewer/reviewer.service';
+import * as ceoService from '@/packages/agents/roles/ceo/ceo.service';
+import * as pmService from '@/packages/agents/roles/product-manager/product-manager.service';
+import * as archService from '@/packages/agents/roles/architect/architect.service';
+import * as devService from '@/packages/agents/roles/developer/developer.service';
+import * as qaService from '@/packages/agents/roles/qa-engineer/qa-engineer.service';
+import * as reviewerService from '@/packages/agents/roles/reviewer/reviewer.service';
 
 describe('Phase 30.5 — Company Orchestrator', () => {
   const testProjectId = 'proj_orch_test_101';

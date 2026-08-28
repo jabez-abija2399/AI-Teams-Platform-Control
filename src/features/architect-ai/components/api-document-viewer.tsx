@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import type { APISpecification } from '@/ai/agents/roles/architect/architect.types';
+import type { APISpecification } from '@/packages/agents/roles/architect/architect.types';
 
 function EndpointBadge({ method }: { method: string }) {
   const colors: Record<string, string> = {

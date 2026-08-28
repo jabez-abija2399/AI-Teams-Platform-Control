@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import type { ImplementationReport } from '@/ai/agents/roles/developer/developer.types';
+import type { ImplementationReport } from '@/packages/agents/roles/developer/developer.types';
 import { Badge } from '@/components/ui/badge';
 
 export function ImplementationViewer({ report }: { report: ImplementationReport }) {

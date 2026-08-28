@@ -1,7 +1,7 @@
 import { getWorkflow } from './workflow.registry';
 import { createWorkflowState, updateWorkflowState } from './workflow.state';
 import type { WorkflowExecutionState, WorkflowStep } from './workflow.types';
-import { getExecutionEngine } from '@/ai/agents/core/execution.engine';
+import { getExecutionEngine } from '@/packages/agents/core/agent-execution-engine';
 import { logAIEvent } from '../../ai/monitoring/ai.logger';
 
 export class WorkflowExecutor {
@@ -58,7 +58,7 @@ export class WorkflowExecutor {
         await logAIEvent('WORKFLOW_STEP_COMPLETED', { workflowId, projectId, step: currentStepId, agent: step.agent });
         currentStepId = step.next;
       } else {
-        const errorMsg = res.error.message ?? 'Step execution failed';
+        const errorMsg = (typeof res.error === 'string' ? res.error : (res.error as any)?.message) ?? 'Step execution failed';
         state.history.push({
           step: currentStepId,
           agent: step.agent,

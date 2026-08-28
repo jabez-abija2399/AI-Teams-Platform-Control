@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { ProductProposalEngine } from '../../src/core/product/proposal/product-proposal.engine';
 import { ProposalScoreService } from '../../src/core/product/proposal/proposal-score.service';
 import { DiscoveryApprovalService } from '../../src/core/discovery/approval.service';
-import { ProductDiscoveryAgent } from '../../src/ai/agents/roles/product-discovery.agent';
+import { ProductDiscoveryAgent } from '../../src/packages/agents/roles/product-discovery/product-discovery.agent';
 
 describe('Phase 22 — Product Proposal Engine & Creator Experience', () => {
   it('1. Specification creates structured ProductProposal', async () => {

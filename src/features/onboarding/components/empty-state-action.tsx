@@ -2,7 +2,7 @@ import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { AgentAvatar } from './agent-avatar';
-import type { AgentRole } from '@/ai/agents/core/agent.types';
+import type { AgentRole } from '@/packages/agents/core/agent.types';
 
 interface EmptyStateActionProps {
   icon: LucideIcon;

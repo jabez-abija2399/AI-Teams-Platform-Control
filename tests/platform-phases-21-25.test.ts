@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { CollaborationStreamService } from '../src/features/collaboration/services/collaboration-stream.service';
-import { OrganizationalIntelligenceService } from '../src/ai/agents/memory/organizational-intelligence.service';
+import { OrganizationalIntelligenceService } from '../src/packages/agents/memory/organizational-intelligence.service';
 import { SelfReflectiveEngine } from '../src/core/execution-engine/self-reflective.engine';
 import { ExecutiveDashboardService } from '../src/features/analytics/services/executive-dashboard.service';
 

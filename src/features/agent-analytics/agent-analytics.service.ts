@@ -1,5 +1,5 @@
-import type { AgentRole } from '../../ai/agents/core/agent.types';
-import { AGENT_CONFIGS } from '../../ai/agents/core/agent.constants';
+import type { AgentRole } from '@/packages/agents/core/agent.types';
+import { AGENT_CONFIGS } from '@/packages/agents/core/agent.constants';
 import { getScoringEngine } from '../../ai/evaluation/scoring.engine';
 import type { AgentAnalyticsSummary } from '../../ai/evaluation/evaluation.types';
 

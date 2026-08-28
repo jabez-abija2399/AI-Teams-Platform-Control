@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { qaReportSpecSchema } from '../../src/ai/agents/roles/qa/qa.types';
-import { QAAgent } from '../../src/ai/agents/roles/qa.agent';
-import { createAgent } from '../../src/ai/agents/manager/agent.registry';
+import { qaReportSpecSchema } from '../../src/packages/agents/roles/qa-engineer/qa.types';
+import { QAAgent } from '../../src/packages/agents/roles/qa-engineer/qa-engineer.agent';
+import { createAgent } from '../../src/packages/agents/manager/agent.registry';
 
 describe('QA Engineer AI Specialist', () => {
   it('should instantiate via direct class and registry', () => {

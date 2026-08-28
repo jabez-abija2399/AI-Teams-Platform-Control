@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import type { AgentRole } from '@/ai/agents/core/agent.types';
+import type { AgentRole } from '@/packages/agents/core/agent.types';
 
 export interface PermissionAuditFinding {
   type: 'EXCESS_PERMISSION' | 'MISSING_PERMISSION' | 'OVERRIDED_DEFAULT';

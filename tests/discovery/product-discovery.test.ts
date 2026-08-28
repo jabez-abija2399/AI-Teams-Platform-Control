@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { ProductDiscoveryAgent } from '../../src/ai/agents/roles/product-discovery.agent';
+import { ProductDiscoveryAgent } from '../../src/packages/agents/roles/product-discovery/product-discovery.agent';
 
 describe('Phase 20 — Product Discovery Agent', () => {
   it('should transform vague user prompt "I want a todo app" into structured ProductSpecification', async () => {

@@ -127,7 +127,7 @@ const mockProductSpec = {
   clarificationRequired: true,
 };
 
-vi.mock('@/ai/agents/roles/product-discovery.agent', () => ({
+vi.mock('@/packages/agents/roles/product-discovery/product-discovery.agent', () => ({
   ProductDiscoveryAgent: vi.fn().mockImplementation(function () {
     return {
       discoverProductSpecification: vi.fn().mockResolvedValue(mockProductSpec),
@@ -135,7 +135,7 @@ vi.mock('@/ai/agents/roles/product-discovery.agent', () => ({
   }),
 }));
 
-vi.mock('@/ai/agents/roles/ceo/ceo.service', () => ({
+vi.mock('@/packages/agents/roles/ceo/ceo.service', () => ({
   analyzeUserIdea: vi.fn().mockResolvedValue({
     success: true,
     data: {
@@ -147,7 +147,7 @@ vi.mock('@/ai/agents/roles/ceo/ceo.service', () => ({
   }),
 }));
 
-vi.mock('@/ai/agents/roles/product-manager/product-manager.service', () => ({
+vi.mock('@/packages/agents/roles/product-manager/product-manager.service', () => ({
   refineRequirements: vi.fn().mockResolvedValue({
     success: true,
     data: {
@@ -160,7 +160,7 @@ vi.mock('@/ai/agents/roles/product-manager/product-manager.service', () => ({
   }),
 }));
 
-vi.mock('@/ai/agents/roles/business-analyst/business-analyst.service', () => ({
+vi.mock('@/packages/agents/roles/business-analyst/business-analyst.service', () => ({
   generateSoftwareRequirementSpec: vi.fn().mockResolvedValue({
     success: true,
     data: {
@@ -174,7 +174,7 @@ vi.mock('@/ai/agents/roles/business-analyst/business-analyst.service', () => ({
   }),
 }));
 
-vi.mock('@/ai/agents/roles/ui-designer/ui-designer.service', () => ({
+vi.mock('@/packages/agents/roles/ui-designer/ui-designer.service', () => ({
   generateUiDesignSpec: vi.fn().mockResolvedValue({
     success: true,
     data: {
@@ -185,7 +185,7 @@ vi.mock('@/ai/agents/roles/ui-designer/ui-designer.service', () => ({
   }),
 }));
 
-vi.mock('@/ai/agents/roles/architect/architect.service', () => ({
+vi.mock('@/packages/agents/roles/architect/architect.service', () => ({
   designArchitecture: vi.fn().mockResolvedValue({
     success: true,
     data: {
@@ -251,7 +251,7 @@ vi.mock('@/core/review-committee/review-committee', () => ({
   },
 }));
 
-vi.mock('@/ai/agents/roles/developer/developer.service', () => ({
+vi.mock('@/packages/agents/roles/developer/developer.service', () => ({
   implementArchitecture: vi.fn().mockResolvedValue({
     success: true,
     data: {
@@ -263,7 +263,7 @@ vi.mock('@/ai/agents/roles/developer/developer.service', () => ({
   }),
 }));
 
-vi.mock('@/ai/agents/roles/qa/qa.service', () => ({
+vi.mock('@/packages/agents/roles/qa-engineer/qa-engineer.service', () => ({
   reviewImplementation: vi.fn().mockResolvedValue({
     success: true,
     data: {
@@ -278,7 +278,7 @@ vi.mock('@/ai/agents/roles/qa/qa.service', () => ({
   }),
 }));
 
-vi.mock('@/ai/agents/roles/security/security.service', () => ({
+vi.mock('@/packages/agents/roles/security-auditor/security-auditor.service', () => ({
   generateSecurityReportSpec: vi.fn().mockResolvedValue({
     success: true,
     data: {
@@ -295,7 +295,7 @@ vi.mock('@/ai/agents/roles/security/security.service', () => ({
   }),
 }));
 
-vi.mock('@/ai/agents/roles/devops/devops.service', () => ({
+vi.mock('@/packages/agents/roles/devops-engineer/devops-engineer.service', () => ({
   generateDevopsPlanSpec: vi.fn().mockResolvedValue({
     success: true,
     data: {
@@ -520,7 +520,7 @@ describe('StudyMate E2E — Full AI Company Pipeline Integration Test', () => {
   // ═══════════════════════════════════════════════════════════════════════════
   describe('Phase 5 — CEO Agent (Strategy)', () => {
     it('should produce BusinessStrategy via analyzeUserIdea', async () => {
-      const { analyzeUserIdea } = await import('@/ai/agents/roles/ceo/ceo.service');
+      const { analyzeUserIdea } = await import('@/packages/agents/roles/ceo/ceo.service');
       const result = await analyzeUserIdea(PROJECT_ID, 'StudyMate student task app');
 
       expect(result.success).toBe(true);
@@ -539,7 +539,7 @@ describe('StudyMate E2E — Full AI Company Pipeline Integration Test', () => {
   // ═══════════════════════════════════════════════════════════════════════════
   describe('Phase 6 — Product Manager Agent', () => {
     it('should produce PRD via refineRequirements', async () => {
-      const { refineRequirements } = await import('@/ai/agents/roles/product-manager/product-manager.service');
+      const { refineRequirements } = await import('@/packages/agents/roles/product-manager/product-manager.service');
       const ceoData = {
         vision: { problem: 'test', solution: 'test', targetUsers: [], businessGoal: 'test' },
         requirements: { features: [], userStories: [], priorities: [], constraints: [] },
@@ -561,7 +561,7 @@ describe('StudyMate E2E — Full AI Company Pipeline Integration Test', () => {
   // ═══════════════════════════════════════════════════════════════════════════
   describe('Phase 7a — Business Analyst', () => {
     it('should produce SRS via generateSoftwareRequirementSpec', async () => {
-      const { generateSoftwareRequirementSpec } = await import('@/ai/agents/roles/business-analyst/business-analyst.service');
+      const { generateSoftwareRequirementSpec } = await import('@/packages/agents/roles/business-analyst/business-analyst.service');
       const result = await generateSoftwareRequirementSpec(PROJECT_ID, {});
 
       expect(result.success).toBe(true);
@@ -578,7 +578,7 @@ describe('StudyMate E2E — Full AI Company Pipeline Integration Test', () => {
   // ═══════════════════════════════════════════════════════════════════════════
   describe('Phase 7b — UI Designer', () => {
     it('should produce DesignSpec via generateUiDesignSpec', async () => {
-      const { generateUiDesignSpec } = await import('@/ai/agents/roles/ui-designer/ui-designer.service');
+      const { generateUiDesignSpec } = await import('@/packages/agents/roles/ui-designer/ui-designer.service');
       const result = await generateUiDesignSpec(PROJECT_ID, {});
 
       expect(result.success).toBe(true);
@@ -595,7 +595,7 @@ describe('StudyMate E2E — Full AI Company Pipeline Integration Test', () => {
   // ═══════════════════════════════════════════════════════════════════════════
   describe('Phase 8 — Software Architect', () => {
     it('should produce ArchitectureDocument via designArchitecture', async () => {
-      const { designArchitecture } = await import('@/ai/agents/roles/architect/architect.service');
+      const { designArchitecture } = await import('@/packages/agents/roles/architect/architect.service');
       const result = await designArchitecture(PROJECT_ID, {
         features: [{ name: 'Task creation', description: 'Create tasks' }],
         userStories: [], priorities: [], constraints: [],
@@ -685,7 +685,7 @@ describe('StudyMate E2E — Full AI Company Pipeline Integration Test', () => {
   // ═══════════════════════════════════════════════════════════════════════════
   describe('Phase 12 — Developer Agent', () => {
     it('should produce implementation with files and changes', async () => {
-      const { implementArchitecture } = await import('@/ai/agents/roles/developer/developer.service');
+      const { implementArchitecture } = await import('@/packages/agents/roles/developer/developer.service');
       const result = await implementArchitecture(PROJECT_ID, {
         architecture: { frontend: 'Next.js', backend: 'API Routes', database: 'Prisma', infrastructure: 'Vercel', security: 'NextAuth' },
         database: { entities: [], relationships: [], indexes: [], constraints: [] },
@@ -708,7 +708,7 @@ describe('StudyMate E2E — Full AI Company Pipeline Integration Test', () => {
   // ═══════════════════════════════════════════════════════════════════════════
   describe('Phase 13 — QA Agent', () => {
     it('should produce quality report with tests', async () => {
-      const { reviewImplementation } = await import('@/ai/agents/roles/qa/qa.service');
+      const { reviewImplementation } = await import('@/packages/agents/roles/qa-engineer/qa-engineer.service');
       const result = await reviewImplementation(PROJECT_ID, {});
 
       expect(result.success).toBe(true);
@@ -749,7 +749,7 @@ describe('StudyMate E2E — Full AI Company Pipeline Integration Test', () => {
   // ═══════════════════════════════════════════════════════════════════════════
   describe('Phase 15 — Security Agent', () => {
     it('should produce security report', async () => {
-      const { generateSecurityReportSpec } = await import('@/ai/agents/roles/security/security.service');
+      const { generateSecurityReportSpec } = await import('@/packages/agents/roles/security-auditor/security-auditor.service');
       const result = await generateSecurityReportSpec(PROJECT_ID, {});
 
       expect(result.success).toBe(true);
@@ -767,7 +767,7 @@ describe('StudyMate E2E — Full AI Company Pipeline Integration Test', () => {
   // ═══════════════════════════════════════════════════════════════════════════
   describe('Phase 16 — DevOps & Deployment', () => {
     it('should produce deployment plan', async () => {
-      const { generateDevopsPlanSpec } = await import('@/ai/agents/roles/devops/devops.service');
+      const { generateDevopsPlanSpec } = await import('@/packages/agents/roles/devops-engineer/devops-engineer.service');
       const result = await generateDevopsPlanSpec(PROJECT_ID, {});
 
       expect(result.success).toBe(true);

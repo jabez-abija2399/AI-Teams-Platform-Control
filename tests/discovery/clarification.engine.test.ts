@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { ProductDiscoveryAgent } from '../../src/ai/agents/roles/product-discovery.agent';
+import { ProductDiscoveryAgent } from '../../src/packages/agents/roles/product-discovery/product-discovery.agent';
 import { ClarificationEngine } from '../../src/core/discovery/clarification.engine';
 import { DiscoveryApprovalService } from '../../src/core/discovery/approval.service';
 import { PipelineOrchestrator } from '../../src/core/execution-engine/pipeline.orchestrator';

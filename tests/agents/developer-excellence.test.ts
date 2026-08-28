@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { implementFromArchitectureTodos, buildHeuristicImplementation } from '@/ai/agents/roles/developer/developer.service';
+import { implementFromArchitectureTodos, buildHeuristicImplementation } from '@/packages/agents/roles/developer/developer.service';
 import { ProjectStateManager } from '@/core/state/project-state.manager';
 import { ArtifactRegistryService } from '@/core/artifacts/artifact-registry.service';
 import { AgentContractRegistry } from '@/core/contracts/agent-registry';

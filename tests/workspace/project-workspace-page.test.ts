@@ -4,11 +4,11 @@ import { WorkspaceService } from '@/core/workspace/workspace.service';
 import { ProjectStateManager } from '@/core/state/project-state.manager';
 import { ArtifactRegistryService } from '@/core/artifacts/artifact-registry.service';
 import { ArtifactManager } from '@/core/company-orchestration/artifact-manager';
-import { buildHeuristicRefinedRequirements } from '@/ai/agents/roles/product-manager/product-manager.service';
-import { buildHeuristicArchitecture } from '@/ai/agents/roles/architect/architect.service';
-import { buildHeuristicUiDesignSpec } from '@/ai/agents/roles/ui-designer/ui-designer.service';
-import { buildHeuristicImplementation } from '@/ai/agents/roles/developer/developer.service';
-import { buildHeuristicQaReport } from '@/ai/agents/roles/qa/qa.service';
+import { buildHeuristicRefinedRequirements } from '@/packages/agents/roles/product-manager/product-manager.service';
+import { buildHeuristicArchitecture } from '@/packages/agents/roles/architect/architect.service';
+import { buildHeuristicUiDesignSpec } from '@/packages/agents/roles/ui-designer/ui-designer.service';
+import { buildHeuristicImplementation } from '@/packages/agents/roles/developer/developer.service';
+import { buildHeuristicQaReport } from '@/packages/agents/roles/qa-engineer/qa-engineer.service';
 
 describe('Project Workspace Page Integration (/dashboard/projects/[id]/workspace)', () => {
   const projectId = 'cmt62tfvn000004l5y3s8ap1a';

@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import type { ProjectTaskEntity, TaskExecutionState, TaskPriorityLevel } from './types';
-import type { AgentRole } from '@/ai/agents/core/agent.types';
+import type { AgentRole } from '@/packages/agents/core/agent.types';
 
 const taskErrors = new Map<string, string>();
 

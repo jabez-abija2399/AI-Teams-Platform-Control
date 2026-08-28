@@ -1,11 +1,11 @@
 import { prisma } from '@/lib/prisma';
 import type { ApiResult } from '@/types/common.types';
-import { analyzeUserIdea } from '@/ai/agents/roles/ceo/ceo.service';
-import { designArchitecture } from '@/ai/agents/roles/architect/architect.service';
-import { implementArchitecture } from '@/ai/agents/roles/developer/developer.service';
-import { reviewImplementation } from '@/ai/agents/roles/qa/qa.service';
-import { refineRequirements } from '@/ai/agents/roles/product-manager/product-manager.service';
-import { reviewArtifact } from '@/ai/agents/roles/reviewer/reviewer.service';
+import { analyzeUserIdea } from '@/packages/agents/roles/ceo/ceo.service';
+import { designArchitecture } from '@/packages/agents/roles/architect/architect.service';
+import { implementArchitecture } from '@/packages/agents/roles/developer/developer.service';
+import { reviewImplementation } from '@/packages/agents/roles/qa-engineer/qa-engineer.service';
+import { refineRequirements } from '@/packages/agents/roles/product-manager/product-manager.service';
+import { reviewArtifact } from '@/packages/agents/roles/reviewer/reviewer.service';
 import {
   createDeployment,
   executeDeployment,
@@ -209,10 +209,10 @@ export async function runFullCompanyWorkflow(
   });
 
   const architectInput = {
-    features: pmResult.data.featureSpecs.map((fs) => ({ name: fs.name, description: fs.description })),
-    userStories: pmResult.data.userStories.map((us) => ({ as: us.asA, iWant: us.iWant, soThat: us.soThat, priority: us.priority })),
-    priorities: pmResult.data.userStories.map((us) => us.priority),
-    constraints: pmResult.data.nonFunctionalRequirements.map((nf) => `${nf.category}: ${nf.requirement}`),
+    features: ((pmResult.data as any).featureSpecs?.map((fs: any) => ({ name: fs.name, description: fs.description })) || (pmResult.data.mvpFeatures || []).map((f: string) => ({ name: f, description: f }))),
+    userStories: (pmResult.data.userStories || []).map((us: any) => ({ as: us.asA || us.as || 'user', iWant: us.iWant, soThat: us.soThat, priority: us.priority })),
+    priorities: (pmResult.data.userStories || []).map((us: any) => us.priority || 'HIGH'),
+    constraints: ((pmResult.data as any).nonFunctionalRequirements?.map((nf: any) => `${nf.category}: ${nf.requirement}`) || []),
   };
 
   const architectResult = await designArchitecture(

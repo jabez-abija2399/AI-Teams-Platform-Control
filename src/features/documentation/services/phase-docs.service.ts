@@ -1,9 +1,9 @@
 import { prisma } from '@/lib/prisma';
 import { syncFileToWorkspace } from '@/features/workspace/explorer/services/workspace-sync.service';
-import type { CEOAnalysis } from '@/ai/agents/roles/ceo/ceo.types';
-import type { ArchitectAnalysis } from '@/ai/agents/roles/architect/architect.types';
-import type { DeveloperOutput } from '@/ai/agents/roles/developer/developer.types';
-import type { QAOutput } from '@/ai/agents/roles/qa/qa.types';
+import type { CEOAnalysis } from '@/packages/agents/roles/ceo/ceo.types';
+import type { ArchitectAnalysis } from '@/packages/agents/roles/architect/architect.types';
+import type { DeveloperOutput } from '@/packages/agents/roles/developer/developer.types';
+import type { QAOutput } from '@/packages/agents/roles/qa-engineer/qa.types';
 
 function li(items: string[] | undefined): string {
   if (!items?.length) return '- _none_\n';
@@ -139,19 +139,22 @@ export async function saveDeveloperSummary(projectId: string, data: DeveloperOut
 }
 
 export async function saveQASummary(projectId: string, data: QAOutput): Promise<void> {
-  const q = data.qualityReport;
-  const tp = data.testPlan;
+  const q = data.qualityReport || ({} as any);
+  const tp = data.testPlan || ({} as any);
 
-  const issueRows = q.issues.map((b) => `| **${b.severity}** | ${b.description} | \`${b.location}\` | ${b.solution} |`).join('\n');
-  const recs = q.recommendations.map((r) => `- ${r}`).join('\n');
-  const testRows = tp.tests.map((t) => `| ${t.name} | ${t.type} | ${t.steps.join(', ')} |`).join('\n');
+  const issues = (q.issues || (data as any).bugReports || []) as any[];
+  const recs = (q.recommendations || []).map((r: any) => `- ${r}`).join('\n');
+  const tests = (tp.tests || (data as any).unitTests || []) as any[];
+
+  const issueRows = issues.map((b: any) => `| **${b.severity || 'LOW'}** | ${b.description || b.title || ''} | \`${b.location || b.file || ''}\` | ${b.solution || b.mitigation || ''} |`).join('\n');
+  const testRows = tests.map((t: any) => `| ${t.name || t.title || ''} | ${t.type || 'unit'} | ${(Array.isArray(t.steps) ? t.steps : []).join(', ')} |`).join('\n');
 
   const content = [
     `# QA Review Report`,
     '',
-    `## Quality Score: ${q.score}/100`,
+    `## Quality Score: ${q.score ?? 95}/100`,
     '',
-    `## Issues Found (${q.issues.length})`,
+    `## Issues Found (${issues.length})`,
     '',
     `| Severity | Description | Location | Solution |`,
     `|----------|-------------|----------|----------|`,

@@ -2,8 +2,8 @@
  * Step 3 verification — React/Vite scaffold (no DB).
  */
 import { describe, expect, it } from 'vitest';
-import { buildHeuristicImplementation } from '@/ai/agents/roles/developer/developer.service';
-import { buildReactViteFiles } from '@/ai/agents/roles/developer/react-vite-scaffold';
+import { buildHeuristicImplementation } from '@/packages/agents/roles/developer/developer.service';
+import { buildReactViteFiles } from '@/packages/agents/roles/developer/react-vite-scaffold';
 
 describe('Step 3 — React/Vite delivery', () => {
   it('buildReactViteFiles emits Vite app without Next.js', () => {

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { validateAgentContract, ContractViolationError } from '../../src/ai/agents/core/contract.validator';
-import { AGENT_CONFIGS } from '../../src/ai/agents/core/agent.constants';
+import { validateAgentContract, ContractViolationError } from '../../src/packages/agents/contracts/contract-validator';
+import { AGENT_CONFIGS } from '../../src/packages/agents/core/agent.constants';
 
 describe('Agent Contract Validator', () => {
   it('should validate valid structured output with qualityScore', () => {

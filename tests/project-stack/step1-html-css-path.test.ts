@@ -9,8 +9,8 @@ import {
   detectStackFromFiles,
   constraintsForStack,
 } from '@/core/project-stack/stack-catalog';
-import { buildHeuristicImplementation } from '@/ai/agents/roles/developer/developer.service';
-import { buildStaticHtmlCssFiles } from '@/ai/agents/roles/developer/static-html-scaffold';
+import { buildHeuristicImplementation } from '@/packages/agents/roles/developer/developer.service';
+import { buildStaticHtmlCssFiles } from '@/packages/agents/roles/developer/static-html-scaffold';
 
 describe('Step 1 — stack + HTML/CSS delivery', () => {
   it('defaults to recommended HTML/CSS for non-tech users', () => {

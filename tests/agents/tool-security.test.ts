@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { validateWorkspacePath, PathTraversalError } from '../../src/ai/agents/security/path-validator';
-import { authorizeToolUsage, UnauthorizedToolError } from '../../src/ai/agents/security/tool-permission.guard';
+import { validateWorkspacePath, PathTraversalError } from '../../src/packages/agents/security/path-validator';
+import { authorizeToolUsage, UnauthorizedToolError } from '../../src/packages/agents/security/tool-permission.guard';
 
 describe('Tool Security & Path Validator', () => {
   describe('PathValidator', () => {

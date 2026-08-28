@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import type { ProductRequirement } from '@/ai/agents/roles/ceo/ceo.types';
+import type { ProductRequirement } from '@/packages/agents/roles/ceo/ceo.types';
 
 export function RequirementViewer({ requirements }: { requirements: ProductRequirement }) {
   return (

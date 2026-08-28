@@ -1,7 +1,7 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import type { TechnicalArchitecture } from '@/ai/agents/roles/architect/architect.types';
+import type { TechnicalArchitecture } from '@/packages/agents/roles/architect/architect.types';
 import { SmartValue } from './smart-value';
 
 const SECTIONS: { key: keyof TechnicalArchitecture; label: string }[] = [

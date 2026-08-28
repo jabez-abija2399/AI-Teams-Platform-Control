@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import type { CodeChange } from '@/ai/agents/roles/developer/developer.types';
+import type { CodeChange } from '@/packages/agents/roles/developer/developer.types';
 
 const CHANGE_COLORS: Record<string, string> = {
   CREATE: 'bg-green-100 text-green-800',

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { CheckCircle2, Loader2, Circle } from 'lucide-react';
 import { AGENT_PERSONALITY } from '../constants/agent-personality.constants';
-import type { AgentRole } from '@/ai/agents/core/agent.types';
+import type { AgentRole } from '@/packages/agents/core/agent.types';
 
 const SEQUENCE: { role: AgentRole; label: string }[] = [
   { role: 'CEO', label: 'Understanding your idea' },

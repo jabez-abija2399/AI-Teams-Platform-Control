@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { authorizeToolUsage, UnauthorizedToolError } from '../../src/ai/agents/security/tool-permission.guard';
+import { authorizeToolUsage, UnauthorizedToolError } from '../../src/packages/agents/security/tool-permission.guard';
 
 describe('Phase 15 Security Validation — Tool Permissions', () => {
   it('should block CEO from executing write_file(), run_command(), and deploy()', async () => {

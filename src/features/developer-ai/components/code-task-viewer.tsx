@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import type { DeveloperPlan } from '@/ai/agents/roles/developer/developer.types';
+import type { DeveloperPlan } from '@/packages/agents/roles/developer/developer.types';
 
 export function CodeTaskViewer({ plan }: { plan: DeveloperPlan }) {
   return (

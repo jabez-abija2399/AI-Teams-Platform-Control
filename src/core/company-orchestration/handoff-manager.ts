@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { ArtifactManager, type ArtifactData } from './artifact-manager';
-import { getMemoryManager } from '@/ai/agents/memory/memory.manager';
+import { getMemoryManager } from '@/packages/agents/memory/memory.manager';
 import { companyEventBus } from '@/core/integration/event-bus';
 import { recordTimelineEvent } from '@/features/ai-workspace/services/timeline.service';
 import type { ApiResult } from '@/types/common.types';

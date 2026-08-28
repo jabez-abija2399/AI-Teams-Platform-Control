@@ -1,4 +1,4 @@
-import { getAgentSummaries } from '@/ai/agents/manager/agent.manager';
+import { getAgentSummaries } from '@/packages/agents/manager/agent.manager';
 import { getAllWorkflowHealth } from '@/ai/monitoring/workflow.monitor';
 import { getAllAgentHealth } from '@/ai/monitoring/agent.monitor';
 

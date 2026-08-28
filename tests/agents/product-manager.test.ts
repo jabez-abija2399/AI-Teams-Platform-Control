@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { refineRequirements, generateProductRequirementsSpec, buildHeuristicRefinedRequirements } from '@/ai/agents/roles/product-manager/product-manager.service';
+import { refineRequirements, generateProductRequirementsSpec, buildHeuristicRefinedRequirements } from '@/packages/agents/roles/product-manager/product-manager.service';
 import { ProjectStateManager } from '@/core/state/project-state.manager';
 import { ArtifactRegistryService } from '@/core/artifacts/artifact-registry.service';
 import { AgentContractRegistry } from '@/core/contracts/agent-registry';
-import type { CEOAnalysis } from '@/ai/agents/roles/ceo/ceo.types';
+import type { CEOAnalysis } from '@/packages/agents/roles/ceo/ceo.types';
 
 describe('Product Manager (PM) Agent Excellence', () => {
   const projectId = 'pm-test-project-1';

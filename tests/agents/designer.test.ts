@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { generateUiDesignSpec, buildHeuristicUiDesignSpec } from '@/ai/agents/roles/ui-designer/ui-designer.service';
+import { generateUiDesignSpec, buildHeuristicUiDesignSpec } from '@/packages/agents/roles/ui-designer/ui-designer.service';
 import { ProjectStateManager } from '@/core/state/project-state.manager';
 import { ArtifactRegistryService } from '@/core/artifacts/artifact-registry.service';
 import { AgentContractRegistry } from '@/core/contracts/agent-registry';

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { createAgent, getAvailableRoles } from '../../src/ai/agents/manager/agent.registry';
+import { createAgent, getAvailableRoles } from '../../src/packages/agents/manager/agent.registry';
 import { ProviderNotFoundError } from '../../src/ai/errors/AIError';
-import type { AgentRole } from '../../src/ai/agents/core/agent.types';
+import type { AgentRole } from '../../src/packages/agents/core/agent.types';
 
 describe('Agent Registry', () => {
   const allRoles: AgentRole[] = [

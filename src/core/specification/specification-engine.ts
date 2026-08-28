@@ -4,7 +4,7 @@ import { RequirementsGenerator } from './requirements-generator';
 import { ClarificationEngine } from '@/core/discovery/clarification.engine';
 import { ScopeAnalyzer } from './scope-analyzer';
 import { RiskEngine } from './risk-engine';
-import { ProductDiscoveryAgent } from '@/ai/agents/roles/product-discovery.agent';
+import { ProductDiscoveryAgent } from '@/packages/agents/roles/product-discovery/product-discovery.agent';
 
 export class SpecificationEngine {
   /**

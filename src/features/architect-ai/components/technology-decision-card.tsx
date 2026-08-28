@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import type { TechnologyDecision } from '@/ai/agents/roles/architect/architect.types';
+import type { TechnologyDecision } from '@/packages/agents/roles/architect/architect.types';
 
 export function TechnologyDecisionCard({ decisions }: { decisions: TechnologyDecision[] }) {
   if (!decisions.length) return null;

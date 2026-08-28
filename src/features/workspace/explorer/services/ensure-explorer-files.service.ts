@@ -8,7 +8,7 @@ import { prisma } from '@/lib/prisma';
 import {
   buildHeuristicImplementation,
   getLanguageFromPath,
-} from '@/ai/agents/roles/developer/developer.service';
+} from '@/packages/agents/roles/developer/developer.service';
 import { syncFilesToWorkspace } from '@/features/workspace/explorer/services/workspace-sync.service';
 import { resolveStackFromMemory } from '@/core/memory/persist-stack-constraints';
 import { ArtifactManager } from '@/core/company-orchestration/artifact-manager';

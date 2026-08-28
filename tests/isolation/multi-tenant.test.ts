@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { validateTenantWorkspacePath, PathTraversalError } from '../../src/ai/agents/security/path-validator';
-import { MemoryManager } from '../../src/ai/agents/memory/memory.manager';
+import { validateTenantWorkspacePath, PathTraversalError } from '../../src/packages/agents/security/path-validator';
+import { MemoryManager } from '../../src/packages/agents/memory/memory.manager';
 
 describe('Phase 15 Multi-Tenant Isolation Validation', () => {
   let memory: MemoryManager;

@@ -1,4 +1,4 @@
-import type { ProductSpecification, MvpFeature } from '@/ai/agents/roles/product-discovery.agent';
+import type { ProductSpecification, MvpFeature } from '@/packages/agents/roles/product-discovery/product-discovery.agent';
 
 export interface ProposalFeature {
   id: string;

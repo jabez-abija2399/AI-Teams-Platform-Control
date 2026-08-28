@@ -3,12 +3,12 @@ import type { PipelineConfig } from './integration.types';
 import { companyEventBus } from './event-bus';
 import { LifecycleManager } from './lifecycle-manager';
 import { ExecutionStateService } from './execution-state.service';
-import { analyzeUserIdea } from '@/ai/agents/roles/ceo/ceo.service';
-import { refineRequirements } from '@/ai/agents/roles/product-manager/product-manager.service';
-import { designArchitecture } from '@/ai/agents/roles/architect/architect.service';
-import { implementArchitecture } from '@/ai/agents/roles/developer/developer.service';
-import { reviewImplementation } from '@/ai/agents/roles/qa/qa.service';
-import { reviewArtifact } from '@/ai/agents/roles/reviewer/reviewer.service';
+import { analyzeUserIdea } from '@/packages/agents/roles/ceo/ceo.service';
+import { refineRequirements } from '@/packages/agents/roles/product-manager/product-manager.service';
+import { designArchitecture } from '@/packages/agents/roles/architect/architect.service';
+import { implementArchitecture } from '@/packages/agents/roles/developer/developer.service';
+import { reviewImplementation } from '@/packages/agents/roles/qa-engineer/qa-engineer.service';
+import { reviewArtifact } from '@/packages/agents/roles/reviewer/reviewer.service';
 import {
   saveCEOSummary,
   saveArchitectSummary,

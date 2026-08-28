@@ -1,5 +1,5 @@
 import type { ExecutionVisibilityEvent, DeveloperTimelineEntry } from './types';
-import type { AgentRole } from '@/ai/agents/core/agent.types';
+import type { AgentRole } from '@/packages/agents/core/agent.types';
 import { getHumanExperienceService } from '@/ai/evaluation/human-experience.service';
 import { EventEmitter } from 'events';
 import { prisma } from '@/lib/prisma';

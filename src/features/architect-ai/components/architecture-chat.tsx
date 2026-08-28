@@ -9,8 +9,8 @@ import { DatabaseViewer } from './database-viewer';
 import { APIDocumentViewer } from './api-document-viewer';
 import { TechnologyDecisionCard } from './technology-decision-card';
 import { Loader2, AlertCircle } from 'lucide-react';
-import type { ArchitectAnalysis } from '@/ai/agents/roles/architect/architect.types';
-import type { ProductRequirement } from '@/ai/agents/roles/ceo/ceo.types';
+import type { ArchitectAnalysis } from '@/packages/agents/roles/architect/architect.types';
+import type { ProductRequirement } from '@/packages/agents/roles/ceo/ceo.types';
 
 interface ArchitectureChatProps {
   projectId: string;

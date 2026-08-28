@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import type { TestPlan } from '@/ai/agents/roles/qa/qa.types';
+import type { TestPlan } from '@/packages/agents/roles/qa-engineer/qa.types';
 import { Badge } from '@/components/ui/badge';
 
 export function TestReport({ testPlan }: { testPlan: TestPlan }) {

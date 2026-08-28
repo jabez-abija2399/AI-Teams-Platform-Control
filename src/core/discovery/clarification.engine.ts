@@ -1,4 +1,4 @@
-import type { ProductSpecification, ClarificationQuestion, MvpFeature } from '@/ai/agents/roles/product-discovery.agent';
+import type { ProductSpecification, ClarificationQuestion, MvpFeature } from '@/packages/agents/roles/product-discovery/product-discovery.agent';
 
 export class ClarificationEngine {
   /**

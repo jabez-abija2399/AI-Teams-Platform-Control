@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { frontendDesignSpecSchema } from '../../src/ai/agents/roles/frontend/frontend.types';
-import { FrontendAgent } from '../../src/ai/agents/roles/frontend.agent';
-import { createAgent } from '../../src/ai/agents/manager/agent.registry';
+import { frontendDesignSpecSchema } from '../../src/packages/agents/roles/frontend/frontend.types';
+import { FrontendAgent } from '../../src/packages/agents/roles/frontend/frontend.agent';
+import { createAgent } from '../../src/packages/agents/manager/agent.registry';
 
 describe('Frontend Engineer AI Specialist', () => {
   it('should instantiate via direct class and registry', () => {

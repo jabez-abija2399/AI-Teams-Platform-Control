@@ -2,11 +2,11 @@ import { describe, expect, it } from 'vitest';
 import {
   composeWorldClassSystemPrompt,
   getWorldClassCharter,
-} from '@/ai/agents/excellence/world-class-charter';
-import { scoreAgentDeliverable } from '@/ai/agents/excellence/output-quality';
-import { buildHeuristicArchitecture } from '@/ai/agents/roles/architect/architect.service';
-import { buildHeuristicImplementation } from '@/ai/agents/roles/developer/developer.service';
-import { buildStaticHtmlCssFiles } from '@/ai/agents/roles/developer/static-html-scaffold';
+} from '@/packages/agents/excellence/world-class-charter';
+import { scoreAgentDeliverable } from '@/packages/agents/excellence/output-quality';
+import { buildHeuristicArchitecture } from '@/packages/agents/roles/architect/architect.service';
+import { buildHeuristicImplementation } from '@/packages/agents/roles/developer/developer.service';
+import { buildStaticHtmlCssFiles } from '@/packages/agents/roles/developer/static-html-scaffold';
 
 const FIXTURE =
   "i don't need next js or other framwork i need you to build only using html and css login and signup page static page no bakcned";

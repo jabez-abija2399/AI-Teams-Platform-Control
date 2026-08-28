@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { loadKnowledgeForAgent } from '../../src/ai/agents/core/knowledge-loader';
+import { loadKnowledgeForAgent } from '../../src/packages/agents/core/knowledge-loader';
 
 describe('Knowledge Loader', () => {
   it('should load CEO strategy and product vision knowledge', () => {

@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import type { ProductVision } from '@/ai/agents/roles/ceo/ceo.types';
+import type { ProductVision } from '@/packages/agents/roles/ceo/ceo.types';
 
 export function ProductVisionCard({ vision }: { vision: ProductVision }) {
   return (

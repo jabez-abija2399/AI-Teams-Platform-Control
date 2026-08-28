@@ -7,7 +7,7 @@ import { ProductVisionCard } from './product-vision-card';
 import { RequirementViewer } from './requirement-viewer';
 import { RoadmapViewer } from './roadmap-viewer';
 import { Loader2, AlertCircle, Sparkles, Send } from 'lucide-react';
-import type { CEOAnalysis } from '@/ai/agents/roles/ceo/ceo.types';
+import type { CEOAnalysis } from '@/packages/agents/roles/ceo/ceo.types';
 
 interface CEOChatProps {
   projectId: string;

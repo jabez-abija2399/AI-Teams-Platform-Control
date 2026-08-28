@@ -3,13 +3,13 @@ import {
   detectStackMismatch,
   resolveStackIntent,
 } from '@/core/company-orchestration/stack-intent';
-import { buildHeuristicArchitecture } from '@/ai/agents/roles/architect/architect.service';
-import { buildHeuristicImplementation } from '@/ai/agents/roles/developer/developer.service';
-import { buildHeuristicCEOAnalysis } from '@/ai/agents/roles/ceo/ceo.service';
-import { buildHeuristicRefinedRequirements } from '@/ai/agents/roles/product-manager/product-manager.service';
-import { buildHeuristicQaReport } from '@/ai/agents/roles/qa/qa.service';
-import { buildHeuristicSecurityReport } from '@/ai/agents/roles/security/security.service';
-import { buildHeuristicDevopsPlan } from '@/ai/agents/roles/devops/devops.service';
+import { buildHeuristicArchitecture } from '@/packages/agents/roles/architect/architect.service';
+import { buildHeuristicImplementation } from '@/packages/agents/roles/developer/developer.service';
+import { buildHeuristicCEOAnalysis } from '@/packages/agents/roles/ceo/ceo.service';
+import { buildHeuristicRefinedRequirements } from '@/packages/agents/roles/product-manager/product-manager.service';
+import { buildHeuristicQaReport } from '@/packages/agents/roles/qa-engineer/qa-engineer.service';
+import { buildHeuristicSecurityReport } from '@/packages/agents/roles/security-auditor/security-auditor.service';
+import { buildHeuristicDevopsPlan } from '@/packages/agents/roles/devops-engineer/devops-engineer.service';
 import { ReviewCommittee } from '@/core/review-committee/review-committee';
 
 const FIXTURE =

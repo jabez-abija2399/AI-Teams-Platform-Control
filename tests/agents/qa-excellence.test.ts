@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { generateQaReportSpec, buildHeuristicQaReport } from '@/ai/agents/roles/qa/qa.service';
+import { generateQaReportSpec, buildHeuristicQaReport } from '@/packages/agents/roles/qa-engineer/qa-engineer.service';
 import { ProjectStateManager } from '@/core/state/project-state.manager';
 import { ArtifactRegistryService } from '@/core/artifacts/artifact-registry.service';
 import { AgentContractRegistry } from '@/core/contracts/agent-registry';

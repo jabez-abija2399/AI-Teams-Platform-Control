@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import type { DatabaseDesign } from '@/ai/agents/roles/architect/architect.types';
+import type { DatabaseDesign } from '@/packages/agents/roles/architect/architect.types';
 
 export function DatabaseViewer({ database }: { database: DatabaseDesign }) {
   return (

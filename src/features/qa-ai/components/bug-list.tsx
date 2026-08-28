@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import type { BugReport } from '@/ai/agents/roles/qa/qa.types';
+import type { BugReport } from '@/packages/agents/roles/qa-engineer/qa.types';
 
 const SEVERITY_COLORS: Record<string, string> = {
   CRITICAL: 'bg-red-100 text-red-800',
@@ -20,7 +20,7 @@ export function BugList({ bugs }: { bugs: BugReport[] }) {
         {bugs.map((bug, i) => (
           <div key={i} className="space-y-1">
             <div className="flex items-center gap-2">
-              <Badge className={SEVERITY_COLORS[bug.severity]}>{bug.severity}</Badge>
+              <Badge className={SEVERITY_COLORS[bug.severity || 'LOW']}>{bug.severity || 'LOW'}</Badge>
               <code className="text-xs">{bug.location}</code>
             </div>
             <p className="text-sm">{bug.description}</p>

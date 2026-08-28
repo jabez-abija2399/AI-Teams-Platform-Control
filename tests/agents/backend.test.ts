@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { backendDesignSpecSchema } from '../../src/ai/agents/roles/backend/backend.types';
-import { BackendAgent } from '../../src/ai/agents/roles/backend.agent';
-import { createAgent } from '../../src/ai/agents/manager/agent.registry';
+import { backendDesignSpecSchema } from '../../src/packages/agents/roles/backend/backend.types';
+import { BackendAgent } from '../../src/packages/agents/roles/backend/backend.agent';
+import { createAgent } from '../../src/packages/agents/manager/agent.registry';
 
 describe('Backend Engineer AI Specialist', () => {
   it('should instantiate via direct class and registry', () => {

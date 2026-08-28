@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import type { DevelopmentPlan } from '@/ai/agents/roles/ceo/ceo.types';
+import type { DevelopmentPlan } from '@/packages/agents/roles/ceo/ceo.types';
 
 export function RoadmapViewer({ plan }: { plan: DevelopmentPlan }) {
   return (

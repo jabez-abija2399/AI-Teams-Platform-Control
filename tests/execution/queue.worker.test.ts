@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { prisma } from '../../src/lib/prisma';
 import { ExecutionQueueWorker } from '../../src/core/execution-engine/queue.worker';
 import { TaskManagementEngine } from '../../src/core/execution-engine/task.engine';
-import { AgentRole } from '../../src/ai/agents/core/agent.types';
+import { AgentRole } from '../../src/packages/agents/core/agent.types';
 
 describe('Phase 18 Gap 1 - Queue Locking Concurrency', () => {
   const projectId = `proj-concurrency-${Date.now()}`;

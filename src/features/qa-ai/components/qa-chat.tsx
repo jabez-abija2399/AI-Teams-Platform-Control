@@ -7,7 +7,7 @@ import { BugList } from './bug-list';
 import { TestReport } from './test-report';
 import { Loader2, AlertCircle } from 'lucide-react';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
-import type { BugReport, TestPlan } from '@/ai/agents/roles/qa/qa.types';
+import type { BugReport, TestPlan } from '@/packages/agents/roles/qa-engineer/qa.types';
 
 interface QAStatus {
   exists: boolean;

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { MemoryManager } from '../../src/ai/agents/memory/memory.manager';
+import { MemoryManager } from '../../src/packages/agents/memory/memory.manager';
 
 describe('Phase 15 Memory Intelligence Validation', () => {
   let memory: MemoryManager;

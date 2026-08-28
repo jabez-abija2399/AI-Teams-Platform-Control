@@ -1,4 +1,4 @@
-import type { AgentRole } from '@/ai/agents/core/agent.types';
+import type { AgentRole } from '@/packages/agents/core/agent.types';
 import { Rocket, Layers, Code2, ShieldCheck, Palette, Server, FileText, Shield, Activity, ClipboardList, SearchCheck } from 'lucide-react';
 
 type AgentPersonality = { icon: typeof Rocket; color: string; bg: string; tagline: string };

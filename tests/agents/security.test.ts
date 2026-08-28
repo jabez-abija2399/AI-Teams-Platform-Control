@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { securityReportSpecSchema } from '../../src/ai/agents/roles/security/security.types';
-import { SecurityAgent } from '../../src/ai/agents/roles/security.agent';
-import { createAgent } from '../../src/ai/agents/manager/agent.registry';
+import { securityReportSpecSchema } from '../../src/packages/agents/roles/security-auditor/security-auditor.types';
+import { SecurityAgent } from '../../src/packages/agents/roles/security-auditor/security-auditor.agent';
+import { createAgent } from '../../src/packages/agents/manager/agent.registry';
 
 describe('Security Engineer AI Specialist', () => {
   it('should instantiate via direct class and registry', () => {

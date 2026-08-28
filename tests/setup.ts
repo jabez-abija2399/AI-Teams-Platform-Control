@@ -350,6 +350,6 @@ vi.mock('@/lib/prisma', () => ({
   prisma: prismaProxy,
 }));
 
-vi.mock('@/ai/agents/core/ai-call-stream', () => ({
+vi.mock('@/packages/agents/core/ai-call-stream', () => ({
   aiCallStreaming: vi.fn().mockRejectedValue(new Error('AI stream disabled in unit tests')),
 }));

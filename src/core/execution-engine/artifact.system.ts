@@ -1,6 +1,6 @@
-import { getArtifactManager } from '@/ai/agents/artifacts/artifact.manager';
+import { getArtifactManager } from '@/packages/agents/artifacts/artifact.manager';
 import type { ExecutionArtifactEntity } from './types';
-import type { AgentRole } from '@/ai/agents/core/agent.types';
+import type { AgentRole } from '@/packages/agents/core/agent.types';
 
 const artifactStore = new Map<string, ExecutionArtifactEntity>();
 

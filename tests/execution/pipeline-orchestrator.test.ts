@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { createPipelineOrchestrator } from '../../src/core/execution-engine/pipeline.orchestrator';
 import { getExecutionVisibilityService } from '../../src/core/execution-engine/visibility.service';
-import type { AgentRole } from '../../src/ai/agents/core/agent.types';
+import type { AgentRole } from '../../src/packages/agents/core/agent.types';
 
 describe('Phase 16 — Pipeline Orchestrator (Full Workflow)', () => {
   it('should execute a Simple Website workflow end-to-end (CEO → Frontend → QA)', async () => {

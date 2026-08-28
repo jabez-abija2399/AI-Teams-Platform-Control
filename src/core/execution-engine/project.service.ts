@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { withDb } from './db.probe';
 import type { ProjectEntity, ProjectExecutionStatus } from './types';
-import type { AgentRole } from '@/ai/agents/core/agent.types';
+import type { AgentRole } from '@/packages/agents/core/agent.types';
 
 const projectStore = new Map<string, ProjectEntity>();
 

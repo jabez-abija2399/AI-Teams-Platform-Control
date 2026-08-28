@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import type { ProductSpecification } from '@/ai/agents/roles/product-discovery.agent';
+import type { ProductSpecification } from '@/packages/agents/roles/product-discovery/product-discovery.agent';
 import { logAIEvent } from '@/ai/monitoring/ai.logger';
 import { ProductProposalEngine, type ProductProposal } from '../product/proposal/product-proposal.engine';
 import { ProposalScoreService, type ProposalScore } from '../product/proposal/proposal-score.service';

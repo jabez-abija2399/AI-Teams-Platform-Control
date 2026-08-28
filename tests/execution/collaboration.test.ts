@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { prisma } from '../../src/lib/prisma';
 import { CollaborationManager } from '../../src/core/execution-engine/collaboration.manager';
-import { AgentRole } from '../../src/ai/agents/core/agent.types';
+import { AgentRole } from '../../src/packages/agents/core/agent.types';
 
 describe('Phase 19 - Collaboration System', () => {
   const projectId = `proj-collab-${Date.now()}`;

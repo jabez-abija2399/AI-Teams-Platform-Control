@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { validateWorkspacePath, PathTraversalError } from '../../src/ai/agents/security/path-validator';
+import { validateWorkspacePath, PathTraversalError } from '../../src/packages/agents/security/path-validator';
 
 describe('Phase 15 Security Validation — Path Traversal', () => {
   it('should block directory traversal outside workspace root (../../etc/passwd)', () => {

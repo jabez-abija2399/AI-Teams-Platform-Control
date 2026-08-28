@@ -9,8 +9,8 @@ import { ImplementationViewer } from './implementation-viewer';
 import { useWorkspaceStore } from '@/features/workspace/stores/workspace.store';
 import { Loader2, CheckCircle2, AlertCircle, FileCode2, ClipboardList, XCircle, ExternalLink } from 'lucide-react';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
-import type { ImplementationReport } from '@/ai/agents/roles/developer/developer.types';
-import type { BuildEvent, TaskInfo, TaskStatus } from '@/ai/agents/roles/developer/developer.types';
+import type { ImplementationReport } from '@/packages/agents/roles/developer/developer.types';
+import type { BuildEvent, TaskInfo, TaskStatus } from '@/packages/agents/roles/developer/developer.types';
 
 interface ProgressData {
   phase: 'planning' | 'generating' | 'saving' | 'complete';

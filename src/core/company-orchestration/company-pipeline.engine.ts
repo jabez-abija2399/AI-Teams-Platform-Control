@@ -27,20 +27,20 @@ import { updateWorkflowScalars, findWorkflowScalars } from './workflow-state-acc
 import { RootCauseDiagnoser } from '@/core/root-cause/root-cause-diagnoser';
 
 const phaseLoaders = {
-  DISCOVERY_RUNNING: () => import('@/ai/agents/roles/product-discovery.agent'),
-  CLARIFICATION_RUNNING: () => import('@/ai/agents/roles/product-discovery.agent'),
+  DISCOVERY_RUNNING: () => import('@/packages/agents/roles/product-discovery/product-discovery.agent'),
+  CLARIFICATION_RUNNING: () => import('@/packages/agents/roles/product-discovery/product-discovery.agent'),
   PROPOSAL_RUNNING: () => import('@/core/product/proposal/product-proposal.engine'),
-  STRATEGY_RUNNING: () => import('@/ai/agents/roles/ceo/ceo.service'),
-  PRODUCT_RUNNING: () => import('@/ai/agents/roles/product-manager/product-manager.service'),
-  ANALYSIS_RUNNING: () => import('@/ai/agents/roles/business-analyst/business-analyst.service'),
-  DESIGN_RUNNING: () => import('@/ai/agents/roles/ui-designer/ui-designer.service'),
-  ARCHITECTURE_RUNNING: () => import('@/ai/agents/roles/architect/architect.service'),
+  STRATEGY_RUNNING: () => import('@/packages/agents/roles/ceo/ceo.service'),
+  PRODUCT_RUNNING: () => import('@/packages/agents/roles/product-manager/product-manager.service'),
+  ANALYSIS_RUNNING: () => import('@/packages/agents/roles/business-analyst/business-analyst.service'),
+  DESIGN_RUNNING: () => import('@/packages/agents/roles/ui-designer/ui-designer.service'),
+  ARCHITECTURE_RUNNING: () => import('@/packages/agents/roles/architect/architect.service'),
   PLANNING_RUNNING: () => import('@/core/executive/executive-planner'),
-  DEVELOPMENT_RUNNING: () => import('@/ai/agents/roles/developer/developer.service'),
-  TESTING_RUNNING: () => import('@/ai/agents/roles/qa/qa.service'),
+  DEVELOPMENT_RUNNING: () => import('@/packages/agents/roles/developer/developer.service'),
+  TESTING_RUNNING: () => import('@/packages/agents/roles/qa-engineer/qa-engineer.service'),
   REVIEW_RUNNING: () => import('@/core/review-committee/review-committee'),
-  SECURITY_RUNNING: () => import('@/ai/agents/roles/security/security.service'),
-  DEPLOYMENT_RUNNING: () => import('@/ai/agents/roles/devops/devops.service'),
+  SECURITY_RUNNING: () => import('@/packages/agents/roles/security-auditor/security-auditor.service'),
+  DEPLOYMENT_RUNNING: () => import('@/packages/agents/roles/devops-engineer/devops-engineer.service'),
 };
 
 async function loadClarificationEngines() {
