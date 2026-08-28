@@ -14,6 +14,9 @@ export type CompanyProjectState =
 
 export type CompanyEventType =
   | 'PROJECT_CREATED'
+  | 'NODE_STARTED'
+  | 'NODE_COMPLETED'
+  | 'NODE_FAILED'
   | 'DISCOVERY_COMPLETED'
   | 'CLARIFICATION_COMPLETED'
   | 'PRODUCT_APPROVED'
@@ -28,6 +31,7 @@ export type CompanyEventType =
   | 'DEPLOYMENT_STARTED'
   | 'DEPLOYMENT_COMPLETED'
   | 'PROJECT_FINISHED'
+  | 'PROJECT_COMPLETED'
   | 'WORKER_STALLED'
   | 'DEADLOCK_DETECTED'
   | 'HEARTBEAT_CHECK'

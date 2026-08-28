@@ -7,4 +7,3 @@ export * from './company-health.service';
 export * from './company-heartbeat';
 export * from './company-supervisor';
 export * from './company-checkpoint.service';
-export * from './company-orchestrator';

@@ -1,7 +1,7 @@
 import { auth } from '@/lib/auth';
 import { unauthorizedResponse } from '@/lib/api-response';
 import { NextResponse } from 'next/server';
-import { ContinuousCompanyOrchestrator } from '@/core/company';
+import { PipelineManager } from '@/core/integration/pipeline-manager';
 
 interface Params {
   params: Promise<{ id: string }>;
@@ -20,7 +20,7 @@ export async function POST(request: Request, { params }: Params) {
     // Ignore JSON parse error if body is empty
   }
 
-  const status = await ContinuousCompanyOrchestrator.pauseProject(id, reason);
+  const status = await PipelineManager.pauseProject(id, reason);
 
   return NextResponse.json({
     success: true,

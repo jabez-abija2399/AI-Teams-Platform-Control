@@ -3,5 +3,4 @@ export * from './event-bus';
 export * from './lifecycle-manager';
 export * from './execution-state.service';
 export * from './integration-validator';
-export * from './company-orchestrator';
 export * from './pipeline-manager';

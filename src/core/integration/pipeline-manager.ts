@@ -1,18 +1,54 @@
 import type { ApiResult } from '@/types/common.types';
 import type { PipelineConfig, ProjectLifecycleState } from './integration.types';
-import { CompanyOrchestrator } from './company-orchestrator';
 import { LifecycleManager } from './lifecycle-manager';
 import { ExecutionStateService } from './execution-state.service';
-import { companyEventBus } from './event-bus';
+import { companyEventBus } from '../company/company-event-bus';
+import { PipelineEngine } from '../workflow-engine/pipeline-engine';
+import { PlanningNode } from '../workflow-engine/nodes/planning-node';
+import { ArchitectureNode } from '../workflow-engine/nodes/architecture-node';
+import { DesignNode } from '../workflow-engine/nodes/design-node';
+import { ExecutionNode } from '../workflow-engine/nodes/execution-node';
+import { DebateNode } from '../workflow-engine/nodes/debate-node';
+import type { ExecutionContext } from '../workflow-engine/execution-context';
 
 export class PipelineManager {
+  private static getNodesFromPhase(phase: ProjectLifecycleState) {
+    const allNodes = [
+      new PlanningNode(),
+      new ArchitectureNode(),
+      new DesignNode(),
+      new ExecutionNode(),
+      new DebateNode()
+    ];
+
+    switch (phase) {
+      case 'PLANNING': return allNodes;
+      case 'ARCHITECTURE': return allNodes.slice(1);
+      case 'DESIGN': return allNodes.slice(2);
+      case 'EXECUTION': return allNodes.slice(3);
+      case 'DEBATE': return allNodes.slice(4);
+      default: return allNodes;
+    }
+  }
+
   public static async startProject(
     projectId: string,
     userIdea: string,
     config: PipelineConfig = { autoAdvance: true, maxRetries: 1, recoverOnFailure: true },
   ): Promise<ApiResult<any>> {
-    ExecutionStateService.initState(projectId, 'CREATED');
-    return CompanyOrchestrator.runFullPipeline(projectId, userIdea, config);
+    try {
+      const engine = new PipelineEngine(this.getNodesFromPhase('PLANNING'));
+      const initialContext: ExecutionContext = {
+        projectId,
+        userIdea,
+        metadata: { startTime: Date.now(), errors: [], attempts: {} }
+      };
+
+      const result = await engine.run(initialContext);
+      return { success: true, data: result };
+    } catch (err: any) {
+      return { success: false, error: { message: err.message, code: 'PIPELINE_FAILED' } };
+    }
   }
 
   public static async pauseProject(projectId: string, reason: string = 'User requested pause'): Promise<ApiResult<ProjectLifecycleState>> {
@@ -45,25 +81,24 @@ export class PipelineManager {
         return { success: false, error: { message: 'Project is not currently paused.', code: 'NOT_PAUSED' } };
       }
 
-      const previousPhase = state.previousPhase || (state.lastEvent?.payload?.from as ProjectLifecycleState) || 'DISCOVERY';
+      const previousPhase = state.previousPhase || (state.lastEvent?.payload?.from as ProjectLifecycleState) || 'PLANNING';
       await LifecycleManager.transition(projectId, 'PAUSED', previousPhase, 'Resuming execution');
       ExecutionStateService.updatePhase(projectId, previousPhase);
       ExecutionStateService.updateHealth(projectId, 'HEALTHY');
 
-      // Continue execution based on restored phase
-      if (previousPhase === 'DISCOVERY') {
-        return CompanyOrchestrator.executeDiscovery(projectId, resumeData.userIdea || 'Resume idea');
-      } else if (previousPhase === 'PLANNING') {
-        return CompanyOrchestrator.executePlanning(projectId, resumeData.ceoData || {});
-      } else if (previousPhase === 'ARCHITECTURE') {
-        return CompanyOrchestrator.executeArchitecture(projectId, resumeData.pmData || {});
-      } else if (previousPhase === 'EXECUTION') {
-        return CompanyOrchestrator.executeExecution(projectId, resumeData.archData || {}, resumeData.requirements || []);
-      } else if (previousPhase === 'REVIEW') {
-        return CompanyOrchestrator.executeReview(projectId, resumeData.devData || {});
-      }
+      const engine = new PipelineEngine(this.getNodesFromPhase(previousPhase));
+      const context: ExecutionContext = {
+        projectId,
+        userIdea: resumeData.userIdea || 'Resume idea',
+        prd: resumeData.prd,
+        architecture: resumeData.architecture,
+        design: resumeData.design,
+        execution: resumeData.execution,
+        metadata: { startTime: Date.now(), errors: [], attempts: {} }
+      };
 
-      return { success: true, data: { status: 'resumed', phase: previousPhase } };
+      const result = await engine.run(context);
+      return { success: true, data: result };
     } catch (err: any) {
       return { success: false, error: { message: err?.message || 'Failed to resume project', code: 'RESUME_FAILED' } };
     }
@@ -76,24 +111,24 @@ export class PipelineManager {
         return { success: false, error: { message: 'Project is not in a failed state.', code: 'NOT_FAILED' } };
       }
 
-      const targetPhase = state.error?.stage || state.previousPhase || (state.lastEvent?.payload?.from as ProjectLifecycleState) || 'DISCOVERY';
+      const targetPhase = state.error?.stage || state.previousPhase || (state.lastEvent?.payload?.from as ProjectLifecycleState) || 'PLANNING';
       await LifecycleManager.transition(projectId, 'FAILED', targetPhase, 'Retrying execution after failure');
       ExecutionStateService.updatePhase(projectId, targetPhase);
       ExecutionStateService.updateHealth(projectId, 'HEALTHY');
 
-      if (targetPhase === 'DISCOVERY') {
-        return CompanyOrchestrator.executeDiscovery(projectId, retryData.userIdea || 'Retried idea');
-      } else if (targetPhase === 'PLANNING') {
-        return CompanyOrchestrator.executePlanning(projectId, retryData.ceoData || {});
-      } else if (targetPhase === 'ARCHITECTURE') {
-        return CompanyOrchestrator.executeArchitecture(projectId, retryData.pmData || {});
-      } else if (targetPhase === 'EXECUTION') {
-        return CompanyOrchestrator.executeExecution(projectId, retryData.archData || {}, retryData.requirements || []);
-      } else if (targetPhase === 'REVIEW') {
-        return CompanyOrchestrator.executeReview(projectId, retryData.devData || {});
-      }
+      const engine = new PipelineEngine(this.getNodesFromPhase(targetPhase));
+      const context: ExecutionContext = {
+        projectId,
+        userIdea: retryData.userIdea || 'Retry idea',
+        prd: retryData.prd,
+        architecture: retryData.architecture,
+        design: retryData.design,
+        execution: retryData.execution,
+        metadata: { startTime: Date.now(), errors: [], attempts: {} }
+      };
 
-      return { success: true, data: { status: 'retried', phase: targetPhase } };
+      const result = await engine.run(context);
+      return { success: true, data: result };
     } catch (err: any) {
       return { success: false, error: { message: err?.message || 'Failed to retry project', code: 'RETRY_FAILED' } };
     }
