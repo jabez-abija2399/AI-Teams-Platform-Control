@@ -11,14 +11,18 @@ import {
   Users2,
   ExternalLink,
   Sparkles,
+  Network,
+  Wand2,
+  Image as ImageIcon,
 } from 'lucide-react';
 import { CodeViewer } from './code-viewer';
 import { AgentChat } from './agent-chat';
 import { DebateRoom } from './debate-room';
 import { GitHubExportModal } from './github-export-modal';
+import { ArchitectureVisualizerPanel } from './architecture-visualizer-panel';
+import { ImageGeneratorModal } from './image-generator-modal';
 import { useGenerationStream } from '../hooks/use-generation-stream';
-import { NeonButton, StatusBadge } from '@/packages/ui';
-import { ROUTES } from '@/config/constants';
+import { NeonButton } from '@/packages/ui';
 
 interface ChatMessage {
   id: string;
@@ -33,8 +37,9 @@ interface WorkspaceClientShellProps {
 }
 
 export function WorkspaceClientShell({ projectId, projectName }: WorkspaceClientShellProps) {
-  const [activeTab, setActiveTab] = useState<'ide' | 'chat' | 'debate'>('ide');
+  const [activeTab, setActiveTab] = useState<'ide' | 'chat' | 'debate' | 'architecture'>('ide');
   const [isGitHubModalOpen, setIsGitHubModalOpen] = useState(false);
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
 
   // Consume live SSE tokens from the generation stream bus
   const { tokens, isStreaming, latestStatus, tokenCount } = useGenerationStream(projectId);
@@ -150,10 +155,31 @@ export default NextAuth(authOptions);`;
             <Users2 className="w-3.5 h-3.5" />
             Debate Arena
           </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('architecture')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              activeTab === 'architecture'
+                ? 'bg-primary text-white shadow-[0_0_12px_rgba(99,102,241,0.4)]'
+                : 'text-white/50 hover:text-white'
+            }`}
+          >
+            <Network className="w-3.5 h-3.5" />
+            Architecture
+          </button>
         </div>
 
-        {/* Right: Actions (GitHub Export, Live Preview, Telemetry) */}
+        {/* Right: Actions (Free AI Images, GitHub Export, Live Preview) */}
         <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setIsImageModalOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-secondary/30 bg-secondary/10 text-secondary hover:bg-secondary/20 text-xs font-bold transition-all shadow-[0_0_15px_rgba(6,182,212,0.2)]"
+          >
+            <Wand2 className="w-3.5 h-3.5" />
+            <span>AI Images</span>
+          </button>
+
           <Link href={`/preview/${projectId}`} target="_blank">
             <button
               type="button"
@@ -178,7 +204,9 @@ export default NextAuth(authOptions);`;
 
       {/* Main Workspace Area */}
       <main className="flex-1 flex overflow-hidden p-6 gap-6">
-        {activeTab === 'debate' ? (
+        {activeTab === 'architecture' ? (
+          <ArchitectureVisualizerPanel projectName={projectName} />
+        ) : activeTab === 'debate' ? (
           <DebateRoom />
         ) : (
           <>
@@ -218,6 +246,13 @@ export default NextAuth(authOptions);`;
         isOpen={isGitHubModalOpen}
         onClose={() => setIsGitHubModalOpen(false)}
         projectId={projectId}
+        projectName={projectName}
+      />
+
+      {/* Free AI Image & Asset Generator Modal */}
+      <ImageGeneratorModal
+        isOpen={isImageModalOpen}
+        onClose={() => setIsImageModalOpen(false)}
         projectName={projectName}
       />
     </div>
