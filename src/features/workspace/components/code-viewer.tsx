@@ -3,7 +3,7 @@
 import React from 'react';
 import Editor, { useMonaco } from '@monaco-editor/react';
 import { GlassCard } from '@/packages/ui';
-import { Loader2, Terminal, Sparkles, Cpu } from 'lucide-react';
+import { Loader2, Terminal, Sparkles } from 'lucide-react';
 
 interface CodeViewerProps {
   // The raw source code to display in the editor
@@ -16,12 +16,14 @@ interface CodeViewerProps {
   streamStatus?: string | null;
   // Number of tokens streamed so far
   tokenCount?: number;
+  // Active editor theme key ('cyber-void', 'matrix-green', 'neon-sunset', 'light-cyber')
+  editorTheme?: string;
 }
 
 /**
- * Ultra-Modern Cyber Void Live Code Viewer & Token Streamer.
+ * Ultra-Modern Live Code Viewer & Token Streamer.
  * Integrates Monaco Editor with real-time SSE token injection, smooth auto-scrolling,
- * and Cyber Void neon syntax highlighting.
+ * and dynamic Cyber Void theme variations.
  */
 export function CodeViewer({
   code,
@@ -29,34 +31,105 @@ export function CodeViewer({
   isStreaming = false,
   streamStatus,
   tokenCount = 0,
+  editorTheme = 'cyber-void',
 }: CodeViewerProps) {
   const monaco = useMonaco();
 
-  // Define our custom "Cyber Void" theme for Monaco when it loads
+  // Define custom themes for Monaco when it loads
+  React.useEffect(() => {
+    if (!monaco) return;
+
+    // 1. Cyber Void Theme (Default Dark Void)
+    monaco.editor.defineTheme('cyber-void', {
+      base: 'vs-dark',
+      inherit: true,
+      rules: [
+        { token: 'comment', foreground: '64748b', fontStyle: 'italic' },
+        { token: 'keyword', foreground: '6366f1' }, // Electric Indigo
+        { token: 'string', foreground: '06b6d4' },  // Cyber Cyan
+        { token: 'function', foreground: '10b981' }, // Emerald Matrix
+        { token: 'type', foreground: 'f59e0b' },     // Amber
+      ],
+      colors: {
+        'editor.background': '#05050A',
+        'editor.foreground': '#f8fafc',
+        'editorLineNumber.foreground': '#334155',
+        'editor.lineHighlightBackground': '#ffffff05',
+        'editor.selectionBackground': '#6366f140',
+        'editorCursor.foreground': '#06b6d4',
+      },
+    });
+
+    // 2. Matrix Green Theme (Retro hacker terminal)
+    monaco.editor.defineTheme('matrix-green', {
+      base: 'vs-dark',
+      inherit: true,
+      rules: [
+        { token: 'comment', foreground: '14532d', fontStyle: 'italic' },
+        { token: 'keyword', foreground: '22c55e' }, // Bright matrix green
+        { token: 'string', foreground: '4ade80' },
+        { token: 'function', foreground: '16a34a' },
+        { token: 'type', foreground: '86efac' },
+      ],
+      colors: {
+        'editor.background': '#020617',
+        'editor.foreground': '#22c55e',
+        'editorLineNumber.foreground': '#166534',
+        'editor.lineHighlightBackground': '#22c55e0a',
+        'editor.selectionBackground': '#22c55e25',
+        'editorCursor.foreground': '#22c55e',
+      },
+    });
+
+    // 3. Neon Sunset Theme (Warm sunset glow)
+    monaco.editor.defineTheme('neon-sunset', {
+      base: 'vs-dark',
+      inherit: true,
+      rules: [
+        { token: 'comment', foreground: '78716c', fontStyle: 'italic' },
+        { token: 'keyword', foreground: 'ec4899' }, // Neon Pink
+        { token: 'string', foreground: 'f97316' },  // Orange Sunset
+        { token: 'function', foreground: 'eab308' }, // Yellow Glow
+        { token: 'type', foreground: 'f472b6' },
+      ],
+      colors: {
+        'editor.background': '#0c0a09',
+        'editor.foreground': '#f5f5f4',
+        'editorLineNumber.foreground': '#44403c',
+        'editor.lineHighlightBackground': '#ec48990a',
+        'editor.selectionBackground': '#ec489925',
+        'editorCursor.foreground': '#ec4899',
+      },
+    });
+
+    // 4. Light Cyber Theme (Frosted light mode)
+    monaco.editor.defineTheme('light-cyber', {
+      base: 'vs',
+      inherit: true,
+      rules: [
+        { token: 'comment', foreground: '94a3b8', fontStyle: 'italic' },
+        { token: 'keyword', foreground: '4f46e5' }, // Deep Indigo
+        { token: 'string', foreground: '0891b2' },  // Cyber Cyan
+        { token: 'function', foreground: '059669' }, // Deep Emerald
+        { token: 'type', foreground: 'd97706' },
+      ],
+      colors: {
+        'editor.background': '#f8fafc',
+        'editor.foreground': '#0f172a',
+        'editorLineNumber.foreground': '#cbd5e1',
+        'editor.lineHighlightBackground': '#4f46e508',
+        'editor.selectionBackground': '#4f46e51a',
+        'editorCursor.foreground': '#4f46e5',
+      },
+    });
+  }, [monaco]);
+
+  // Set the theme when it changes
   React.useEffect(() => {
     if (monaco) {
-      monaco.editor.defineTheme('cyber-void', {
-        base: 'vs-dark',
-        inherit: true,
-        rules: [
-          { token: 'comment', foreground: '64748b', fontStyle: 'italic' },
-          { token: 'keyword', foreground: '6366f1' }, // Electric Indigo
-          { token: 'string', foreground: '06b6d4' },  // Cyber Cyan
-          { token: 'function', foreground: '10b981' }, // Emerald Matrix
-          { token: 'type', foreground: 'f59e0b' },     // Amber
-        ],
-        colors: {
-          'editor.background': '#05050A', // Void Black
-          'editor.foreground': '#f8fafc',
-          'editorLineNumber.foreground': '#334155',
-          'editor.lineHighlightBackground': '#ffffff05',
-          'editor.selectionBackground': '#6366f140',
-          'editorCursor.foreground': '#06b6d4', // Cyber Cyan pulsating cursor
-        },
-      });
-      monaco.editor.setTheme('cyber-void');
+      monaco.editor.setTheme(editorTheme);
     }
-  }, [monaco]);
+  }, [monaco, editorTheme]);
 
   return (
     <GlassCard className="w-full h-full flex flex-col p-0 overflow-hidden border-white/10 shadow-2xl bg-surface-glass/90">
@@ -107,9 +180,9 @@ export function CodeViewer({
           height="100%"
           language={language}
           value={code}
-          theme="cyber-void"
+          theme={editorTheme}
           options={{
-            readOnly: true, // The user monitors autonomous agent code generation
+            readOnly: true,
             minimap: { enabled: false },
             fontSize: 13,
             fontFamily: "'JetBrains Mono', 'Fira Code', monospace",

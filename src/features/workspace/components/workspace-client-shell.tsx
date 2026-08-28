@@ -51,6 +51,7 @@ export function WorkspaceClientShell({ projectId, projectName }: WorkspaceClient
   const [activeTab, setActiveTab] = useState<'ide' | 'chat' | 'debate' | 'architecture'>('ide');
   const [isGitHubModalOpen, setIsGitHubModalOpen] = useState(false);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [editorTheme, setEditorTheme] = useState<string>('cyber-void');
 
   // File explorer states
   const [files, setFiles] = useState<ProjectFile[]>([]);
@@ -241,6 +242,23 @@ export function WorkspaceClientShell({ projectId, projectName }: WorkspaceClient
 
         {/* Right: Actions (Free AI Images, GitHub Export, Live Preview) */}
         <div className="flex items-center gap-3">
+          {/* Theme Changer Dropdown */}
+          <div className="relative">
+            <select
+              value={editorTheme}
+              onChange={(e) => setEditorTheme(e.target.value)}
+              className="appearance-none h-9 px-3 pr-8 rounded-xl border border-white/10 bg-white/5 text-white/70 hover:text-white text-xs font-mono font-bold transition-all focus:outline-none focus:border-primary/50 cursor-pointer backdrop-blur-md"
+            >
+              <option value="cyber-void" className="bg-[#05050A] text-white">👾 Cyber Void</option>
+              <option value="matrix-green" className="bg-[#05050A] text-white">📟 Matrix Green</option>
+              <option value="neon-sunset" className="bg-[#05050A] text-white">🌅 Neon Sunset</option>
+              <option value="light-cyber" className="bg-[#f8fafc] text-[#0f172a]">❄️ Light Cyber</option>
+            </select>
+            <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-white/40 text-[9px]">
+              ▼
+            </div>
+          </div>
+
           <button
             type="button"
             onClick={() => setIsImageModalOpen(true)}
@@ -351,6 +369,7 @@ export function WorkspaceClientShell({ projectId, projectName }: WorkspaceClient
                   isStreaming={isStreaming}
                   streamStatus={latestStatus}
                   tokenCount={tokenCount}
+                  editorTheme={editorTheme}
                 />
               </div>
             </div>
