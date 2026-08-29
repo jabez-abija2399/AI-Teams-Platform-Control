@@ -4,7 +4,9 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 // Import Lucide icons for sidebar navigation.
-import { Sparkles, Bot, Sun, Moon, Loader2 } from 'lucide-react';
+import { Bot, Sun, Moon, Loader2 } from 'lucide-react';
+// Import Logo component
+import { Logo } from '@/components/layout/logo';
 // Import utility for theme switching
 import { useTheme } from 'next-themes';
 import React from 'react';
@@ -43,8 +45,8 @@ export function Sidebar({ isSuperAdmin = false }: SidebarProps) {
     <aside className="hidden w-64 shrink-0 flex-col border-r border-white/10 bg-surface-glass/80 backdrop-blur-2xl md:flex shadow-2xl z-20">
       {/* Brand & Platform Header */}
       <div className="flex h-16 items-center gap-3 border-b border-white/10 px-5 bg-white/[0.02]">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-secondary text-white shadow-[0_0_15px_rgba(99,102,241,0.5)]">
-          <Sparkles className="h-4.5 w-4.5" />
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-surface-container border border-white/10 text-primary">
+          <Logo size={20} />
         </div>
         <div className="min-w-0">
           <p className="truncate text-sm font-bold tracking-tight text-foreground">{APP_NAME}</p>

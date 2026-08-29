@@ -81,6 +81,10 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-image: 
+    linear-gradient(to right, rgba(70, 69, 69, 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(70, 69, 69, 0.08) 1px, transparent 1px);
+  background-size: 40px 40px;
 }
 
 /* Tailwind base resets and layers */
@@ -139,5 +143,14 @@ body {
     background-color: #ffffff !important;
     border: 1px solid rgba(70, 70, 69, 0.15) !important;
     box-shadow: 0 1px 3px 0 rgba(70, 70, 69, 0.05) !important;
+  }
+
+  .offset-shadow {
+    box-shadow: 4px 4px 0px 0px rgba(0, 172, 172, 0.15);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .offset-shadow:hover {
+    box-shadow: 8px 8px 0px 0px rgba(0, 172, 172, 0.3);
+    transform: translate(-2px, -2px);
   }
 }

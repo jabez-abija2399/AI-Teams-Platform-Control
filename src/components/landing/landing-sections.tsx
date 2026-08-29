@@ -11,11 +11,11 @@ import {
   Layers,
   Rocket,
   Shield,
-  Sparkles,
   Terminal,
   Cpu,
   Zap,
 } from 'lucide-react';
+import { Logo } from '@/components/layout/logo';
 import { cn } from '@/lib/utils';
 import { APP_NAME, ROUTES } from '@/config/constants';
 import { MissionControlPreview } from '@/components/shared/mission-control-preview';
@@ -105,8 +105,8 @@ export function LandingHeader() {
     <header className="sticky top-0 z-50 border-b border-white/10 bg-surface-glass/75 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href={ROUTES.home} className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-black">
-            <Sparkles className="h-4.5 w-4.5" />
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-surface-container border border-white/10 text-primary">
+            <Logo size={20} />
           </div>
           <span className="text-lg font-bold tracking-tight text-foreground">{APP_NAME}</span>
         </Link>
@@ -502,8 +502,8 @@ export function LandingFooter() {
     <footer className="border-t border-white/10 py-12 bg-surface">
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 px-4 sm:flex-row sm:px-6 lg:px-8">
         <div className="flex items-center gap-3">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/20 text-primary border border-primary/40">
-            <Sparkles className="h-3.5 w-3.5" />
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-surface-container border border-white/10 text-primary">
+            <Logo size={16} />
           </div>
           <span className="text-sm font-bold tracking-tight text-foreground">{APP_NAME}</span>
           <div className="h-3.5 w-px bg-white/10 ml-2" />
