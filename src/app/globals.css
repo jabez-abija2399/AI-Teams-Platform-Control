@@ -101,29 +101,30 @@ body {
 
 /* Custom Light Mode Overrides for Hardcoded Dark Theme Utilities */
 @layer utilities {
+  /* Restructure utility overrides to map to our charcoal graphite */
   html:not(.dark) .text-white {
-    color: var(--foreground) !important;
+    color: var(--foreground);
   }
   html:not(.dark) .text-white\/80 {
-    color: rgba(60, 64, 68, 0.8) !important;
+    color: rgba(60, 64, 68, 0.85);
   }
   html:not(.dark) .text-white\/70 {
-    color: rgba(60, 64, 68, 0.7) !important;
+    color: rgba(60, 64, 68, 0.75);
   }
   html:not(.dark) .text-white\/60 {
-    color: rgba(60, 64, 68, 0.6) !important;
+    color: rgba(60, 64, 68, 0.6);
   }
   html:not(.dark) .text-white\/50 {
-    color: rgba(60, 64, 68, 0.5) !important;
+    color: rgba(60, 64, 68, 0.5);
   }
   html:not(.dark) .text-white\/40 {
-    color: rgba(60, 64, 68, 0.4) !important;
+    color: rgba(60, 64, 68, 0.4);
   }
   html:not(.dark) .border-white\/10 {
-    border-color: rgba(60, 64, 68, 0.12) !important;
+    border-color: rgba(60, 64, 68, 0.15) !important;
   }
   html:not(.dark) .border-white\/5 {
-    border-color: rgba(60, 64, 68, 0.06) !important;
+    border-color: rgba(60, 64, 68, 0.08) !important;
   }
   html:not(.dark) .bg-white\/5 {
     background-color: rgba(60, 64, 68, 0.05) !important;
@@ -132,9 +133,26 @@ body {
     background-color: rgba(60, 64, 68, 0.08) !important;
   }
   html:not(.dark) .bg-black\/25 {
-    background-color: rgba(255, 255, 255, 0.5) !important;
+    background-color: rgba(255, 255, 255, 0.6) !important;
   }
   html:not(.dark) .bg-black\/45 {
-    background-color: rgba(255, 255, 255, 0.8) !important;
+    background-color: rgba(255, 255, 255, 0.95) !important;
+  }
+
+  /* Force premium Neo-Brutalist borders and drop-shadows on cards/panels in Light Mode */
+  html:not(.dark) .bg-surface-glass,
+  html:not(.dark) .bg-surface {
+    background-color: #ffffff !important;
+    border: 1.5px solid var(--source-charcoal) !important;
+    box-shadow: 4px 4px 0px rgba(60, 64, 68, 0.15) !important;
+  }
+
+  /* Ensure button/badge elements, status markers, and text links keep their absolute white text for legibility */
+  html:not(.dark) button .text-white,
+  html:not(.dark) button.text-white,
+  html:not(.dark) a.text-white,
+  html:not(.dark) .text-white-force,
+  html:not(.dark) [class*="bg-gradient-to"] * {
+    color: #ffffff !important;
   }
 }
