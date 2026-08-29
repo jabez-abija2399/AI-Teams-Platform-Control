@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Bot, Sun, Moon, Loader2, CheckCircle2 } from 'lucide-react';
+import { Sun, Moon } from 'lucide-react';
 import { Logo } from '@/components/layout/logo';
 import { useTheme } from 'next-themes';
 import React from 'react';
@@ -29,16 +29,13 @@ export function Sidebar({ isSuperAdmin = false }: SidebarProps) {
 
   return (
     <aside className="hidden w-64 shrink-0 flex-col border-r border-white/10 bg-surface/90 backdrop-blur-2xl md:flex shadow-2xl z-20">
-      {/* Brand & Platform Header */}
+      {/* Brand Header */}
       <div className="flex h-16 items-center gap-3 border-b border-white/10 px-5 bg-white/[0.02]">
         <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-surface border border-primary/40 text-primary shadow-[0_0_12px_rgba(0,242,254,0.25)]">
           <Logo size={20} />
         </div>
         <div className="min-w-0">
-          <p className="truncate text-sm font-bold tracking-tight text-white font-heading">{APP_NAME}</p>
-          <p className="truncate text-[10px] font-mono font-bold text-primary uppercase tracking-widest">
-            Production Cluster
-          </p>
+          <p className="truncate text-base font-bold tracking-tight text-white font-heading">{APP_NAME}</p>
         </div>
       </div>
 
@@ -61,7 +58,6 @@ export function Sidebar({ isSuperAdmin = false }: SidebarProps) {
                   : 'text-on-surface-variant hover:bg-white/5 hover:text-white',
               )}
             >
-              {/* Active left indicator bar */}
               {active && (
                 <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 rounded-r-full bg-primary glow-cyan" />
               )}
@@ -113,24 +109,21 @@ export function Sidebar({ isSuperAdmin = false }: SidebarProps) {
         )}
       </nav>
 
-      {/* Cluster Health Footer */}
-      <div className="p-4 border-t border-white/10 bg-surface-container-high/30">
-        <div className="flex items-center justify-between text-xs font-mono text-primary font-bold">
-          <span className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-primary animate-pulse" />
-            Status: Healthy
-          </span>
-          {mounted && (
-            <button
-              type="button"
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="p-1.5 rounded-lg border border-white/10 hover:border-primary text-on-surface-variant hover:text-white transition-colors"
-              title="Toggle Theme"
-            >
-              {theme === 'dark' ? <Sun className="w-3.5 h-3.5 text-warning" /> : <Moon className="w-3.5 h-3.5 text-primary" />}
-            </button>
-          )}
-        </div>
+      {/* Sidebar Footer Theme Control */}
+      <div className="p-4 border-t border-white/10 bg-surface-container-high/30 flex justify-between items-center">
+        <span className="font-mono text-[10px] text-on-surface-variant uppercase tracking-wider font-bold">
+          Workspace Mode
+        </span>
+        {mounted && (
+          <button
+            type="button"
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            className="p-1.5 rounded-lg border border-white/10 hover:border-primary text-on-surface-variant hover:text-white transition-colors"
+            title="Toggle Theme"
+          >
+            {theme === 'dark' ? <Sun className="w-3.5 h-3.5 text-warning" /> : <Moon className="w-3.5 h-3.5 text-primary" />}
+          </button>
+        )}
       </div>
     </aside>
   );

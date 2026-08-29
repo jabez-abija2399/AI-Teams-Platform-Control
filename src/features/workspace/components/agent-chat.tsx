@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AgentAvatar } from '@/packages/ui';
 import { fadeUpVariant, staggerContainer } from '@/packages/motion';
 import { sanitizeHtml } from '@/lib/security/sanitize';
-import { Send, Sparkles, Bot } from 'lucide-react';
+import { Send, Sparkles, Bot, X } from 'lucide-react';
 
 interface Message {
   id: string;
@@ -18,9 +18,10 @@ interface AgentChatProps {
   messages: Message[];
   onSendMessage: (content: string) => void;
   isAgentTyping?: boolean;
+  onClose?: () => void;
 }
 
-export function AgentChat({ messages, onSendMessage, isAgentTyping = false }: AgentChatProps) {
+export function AgentChat({ messages, onSendMessage, isAgentTyping = false, onClose }: AgentChatProps) {
   const [inputValue, setInputValue] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -40,17 +41,29 @@ export function AgentChat({ messages, onSendMessage, isAgentTyping = false }: Ag
   };
 
   const MotionDiv = motion.div as any;
-  const MotionForm = motion.form as any;
 
   return (
-    <div className="w-full h-full flex flex-col p-0 border border-white/10 bg-surface glass-card rounded-2xl overflow-hidden">
+    <div className="w-full h-full flex flex-col p-0 border border-white/10 bg-surface glass-card rounded-2xl overflow-hidden shadow-2xl">
       {/* Header */}
-      <div className="flex items-center gap-3 p-4 border-b border-white/10 bg-surface-container-high/60 backdrop-blur-md z-10">
-        <AgentAvatar role="PRODUCT_MANAGER" isActive={isAgentTyping} size="sm" />
-        <div>
-          <h3 className="text-sm font-bold text-white tracking-tight font-heading">Sarah</h3>
-          <p className="text-[10px] text-primary uppercase tracking-widest font-mono font-bold">Product Manager</p>
+      <div className="flex items-center justify-between p-4 border-b border-white/10 bg-surface-container-high/60 backdrop-blur-md z-10">
+        <div className="flex items-center gap-3">
+          <AgentAvatar role="PRODUCT_MANAGER" isActive={isAgentTyping} size="sm" />
+          <div>
+            <h3 className="text-sm font-bold text-white tracking-tight font-heading">Sarah</h3>
+            <p className="text-[10px] text-primary uppercase tracking-widest font-mono font-bold">Product Manager</p>
+          </div>
         </div>
+
+        {onClose && (
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-1.5 rounded-lg border border-white/10 text-on-surface-variant hover:text-white hover:border-white/30 transition-all"
+            title="Close AI Chat"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
       </div>
 
       {/* Messages Area */}
