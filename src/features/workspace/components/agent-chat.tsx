@@ -9,7 +9,7 @@ import { Send, Sparkles } from 'lucide-react';
 
 interface Message {
   id: string;
-  sender: 'USER' | 'PRODUCT_MANAGER' | 'ARCHITECT';
+  sender: 'USER' | 'PRODUCT_MANAGER' | 'ARCHITECT' | 'DEVELOPER' | 'QA' | 'CEO';
   content: string;
   timestamp: Date;
 }

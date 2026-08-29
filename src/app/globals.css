@@ -140,13 +140,4 @@ body {
     border: 1px solid rgba(70, 70, 69, 0.15) !important;
     box-shadow: 0 1px 3px 0 rgba(70, 70, 69, 0.05) !important;
   }
-
-  /* Ensure button elements, status markers, and text links keep their absolute white text for legibility */
-  html:not(.dark) button .text-white,
-  html:not(.dark) button.text-white,
-  html:not(.dark) a.text-white,
-  html:not(.dark) .text-white-force,
-  html:not(.dark) [class*="bg-gradient-to"] * {
-    color: #ffffff !important;
-  }
 }

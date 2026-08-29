@@ -64,10 +64,10 @@ export function ProjectCard({ project, stack }: ProjectCardProps) {
               </div>
               
               <div className="min-w-0">
-                <h3 className="truncate text-base font-bold tracking-tight text-white group-hover:text-primary transition-colors">
+                <h3 className="truncate text-base font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">
                   {project.name}
                 </h3>
-                <div className="flex items-center gap-1.5 mt-0.5 text-xs text-white/40 font-mono">
+                <div className="flex items-center gap-1.5 mt-0.5 text-xs text-secondary font-mono">
                   <Calendar className="w-3 h-3" />
                   <span>Updated {formatRelativeTime(project.updatedAt)}</span>
                 </div>
@@ -80,11 +80,11 @@ export function ProjectCard({ project, stack }: ProjectCardProps) {
 
           {/* Project Description snippet */}
           {project.description ? (
-            <p className="text-xs leading-relaxed text-white/60 line-clamp-2 mt-2">
+            <p className="text-xs leading-relaxed text-secondary line-clamp-2 mt-2">
               {truncate(project.description, 120)}
             </p>
           ) : (
-            <p className="text-xs italic text-white/30 mt-2">
+            <p className="text-xs italic text-secondary/50 mt-2">
               Autonomous software build in progress…
             </p>
           )}
@@ -92,9 +92,9 @@ export function ProjectCard({ project, stack }: ProjectCardProps) {
 
         {/* Footer Row: Delivery Stack and Action CTA */}
         <div className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between">
-          <div className="flex items-center gap-1.5 text-[11px] font-mono text-white/50">
+          <div className="flex items-center gap-1.5 text-[11px] font-mono text-secondary">
             <Layers className="w-3.5 h-3.5 text-primary" />
-            <span className="uppercase tracking-wider font-semibold text-white/70">
+            <span className="uppercase tracking-wider font-semibold text-foreground/75">
               {stack || 'Full-Stack'}
             </span>
           </div>

@@ -47,8 +47,8 @@ export function Sidebar({ isSuperAdmin = false }: SidebarProps) {
           <Sparkles className="h-4.5 w-4.5" />
         </div>
         <div className="min-w-0">
-          <p className="truncate text-sm font-bold tracking-tight text-white">{APP_NAME}</p>
-          <p className="truncate text-[10px] font-mono font-medium text-white/40 uppercase tracking-widest">
+          <p className="truncate text-sm font-bold tracking-tight text-foreground">{APP_NAME}</p>
+          <p className="truncate text-[10px] font-mono font-medium text-secondary uppercase tracking-widest">
             Mission Control
           </p>
         </div>
@@ -56,7 +56,7 @@ export function Sidebar({ isSuperAdmin = false }: SidebarProps) {
 
       {/* Main Navigation Links */}
       <nav className="flex-1 space-y-1.5 overflow-y-auto p-4 scrollbar-hide">
-        <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-widest font-mono text-white/40">
+        <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-widest font-mono text-secondary">
           Workspace
         </p>
         {DASHBOARD_NAV_ITEMS.map(({ href, label, icon: Icon, exact }) => {
@@ -69,18 +69,18 @@ export function Sidebar({ isSuperAdmin = false }: SidebarProps) {
               className={cn(
                 'group relative flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs font-semibold transition-all duration-200',
                 active
-                  ? 'border border-primary/40 bg-primary/15 text-white shadow-[0_0_20px_rgba(99,102,241,0.2)] ring-1 ring-primary/40'
-                  : 'text-white/60 hover:bg-white/5 hover:text-white',
+                  ? 'border border-primary/40 bg-primary/15 text-foreground shadow-[0_0_20px_rgba(0,172,172,0.15)] ring-1 ring-primary/40'
+                  : 'text-secondary hover:bg-white/5 hover:text-foreground',
               )}
             >
               {/* Active left indicator bar */}
               {active && (
-                <span className="absolute left-0 top-1/2 -translate-y-1/2 h-4 w-1 rounded-r-full bg-primary shadow-[0_0_8px_#6366f1]" />
+                <span className="absolute left-0 top-1/2 -translate-y-1/2 h-4 w-1 rounded-r-full bg-primary shadow-[0_0_8px_#00ACAC]" />
               )}
               <Icon
                 className={cn(
                   'h-4 w-4 transition-colors',
-                  active ? 'text-primary' : 'text-white/40 group-hover:text-white',
+                  active ? 'text-primary' : 'text-secondary group-hover:text-foreground',
                 )}
               />
               <span className="tracking-tight">{label}</span>
@@ -91,7 +91,7 @@ export function Sidebar({ isSuperAdmin = false }: SidebarProps) {
         {/* SuperAdmin Navigation Links */}
         {isSuperAdmin && (
           <div className="pt-4">
-            <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-widest font-mono text-white/40">
+            <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-widest font-mono text-secondary">
               Platform Admin
             </p>
             {ADMIN_NAV_ITEMS.map(({ href, label, icon: Icon, exact }) => {
@@ -104,17 +104,17 @@ export function Sidebar({ isSuperAdmin = false }: SidebarProps) {
                   className={cn(
                     'group relative flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs font-semibold transition-all duration-200',
                     active
-                      ? 'border border-primary/40 bg-primary/15 text-white shadow-[0_0_20px_rgba(99,102,241,0.2)] ring-1 ring-primary/40'
-                      : 'text-white/60 hover:bg-white/5 hover:text-white',
+                      ? 'border border-primary/40 bg-primary/15 text-foreground shadow-[0_0_20px_rgba(0,172,172,0.15)] ring-1 ring-primary/40'
+                      : 'text-secondary hover:bg-white/5 hover:text-foreground',
                   )}
                 >
                   {active && (
-                    <span className="absolute left-0 top-1/2 -translate-y-1/2 h-4 w-1 rounded-r-full bg-primary shadow-[0_0_8px_#6366f1]" />
+                    <span className="absolute left-0 top-1/2 -translate-y-1/2 h-4 w-1 rounded-r-full bg-primary shadow-[0_0_8px_#00ACAC]" />
                   )}
                   <Icon
                     className={cn(
                       'h-4 w-4 transition-colors',
-                      active ? 'text-primary' : 'text-white/40 group-hover:text-white',
+                      active ? 'text-primary' : 'text-secondary group-hover:text-foreground',
                     )}
                   />
                   <span className="tracking-tight">{label}</span>
@@ -127,13 +127,13 @@ export function Sidebar({ isSuperAdmin = false }: SidebarProps) {
 
       {/* Appearance Theme Changer Toggle */}
       <div className="px-4 py-2.5 border-t border-white/10 flex items-center justify-between bg-white/[0.01]">
-        <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-white/40">
+        <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-secondary">
           Appearance
         </span>
         <button
           type="button"
           onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-white/10 bg-white/5 text-white hover:bg-white/10 text-xs font-semibold transition-all cursor-pointer"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-white/10 bg-white/5 text-foreground hover:bg-white/10 text-xs font-semibold transition-all cursor-pointer"
         >
           {!mounted ? (
             <Loader2 className="w-3 h-3 animate-spin" />
@@ -149,22 +149,6 @@ export function Sidebar({ isSuperAdmin = false }: SidebarProps) {
             </>
           )}
         </button>
-      </div>
-
-      {/* AI Workforce Live Telemetry Widget */}
-      <div className="border-t border-white/10 p-4 bg-white/[0.01]">
-        <GlassCard className="p-3.5 border-white/10 bg-white/[0.03]">
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <Bot className="w-3.5 h-3.5 text-success" />
-              <p className="text-xs font-bold text-white tracking-tight">AI Workforce</p>
-            </div>
-            <StatusBadge status="HEALTHY" />
-          </div>
-          <p className="mt-1.5 text-[11px] font-mono text-white/50">
-            5 autonomous specialists online
-          </p>
-        </GlassCard>
       </div>
     </aside>
   );

@@ -105,27 +105,27 @@ export function LandingHeader() {
     <header className="sticky top-0 z-50 border-b border-white/10 bg-surface-glass/75 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href={ROUTES.home} className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-secondary text-white shadow-[0_0_15px_rgba(99,102,241,0.5)]">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-black">
             <Sparkles className="h-4.5 w-4.5" />
           </div>
-          <span className="text-lg font-bold tracking-tight text-white">{APP_NAME}</span>
+          <span className="text-lg font-bold tracking-tight text-foreground">{APP_NAME}</span>
         </Link>
-        <nav className="hidden items-center gap-8 text-xs font-semibold uppercase tracking-wider text-white/60 md:flex">
-          <a href="#company" className="transition-colors hover:text-white">
+        <nav className="hidden items-center gap-8 text-xs font-semibold uppercase tracking-wider text-foreground/70 md:flex">
+          <a href="#company" className="transition-colors hover:text-primary">
             Organization
           </a>
-          <a href="#workspace" className="transition-colors hover:text-white">
+          <a href="#workspace" className="transition-colors hover:text-primary">
             Workspace
           </a>
-          <a href="#features" className="transition-colors hover:text-white">
+          <a href="#features" className="transition-colors hover:text-primary">
             Features
           </a>
-          <a href="#how-it-works" className="transition-colors hover:text-white">
+          <a href="#how-it-works" className="transition-colors hover:text-primary">
             Process
           </a>
         </nav>
         <div className="flex items-center gap-3">
-          <Link href={ROUTES.login} className="text-xs font-bold text-white/70 hover:text-white transition-colors px-3 py-2">
+          <Link href={ROUTES.login} className="text-xs font-bold text-foreground/75 hover:text-primary transition-colors px-3 py-2">
             Sign In
           </Link>
           <Link href={ROUTES.register}>
@@ -145,71 +145,72 @@ export function LandingHeader() {
  */
 export function LandingHero() {
   return (
-    <section className="relative overflow-hidden pt-12 pb-20 sm:pt-16 sm:pb-28">
+    <section className="relative overflow-hidden pt-16 pb-20 sm:pt-24 sm:pb-32">
       {/* Background Cyber Ambient Radials */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_120%_80%_at_50%_-20%,rgba(99,102,241,0.2),transparent_65%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,rgba(6,182,212,0.12),transparent_50%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_120%_80%_at_50%_-20%,rgba(0,172,172,0.15),transparent_65%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,rgba(0,172,172,0.08),transparent_50%)]" />
 
-      <div className="relative mx-auto flex max-w-6xl flex-col items-center px-4 text-center sm:px-6 lg:px-8">
-        <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-xs font-bold text-primary shadow-[0_0_20px_rgba(99,102,241,0.25)]">
-          <Sparkles className="h-3.5 w-3.5" />
-          Autonomous Software Engineering Organization
-        </div>
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          {/* Left Column: Heading and description */}
+          <div className="lg:col-span-7 flex flex-col items-start text-left">
+            <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl leading-tight text-balance">
+              Build software with an entire autonomous AI company.
+            </h1>
+            <p className="mt-6 text-base leading-relaxed text-secondary sm:text-lg max-w-xl">
+              Describe your vision once. Product managers, system architects, designers, developers, and QA specialists collaborate in real time to ship production applications.
+            </p>
 
-        <h1 className="max-w-4xl text-balance text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl leading-tight">
-          Build software with an entire autonomous AI company.
-        </h1>
-
-        <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-white/60 sm:text-lg">
-          Describe your vision once. Product managers, system architects, designers, developers, and QA specialists collaborate in real time to ship production applications.
-        </p>
-
-        {/* Call to Actions */}
-        <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row w-full max-w-md">
-          <Link href={ROUTES.register} className="w-full sm:w-auto">
-            <NeonButton variant="primary" className="w-full sm:w-auto px-8 h-12 text-sm font-bold shadow-xl">
-              <span>Launch AI Company</span>
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </NeonButton>
-          </Link>
-          <Link href={ROUTES.login} className="w-full sm:w-auto">
-            <NeonButton variant="secondary" className="w-full sm:w-auto px-8 h-12 text-sm font-bold">
-              Sign In to Workspace
-            </NeonButton>
-          </Link>
-        </div>
-
-        {/* Quick Inspiration Tags */}
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-2 text-xs">
-          <span className="text-white/40 font-mono text-[11px] uppercase tracking-wider mr-1">Inspiration:</span>
-          {['SaaS Kanban Platform', 'Realtime Chat Hub', 'AI Billing Portal', 'Landing Page'].map(
-            (tag) => (
-              <Link
-                key={tag}
-                href={`${ROUTES.projects}/new`}
-                className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white/70 transition-all duration-200 hover:border-primary/40 hover:text-white hover:bg-primary/10"
-              >
-                ✨ {tag}
+            {/* Call to Actions */}
+            <div className="mt-8 flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+              <Link href={ROUTES.register} className="w-full sm:w-auto">
+                <NeonButton variant="primary" className="w-full sm:w-auto px-8 h-12 text-sm font-bold">
+                  <span>Launch AI Company</span>
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </NeonButton>
               </Link>
-            ),
-          )}
-        </div>
+              <Link href={ROUTES.login} className="w-full sm:w-auto">
+                <NeonButton variant="secondary" className="w-full sm:w-auto px-8 h-12 text-sm font-bold">
+                  Sign In to Workspace
+                </NeonButton>
+              </Link>
+            </div>
 
-        {/* Trust Badges */}
-        <ul className="mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-white/50 font-mono">
-          {TRUST.map((item) => (
-            <li key={item} className="flex items-center gap-1.5">
-              <CheckCircle2 className="h-3.5 w-3.5 text-success" />
-              {item}
-            </li>
-          ))}
-        </ul>
+            {/* Quick Inspiration Tags */}
+            <div className="mt-8 flex flex-wrap items-center gap-2 text-xs">
+              <span className="text-secondary font-mono text-[11px] uppercase tracking-wider mr-1">Inspiration:</span>
+              {['SaaS Kanban Platform', 'Realtime Chat Hub', 'AI Billing Portal', 'Landing Page'].map(
+                (tag) => (
+                  <Link
+                    key={tag}
+                    href={`${ROUTES.projects}/new`}
+                    className="rounded-xl border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-foreground hover:border-primary/40 hover:text-primary hover:bg-primary/10 transition-all"
+                  >
+                    ✨ {tag}
+                  </Link>
+                ),
+              )}
+            </div>
 
-        {/* Live Mission Control Interactive Preview */}
-        <div className="relative mt-14 w-full max-w-5xl shadow-[0_0_60px_rgba(0,0,0,0.8)] rounded-3xl overflow-hidden border border-white/10">
-          <GlassCard className="p-0 border-none bg-surface-glass/95">
-            <MissionControlPreview />
-          </GlassCard>
+            {/* Trust Badges */}
+            <ul className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-secondary font-mono">
+              {TRUST.map((item) => (
+                <li key={item} className="flex items-center gap-1.5">
+                  <CheckCircle2 className="h-3.5 w-3.5 text-primary" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Right Column: Mission Control Preview */}
+          <div className="lg:col-span-5 w-full relative flex justify-center">
+            <div className="relative w-full shadow-[0_0_50px_rgba(0,0,0,0.1)] rounded-3xl overflow-hidden border border-white/10">
+              <GlassCard className="p-0 border-none bg-surface-glass/95">
+                <MissionControlPreview />
+              </GlassCard>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -498,27 +499,27 @@ export function LandingCta() {
  */
 export function LandingFooter() {
   return (
-    <footer className="border-t border-white/10 py-12 bg-[#05050A]">
+    <footer className="border-t border-white/10 py-12 bg-surface">
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 px-4 sm:flex-row sm:px-6 lg:px-8">
         <div className="flex items-center gap-3">
           <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/20 text-primary border border-primary/40">
             <Sparkles className="h-3.5 w-3.5" />
           </div>
-          <span className="text-sm font-bold tracking-tight text-white">{APP_NAME}</span>
+          <span className="text-sm font-bold tracking-tight text-foreground">{APP_NAME}</span>
           <div className="h-3.5 w-px bg-white/10 ml-2" />
-          <div className="flex items-center gap-1.5 text-[11px] font-mono text-success ml-2">
-            <span className="h-2 w-2 rounded-full bg-success animate-pulse" />
+          <div className="flex items-center gap-1.5 text-[11px] font-mono text-primary ml-2">
+            <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
             All AI Agents Operational
           </div>
         </div>
-        <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs font-mono text-white/50">
+        <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs font-mono text-secondary">
           {FOOTER_LINKS.map((link) => (
-            <Link key={link.label} href={link.href} className="transition-colors hover:text-white">
+            <Link key={link.label} href={link.href} className="transition-colors hover:text-primary">
               {link.label}
             </Link>
           ))}
         </nav>
-        <p className="text-xs font-mono text-white/40">
+        <p className="text-xs font-mono text-secondary">
           &copy; {new Date().getFullYear()} {APP_NAME} · Autonomous AI Platform
         </p>
       </div>

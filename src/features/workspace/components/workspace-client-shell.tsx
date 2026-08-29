@@ -37,7 +37,7 @@ import { NeonButton, GlassCard } from '@/packages/ui';
 
 interface ChatMessage {
   id: string;
-  sender: 'USER' | 'PRODUCT_MANAGER' | 'ARCHITECT';
+  sender: 'USER' | 'PRODUCT_MANAGER' | 'ARCHITECT' | 'DEVELOPER' | 'QA' | 'CEO';
   content: string;
   timestamp: Date;
 }
@@ -159,12 +159,73 @@ export function WorkspaceClientShell({ projectId, projectName }: WorkspaceClient
 
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
-      id: '1',
+      id: 'welcome',
       sender: 'PRODUCT_MANAGER',
       content: `Welcome to **${projectName}**! The engineering team has assembled. Sarah is tracking requirements, Marcus designed the architecture, and Alex is generating the core files.`,
       timestamp: new Date(),
     },
   ]);
+
+  useEffect(() => {
+    if (!projectId) return;
+
+    const mapActivityToMessage = (act: any): ChatMessage => {
+      let sender: 'USER' | 'PRODUCT_MANAGER' | 'ARCHITECT' | 'DEVELOPER' | 'QA' | 'CEO' = 'PRODUCT_MANAGER';
+      const role = String(act.agentRole || '').toUpperCase();
+      
+      if (role.includes('PRODUCT_MANAGER') || role.includes('PM') || role.includes('PRODUCT')) {
+        sender = 'PRODUCT_MANAGER';
+      } else if (role.includes('ARCHITECT')) {
+        sender = 'ARCHITECT';
+      } else if (role.includes('DEVELOPER') || role.includes('DEV') || role.includes('ENGINEER')) {
+        sender = 'DEVELOPER';
+      } else if (role.includes('QA') || role.includes('TEST')) {
+        sender = 'QA';
+      } else if (role.includes('CEO') || role.includes('CHIEF')) {
+        sender = 'CEO';
+      }
+      
+      let content = act.message || '';
+      if (content.startsWith('[communication]')) {
+        content = content.replace('[communication]', '').trim();
+      } else if (content.startsWith('[handoff]')) {
+        content = content.replace('[handoff]', '').trim();
+      }
+    
+      return {
+        id: act.id,
+        sender,
+        content,
+        timestamp: new Date(),
+      };
+    };
+
+    const fetchActivities = async () => {
+      try {
+        const res = await fetch(`/api/projects/${projectId}/workspace/activity`);
+        if (!res.ok) return;
+        const json = await res.json();
+        if (json.success && Array.isArray(json.activities)) {
+          const mapped = [...json.activities].reverse().map(mapActivityToMessage);
+          
+          const welcomeMsg: ChatMessage = {
+            id: 'welcome',
+            sender: 'PRODUCT_MANAGER',
+            content: `Welcome to **${projectName}**! The engineering team has assembled. Sarah is tracking requirements, Marcus designed the architecture, and Alex is generating the core files.`,
+            timestamp: new Date(),
+          };
+
+          setMessages([welcomeMsg, ...mapped]);
+        }
+      } catch {
+        // Ignore
+      }
+    };
+
+    fetchActivities();
+    const interval = setInterval(fetchActivities, 3000);
+    return () => clearInterval(interval);
+  }, [projectId, projectName]);
 
   const handleSendMessage = (content: string) => {
     setMessages((prev) => [
@@ -409,82 +470,84 @@ export function WorkspaceClientShell({ projectId, projectName }: WorkspaceClient
               }`}
             >
               {/* File Explorer Tree */}
-              <div className="w-56 bg-surface-glass/40 border border-white/10 rounded-2xl p-4 flex flex-col shrink-0">
-                <p className="text-[10px] font-mono font-bold text-white/40 uppercase tracking-widest mb-3">
-                  Workspace Files
-                </p>
-                {loadingFiles ? (
-                  <div className="flex items-center gap-2 text-xs text-white/30 font-mono py-4">
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Loading...</span>
-                  </div>
-                ) : (
-                  <div className="flex-1 overflow-y-auto space-y-1.5 scrollbar-hide">
-                    {files.map((file) => {
-                      const isSelected = selectedFile?.id === file.id;
-                      return (
-                        <button
-                          key={file.id}
-                          type="button"
-                          onClick={() => {
-                            if (file.type === 'file') setSelectedFile(file);
-                          }}
-                          className={`w-full flex items-center justify-between gap-2 px-2.5 py-2 rounded-xl text-xs font-medium text-left transition-all ${
-                            isSelected
-                              ? 'bg-primary/20 text-white border border-primary/30'
-                              : 'text-white/60 hover:text-white hover:bg-white/5 border border-transparent'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2 min-w-0">
-                            {file.type === 'folder' ? (
-                              <Folder className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                            ) : (
-                              <FileCode className="w-3.5 h-3.5 text-primary shrink-0" />
+              {approvalRequests.length === 0 && (
+                <div className="w-56 bg-surface-glass/40 border border-white/10 rounded-2xl p-4 flex flex-col shrink-0">
+                  <p className="text-[10px] font-mono font-bold text-white/40 uppercase tracking-widest mb-3">
+                    Workspace Files
+                  </p>
+                  {loadingFiles ? (
+                    <div className="flex items-center gap-2 text-xs text-white/30 font-mono py-4">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Loading...</span>
+                    </div>
+                  ) : (
+                    <div className="flex-1 overflow-y-auto space-y-1.5 scrollbar-hide">
+                      {files.map((file) => {
+                        const isSelected = selectedFile?.id === file.id;
+                        return (
+                          <button
+                            key={file.id}
+                            type="button"
+                            onClick={() => {
+                              if (file.type === 'file') setSelectedFile(file);
+                            }}
+                            className={`w-full flex items-center justify-between gap-2 px-2.5 py-2 rounded-xl text-xs font-medium text-left transition-all ${
+                              isSelected
+                                ? 'bg-primary/20 text-white border border-primary/30'
+                                : 'text-white/60 hover:text-white hover:bg-white/5 border border-transparent'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2 min-w-0">
+                              {file.type === 'folder' ? (
+                                <Folder className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                              ) : (
+                                <FileCode className="w-3.5 h-3.5 text-primary shrink-0" />
+                              )}
+                              <span className="truncate">{file.name}</span>
+                            </div>
+                            {file.reviewStatus === 'pending' && (
+                              <span className="w-1.5 h-1.5 rounded-full bg-warning animate-pulse" />
                             )}
-                            <span className="truncate">{file.name}</span>
-                          </div>
-                          {file.reviewStatus === 'pending' && (
-                            <span className="w-1.5 h-1.5 rounded-full bg-warning animate-pulse" />
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
 
-                {/* Approve toolbar for pending files */}
-                {files.some((f) => f.reviewStatus === 'pending') && (
-                  <button
-                    type="button"
-                    onClick={handleAcceptChanges}
-                    className="w-full mt-4 py-2 rounded-xl border border-success/30 bg-success/10 text-success hover:bg-success/20 text-xs font-bold transition-all flex items-center justify-center gap-1.5"
-                  >
-                    <CheckCircle className="w-3.5 h-3.5" />
-                    Accept Changes
-                  </button>
-                )}
-              </div>
+                  {/* Approve toolbar for pending files */}
+                  {files.some((f) => f.reviewStatus === 'pending') && (
+                    <button
+                      type="button"
+                      onClick={handleAcceptChanges}
+                      className="w-full mt-4 py-2 rounded-xl border border-success/30 bg-success/10 text-success hover:bg-success/20 text-xs font-bold transition-all flex items-center justify-center gap-1.5"
+                    >
+                      <CheckCircle className="w-3.5 h-3.5" />
+                      <span>Accept Changes</span>
+                    </button>
+                  )}
+                </div>
+              )}
 
               {/* Monaco Code Viewer Container */}
               <div className="flex-1 h-full shadow-[0_0_50px_rgba(0,0,0,0.5)] rounded-2xl overflow-hidden flex flex-col">
                 {approvalRequests.length > 0 ? (
-                  <div className="flex-grow flex flex-col lg:flex-row h-full gap-4 p-4 bg-surface-glass/40 border border-white/10 rounded-2xl backdrop-blur-xl overflow-hidden">
+                  <div className="flex-grow flex flex-col md:flex-row h-full gap-4 p-4 bg-surface-glass/40 border border-white/10 rounded-2xl backdrop-blur-xl overflow-y-auto md:overflow-hidden">
                     {/* Left: Pending Document Review Pane */}
-                    <div className="flex-[6] flex flex-col h-full bg-black/25 border border-white/5 rounded-xl p-6 overflow-hidden">
-                      <div className="flex items-center gap-2 mb-4 shrink-0">
-                        <AlertCircle className="w-5 h-5 text-warning" />
-                        <h3 className="text-base font-bold text-white tracking-tight">
+                    <div className="flex-[6] flex flex-col h-[380px] md:h-full bg-black/25 border border-white/5 rounded-xl p-5 overflow-hidden shrink-0">
+                      <div className="flex items-center gap-2 mb-3 shrink-0">
+                        <AlertCircle className="w-4 h-4 text-warning" />
+                        <h3 className="text-sm font-bold text-white tracking-tight">
                           {pendingDocument?.title || approvalRequests[0]?.title || 'Pending Approval'}
                         </h3>
                       </div>
-                      <div className="flex-1 overflow-y-auto scrollbar-hide bg-white/[0.02] border border-white/5 rounded-lg p-4">
+                      <div className="flex-1 overflow-y-auto scrollbar-hide bg-white/[0.02] border border-white/5 rounded-lg p-3.5">
                         {pendingDocument?.content ? (
                           typeof pendingDocument.content === 'string' ? (
-                            <div className="whitespace-pre-wrap font-sans text-sm text-white/80 leading-relaxed">
+                            <div className="whitespace-pre-wrap font-sans text-xs text-white/85 leading-relaxed">
                               {pendingDocument.content}
                             </div>
                           ) : (
-                            <pre className="font-mono text-xs text-primary/80 bg-black/40 p-4 rounded-xl overflow-x-auto">
+                            <pre className="font-mono text-[10px] text-primary/80 bg-black/40 p-3 rounded-lg overflow-x-auto">
                               {JSON.stringify(pendingDocument.content, null, 2)}
                             </pre>
                           )
@@ -497,26 +560,26 @@ export function WorkspaceClientShell({ projectId, projectName }: WorkspaceClient
                     </div>
 
                     {/* Right: Approval Actions Control Card */}
-                    <div className="flex-[4] flex flex-col justify-between h-full bg-black/45 border border-white/10 rounded-xl p-5 overflow-hidden">
-                      <div className="space-y-4">
-                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-warning/10 border border-warning/30">
+                    <div className="flex-[4] flex flex-col justify-between h-auto md:h-full bg-black/45 border border-white/10 rounded-xl p-5 overflow-y-auto md:overflow-hidden shrink-0">
+                      <div className="space-y-3.5">
+                        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-warning/10 border border-warning/30">
                           <span className="w-1.5 h-1.5 rounded-full bg-warning animate-pulse" />
-                          <span className="text-[9px] font-mono text-warning font-bold uppercase tracking-wider">
+                          <span className="text-[8px] font-mono text-warning font-bold uppercase tracking-wider">
                             Executive Checkpoint
                           </span>
                         </div>
                         <div>
-                          <h4 className="text-sm font-bold text-white mb-1">
+                          <h4 className="text-xs font-bold text-white mb-1">
                             {approvalRequests[0]?.title || 'Approval'} Required
                           </h4>
-                          <p className="text-xs text-white/50 leading-relaxed">
+                          <p className="text-[11px] text-white/50 leading-relaxed">
                             Sarah has assembled the requirements. Please review the documents and cast your executive validation vote.
                           </p>
                         </div>
 
                         {/* Optional Feedback Comments */}
                         <div className="space-y-1.5">
-                          <label className="text-[10px] font-mono font-bold text-white/40 uppercase tracking-widest flex items-center gap-1">
+                          <label className="text-[9px] font-mono font-bold text-white/40 uppercase tracking-widest flex items-center gap-1">
                             <MessageSquareDashed className="w-3 h-3" />
                             Revision Feedback (Optional)
                           </label>
@@ -524,19 +587,19 @@ export function WorkspaceClientShell({ projectId, projectName }: WorkspaceClient
                             value={approvalFeedback}
                             onChange={(e) => setApprovalFeedback(e.target.value)}
                             placeholder="Add guidelines or request specific modifications..."
-                            className="w-full h-24 p-3 rounded-xl border border-white/10 bg-white/5 text-xs text-white/80 placeholder-white/20 focus:outline-none focus:border-primary/50 resize-none font-sans"
+                            className="w-full h-20 p-2.5 rounded-xl border border-white/10 bg-white/5 text-[11px] text-white/80 placeholder-white/20 focus:outline-none focus:border-primary/50 resize-none font-sans"
                           />
                         </div>
                       </div>
 
                       {/* Approval Submission Buttons */}
-                      <div className="space-y-2.5 mt-4 shrink-0">
+                      <div className="space-y-2 mt-4 shrink-0">
                         <NeonButton
                           onClick={() => handleApprovePipeline('approve')}
                           isLoading={isApproving}
-                          className="w-full h-11 text-xs font-bold"
+                          className="w-full h-10 text-xs font-bold"
                         >
-                          <ShieldCheck className="w-4 h-4 mr-2" />
+                          <ShieldCheck className="w-3.5 h-3.5 mr-2" />
                           <span>Approve & Proceed</span>
                         </NeonButton>
 
@@ -544,7 +607,7 @@ export function WorkspaceClientShell({ projectId, projectName }: WorkspaceClient
                           type="button"
                           onClick={() => handleApprovePipeline('request_changes')}
                           disabled={isApproving}
-                          className="w-full h-11 rounded-xl border border-white/10 hover:bg-white/5 text-white/70 hover:text-white text-xs font-bold transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                          className="w-full h-10 rounded-xl border border-white/10 hover:bg-white/5 text-white/70 hover:text-white text-xs font-bold transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
                         >
                           Request Changes
                         </button>
