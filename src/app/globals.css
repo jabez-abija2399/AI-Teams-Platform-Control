@@ -31,54 +31,48 @@
 
 /* Configurable Theme Color Variables (Adjust in one place) */
 :root {
-  --source-light-gray: #DDDCDB;
-  --source-coral-orange: #FD7B41;
-  --source-peach-sand: #EDBF9B;
-  --source-charcoal: #3C4044;
-}
+  --brand-black: #000000;
+  --brand-off-white: #DFDEDC;
+  --brand-dark-gray: #464545;
+  --brand-teal: #00ACAC;
+  --brand-muted-gray: #A6A7A2;
 
-/* ☀️ Light Theme Mappings (Default mode) */
-html:not(.dark) {
-  --void: var(--source-light-gray);
-  --surface: #ffffff;
-  --surface-glass: rgba(255, 255, 255, 0.85);
-  --surface-hover: rgba(60, 64, 68, 0.05);
-  
-  --primary: var(--source-coral-orange);
-  --secondary: var(--source-peach-sand);
-  --success: #16a34a;
-  --warning: var(--source-peach-sand);
-  --danger: #dc2626;
-
-  --background: var(--void);
-  --foreground: var(--source-charcoal);
-  
-  --font-sans: 'Inter', sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
-  
-  --radius: 0.75rem;
-}
-
-/* 🌙 Premium Clean Dark Theme */
-.dark {
-  --void: #141416;
-  --surface: #202024;
-  --surface-glass: rgba(32, 32, 36, 0.85);
+  /* 🌙 Dark Theme Mappings (Primary/Default mode) */
+  --void: var(--brand-black);
+  --surface: var(--brand-dark-gray);
+  --surface-glass: rgba(70, 70, 69, 0.4);
   --surface-hover: rgba(255, 255, 255, 0.05);
   
-  --primary: var(--source-coral-orange);
-  --secondary: var(--source-peach-sand);
-  --success: #22c55e;
-  --warning: var(--source-peach-sand);
+  --primary: var(--brand-teal);
+  --secondary: var(--brand-muted-gray);
+  --success: var(--brand-teal);
+  --warning: #eab308;
   --danger: #ef4444;
 
   --background: var(--void);
-  --foreground: #f3f4f6;
+  --foreground: var(--brand-off-white);
   
   --font-sans: 'Inter', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
   
   --radius: 0.75rem;
+}
+
+/* ☀️ Light Theme Mappings (Secondary mode) */
+html:not(.dark) {
+  --void: var(--brand-off-white);
+  --surface: #ffffff;
+  --surface-glass: rgba(255, 255, 255, 0.85);
+  --surface-hover: rgba(70, 70, 69, 0.05);
+  
+  --primary: var(--brand-teal);
+  --secondary: var(--brand-muted-gray);
+  --success: var(--brand-teal);
+  --warning: #d97706;
+  --danger: #dc2626;
+
+  --background: var(--void);
+  --foreground: var(--brand-black);
 }
 
 body {
@@ -92,45 +86,45 @@ body {
 /* Tailwind base resets and layers */
 @layer base {
   html:not(.dark) * {
-    border-color: rgba(60, 64, 68, 0.12);
+    border-color: rgba(70, 70, 69, 0.15);
   }
-  .dark * {
-    border-color: rgba(255, 255, 255, 0.08);
+  .dark *, :root * {
+    border-color: var(--brand-dark-gray);
   }
 }
 
 /* Custom Light Mode Overrides for Hardcoded Dark Theme Utilities */
 @layer utilities {
-  /* Restructure utility overrides to map to our charcoal graphite */
+  /* Restructure utility overrides to map to our brand colors in light mode */
   html:not(.dark) .text-white {
     color: var(--foreground);
   }
   html:not(.dark) .text-white\/80 {
-    color: rgba(60, 64, 68, 0.85);
+    color: rgba(0, 0, 0, 0.85);
   }
   html:not(.dark) .text-white\/70 {
-    color: rgba(60, 64, 68, 0.75);
+    color: rgba(0, 0, 0, 0.75);
   }
   html:not(.dark) .text-white\/60 {
-    color: rgba(60, 64, 68, 0.60);
+    color: rgba(0, 0, 0, 0.60);
   }
   html:not(.dark) .text-white\/50 {
-    color: rgba(60, 64, 68, 0.50);
+    color: rgba(0, 0, 0, 0.50);
   }
   html:not(.dark) .text-white\/40 {
-    color: rgba(60, 64, 68, 0.40);
+    color: rgba(0, 0, 0, 0.40);
   }
   html:not(.dark) .border-white\/10 {
-    border-color: rgba(60, 64, 68, 0.12) !important;
+    border-color: rgba(70, 70, 69, 0.12) !important;
   }
   html:not(.dark) .border-white\/5 {
-    border-color: rgba(60, 64, 68, 0.06) !important;
+    border-color: rgba(70, 70, 69, 0.06) !important;
   }
   html:not(.dark) .bg-white\/5 {
-    background-color: rgba(60, 64, 68, 0.04) !important;
+    background-color: rgba(70, 70, 69, 0.04) !important;
   }
   html:not(.dark) .bg-white\/10 {
-    background-color: rgba(60, 64, 68, 0.08) !important;
+    background-color: rgba(70, 70, 69, 0.08) !important;
   }
   html:not(.dark) .bg-black\/25 {
     background-color: rgba(255, 255, 255, 0.50) !important;
@@ -143,11 +137,11 @@ body {
   html:not(.dark) .bg-surface-glass,
   html:not(.dark) .bg-surface {
     background-color: #ffffff !important;
-    border: 1px solid rgba(60, 64, 68, 0.15) !important;
-    box-shadow: 0 1px 3px 0 rgba(60, 64, 68, 0.05), 0 1px 2px -1px rgba(60, 64, 68, 0.05) !important;
+    border: 1px solid rgba(70, 70, 69, 0.15) !important;
+    box-shadow: 0 1px 3px 0 rgba(70, 70, 69, 0.05) !important;
   }
 
-  /* Ensure button/badge elements, status markers, and text links keep their absolute white text for legibility */
+  /* Ensure button elements, status markers, and text links keep their absolute white text for legibility */
   html:not(.dark) button .text-white,
   html:not(.dark) button.text-white,
   html:not(.dark) a.text-white,

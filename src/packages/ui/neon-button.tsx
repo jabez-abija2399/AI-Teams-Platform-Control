@@ -28,15 +28,15 @@ export const NeonButton = React.forwardRef<HTMLButtonElement, NeonButtonProps>(
     ref // Receive the forwarded ref (useful if parent components need direct access to the DOM node).
   ) => {
     
-    // A helper function to determine the Tailwind classes for the background gradient based on the variant.
+    // A helper function to determine the Tailwind classes based on the variant.
     const getVariantClasses = () => {
       switch (variant) {
-        // If primary, use a gradient from our custom Electric Indigo to a deep purple.
-        case 'primary': return 'bg-gradient-to-r from-primary to-indigo-700 shadow-[0_0_15px_rgba(99,102,241,0.4)]';
-        // If secondary, use a gradient from our Cyber Cyan to a deep blue.
-        case 'secondary': return 'bg-gradient-to-r from-secondary to-blue-600 shadow-[0_0_15px_rgba(6,182,212,0.4)]';
-        // If danger, use a gradient from Crimson Red to a deep ruby.
-        case 'danger': return 'bg-gradient-to-r from-danger to-rose-700 shadow-[0_0_15px_rgba(244,63,94,0.4)]';
+        // Primary: Teal background (#00ACAC), dark text.
+        case 'primary': return 'bg-primary text-black hover:opacity-90';
+        // Secondary: Dark gray surface (#464545), off-white text (#DFDEDC).
+        case 'secondary': return 'bg-surface border border-white/5 text-foreground hover:bg-surface-hover';
+        // Danger: Restrained red semantic treatment.
+        case 'danger': return 'bg-danger text-white hover:opacity-95';
       }
     };
 
@@ -60,15 +60,7 @@ export const NeonButton = React.forwardRef<HTMLButtonElement, NeonButtonProps>(
         // Apply standard HTML disabled attribute if necessary.
         disabled={isDisabled}
         // Build the complex string of Tailwind utility classes.
-        // 1. relative overflow-hidden: Contains inner glows.
-        // 2. inline-flex items-center justify-center gap-2: Centers the icon and text with standard spacing.
-        // 3. rounded-xl px-4 py-2: Standardized shape and padding.
-        // 4. font-medium text-sm text-white: Clean, readable typography.
-        // 5. transition-opacity: Smoothly fade when disabled.
-        // 6. Conditionally apply opacity-50 and cursor-not-allowed if disabled.
-        // 7. Inject the dynamically determined variant classes (gradients and glows).
-        // 8. Append any custom className overrides.
-        className={`relative overflow-hidden inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 font-medium text-sm text-white transition-opacity duration-200 ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'} ${getVariantClasses()} ${className}`}
+        className={`relative overflow-hidden inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 font-semibold text-sm transition-all duration-200 ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''} ${getVariantClasses()} ${className}`}
         // Pass any remaining HTML attributes down to the DOM node.
         {...props}
       >

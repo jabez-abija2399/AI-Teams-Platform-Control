@@ -8,7 +8,7 @@ import { ToastProvider } from '@/components/ui/toast';
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <SessionProvider>
-      <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+      <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
         <QueryProvider>
           <ToastProvider>{children}</ToastProvider>
         </QueryProvider>
