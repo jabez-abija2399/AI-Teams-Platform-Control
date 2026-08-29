@@ -21,7 +21,10 @@ import {
   ShieldCheck,
   AlertCircle,
   MessageSquareDashed,
+  Sun,
+  Moon,
 } from 'lucide-react';
+import { useTheme } from 'next-themes';
 import { CodeViewer } from './code-viewer';
 import { AgentChat } from './agent-chat';
 import { DebateRoom } from './debate-room';
@@ -59,6 +62,12 @@ export function WorkspaceClientShell({ projectId, projectName }: WorkspaceClient
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [editorTheme, setEditorTheme] = useState<string>('cyber-void');
   const [isTriggering, setIsTriggering] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const { theme, setTheme } = useTheme();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const [approvalFeedback, setApprovalFeedback] = useState('');
   const [isApproving, setIsApproving] = useState(false);
 
@@ -359,6 +368,20 @@ export function WorkspaceClientShell({ projectId, projectName }: WorkspaceClient
               <ExternalLink className="w-3 h-3 ml-0.5 opacity-70" />
             </button>
           </Link>
+
+          {/* Global Theme Toggle Button */}
+          <button
+            type="button"
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            className="h-9 w-9 flex items-center justify-center rounded-xl border border-white/10 bg-white/5 text-white/70 hover:text-white transition-all cursor-pointer shrink-0"
+            title="Toggle Dashboard Theme"
+          >
+            {mounted && theme === 'dark' ? (
+              <Sun className="w-4 h-4 text-warning" />
+            ) : (
+              <Moon className="w-4 h-4 text-primary" />
+            )}
+          </button>
 
           <NeonButton
             variant="secondary"

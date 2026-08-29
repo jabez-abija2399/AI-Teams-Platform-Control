@@ -4,7 +4,10 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 // Import Lucide icons for sidebar navigation.
-import { Sparkles, Bot } from 'lucide-react';
+import { Sparkles, Bot, Sun, Moon, Loader2 } from 'lucide-react';
+// Import utility for theme switching
+import { useTheme } from 'next-themes';
+import React from 'react';
 // Import utility for dynamic class names.
 import { cn } from '@/lib/utils';
 // Import application name constant.
@@ -29,6 +32,12 @@ interface SidebarProps {
  */
 export function Sidebar({ isSuperAdmin = false }: SidebarProps) {
   const pathname = usePathname();
+  const [mounted, setMounted] = React.useState(false);
+  const { theme, setTheme } = useTheme();
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <aside className="hidden w-64 shrink-0 flex-col border-r border-white/10 bg-surface-glass/80 backdrop-blur-2xl md:flex shadow-2xl z-20">
@@ -115,6 +124,32 @@ export function Sidebar({ isSuperAdmin = false }: SidebarProps) {
           </div>
         )}
       </nav>
+
+      {/* Appearance Theme Changer Toggle */}
+      <div className="px-4 py-2.5 border-t border-white/10 flex items-center justify-between bg-white/[0.01]">
+        <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-white/40">
+          Appearance
+        </span>
+        <button
+          type="button"
+          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-white/10 bg-white/5 text-white hover:bg-white/10 text-xs font-semibold transition-all cursor-pointer"
+        >
+          {!mounted ? (
+            <Loader2 className="w-3 h-3 animate-spin" />
+          ) : theme === 'dark' ? (
+            <>
+              <Sun className="w-3.5 h-3.5 text-warning" />
+              <span>Light</span>
+            </>
+          ) : (
+            <>
+              <Moon className="w-3.5 h-3.5 text-primary" />
+              <span>Dark</span>
+            </>
+          )}
+        </button>
+      </div>
 
       {/* AI Workforce Live Telemetry Widget */}
       <div className="border-t border-white/10 p-4 bg-white/[0.01]">
