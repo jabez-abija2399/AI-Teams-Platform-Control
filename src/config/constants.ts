@@ -1,4 +1,4 @@
-export const APP_NAME = 'AI Teams Platform';
+export const APP_NAME = 'HibirDev AI';
 
 export const ROUTES = {
   home: '/',
