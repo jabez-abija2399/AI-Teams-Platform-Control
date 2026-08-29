@@ -1,9 +1,7 @@
 import { getAuthSession } from '@/lib/session-helper';
 import { getUserProfile } from '@/features/auth/services/user.service';
-import { ProfileForm } from '@/features/settings/components/profile-form';
 import { AiCredentialsForm } from '@/features/settings/components/ai-credentials-form';
-import { GlassCard } from '@/packages/ui';
-import { Settings, Shield, UserCheck, Key } from 'lucide-react';
+import { Shield, Key, Users, Lock, CheckCircle } from 'lucide-react';
 import { redirect, notFound } from 'next/navigation';
 
 export default async function SettingsPage() {
@@ -17,50 +15,140 @@ export default async function SettingsPage() {
   if (!profile) notFound();
 
   return (
-    <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8 flex flex-col gap-8">
-      {/* Header */}
-      <div className="border-b border-white/10 pb-6">
-        <div className="flex items-center gap-2 mb-1">
-          <Settings className="w-6 h-6 text-primary" />
-          <h1 className="text-3xl font-bold tracking-tight text-white">Platform Settings</h1>
+    <div className="max-w-7xl mx-auto py-4 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      {/* SECTION 1: SETTINGS CATEGORIES */}
+      <div className="lg:col-span-3 border border-white/10 p-4 bg-surface-container-low">
+        <div className="font-heading text-lg font-bold mb-6 pb-2 border-b border-white/10 text-white">
+          Configuration
         </div>
-        <p className="text-sm text-white/50">
-          Manage your account profile and autonomous AI workforce credentials.
-        </p>
+        <ul className="space-y-2 font-mono text-xs">
+          <li>
+            <a className="block px-4 py-2 bg-surface-container text-primary border-l-2 border-primary font-bold" href="#">
+              AI Providers
+            </a>
+          </li>
+          <li>
+            <a className="block px-4 py-2 text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+              Workspace Configuration
+            </a>
+          </li>
+          <li>
+            <a className="block px-4 py-2 text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+              User Access Keys
+            </a>
+          </li>
+          <li>
+            <a className="block px-4 py-2 text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+              Security Audits
+            </a>
+          </li>
+        </ul>
       </div>
 
-      {/* AI Credentials BYOK Section */}
-      <section className="space-y-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <Key className="w-4 h-4 text-primary" />
-            <h2 className="text-lg font-bold text-white tracking-tight">AI Provider Credentials</h2>
-          </div>
-          <p className="text-xs text-white/50">
-            Required before launching projects. Free tiers available via Google Gemini and Groq.
-          </p>
-        </div>
-        <AiCredentialsForm />
-      </section>
+      <div className="lg:col-span-9 space-y-8">
+        {/* SECTION 2: AI CREDENTIAL FORM */}
+        <section className="relative">
+          <AiCredentialsForm />
+        </section>
 
-      {/* User Profile Section */}
-      <section className="space-y-4 pt-4 border-t border-white/10">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <UserCheck className="w-4 h-4 text-primary" />
-            <h2 className="text-lg font-bold text-white tracking-tight">Account Profile</h2>
+        {/* SECTION 3: CONNECTION STATUS MATRIX */}
+        <section className="border border-white/10 overflow-hidden bg-surface">
+          <div className="p-4 bg-surface-container-high font-mono text-xs uppercase font-bold text-white border-b border-white/10">
+            Connection Status Matrix
           </div>
-          <p className="text-xs text-white/50">Your personal details and authentication email.</p>
-        </div>
-        <GlassCard className="p-6 border-white/10 shadow-xl">
-          <ProfileForm
-            defaultValues={{
-              name: profile.name,
-              email: profile.email,
-            }}
-          />
-        </GlassCard>
-      </section>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left font-mono text-xs">
+              <thead className="bg-surface-container-lowest border-b border-white/10">
+                <tr>
+                  <th className="p-4 text-on-surface-variant uppercase font-bold">Provider</th>
+                  <th className="p-4 text-on-surface-variant uppercase font-bold">Active Model</th>
+                  <th className="p-4 text-on-surface-variant uppercase font-bold">Status</th>
+                  <th className="p-4 text-on-surface-variant uppercase font-bold">Latency</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/10">
+                <tr className="hover:bg-surface-container-high transition-colors">
+                  <td className="p-4 font-bold text-white">Anthropic</td>
+                  <td className="p-4 text-on-surface-variant">claude-3-5-sonnet</td>
+                  <td className="p-4">
+                    <span className="inline-block px-2 py-0.5 bg-primary/10 text-primary border border-primary/20 font-bold">Active</span>
+                  </td>
+                  <td className="p-4">142ms</td>
+                </tr>
+                <tr className="hover:bg-surface-container-high transition-colors">
+                  <td className="p-4 font-bold text-white">OpenAI</td>
+                  <td className="p-4 text-on-surface-variant">gpt-4o</td>
+                  <td className="p-4">
+                    <span className="inline-block px-2 py-0.5 bg-primary/10 text-primary border border-primary/20 font-bold">Active</span>
+                  </td>
+                  <td className="p-4">204ms</td>
+                </tr>
+                <tr className="hover:bg-surface-container-high transition-colors">
+                  <td className="p-4 font-bold text-white">Groq</td>
+                  <td className="p-4 text-on-surface-variant">llama-3-70b</td>
+                  <td className="p-4">
+                    <span className="inline-block px-2 py-0.5 bg-surface-container-highest text-on-surface border border-white/10">Idle</span>
+                  </td>
+                  <td className="p-4">--</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* SECTION 4: ACCESS CONTROL */}
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="border border-white/10 p-6 bg-surface-container">
+            <h3 className="font-mono text-xs uppercase font-bold text-on-surface-variant mb-4 flex items-center gap-2">
+              <Users className="w-4 h-4 text-primary" /> Active Users
+            </h3>
+            <ul className="space-y-4 font-mono text-xs">
+              <li className="flex justify-between items-center pb-2 border-b border-white/10">
+                <span className="text-white">{profile.email}</span>
+                <span className="text-primary font-bold">Owner</span>
+              </li>
+              <li className="flex justify-between items-center pb-2 border-b border-white/10">
+                <span className="text-on-surface-variant">eng-lead@hibir.dev</span>
+                <span className="text-on-surface-variant">Write</span>
+              </li>
+            </ul>
+            <button type="button" className="mt-4 text-primary font-mono text-xs font-bold hover:underline">
+              + Invite User
+            </button>
+          </div>
+          <div className="border border-white/10 p-6 bg-surface-container">
+            <h3 className="font-mono text-xs uppercase font-bold text-on-surface-variant mb-4 flex items-center gap-2">
+              <Key className="w-4 h-4 text-primary" /> Active Tokens
+            </h3>
+            <ul className="space-y-4 font-mono text-xs">
+              <li className="flex justify-between items-center pb-2 border-b border-white/10">
+                <span className="text-white">Prod-CI-Token</span>
+                <span className="text-on-surface-variant text-[11px]">Last used: 2m ago</span>
+              </li>
+              <li className="flex justify-between items-center pb-2 border-b border-white/10">
+                <span className="text-white">Dev-Local-Key</span>
+                <span className="text-on-surface-variant text-[11px]">Last used: 1h ago</span>
+              </li>
+            </ul>
+            <button type="button" className="mt-4 text-primary font-mono text-xs font-bold hover:underline">
+              + Generate Token
+            </button>
+          </div>
+        </section>
+
+        {/* SECTION 5: ENCRYPTION PLEDGE */}
+        <section className="border border-white/10 p-6 border-l-4 border-l-primary bg-white/[0.02]">
+          <div className="flex gap-4">
+            <Shield className="w-5 h-5 text-primary shrink-0" />
+            <div>
+              <h4 className="font-mono text-xs font-bold mb-2 text-white uppercase">Security Guarantee</h4>
+              <p className="text-xs text-on-surface-variant leading-relaxed">
+                All API keys are encrypted at rest using AES-GCM vault storage. Credentials are never exposed to the frontend after initial input. For compliance details, review our security whitepaper.
+              </p>
+            </div>
+          </div>
+        </section>
+      </div>
     </div>
   );
 }

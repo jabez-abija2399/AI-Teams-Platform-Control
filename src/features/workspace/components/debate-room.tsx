@@ -1,237 +1,194 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
   MessageSquare,
-  Sparkles,
-  CheckCircle2,
   AlertTriangle,
-  Scale,
-  ThumbsUp,
-  Award,
-  Vote,
+  Gavel,
+  CheckCircle,
+  Database,
+  Cpu,
+  Layers,
+  Bot,
+  Terminal,
+  Brain,
+  HelpCircle,
 } from 'lucide-react';
-import { GlassCard, NeonButton, StatusBadge, AgentAvatar } from '@/packages/ui';
-import { fadeUpVariant, staggerContainer } from '@/packages/motion';
-
-interface DebateTopic {
-  id: string;
-  category: string;
-  question: string;
-  architectStance: {
-    agent: 'ARCHITECT';
-    proposal: string;
-    reason: string;
-  };
-  developerStance: {
-    agent: 'DEVELOPER';
-    proposal: string;
-    reason: string;
-  };
-  consensusScore: number;
-  resolved: boolean;
-  winner?: 'ARCHITECT' | 'DEVELOPER';
-}
-
-const INITIAL_TOPICS: DebateTopic[] = [
-  {
-    id: '1',
-    category: 'Persistence & Schema',
-    question: 'Database Migration Strategy: Relational PostgreSQL vs Serverless Neon',
-    architectStance: {
-      agent: 'ARCHITECT',
-      proposal: 'Strict Prisma Schema with ACID Transactions',
-      reason: 'Guarantees relational integrity, migrations history, and prevents orphan tasks in enterprise pipelines.',
-    },
-    developerStance: {
-      agent: 'DEVELOPER',
-      proposal: 'Edge Connection Pooling with Prepared Statements',
-      reason: 'Faster cold start on Serverless functions with minimal ORM serialization overhead.',
-    },
-    consensusScore: 92,
-    resolved: true,
-    winner: 'ARCHITECT',
-  },
-  {
-    id: '2',
-    category: 'State & React Lifecycle',
-    question: 'Client State Architecture: Zustand Store vs Server Actions Only',
-    architectStance: {
-      agent: 'ARCHITECT',
-      proposal: 'Zustand Reactive Store for SSE Stream Sync',
-      reason: 'Enables sub-second updates to Monaco Editor cursor and live chat without full-page revalidation.',
-    },
-    developerStance: {
-      agent: 'DEVELOPER',
-      proposal: 'React 19 Server Actions with Optimistic Hooks',
-      reason: 'Zero bundle size increase on initial client load.',
-    },
-    consensusScore: 84,
-    resolved: false,
-  },
-];
+import { toast } from 'sonner';
 
 export function DebateRoom() {
-  const [topics, setTopics] = useState<DebateTopic[]>(INITIAL_TOPICS);
+  const [resolved, setResolved] = useState<string | null>(null);
+  const [countdown, setCountdown] = useState(14);
 
-  const handleVote = (topicId: string, choice: 'ARCHITECT' | 'DEVELOPER') => {
-    setTopics((prev) =>
-      prev.map((t) =>
-        t.id === topicId ? { ...t, resolved: true, winner: choice, consensusScore: 100 } : t,
-      ),
-    );
+  const handleVote = (choice: string) => {
+    setResolved(choice);
+    toast.success('Executive Decision Recorded', {
+      description: `Forced override applied: ${choice}`,
+    });
   };
 
-  const MotionDiv = motion.div as any;
-
   return (
-    <GlassCard className="w-full h-full flex flex-col p-6 border-white/10 shadow-2xl bg-surface-glass/90 overflow-y-auto scrollbar-hide">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-6 mb-6">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <Scale className="w-5 h-5 text-primary" />
-            <h2 className="text-xl font-bold tracking-tight text-white">
-              Architecture & Code Debate Arena
-            </h2>
+    <div className="w-full h-full flex flex-col bg-background text-on-background overflow-hidden relative">
+      {/* Content Area */}
+      <div className="flex-1 p-6 overflow-y-auto pb-32 space-y-8 scrollbar-hide">
+        {/* SECTION 1: ARENA CONFLICT TITLE */}
+        <header className="border border-white/10 bg-surface-container-low brutalist-offset-container p-6 relative">
+          <div className="brutal-offset-bg"></div>
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 relative z-10">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 border border-danger text-danger font-mono text-xs mb-4 uppercase bg-danger/10 font-bold">
+                <AlertTriangle className="w-3.5 h-3.5" /> Active Conflict Resolution
+              </div>
+              <h1 className="font-heading text-2xl md:text-3xl font-bold text-on-surface mb-2">
+                DB Schema Alignment
+              </h1>
+              <p className="font-mono text-xs text-on-surface-variant max-w-2xl leading-relaxed">
+                System halted pending architectural decision. Two critical agents have proposed mutually exclusive models for the new orchestration engine backend.
+              </p>
+            </div>
+            <div className="flex items-center gap-4 bg-surface-container p-3 border border-white/10">
+              <div className="text-right">
+                <p className="font-mono text-[10px] text-on-surface-variant uppercase">Architect</p>
+                <p className="font-heading text-lg font-bold text-primary">Marcus</p>
+              </div>
+              <span className="font-heading text-xl font-bold text-on-surface-variant px-2">VS</span>
+              <div className="text-left">
+                <p className="font-mono text-[10px] text-on-surface-variant uppercase">Developer</p>
+                <p className="font-heading text-lg font-bold text-secondary">Alex</p>
+              </div>
+            </div>
           </div>
-          <p className="text-xs text-white/50">
-            Specialists debate design tradeoffs and reach consensus before code generation.
-          </p>
-        </div>
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/30">
-          <Sparkles className="w-3.5 h-3.5 text-primary" />
-          <span className="text-xs font-mono font-bold text-primary">Consensus Engine Active</span>
-        </div>
+        </header>
+
+        {/* SECTION 3: DECISION PROBABILITY METER */}
+        <section className="border border-white/10 bg-surface p-6">
+          <div className="flex justify-between items-center mb-4 font-mono text-xs">
+            <h3 className="font-bold text-on-surface uppercase tracking-wider">Consensus Probability</h3>
+            <span className="text-primary font-bold">78% Confidence: Relational</span>
+          </div>
+          <div className="h-8 w-full border border-white/10 bg-surface-container relative overflow-hidden flex">
+            <div className="h-full bg-primary transition-all duration-1000" style={{ width: '78%' }} />
+            <div className="h-full bg-surface-container-highest transition-all duration-1000" style={{ width: '22%' }} />
+          </div>
+          <div className="flex justify-between mt-2 font-mono text-[11px] text-on-surface-variant">
+            <span>Relational (PostgreSQL) — 78%</span>
+            <span>Document (MongoDB) — 22%</span>
+          </div>
+        </section>
+
+        {/* SECTION 2: MULTI-AGENT CHAT BUBBLES */}
+        <section className="space-y-6">
+          <div className="flex items-center gap-2 mb-6">
+            <MessageSquare className="text-primary w-4 h-4" />
+            <h2 className="font-mono text-xs font-bold text-on-surface uppercase tracking-widest">
+              Live Debate Log
+            </h2>
+            <div className="flex-1 h-px bg-white/10 ml-4" />
+          </div>
+
+          {/* PM Sarah Context Inject */}
+          <div className="flex flex-col items-center max-w-3xl mx-auto opacity-80">
+            <div className="bg-surface-container-high border border-white/10 px-4 py-1.5 flex items-center gap-2">
+              <Brain className="w-3.5 h-3.5 text-on-surface-variant" />
+              <span className="font-mono text-[10px] font-bold text-on-surface-variant uppercase">
+                PM Sarah (Context Inject)
+              </span>
+            </div>
+            <div className="h-4 w-px bg-white/10" />
+            <div className="font-mono text-xs text-on-surface-variant text-center border border-white/10 p-4 bg-surface-container-low leading-relaxed">
+              "Requirement: The new orchestration engine must handle hierarchical task trees with unknown depth, while ensuring strict transactional integrity across agent handoffs."
+            </div>
+            <div className="h-6 w-px bg-white/10" />
+          </div>
+
+          {/* Architect Marcus (Left) */}
+          <div className="flex flex-col items-start max-w-2xl">
+            <div className="flex items-center gap-2 mb-2 pl-2">
+              <div className="w-2 h-2 bg-primary"></div>
+              <span className="font-mono text-xs font-bold text-on-surface uppercase">Marcus (Architect)</span>
+              <span className="font-mono text-[10px] text-on-surface-variant ml-2">T-0.4s</span>
+            </div>
+            <div className="bg-[#464545] border border-white/10 p-5 offset-shadow">
+              <p className="text-sm text-on-surface mb-3 leading-relaxed">
+                Transactional integrity dictates a relational approach. CTEs (Common Table Expressions) in PostgreSQL perfectly solve the hierarchical depth requirement without sacrificing ACID compliance during handoffs.
+              </p>
+              <div className="bg-surface-container-lowest p-3 border border-white/10 font-mono text-xs text-on-surface-variant">
+                &gt; Executing query simulation: CTE recursive depth stress test... PASSED (p99 &lt; 45ms)
+              </div>
+            </div>
+          </div>
+
+          {/* Developer Alex (Right) */}
+          <div className="flex flex-col items-end max-w-2xl ml-auto">
+            <div className="flex items-center gap-2 mb-2 pr-2">
+              <span className="font-mono text-[10px] text-on-surface-variant mr-2">T-0.8s</span>
+              <span className="font-mono text-xs font-bold text-on-surface uppercase">Alex (Developer)</span>
+              <div className="w-2 h-2 bg-secondary"></div>
+            </div>
+            <div className="bg-surface-container border border-white/10 p-5 brutal-border text-right">
+              <p className="text-sm text-on-surface mb-3 leading-relaxed">
+                Hard disagree. The schema payload from external AI agents is highly volatile. Forcing it into rigid relational columns will break our ingestion pipelines daily. Document JSON gives us the schema flexibility needed for unstructured AI outputs.
+              </p>
+              <div className="inline-flex gap-2 items-center bg-surface-container-lowest px-3 py-1 border border-white/10 font-mono text-[11px] text-warning">
+                <AlertTriangle className="w-3.5 h-3.5" />
+                Risk factor: Schema Drift
+              </div>
+            </div>
+          </div>
+
+          {/* Architect Marcus Rebuttal (Left) */}
+          <div className="flex flex-col items-start max-w-2xl">
+            <div className="flex items-center gap-2 mb-2 pl-2">
+              <div className="w-2 h-2 bg-primary"></div>
+              <span className="font-mono text-xs font-bold text-on-surface uppercase">Marcus (Architect)</span>
+              <span className="font-mono text-[10px] text-on-surface-variant ml-2">T-1.2s</span>
+            </div>
+            <div className="bg-[#464545] border border-white/10 p-5 offset-shadow">
+              <p className="text-sm text-on-surface leading-relaxed">
+                PostgreSQL has native JSONB support. We can store volatile payload data in JSONB columns while keeping the critical orchestration metadata (Task ID, Parent ID, Status) in strict relational columns. It's not mutually exclusive.
+              </p>
+            </div>
+          </div>
+        </section>
       </div>
 
-      {/* Topics Stream */}
-      <MotionDiv
-        variants={staggerContainer}
-        initial="hidden"
-        animate="show"
-        className="space-y-6 flex-1"
-      >
-        {topics.map((topic) => (
-          <MotionDiv key={topic.id} variants={fadeUpVariant}>
-            <GlassCard className="p-6 border-white/10 bg-white/[0.02] shadow-xl space-y-6">
-              {/* Category & Topic Header */}
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-primary px-2.5 py-1 rounded-md bg-primary/10 border border-primary/20">
-                  {topic.category}
-                </span>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-mono text-white/40">Consensus:</span>
-                  <span
-                    className={`text-xs font-mono font-bold ${
-                      topic.consensusScore >= 90
-                        ? 'text-success'
-                        : topic.consensusScore >= 75
-                        ? 'text-warning'
-                        : 'text-danger'
-                    }`}
-                  >
-                    {topic.consensusScore}%
-                  </span>
-                  {topic.resolved && (
-                    <span className="rounded-full bg-success/20 text-success border border-success/30 px-2 py-0.5 text-[9px] font-mono font-bold uppercase">
-                      Resolved
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              <h3 className="text-base font-bold text-white tracking-tight">{topic.question}</h3>
-
-              {/* Stance Split Arena */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Architect Card */}
-                <div
-                  className={`p-5 rounded-2xl border transition-all ${
-                    topic.winner === 'ARCHITECT'
-                      ? 'border-primary/80 bg-primary/15 shadow-[0_0_20px_rgba(99,102,241,0.25)] ring-1 ring-primary/60'
-                      : 'border-white/10 bg-white/5'
-                  }`}
-                >
-                  <div className="flex items-center justify-between gap-2 mb-3">
-                    <div className="flex items-center gap-2">
-                      <AgentAvatar role="ARCHITECT" size="sm" />
-                      <div>
-                        <p className="text-xs font-bold text-white">Marcus</p>
-                        <p className="text-[9px] text-white/40 uppercase font-mono">System Architect</p>
-                      </div>
-                    </div>
-                    {topic.winner === 'ARCHITECT' && (
-                      <span className="flex items-center gap-1 text-[10px] font-bold text-primary uppercase font-mono">
-                        <Award className="w-3.5 h-3.5" />
-                        Approved
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-xs font-bold text-white/90 mb-1">
-                    {topic.architectStance.proposal}
-                  </p>
-                  <p className="text-xs text-white/60 leading-relaxed">
-                    {topic.architectStance.reason}
-                  </p>
-                  {!topic.resolved && (
-                    <button
-                      type="button"
-                      onClick={() => handleVote(topic.id, 'ARCHITECT')}
-                      className="mt-4 w-full py-2 rounded-xl border border-primary/30 bg-primary/10 text-primary hover:bg-primary/20 text-xs font-bold transition-all flex items-center justify-center gap-1.5"
-                    >
-                      <Vote className="w-3.5 h-3.5" />
-                      Vote with Architect
-                    </button>
-                  )}
-                </div>
-
-                {/* Developer Card */}
-                <div
-                  className={`p-5 rounded-2xl border transition-all ${
-                    topic.winner === 'DEVELOPER'
-                      ? 'border-secondary/80 bg-secondary/15 shadow-[0_0_20px_rgba(6,182,212,0.25)] ring-1 ring-secondary/60'
-                      : 'border-white/10 bg-white/5'
-                  }`}
-                >
-                  <div className="flex items-center justify-between gap-2 mb-3">
-                    <div className="flex items-center gap-2">
-                      <AgentAvatar role="DEVELOPER" size="sm" />
-                      <div>
-                        <p className="text-xs font-bold text-white">Alex</p>
-                        <p className="text-[9px] text-white/40 uppercase font-mono">Lead Developer</p>
-                      </div>
-                    </div>
-                    {topic.winner === 'DEVELOPER' && (
-                      <span className="flex items-center gap-1 text-[10px] font-bold text-secondary uppercase font-mono">
-                        <Award className="w-3.5 h-3.5" />
-                        Approved
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-xs font-bold text-white/90 mb-1">
-                    {topic.developerStance.proposal}
-                  </p>
-                  <p className="text-xs text-white/60 leading-relaxed">
-                    {topic.developerStance.reason}
-                  </p>
-                  {!topic.resolved && (
-                    <button
-                      type="button"
-                      onClick={() => handleVote(topic.id, 'DEVELOPER')}
-                      className="mt-4 w-full py-2 rounded-xl border border-secondary/30 bg-secondary/10 text-secondary hover:bg-secondary/20 text-xs font-bold transition-all flex items-center justify-center gap-1.5"
-                    >
-                      <Vote className="w-3.5 h-3.5" />
-                      Vote with Developer
-                    </button>
-                  )}
-                </div>
-              </div>
-            </GlassCard>
-          </MotionDiv>
-        ))}
-      </MotionDiv>
-    </GlassCard>
+      {/* SECTION 4: EXECUTIVE CAST VOTE BAR */}
+      <div className="absolute bottom-0 left-0 right-0 border-t border-primary bg-surface-container-high z-40 p-4 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <Gavel className="text-primary w-5 h-5" />
+            <div>
+              <h4 className="font-mono text-xs font-bold text-on-surface uppercase">Executive Intervention Required</h4>
+              <p className="font-mono text-[11px] text-on-surface-variant">
+                {resolved ? `Decision override applied: ${resolved}` : 'Awaiting human override or auto-resolution.'}
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-wrap justify-end gap-3 w-full md:w-auto">
+            <button
+              onClick={() => handleVote('Document JSON')}
+              type="button"
+              className="border border-white/10 bg-transparent text-on-surface font-mono text-xs font-bold px-4 py-3 uppercase hover:bg-surface-container-highest transition-colors"
+            >
+              Force Document JSON
+            </button>
+            <button
+              onClick={() => handleVote('Auto-Resolved')}
+              type="button"
+              className="border border-white/10 bg-transparent text-on-surface font-mono text-xs font-bold px-4 py-3 uppercase hover:bg-surface-container-highest transition-colors"
+            >
+              Let Auto-Resolve ({countdown}s)
+            </button>
+            <button
+              onClick={() => handleVote('Relational Model')}
+              type="button"
+              className="bg-primary text-background border border-primary font-mono text-xs font-bold px-6 py-3 uppercase hover:bg-transparent hover:text-primary transition-colors offset-shadow"
+            >
+              Force Relational Model
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
