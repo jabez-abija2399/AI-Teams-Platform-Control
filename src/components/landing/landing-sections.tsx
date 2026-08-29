@@ -14,203 +14,139 @@ import {
   Terminal,
   Cpu,
   Zap,
+  Search,
+  ArrowUpRight,
+  Check,
+  Settings,
 } from 'lucide-react';
 import { Logo } from '@/components/layout/logo';
 import { cn } from '@/lib/utils';
 import { APP_NAME, ROUTES } from '@/config/constants';
-import { MissionControlPreview } from '@/components/shared/mission-control-preview';
-import { GlassCard, NeonButton, StatusBadge } from '@/packages/ui';
 
-const SHOWCASE_PANES = [
-  { id: 'mission', label: 'Mission Control', icon: Rocket },
-  { id: 'studio', label: 'Workspace IDE', icon: Code2 },
-  { id: 'explorer', label: 'Explorer', icon: FolderTree },
-  { id: 'terminal', label: 'Terminal', icon: Terminal },
-] as const;
-
-const TRUST = ['Enterprise Ready', 'Production Code', 'AES-256 Secure', 'Human Approval Gates'] as const;
+const TRUST = ['VERCEL', 'STRIPE', 'SUPABASE'] as const;
 
 const TEAM = [
-  { role: 'Sarah', title: 'Product Manager', dept: 'Strategy & Requirements', focus: 'PRDs, User Stories, Acceptance Criteria' },
-  { role: 'Marcus', title: 'System Architect', dept: 'System Architecture', focus: 'Tech Stacks, Schema Design, API Specs' },
-  { role: 'Elena', title: 'UI/UX Designer', dept: 'Interface Design', focus: 'Design Tokens, Component Mapping, UX Flow' },
-  { role: 'Alex', title: 'Lead Developer', dept: 'Software Engineering', focus: 'Frontend, Backend, Database Implementation' },
-  { role: 'Maya', title: 'QA & Security Lead', dept: 'Verification & QA', focus: 'Automated Test Suites, Security Audit' },
-] as const;
-
-const FEATURES = [
   {
+    role: 'Sarah PM',
+    title: 'Product Dept',
+    status: 'Active',
     icon: Bot,
-    title: 'Autonomous AI Organization',
-    description:
-      'Specialized AI employees collaborate like a real engineering org — not a single chatbot answering prompts.',
+    focus: 'Defines scope, writes requirements, and ensures alignment with business goals.',
   },
   {
+    role: 'Marcus Architect',
+    title: 'Architecture Dept',
+    status: 'Active',
     icon: Layers,
-    title: 'End-to-End Execution Pipeline',
-    description:
-      'Discovery through architecture, development, testing, security, and deployment — fully orchestrated.',
+    focus: 'Designs scalable systems, selects tech stacks, and plans database schemas.',
   },
   {
-    icon: Shield,
-    title: 'Human Governance & Approvals',
-    description:
-      'Stay in control with checkpoints at product, design, architecture, and deployment milestones.',
-  },
-  {
-    icon: Rocket,
-    title: 'Real-Time Mission Control',
-    description:
-      'Watch your AI team work in real time — live code generation, phase timelines, artifacts, and Monaco IDE.',
-  },
-] as const;
-
-const STEPS = [
-  {
-    step: '01',
-    title: 'Define Software Vision',
-    detail: 'Describe what you want to build once with prompt templates.',
-  },
-  {
-    step: '02',
-    title: 'Review Architecture Specs',
-    detail: 'Product specs, tech stacks, and DB schemas land at your desk.',
-  },
-  {
-    step: '03',
-    title: 'AI Company Builds',
-    detail: 'Architects, engineers, designers, and QA collaborate autonomously.',
-  },
-  {
-    step: '04',
-    title: 'Ship to Production',
-    detail: 'Receive working software with live sandbox preview and Git sync.',
+    role: 'Alex Developer',
+    title: 'Development Dept',
+    status: 'Active',
+    icon: Code2,
+    focus: 'Writes clean, efficient code, creates tests, and handles deployments.',
   },
 ] as const;
 
 const FOOTER_LINKS = [
-  { href: '#company', label: 'AI Organization' },
-  { href: '#workspace', label: 'Workspace' },
-  { href: '#features', label: 'Capabilities' },
-  { href: '#how-it-works', label: 'How It Works' },
-  { href: ROUTES.login, label: 'Sign In' },
-  { href: ROUTES.register, label: 'Initialize Company' },
+  { href: '#company', label: 'Documentation' },
+  { href: '#workspace', label: 'Security' },
+  { href: '#features', label: 'API Status' },
+  { href: '#how-it-works', label: 'Privacy' },
 ] as const;
 
 /**
- * Ultra-Modern Cyber Void Sticky Header Navbar.
+ * Sticky Header Navbar with Brutalist styling.
  */
 export function LandingHeader() {
   return (
-    <header className="sticky top-0 z-50 border-b border-white/10 bg-surface-glass/75 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+    <header className="bg-background dark:bg-background text-primary dark:text-primary font-body-md text-body-md font-bold text-on-background tracking-tighter w-full top-0 sticky border-b border-[rgba(223,222,220,0.1)] z-50">
+      <div className="flex justify-between items-center px-gutter h-16 w-full max-w-full">
         <Link href={ROUTES.home} className="flex items-center gap-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-surface-container border border-white/10 text-primary">
             <Logo size={20} />
           </div>
           <span className="text-lg font-bold tracking-tight text-foreground">{APP_NAME}</span>
         </Link>
-        <nav className="hidden items-center gap-8 text-xs font-semibold uppercase tracking-wider text-foreground/70 md:flex">
-          <a href="#company" className="transition-colors hover:text-primary">
+        <nav className="hidden md:flex gap-8">
+          <a className="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors duration-200 px-3 py-2 text-sm" href="#company">
             Organization
           </a>
-          <a href="#workspace" className="transition-colors hover:text-primary">
+          <a className="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors duration-200 px-3 py-2 text-sm" href="#workspace">
             Workspace
           </a>
-          <a href="#features" className="transition-colors hover:text-primary">
-            Features
+          <a className="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors duration-200 px-3 py-2 text-sm" href="#features">
+            Processes
           </a>
-          <a href="#how-it-works" className="transition-colors hover:text-primary">
-            Process
+          <a className="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors duration-200 px-3 py-2 text-sm" href="#pricing">
+            Pricing
           </a>
         </nav>
-        <div className="flex items-center gap-3">
-          <Link href={ROUTES.login} className="text-xs font-bold text-foreground/75 hover:text-primary transition-colors px-3 py-2">
-            Sign In
-          </Link>
-          <Link href={ROUTES.register}>
-            <NeonButton variant="primary" className="h-9 px-4 text-xs font-bold shadow-md">
-              <span>Start Building</span>
-              <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
-            </NeonButton>
-          </Link>
-        </div>
+        <Link href={ROUTES.register}>
+          <button className="bg-[#00ACAC] text-background font-mono text-[11px] font-bold px-6 py-2 border border-[#00ACAC] hover:bg-transparent hover:text-[#00ACAC] transition-colors duration-200 active:translate-y-0.5 transition-transform uppercase tracking-wider">
+            Start Building
+          </button>
+        </Link>
       </div>
     </header>
   );
 }
 
 /**
- * Atmospheric Cyber Void Hero Section.
+ * Asymmetrical Brutalist Hero Section.
  */
 export function LandingHero() {
   return (
-    <section className="relative overflow-hidden pt-16 pb-20 sm:pt-24 sm:pb-32">
-      {/* Background Cyber Ambient Radials */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_120%_80%_at_50%_-20%,rgba(0,172,172,0.15),transparent_65%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,rgba(0,172,172,0.08),transparent_50%)]" />
-
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          {/* Left Column: Heading and description */}
-          <div className="lg:col-span-7 flex flex-col items-start text-left">
-            <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl leading-tight text-balance">
-              Build software with an entire autonomous AI company.
-            </h1>
-            <p className="mt-6 text-base leading-relaxed text-secondary sm:text-lg max-w-xl">
-              Describe your vision once. Product managers, system architects, designers, developers, and QA specialists collaborate in real time to ship production applications.
-            </p>
-
-            {/* Call to Actions */}
-            <div className="mt-8 flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-              <Link href={ROUTES.register} className="w-full sm:w-auto">
-                <NeonButton variant="primary" className="w-full sm:w-auto px-8 h-12 text-sm font-bold">
-                  <span>Launch AI Company</span>
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </NeonButton>
-              </Link>
-              <Link href={ROUTES.login} className="w-full sm:w-auto">
-                <NeonButton variant="secondary" className="w-full sm:w-auto px-8 h-12 text-sm font-bold">
-                  Sign In to Workspace
-                </NeonButton>
-              </Link>
-            </div>
-
-            {/* Quick Inspiration Tags */}
-            <div className="mt-8 flex flex-wrap items-center gap-2 text-xs">
-              <span className="text-secondary font-mono text-[11px] uppercase tracking-wider mr-1">Inspiration:</span>
-              {['SaaS Kanban Platform', 'Realtime Chat Hub', 'AI Billing Portal', 'Landing Page'].map(
-                (tag) => (
-                  <Link
-                    key={tag}
-                    href={`${ROUTES.projects}/new`}
-                    className="rounded-xl border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-foreground hover:border-primary/40 hover:text-primary hover:bg-primary/10 transition-all"
-                  >
-                    ✨ {tag}
-                  </Link>
-                ),
-              )}
-            </div>
-
-            {/* Trust Badges */}
-            <ul className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-secondary font-mono">
-              {TRUST.map((item) => (
-                <li key={item} className="flex items-center gap-1.5">
-                  <CheckCircle2 className="h-3.5 w-3.5 text-primary" />
-                  {item}
-                </li>
-              ))}
-            </ul>
+    <section className="px-gutter py-24 max-w-7xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+        <div className="md:col-span-5 flex flex-col gap-8">
+          <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-on-surface leading-tight">
+            Deploy an entire autonomous AI company to build your software.
+          </h1>
+          <p className="text-base sm:text-lg leading-relaxed text-on-surface-variant">
+            Stop managing freelancers. Orchestrate intelligent agents that design, architect, and code your ideas into reality.
+          </p>
+          <div>
+            <Link href={ROUTES.register}>
+              <button className="bg-[#00ACAC] text-background font-mono text-xs font-bold px-8 py-4 border border-[#00ACAC] hover:bg-transparent hover:text-[#00ACAC] transition-all duration-200 offset-shadow uppercase tracking-wider">
+                Launch AI Company
+              </button>
+            </Link>
           </div>
-
-          {/* Right Column: Mission Control Preview */}
-          <div className="lg:col-span-5 w-full relative flex justify-center">
-            <div className="relative w-full shadow-[0_0_50px_rgba(0,0,0,0.1)] rounded-3xl overflow-hidden border border-white/10">
-              <GlassCard className="p-0 border-none bg-surface-glass/95">
-                <MissionControlPreview />
-              </GlassCard>
+        </div>
+        <div className="md:col-span-7 relative">
+          <div className="glass-panel p-6 rounded-none relative z-10 offset-shadow bg-surface-container/70 backdrop-blur-md border border-white/10">
+            <div className="flex items-center justify-between border-b border-[rgba(223,222,220,0.1)] pb-4 mb-4">
+              <div className="flex gap-2">
+                <div className="w-3 h-3 rounded-full bg-surface-container-highest"></div>
+                <div className="w-3 h-3 rounded-full bg-surface-container-highest"></div>
+                <div className="w-3 h-3 rounded-full bg-surface-container-highest"></div>
+              </div>
+              <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">
+                Live Telemetry Workspace
+              </span>
+              <Terminal className="w-4 h-4 text-on-surface-variant" />
+            </div>
+            <div className="h-64 flex items-center justify-center border border-[rgba(223,222,220,0.1)] bg-surface-container-low relative overflow-hidden">
+              <div className="absolute inset-0 flex items-center justify-center opacity-50">
+                <svg height="100%" width="100%" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M50 150 Q 150 50, 250 150 T 450 150" fill="transparent" stroke="#00ACAC" strokeWidth="2"></path>
+                  <circle cx="50" cy="150" fill="#00ACAC" r="4"></circle>
+                  <circle cx="250" cy="150" fill="#00ACAC" r="6"></circle>
+                  <circle cx="450" cy="150" fill="#00ACAC" r="4"></circle>
+                </svg>
+              </div>
+              <div className="text-center z-10">
+                <span className="font-mono text-sm text-primary font-bold block mb-2">Analyzing Architecture...</span>
+                <div className="w-48 h-1 bg-surface-container-highest mx-auto">
+                  <div className="h-full bg-primary w-2/3"></div>
+                </div>
+              </div>
             </div>
           </div>
+          {/* Decorative background grid */}
+          <div className="absolute -inset-4 border border-[rgba(223,222,220,0.05)] bg-[rgba(255,255,255,0.01)] z-0 -translate-x-4 translate-y-4"></div>
         </div>
       </div>
     </section>
@@ -218,41 +154,20 @@ export function LandingHero() {
 }
 
 /**
- * AI Company Organization Section.
+ * Social Proof Section.
  */
 export function LandingCompany() {
   return (
-    <section id="company" className="border-t border-white/10 py-24 bg-white/[0.01]">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-            Meet Your Autonomous AI Workforce
-          </h2>
-          <p className="mt-4 text-sm sm:text-base text-white/60 leading-relaxed">
-            Specialized engineering roles that collaborate the way elite software teams do — with you in the driver&apos;s seat.
-          </p>
-        </div>
-
-        <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-          {TEAM.map((member) => (
-            <GlassCard
-              key={member.role}
-              interactive={true}
-              className="p-5 border-white/10 hover:border-primary/40 transition-all duration-300"
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/15 text-primary border border-primary/30 font-bold text-sm">
-                  {member.role[0]}
-                </div>
-                <StatusBadge status="HEALTHY" />
-              </div>
-              <h3 className="mt-4 text-base font-bold tracking-tight text-white">{member.role}</h3>
-              <p className="text-xs font-semibold text-primary">{member.title}</p>
-              <p className="mt-1 text-[10px] font-mono uppercase tracking-wider text-white/40">
-                {member.dept}
-              </p>
-              <p className="mt-3 text-xs leading-relaxed text-white/60 line-clamp-2">{member.focus}</p>
-            </GlassCard>
+    <section className="border-y border-[rgba(223,222,220,0.1)] py-12 bg-surface-container-lowest">
+      <div className="max-w-7xl mx-auto px-gutter text-center">
+        <p className="font-mono text-[11px] font-bold text-on-surface-variant mb-8 uppercase tracking-widest">
+          Trusted by engineering teams worldwide
+        </p>
+        <div className="flex flex-wrap justify-center gap-16 opacity-50 grayscale">
+          {TRUST.map((name) => (
+            <span key={name} className="font-heading text-lg font-bold text-[#A6A7A2]">
+              {name}
+            </span>
           ))}
         </div>
       </div>
@@ -261,165 +176,81 @@ export function LandingCompany() {
 }
 
 /**
- * Interactive Studio Workspace Showcase.
+ * AI Roster Departments Section.
  */
 export function LandingShowcase() {
   return (
-    <section id="workspace" className="border-t border-white/10 py-24 bg-void">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-            One Unified Workspace for the Entire Company
-          </h2>
-          <p className="mt-4 text-sm sm:text-base text-white/60 leading-relaxed">
-            Mission Control, Monaco IDE, SVG Pipeline Visualizer, and Live Sandbox Preview in a single surface.
-          </p>
-        </div>
-
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
-          {SHOWCASE_PANES.map(({ id, label, icon: Icon }) => (
-            <span
-              key={id}
-              className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-mono font-semibold text-white/70"
-            >
-              <Icon className="h-3.5 w-3.5 text-primary" />
-              {label}
-            </span>
-          ))}
-        </div>
-
-        <div className="mt-12 overflow-hidden rounded-3xl border border-white/10 bg-surface-glass/90 shadow-2xl">
-          <div className="flex items-center gap-2 border-b border-white/10 bg-white/5 px-5 py-3.5">
-            <span className="h-3 w-3 rounded-full bg-danger/80" />
-            <span className="h-3 w-3 rounded-full bg-warning/80" />
-            <span className="h-3 w-3 rounded-full bg-success/80" />
-            <span className="ml-3 text-xs font-bold text-white font-mono">Cyber Void Studio · Project Workspace</span>
-            <span className="ml-auto hidden text-[11px] font-mono text-white/40 sm:inline">
-              Monaco · TypeScript · Real-Time Stream
-            </span>
-          </div>
-
-          <div className="grid min-h-[340px] lg:grid-cols-[220px_1fr_240px]">
-            <aside className="hidden border-r border-white/10 p-5 lg:block bg-white/[0.01]">
-              <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-white/40">
-                Explorer
-              </p>
-              <ul className="mt-3 space-y-1.5 font-mono text-xs text-white/60">
-                <li className="rounded-lg bg-primary/20 px-2.5 py-1.5 font-bold text-primary">src/</li>
-                <li className="px-2.5 py-1 pl-6">app/page.tsx</li>
-                <li className="px-2.5 py-1 pl-6">components/</li>
-                <li className="px-2.5 py-1 pl-6">packages/ui/</li>
-                <li className="rounded-lg px-2.5 py-1.5 text-white/40">schema.prisma</li>
-                <li className="rounded-lg px-2.5 py-1.5 text-white/40">README.md</li>
-              </ul>
-            </aside>
-
-            <div className="flex flex-col border-b border-white/10 lg:border-b-0 lg:border-r bg-[#05050A]">
-              <div className="flex items-center gap-2 border-b border-white/10 px-4 py-2.5 text-xs text-white/50 bg-white/[0.02]">
-                <span className="rounded-md bg-primary/20 px-2.5 py-0.5 font-mono font-bold text-primary">page.tsx</span>
-                <span className="font-mono text-white/40">pipeline.ts</span>
+    <section id="company" className="py-24 px-gutter max-w-7xl mx-auto">
+      <div className="mb-12">
+        <h2 className="font-heading text-3xl font-bold text-on-surface mb-4">AI Roster Departments</h2>
+        <p className="text-sm text-on-surface-variant max-w-2xl">
+          Specialized autonomous agents ready to tackle your complex engineering challenges.
+        </p>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {TEAM.map((member) => {
+          const Icon = member.icon;
+          return (
+            <div key={member.role} className="border border-[rgba(223,222,220,0.1)] bg-[#464545] p-6 hover:translate-y-[-4px] transition-transform duration-300 relative group">
+              <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                <ArrowUpRight className="w-5 h-5 text-primary" />
               </div>
-              <pre className="flex-1 overflow-hidden p-5 font-mono text-xs leading-6 text-white/70">
-                <code>
-                  <span className="text-white/40">{'// Generated by Alex (Lead Developer)'}</span>
-                  {'\n'}
-                  <span className="text-primary">{'export default function '}</span>
-                  <span className="text-success">{'AIWorkspace'}</span>
-                  <span className="text-white">{'() {'}</span>
-                  {'\n'}
-                  {'  '}
-                  <span className="text-primary">{'return ('}</span>
-                  {'\n'}
-                  {'    '}
-                  <span className="text-secondary">{'<CommandCenter>'}</span>
-                  {'\n'}
-                  {'      '}
-                  <span className="text-white">{'<PipelineVisualizer live={true} />'}</span>
-                  {'\n'}
-                  {'      '}
-                  <span className="text-white">{'<AgentRoster specialists={5} />'}</span>
-                  {'\n'}
-                  {'    '}
-                  <span className="text-secondary">{'</CommandCenter>'}</span>
-                  {'\n'}
-                  {'  );'}
-                  {'\n'}
-                  <span className="text-white">{'}'}</span>
-                </code>
-              </pre>
-              <div className="border-t border-white/10 bg-white/[0.02] px-5 py-2.5 font-mono text-[11px] text-white/50 flex items-center justify-between">
-                <span className="text-success font-bold flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
-                  Live Sync · Compilation Clean
-                </span>
-                <span className="text-white/30">TypeScript 5.x</span>
-              </div>
-            </div>
-
-            <aside className="space-y-5 p-5 bg-white/[0.01]">
-              <div>
-                <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-white/40">
-                  Telemetry Feed
-                </p>
-                <ul className="mt-3 space-y-3 text-left text-xs">
-                  <li className="flex gap-2.5 text-white font-medium">
-                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-primary animate-pulse" />
-                    Marcus updated system architecture
-                  </li>
-                  <li className="flex gap-2.5 text-white/60">
-                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-white/20" />
-                    Sarah refined PRD user acceptance
-                  </li>
-                  <li className="flex gap-2.5 text-white/60">
-                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-white/20" />
-                    Sandbox preview synced to Studio
-                  </li>
-                </ul>
-              </div>
-              <GlassCard className="p-3.5 border-white/10 bg-white/5">
-                <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-white/40">Pipeline Progress</p>
-                <p className="mt-1 text-xs font-bold text-white">Full Build · 80%</p>
-                <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-white/10">
-                  <div className="h-full w-[80%] rounded-full bg-gradient-to-r from-primary to-success shadow-[0_0_8px_#6366f1]" />
+              <div className="mb-6 flex justify-between items-start">
+                <div className="w-12 h-12 bg-surface-container-high border border-[rgba(223,222,220,0.1)] flex items-center justify-center">
+                  <Icon className="w-6 h-6 text-on-surface" />
                 </div>
-              </GlassCard>
-            </aside>
-          </div>
-        </div>
+                <span className="bg-primary text-background font-mono text-[10px] font-bold px-2 py-1 uppercase">
+                  {member.status}
+                </span>
+              </div>
+              <h3 className="font-heading text-lg font-bold text-on-surface mb-1">{member.title}</h3>
+              <p className="font-mono text-xs text-on-surface-variant mb-4">{member.role}</p>
+              <p className="text-sm text-[#c9c6c5] border-t border-[rgba(223,222,220,0.1)] pt-4 mt-4 leading-relaxed">
+                {member.focus}
+              </p>
+            </div>
+          );
+        })}
       </div>
     </section>
   );
 }
 
 /**
- * Cyber Void Core Capabilities Grid.
+ * Pipeline Steps Section.
  */
 export function LandingFeatures() {
+  const pipeline = ['Ideate', 'Spec', 'Build', 'Test', 'Deploy'];
   return (
-    <section id="features" className="border-t border-white/10 py-24 bg-white/[0.01]">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-            Built Like an Engineering Organization
-          </h2>
-          <p className="mt-4 text-sm sm:text-base text-white/60 leading-relaxed">
-            Structure, contracts, human governance, and CI/CD pipelines — what you need to trust AI-generated software.
-          </p>
-        </div>
-        <div className="mt-14 grid gap-6 sm:grid-cols-2">
-          {FEATURES.map(({ icon: Icon, title, description }) => (
-            <GlassCard
-              key={title}
-              interactive={true}
-              className="p-8 border-white/10 hover:border-primary/40 transition-all duration-300 shadow-xl"
-            >
-              <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/15 text-primary border border-primary/30 shadow-[0_0_15px_rgba(99,102,241,0.3)]">
-                <Icon className="h-6 w-6" />
+    <section id="features" className="py-12 border-y border-[rgba(223,222,220,0.1)] bg-surface-container-low overflow-hidden">
+      <div className="max-w-7xl mx-auto px-gutter">
+        <p className="font-mono text-[11px] font-bold text-on-surface-variant mb-8 uppercase tracking-wider">
+          Orchestration Pipeline
+        </p>
+        <div className="flex items-center justify-between relative px-4">
+          {/* Connecting Line */}
+          <div className="absolute top-1/2 left-0 right-0 h-px bg-[rgba(223,222,220,0.1)] -z-10 transform -translate-y-1/2" />
+          
+          {pipeline.map((step, idx) => {
+            const isBuild = step === 'Build';
+            return (
+              <div key={step} className="flex flex-col items-center gap-2 relative">
+                {isBuild ? (
+                  <div className="w-6 h-6 bg-[#00ACAC] shadow-[0_0_15px_rgba(0,172,172,0.5)] rounded-full flex items-center justify-center">
+                    <div className="w-2 h-2 bg-background rounded-full"></div>
+                  </div>
+                ) : (
+                  <div className="w-4 h-4 bg-surface-container-highest border border-[rgba(223,222,220,0.5)] rounded-full"></div>
+                )}
+                <span className={cn(
+                  "font-mono text-[10px]",
+                  isBuild ? "text-primary font-bold text-xs" : "text-on-surface-variant opacity-70"
+                )}>
+                  {step}
+                </span>
               </div>
-              <h3 className="text-lg font-bold tracking-tight text-white">{title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-white/60">{description}</p>
-            </GlassCard>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
@@ -427,101 +258,62 @@ export function LandingFeatures() {
 }
 
 /**
- * 4-Step Process Timeline.
+ * Placeholder for compatibility / layout mapping.
  */
 export function LandingHowItWorks() {
-  return (
-    <section id="how-it-works" className="border-t border-white/10 py-24 bg-void">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-            From Software Vision to Production
-          </h2>
-          <p className="mt-4 text-sm sm:text-base text-white/60 leading-relaxed">
-            A linear lifecycle with you in control — autonomous agents execute the heavy engineering between approval gates.
-          </p>
-        </div>
-        <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {STEPS.map(({ step, title, detail }) => (
-            <GlassCard
-              key={step}
-              className="p-6 border-white/10 relative overflow-hidden"
-            >
-              <span className="font-mono text-3xl font-bold text-primary/30">{step}</span>
-              <h3 className="mt-3 text-sm font-bold text-white tracking-tight">{title}</h3>
-              <p className="mt-2 text-xs leading-relaxed text-white/60">{detail}</p>
-            </GlassCard>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
+  return null;
 }
 
 /**
- * Call to Action Finale Banner.
+ * Core CTA Banner with idea description input.
  */
 export function LandingCta() {
   return (
-    <section className="border-t border-white/10 py-20 bg-void">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <GlassCard className="p-10 sm:p-16 text-center border-primary/30 bg-gradient-to-br from-surface-glass/90 via-primary/10 to-secondary/10 shadow-2xl relative overflow-hidden">
-          <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-primary/20 blur-3xl" />
-          <div className="pointer-events-none absolute -bottom-20 -left-20 h-64 w-64 rounded-full bg-secondary/20 blur-3xl" />
-          
-          <h2 className="relative text-3xl sm:text-4xl font-bold tracking-tight text-white">
-            Ready to build with an autonomous AI company?
-          </h2>
-          <p className="relative mx-auto mt-4 max-w-xl text-sm sm:text-base text-white/70 leading-relaxed">
-            Stop coordinating fragmented tools. Start shipping full-stack production software today.
-          </p>
-          <div className="relative mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <Link href={ROUTES.register} className="w-full sm:w-auto">
-              <NeonButton variant="primary" className="w-full sm:w-auto px-8 h-12 text-sm font-bold shadow-xl">
-                <span>Start Building Now</span>
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </NeonButton>
-            </Link>
-            <Link href={ROUTES.login} className="w-full sm:w-auto">
-              <NeonButton variant="secondary" className="w-full sm:w-auto px-8 h-12 text-sm font-bold">
-                Sign In to Mission Control
-              </NeonButton>
-            </Link>
-          </div>
-        </GlassCard>
+    <section id="workspace" className="py-24 px-gutter max-w-5xl mx-auto text-center">
+      <div className="bg-[#464545] p-12 md:p-24 border border-[rgba(223,222,220,0.1)] offset-shadow">
+        <h2 className="font-heading text-3xl font-bold text-on-surface mb-8 max-w-2xl mx-auto leading-snug">
+          Stop managing freelancers. Let AI agents write your software.
+        </h2>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-xl mx-auto">
+          <input
+            className="bg-surface font-mono text-sm text-on-surface border border-[rgba(223,222,220,0.2)] px-4 py-3 flex-grow focus:outline-none focus:border-[#00ACAC] focus:ring-1 focus:ring-[#00ACAC] placeholder-on-surface-variant/40"
+            placeholder="Describe your app idea..."
+            type="text"
+          />
+          <Link href={ROUTES.register}>
+            <button className="w-full sm:w-auto bg-[#00ACAC] text-background font-mono text-[11px] font-bold px-8 py-4 border border-[#00ACAC] hover:bg-transparent hover:text-[#00ACAC] transition-colors duration-200 uppercase whitespace-nowrap tracking-wider">
+              Generate Scope
+            </button>
+          </Link>
+        </div>
       </div>
     </section>
   );
 }
 
 /**
- * Minimalist Cyber Void Footer with Live Telemetry.
+ * System Footer with Live Status Telemetry.
  */
 export function LandingFooter() {
   return (
-    <footer className="border-t border-white/10 py-12 bg-surface">
-      <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 px-4 sm:flex-row sm:px-6 lg:px-8">
-        <div className="flex items-center gap-3">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-surface-container border border-white/10 text-primary">
-            <Logo size={16} />
-          </div>
-          <span className="text-sm font-bold tracking-tight text-foreground">{APP_NAME}</span>
-          <div className="h-3.5 w-px bg-white/10 ml-2" />
-          <div className="flex items-center gap-1.5 text-[11px] font-mono text-primary ml-2">
-            <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
-            All AI Agents Operational
-          </div>
+    <footer className="bg-background dark:bg-background text-primary dark:text-primary font-mono text-xs text-on-background w-full relative border-t border-[rgba(223,222,220,0.1)]">
+      <div className="flex flex-col md:flex-row justify-between items-center px-gutter py-8 w-full gap-4 max-w-7xl mx-auto">
+        <div className="flex items-center gap-4">
+          <span className="text-on-surface-variant font-mono">© {new Date().getFullYear()} HibirDev AI Orchestration</span>
         </div>
-        <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs font-mono text-secondary">
+        <div className="flex items-center gap-2 border border-[rgba(223,222,220,0.1)] bg-surface-container-low px-4 py-2">
+          <div className="w-2 h-2 rounded-full bg-[#00ACAC] animate-pulse"></div>
+          <span className="font-mono text-[12px] text-on-surface-variant">
+            All AI Agent Clusters Operational - Node Latency: 22ms
+          </span>
+        </div>
+        <nav className="flex gap-6">
           {FOOTER_LINKS.map((link) => (
-            <Link key={link.label} href={link.href} className="transition-colors hover:text-primary">
+            <a key={link.label} className="text-on-surface-variant hover:text-primary transition-colors font-mono" href={link.href}>
               {link.label}
-            </Link>
+            </a>
           ))}
         </nav>
-        <p className="text-xs font-mono text-secondary">
-          &copy; {new Date().getFullYear()} {APP_NAME} · Autonomous AI Platform
-        </p>
       </div>
     </footer>
   );

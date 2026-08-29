@@ -1,95 +1,33 @@
 'use client';
 
-// Import core React hooks for state, memoization, and side-effects.
-import { useEffect, useMemo, useState } from 'react';
-// Import Next.js navigation primitives for routing and link jumps.
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-// Import Sonner for high-contrast toast notifications.
 import { toast } from 'sonner';
-// Import Lucide icons for rich iconography throughout the creation wizard.
 import {
   ArrowLeft,
   ArrowRight,
-  KeyRound,
-  Loader2,
-  Sparkles,
+  Check,
+  Cpu,
   Layers,
-  Lightbulb,
   Bot,
-  Wand2,
+  Terminal,
+  Settings,
+  CheckCircle2,
+  Lock,
 } from 'lucide-react';
-// Import Framer Motion for entrance and layout animations.
-import { motion, AnimatePresence } from 'framer-motion';
-// Import our centralized Atomic UI components from packages/ui.
-import { GlassCard, NeonButton, StatusBadge } from '@/packages/ui';
-// Import motion physics variants from packages/motion.
-import { fadeUpVariant, staggerContainer } from '@/packages/motion';
-// Import classnames utility and application routing constants.
-import { cn } from '@/lib/utils';
 import { ROUTES } from '@/config/constants';
-// Import the upgraded Cyber Void stack selector component.
-import { StackSelect } from './stack-select';
-import {
-  DEFAULT_PROJECT_STACK,
-  type ProjectStackId,
-} from '@/core/project-stack/stack-catalog';
-// Import credentials form for setting up AI provider API keys.
 import { AiCredentialsForm } from '@/features/settings/components/ai-credentials-form';
 
-// Curated inspiration prompts for rapid project prototyping.
-const EXAMPLES = [
-  {
-    title: 'Enterprise Kanban Platform',
-    idea: 'A collaborative real-time agile Kanban board with sprint planning, drag-and-drop tasks, subtasks, and progress analytics.',
-    stack: 'nextjs' as const,
-  },
-  {
-    title: 'Modern SaaS Billing Portal',
-    idea: 'A full-featured SaaS subscription management portal with customer metrics, revenue charts, plan upgrade flows, and webhook integrations.',
-    stack: 'nextjs' as const,
-  },
-  {
-    title: 'Realtime Chat & Team Hub',
-    idea: 'A modern messaging app with direct channels, thread replies, user presence, typing indicators, and markdown formatting.',
-    stack: 'nextjs' as const,
-  },
-  {
-    title: 'Sleek Product Landing Page',
-    idea: 'A high-converting product marketing landing page with interactive pricing tiers, feature showcase, and responsive dark mode.',
-    stack: 'static-html' as const,
-  },
-] as const;
-
-// Helper to derive a clean project name from the initial idea description.
-function deriveName(idea: string): string {
-  const cleaned = idea.trim().replace(/\s+/g, ' ');
-  if (!cleaned) return 'My Software Project';
-  const firstSentence = cleaned.split(/[.!?\n]/)[0] || cleaned;
-  return firstSentence.slice(0, 48).trim() || 'My Software Project';
-}
-
-/**
- * Ultra-Modern Project Creation Wizard.
- * Guides the user through connecting AI keys, defining software specs, selecting tech stacks,
- * and initializing their autonomous AI software engineering organization.
- */
 export function ProjectCreationForm() {
   const router = useRouter();
-  const [name, setName] = useState('');
   const [idea, setIdea] = useState('');
-  const [stack, setStack] = useState<ProjectStackId | null>(DEFAULT_PROJECT_STACK);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [checkingKey, setCheckingKey] = useState(true);
   const [hasApiKey, setHasApiKey] = useState(false);
 
-  // Form submission criteria validation
-  const canSubmit = idea.trim().length >= 8 && stack !== null && stack !== 'unknown' && hasApiKey;
-  // Memoized preview title
-  const previewName = useMemo(() => (name.trim() ? name.trim() : deriveName(idea)), [name, idea]);
-
-  // Check if the user has an active AI API key configured
+  // Check if API key is active
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -110,280 +48,321 @@ export function ProjectCreationForm() {
     };
   }, []);
 
-  // Form submission handler to register the project in the database
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!canSubmit || loading || !stack) return;
+    if (!idea.trim() || loading || !hasApiKey) return;
 
-    setError(null);
     setLoading(true);
+    setError(null);
 
     try {
-      const projectName = name.trim() || deriveName(idea);
+      const firstSentence = idea.trim().split(/[.!?\n]/)[0] || 'My Project';
+      const projectName = firstSentence.slice(0, 40).trim() || 'My Project';
       const res = await fetch('/api/projects', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: projectName,
           description: idea.trim(),
-          stack,
+          stack: 'nextjs',
         }),
       });
 
       const result = await res.json().catch(() => null);
       if (!res.ok || !result?.success) {
-        if (result?.error?.code === 'API_KEY_REQUIRED') {
-          setHasApiKey(false);
-        }
         throw new Error(result?.error?.message || 'Could not create project');
       }
 
       const projectId = result.data?.id;
-      if (!projectId) throw new Error('No project ID returned from server');
+      if (!projectId) throw new Error('No project ID returned');
 
-      // Automatically trigger the build/execution pipeline so it starts building right away
+      // Trigger automatic pipeline start
       try {
-        const startRes = await fetch(`/api/projects/${projectId}/lifecycle/start`, {
+        await fetch(`/api/projects/${projectId}/lifecycle/start`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userIdea: idea.trim() }),
         });
-        const startResult = await startRes.json().catch(() => null);
-        if (!startRes.ok || !startResult?.success) {
-          console.warn('Pipeline automatic trigger failed, but project was successfully created:', startResult?.error);
-        }
-      } catch (startErr) {
-        console.warn('Network error while triggering pipeline:', startErr);
+      } catch (err) {
+        console.warn('Network error triggering start:', err);
       }
 
-      toast.success('Project Created & Team Assembled', {
-        description: `"${projectName}" is now being built by your AI workforce.`,
-      });
+      toast.success('Workspace Initialized', { description: `"${projectName}" is now compiling.` });
       router.push(`/dashboard/projects/${projectId}/workspace`);
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : 'Something went wrong. Please try again.';
-      setError(message);
-      toast.error('Could not create project', { description: message });
+      const msg = err instanceof Error ? err.message : 'Could not create project';
+      setError(msg);
+      toast.error('Initialization Failed', { description: msg });
       setLoading(false);
     }
   };
 
-  const MotionDiv = motion.div as any;
+  if (checkingKey) {
+    return (
+      <div className="flex items-center justify-center gap-3 py-20 text-sm text-on-surface-variant font-mono">
+        <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+        <span>Verifying AI workforce credentials…</span>
+      </div>
+    );
+  }
+
+  if (!hasApiKey) {
+    return (
+      <div className="space-y-6 max-w-4xl mx-auto py-8">
+        <div className="border border-warning bg-warning/5 p-6 brutalist-offset-content">
+          <p className="font-mono text-sm font-bold text-white uppercase tracking-wider">Step 1 — Connect AI Provider</p>
+          <p className="mt-2 text-xs leading-relaxed text-on-surface-variant">
+            A key is required to bootstrap your workspace (Gemini Free works out of the box). Keys are stored locally and encrypted.
+          </p>
+        </div>
+        <AiCredentialsForm
+          embedded
+          onConfigured={() => {
+            setHasApiKey(true);
+            toast.success('AI Provider Connected');
+          }}
+        />
+      </div>
+    );
+  }
 
   return (
-    <MotionDiv
-      variants={staggerContainer}
-      initial="hidden"
-      animate="show"
-      className="mx-auto w-full max-w-4xl space-y-8 py-4"
-    >
-      {/* Back to projects navigation button */}
-      <MotionDiv variants={fadeUpVariant}>
-        <Link
-          href={ROUTES.projects}
-          className="group inline-flex items-center gap-2 text-xs font-semibold text-white/50 transition-colors hover:text-white"
-        >
-          <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-          Back to projects
-        </Link>
-      </MotionDiv>
+    <div className="flex-1 w-full pb-32">
+      {/* SECTION 1: BREADCRUMB PROGRESS BAR */}
+      <section className="mb-12">
+        <nav aria-label="Progress">
+          <ol className="flex items-center border border-white/10 p-4 bg-surface-container-low" role="list">
+            <li className="relative pr-8 sm:pr-20">
+              <div aria-hidden="true" className="absolute inset-0 flex items-center">
+                <div className="h-0.5 w-full bg-white/15"></div>
+              </div>
+              <div className="relative flex h-8 w-8 items-center justify-center bg-surface-container-highest border border-white/10 text-primary">
+                <Check className="w-4 h-4" />
+              </div>
+              <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 font-mono text-[10px] uppercase tracking-wider text-on-surface-variant whitespace-nowrap hidden sm:block">
+                Define Concept
+              </span>
+            </li>
+            <li className="relative pr-8 sm:pr-20">
+              <div aria-hidden="true" className="absolute inset-0 flex items-center">
+                <div className="h-0.5 w-full bg-white/10"></div>
+              </div>
+              <div className="relative flex h-8 w-8 items-center justify-center bg-primary text-background border border-primary font-bold font-mono text-xs">
+                2
+              </div>
+              <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 font-mono text-[10px] uppercase tracking-wider text-primary whitespace-nowrap hidden sm:block">
+                Generate Stack
+              </span>
+            </li>
+            <li className="relative pr-8 sm:pr-20">
+              <div aria-hidden="true" className="absolute inset-0 flex items-center">
+                <div className="h-0.5 w-full bg-white/10"></div>
+              </div>
+              <div className="relative flex h-8 w-8 items-center justify-center bg-surface-container border border-white/10 text-on-surface-variant font-bold font-mono text-xs">
+                3
+              </div>
+              <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 font-mono text-[10px] uppercase tracking-wider text-on-surface-variant whitespace-nowrap hidden sm:block">
+                Assemble Team
+              </span>
+            </li>
+            <li className="relative">
+              <div className="relative flex h-8 w-8 items-center justify-center bg-surface-container border border-white/10 text-on-surface-variant font-bold font-mono text-xs">
+                4
+              </div>
+              <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 font-mono text-[10px] uppercase tracking-wider text-on-surface-variant whitespace-nowrap hidden sm:block">
+                Launch Build
+              </span>
+            </li>
+          </ol>
+        </nav>
+      </section>
 
-      {/* Cyber Void Hero Header Banner */}
-      <MotionDiv variants={fadeUpVariant}>
-        <GlassCard className="relative overflow-hidden p-8 border-primary/20 bg-gradient-to-br from-surface-glass/80 via-primary/5 to-secondary/5">
-          <div className="absolute -right-16 -top-16 h-48 w-48 rounded-full bg-primary/20 blur-3xl pointer-events-none" />
-          <div className="relative z-10">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3.5 py-1 text-xs font-bold text-primary shadow-[0_0_15px_rgba(99,102,241,0.2)]">
-              <Sparkles className="h-3.5 w-3.5" />
-              Autonomous Engineering Organization
-            </div>
-            <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-              {hasApiKey ? 'What would you like to build?' : 'Connect Your AI Workforce'}
-            </h1>
-            <p className="mt-3 text-sm leading-relaxed text-white/60 max-w-2xl">
-              {hasApiKey
-                ? 'Your dedicated team of 5 AI specialists (Product Manager, Architect, Designer, Developer, QA) will collaborate in real time to build production-ready software.'
-                : 'Connect an AI provider to empower your autonomous team. Free tiers (Google Gemini, Groq) work out of the box.'}
-            </p>
+      <form onSubmit={handleSubmit} className="space-y-12">
+        {error && (
+          <div className="rounded-none border border-danger/40 bg-danger/10 p-4 text-xs font-semibold text-danger">
+            {error}
           </div>
-        </GlassCard>
-      </MotionDiv>
+        )}
 
-      {/* Loading state for credentials verification */}
-      {checkingKey ? (
-        <MotionDiv variants={fadeUpVariant}>
-          <GlassCard className="flex items-center justify-center gap-3 py-20 text-sm text-white/50">
-            <Loader2 className="h-5 w-5 animate-spin text-primary" />
-            <span>Verifying AI workforce credentials…</span>
-          </GlassCard>
-        </MotionDiv>
-      ) : !hasApiKey ? (
-        /* Unconfigured API Key State */
-        <MotionDiv variants={fadeUpVariant} className="space-y-6">
-          <GlassCard className="border-warning/30 bg-warning/5 p-6">
-            <div className="flex gap-4">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-warning/15 text-warning border border-warning/30">
-                <KeyRound className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="text-sm font-bold text-white">Step 1 — Connect AI Provider</p>
-                <p className="mt-1 text-xs leading-relaxed text-white/60">
-                  Pick your provider (Google Gemini, Groq, OpenRouter, OpenAI, Anthropic) and enter your key. Keys are encrypted with AES-256-GCM at rest.
-                </p>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* SECTION 2: CONCEPT DEFINITION PANEL */}
+          <section className="lg:col-span-7 flex flex-col gap-4">
+            <div className="border border-white/10 p-6 bg-surface relative group">
+              <label className="block font-mono text-xs uppercase tracking-wider text-on-surface mb-4" htmlFor="concept-input">
+                Describe your app idea
+              </label>
+              <textarea
+                id="concept-input"
+                value={idea}
+                onChange={(e) => setIdea(e.target.value)}
+                placeholder="e.g., A multi-tenant SaaS platform for managing autonomous delivery drones. Needs real-time tracking, a manager dashboard, and API access for third-party logistics integrations..."
+                rows={12}
+                className="w-full bg-transparent border-none outline-none font-mono text-sm text-on-background placeholder:text-on-surface-variant/40 resize-none focus:ring-0 p-0 leading-relaxed"
+                required
+              />
+              <div className="mt-4 flex justify-between items-center border-t border-white/10 pt-4">
+                <span className="font-mono text-xs text-on-surface-variant">Markdown Supported</span>
+                <button
+                  type="button"
+                  className="bg-surface-container-highest border border-white/10 px-4 py-2 font-mono text-xs text-on-surface hover:bg-surface-container-high hover:text-primary transition-colors"
+                >
+                  Analyze Concept
+                </button>
               </div>
             </div>
-          </GlassCard>
-          <AiCredentialsForm
-            embedded
-            onConfigured={() => {
-              setHasApiKey(true);
-              toast.success('AI Provider Connected', {
-                description: 'You can now create your project.',
-              });
-            }}
-          />
-        </MotionDiv>
-      ) : (
-        /* Main Project Creation Form */
-        <MotionDiv variants={fadeUpVariant}>
-          <form onSubmit={handleSubmit} className="space-y-8">
-            <GlassCard className="p-8 space-y-7 border-white/10 shadow-2xl">
-              {/* Error banner if submission fails */}
-              {error && (
-                <div className="rounded-xl border border-danger/30 bg-danger/10 px-4 py-3 text-xs font-medium text-danger">
-                  {error}
-                </div>
-              )}
+          </section>
 
-              {/* Prompt / Vision Field */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <label htmlFor="project-idea" className="text-xs font-bold uppercase tracking-wider text-white/70 flex items-center gap-2">
-                    <Wand2 className="w-3.5 h-3.5 text-primary" />
-                    Software Vision & Requirements <span className="text-danger">*</span>
-                  </label>
-                  <span className="text-[11px] font-mono text-white/40">
-                    {idea.length}/1000
-                  </span>
-                </div>
-                <textarea
-                  id="project-idea"
-                  value={idea}
-                  onChange={(e) => setIdea(e.target.value)}
-                  placeholder="Describe your software idea in detail. E.g. A real-time collaborative Kanban board with sprint analytics, drag-and-drop tasks, and automated export…"
-                  rows={4}
-                  autoFocus
-                  required
-                  className="w-full resize-none rounded-2xl border border-white/10 bg-white/5 p-4 text-sm leading-relaxed text-white outline-none transition-all placeholder:text-white/30 focus:border-primary/60 focus:bg-white/[0.08] focus:ring-2 focus:ring-primary/20 font-sans backdrop-blur-md"
-                />
+          {/* SECTION 3: ARCHITECT RECOMMENDED STACK CARD */}
+          <section className="lg:col-span-5 flex flex-col gap-4">
+            <div className="bg-[#464545] border border-white/10 p-6 h-full flex flex-col relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-white/5 to-transparent opacity-50 transform rotate-45 translate-x-1/2 -translate-y-1/2"></div>
+              <div className="flex items-center gap-2 mb-6 relative z-10">
+                <Layers className="text-primary w-5 h-5" />
+                <h3 className="font-heading text-lg font-bold text-on-surface">System Architecture Recommendation</h3>
               </div>
-
-              {/* Quick Inspiration Templates */}
-              <div className="space-y-3">
-                <div className="flex items-center gap-2 text-xs font-semibold text-white/60">
-                  <Lightbulb className="h-3.5 w-3.5 text-amber-400" />
-                  <span>Or select an inspiration template:</span>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {EXAMPLES.map((ex) => {
-                    const isSelected = name === ex.title;
-                    return (
-                      <button
-                        key={ex.title}
-                        type="button"
-                        onClick={() => {
-                          setIdea(ex.idea);
-                          setStack(ex.stack);
-                          setName(ex.title);
-                        }}
-                        className={cn(
-                          'flex flex-col items-start p-4 rounded-xl border text-left transition-all duration-200 backdrop-blur-md',
-                          isSelected
-                            ? 'border-primary/80 bg-primary/15 shadow-[0_0_20px_rgba(99,102,241,0.2)] ring-1 ring-primary/60'
-                            : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10 active:scale-[0.99]'
-                        )}
-                      >
-                        <span className="text-xs font-bold text-white">{ex.title}</span>
-                        <span className="mt-1 text-[11px] text-white/50 line-clamp-1">{ex.idea}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Project Name (Optional) */}
-              <div className="space-y-2.5">
-                <label htmlFor="project-name" className="text-xs font-bold uppercase tracking-wider text-white/70">
-                  Project Name <span className="text-xs font-normal text-white/40">(optional — auto-derived from vision)</span>
-                </label>
-                <input
-                  id="project-name"
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder={previewName}
-                  className="w-full h-11 rounded-xl border border-white/10 bg-white/5 px-4 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/20 backdrop-blur-md"
-                />
-              </div>
-
-              {/* Delivery Tech Stack Selection */}
-              <div className="space-y-3 pt-2">
-                <div className="flex items-center gap-2">
-                  <Layers className="h-4 w-4 text-primary" />
-                  <p className="text-xs font-bold uppercase tracking-wider text-white/70">
-                    Architecture & Target Stack
-                  </p>
-                </div>
-                <StackSelect value={stack} onChange={setStack} />
-              </div>
-
-              {/* Live Team Assignment Summary Card */}
-              {idea.trim().length >= 8 && (
-                <AnimatePresence>
-                  <MotionDiv
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="flex items-center gap-4 rounded-2xl border border-primary/30 bg-primary/10 p-4 text-xs shadow-inner"
-                  >
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/20 text-primary border border-primary/40">
-                      <Bot className="h-5 w-5" />
+              <div className="flex-1 space-y-4 relative z-10">
+                {/* Stack Items */}
+                <div className="border border-white/10 bg-surface-container-highest p-4 flex items-center justify-between group hover:border-primary transition-colors cursor-pointer">
+                  <div className="flex items-center gap-4">
+                    <div className="w-8 h-8 bg-surface-container flex items-center justify-center border border-white/10 font-mono text-sm">
+                      Re
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="font-bold text-white">{previewName}</p>
-                      <p className="mt-0.5 text-white/60">
-                        5 Specialists Assigned · Delivery Engine: <span className="font-bold text-primary uppercase">{stack}</span>
-                      </p>
+                    <div>
+                      <p className="font-mono text-xs uppercase tracking-wider text-on-surface">React / Next.js</p>
+                      <p className="font-mono text-[10px] text-on-surface-variant mt-1">Frontend Framework</p>
                     </div>
-                    <StatusBadge status="HEALTHY" />
-                  </MotionDiv>
-                </AnimatePresence>
-              )}
-
-              {/* Primary Action Button */}
-              <div className="pt-4">
-                <NeonButton
-                  type="submit"
-                  variant="primary"
-                  isLoading={loading}
-                  disabled={!canSubmit || loading}
-                  className="w-full h-13 text-sm font-bold shadow-xl flex items-center justify-center gap-2"
+                  </div>
+                  <CheckCircle2 className="w-4 h-4 text-primary" />
+                </div>
+                <div className="border border-white/10 bg-surface-container-highest p-4 flex items-center justify-between group hover:border-primary transition-colors cursor-pointer">
+                  <div className="flex items-center gap-4">
+                    <div className="w-8 h-8 bg-surface-container flex items-center justify-center border border-white/10 font-mono text-sm">
+                      No
+                    </div>
+                    <div>
+                      <p className="font-mono text-xs uppercase tracking-wider text-on-surface">Node.js / Express</p>
+                      <p className="font-mono text-[10px] text-on-surface-variant mt-1">Runtime Environment</p>
+                    </div>
+                  </div>
+                  <CheckCircle2 className="w-4 h-4 text-primary" />
+                </div>
+                <div className="border border-white/10 bg-surface-container-highest p-4 flex items-center justify-between group hover:border-primary transition-colors cursor-pointer">
+                  <div className="flex items-center gap-4">
+                    <div className="w-8 h-8 bg-surface-container flex items-center justify-center border border-white/10 font-mono text-sm">
+                      Pr
+                    </div>
+                    <div>
+                      <p className="font-mono text-xs uppercase tracking-wider text-on-surface">Prisma ORM</p>
+                      <p className="font-mono text-[10px] text-on-surface-variant mt-1">Database Client</p>
+                    </div>
+                  </div>
+                  <CheckCircle2 className="w-4 h-4 text-primary" />
+                </div>
+                <div className="border border-white/10 bg-surface-container-highest p-4 flex items-center justify-between group hover:border-primary transition-colors cursor-pointer">
+                  <div className="flex items-center gap-4">
+                    <div className="w-8 h-8 bg-surface-container flex items-center justify-center border border-white/10 font-mono text-sm">
+                      Pg
+                    </div>
+                    <div>
+                      <p className="font-mono text-xs uppercase tracking-wider text-on-surface">PostgreSQL</p>
+                      <p className="font-mono text-[10px] text-on-surface-variant mt-1">Relational Database</p>
+                    </div>
+                  </div>
+                  <CheckCircle2 className="w-4 h-4 text-primary" />
+                </div>
+              </div>
+              <div className="mt-6 pt-4 border-t border-white/10 relative z-10">
+                <button
+                  type="button"
+                  className="w-full bg-transparent border border-white/20 hover:border-primary text-on-surface hover:text-primary py-3 font-mono text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-2"
                 >
-                  {loading ? (
-                    'Initializing AI Company & Generating Specs…'
-                  ) : (
-                    <>
-                      <span>Launch Project & Assemble AI Team</span>
-                      <ArrowRight className="w-4 h-4 ml-1" />
-                    </>
-                  )}
-                </NeonButton>
+                  Customize Stack
+                </button>
               </div>
-            </GlassCard>
-          </form>
-        </MotionDiv>
-      )}
-    </MotionDiv>
+            </div>
+          </section>
+        </div>
+
+        {/* SECTION 4: AGENT WORKFORCE ASSIGNMENT */}
+        <section className="mb-12 border-t border-white/10 pt-8">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="font-heading text-lg font-bold text-on-surface">Agent Workforce Assignment</h3>
+            <span className="font-mono text-xs text-on-surface-variant bg-surface-container-highest px-3 py-1 border border-white/10">
+              3 Agents Assigned
+            </span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Agent 1 */}
+            <div className="border border-white/10 p-5 bg-surface hover:bg-surface-container-low transition-colors group relative">
+              <div className="absolute top-4 right-4 w-2 h-2 bg-primary"></div>
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-12 h-12 bg-surface-container border border-white/10 flex items-center justify-center overflow-hidden font-bold text-primary font-heading">
+                  SP
+                </div>
+                <div>
+                  <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-on-surface">Sarah</h4>
+                  <p className="font-mono text-[10px] text-on-surface-variant mt-1">Project Manager</p>
+                </div>
+              </div>
+              <div className="font-mono text-xs text-on-surface-variant border-t border-white/10 pt-3 flex justify-between">
+                <span>Status: <span className="text-primary font-bold">Ready</span></span>
+                <Bot className="w-4 h-4 text-primary" />
+              </div>
+            </div>
+
+            {/* Agent 2 */}
+            <div className="border border-white/10 p-5 bg-surface hover:bg-surface-container-low transition-colors group relative">
+              <div className="absolute top-4 right-4 w-2 h-2 bg-primary animate-pulse"></div>
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-12 h-12 bg-surface-container border border-white/10 flex items-center justify-center overflow-hidden font-bold text-primary font-heading">
+                  MA
+                </div>
+                <div>
+                  <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-on-surface">Marcus</h4>
+                  <p className="font-mono text-[10px] text-on-surface-variant mt-1">System Architect</p>
+                </div>
+              </div>
+              <div className="font-mono text-xs text-on-surface-variant border-t border-white/10 pt-3 flex justify-between">
+                <span>Status: <span className="text-primary font-bold">Analyzing</span></span>
+                <Layers className="w-4 h-4 text-primary" />
+              </div>
+            </div>
+
+            {/* Agent 3 */}
+            <div className="border border-white/10 p-5 bg-surface hover:bg-surface-container-low transition-colors group relative">
+              <div className="absolute top-4 right-4 w-2 h-2 bg-white/10"></div>
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-12 h-12 bg-surface-container border border-white/10 flex items-center justify-center overflow-hidden font-bold text-primary font-heading">
+                  AD
+                </div>
+                <div>
+                  <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-on-surface">Alex</h4>
+                  <p className="font-mono text-[10px] text-on-surface-variant mt-1">Full Stack Developer</p>
+                </div>
+              </div>
+              <div className="font-mono text-xs text-on-surface-variant border-t border-white/10 pt-3 flex justify-between">
+                <span>Status: <span className="text-on-surface-variant">Standby</span></span>
+                <Terminal className="w-4 h-4 text-on-surface-variant" />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* SECTION 5: PRIMARY SUBMIT FOOTER */}
+        <footer className="fixed bottom-0 left-0 md:left-64 right-0 bg-background border-t border-white/10 p-6 z-50 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <div className="text-on-surface-variant font-mono text-xs">
+            Estimated build configuration time: <span className="text-on-surface font-bold">~2 mins</span>
+          </div>
+          <button
+            type="submit"
+            disabled={loading || !idea.trim()}
+            className="w-full sm:w-auto bg-primary text-background font-mono text-xs font-bold px-8 py-4 hover:bg-transparent hover:text-primary border border-primary transition-all flex items-center justify-center gap-2 group uppercase tracking-wider"
+          >
+            {loading ? 'Assembling AI Team...' : 'Confirm Stack & Assemble Team'}
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </button>
+        </footer>
+      </form>
+    </div>
   );
 }

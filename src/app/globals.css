@@ -153,4 +153,43 @@ body {
     box-shadow: 8px 8px 0px 0px rgba(0, 172, 172, 0.3);
     transform: translate(-2px, -2px);
   }
+
+  .grid-overlay {
+    background-size: 40px 40px;
+    background-image: linear-gradient(to right, rgba(223, 222, 220, 0.05) 1px, transparent 1px),
+                      linear-gradient(to bottom, rgba(223, 222, 220, 0.05) 1px, transparent 1px);
+  }
+  
+  .log-stream {
+    animation: scrollUp 20s linear infinite;
+  }
+
+  @keyframes scrollUp {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-50%); }
+  }
+
+  .animate-ticker {
+    animation: ticker 30s linear infinite;
+  }
+
+  @keyframes ticker {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+  }
+
+  .brutal-border {
+    border: 1px solid rgba(223, 222, 220, 0.1);
+  }
+  .brutal-offset-container {
+    position: relative;
+  }
+  .brutal-offset-bg { 
+    position: absolute; 
+    inset: 0; 
+    background-color: #2a2a2a; 
+    transform: translate(6px, 6px); 
+    z-index: -1; 
+    border: 1px solid rgba(223, 222, 220, 0.1);
+  }
 }

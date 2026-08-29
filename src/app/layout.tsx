@@ -1,23 +1,23 @@
 import type { Metadata } from 'next';
-import { Fraunces, Manrope, JetBrains_Mono } from 'next/font/google';
+import { Outfit, Inter, JetBrains_Mono } from 'next/font/google';
 import { Toaster } from 'sonner';
 import { Providers } from '@/components/providers/providers';
 import { APP_NAME } from '@/config/constants';
 import './globals.css';
 
-const manrope = Manrope({
+const inter = Inter({
   subsets: ['latin'],
   variable: '--font-sans',
   display: 'swap',
-  fallback: ['ui-sans-serif', 'system-ui', 'Segoe UI', 'sans-serif'],
+  fallback: ['ui-sans-serif', 'system-ui', 'sans-serif'],
   adjustFontFallback: true,
 });
 
-const fraunces = Fraunces({
+const outfit = Outfit({
   subsets: ['latin'],
   variable: '--font-heading',
   display: 'swap',
-  fallback: ['ui-serif', 'Georgia', 'serif'],
+  fallback: ['ui-sans-serif', 'system-ui', 'sans-serif'],
   adjustFontFallback: true,
 });
 
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${manrope.variable} ${fraunces.variable} ${jetbrains.variable} font-sans antialiased`}>
+      <body className={`${inter.variable} ${outfit.variable} ${jetbrains.variable} font-sans antialiased`}>
         <Providers>
           {children}
           <Toaster

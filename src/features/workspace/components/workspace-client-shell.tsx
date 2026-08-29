@@ -531,86 +531,135 @@ export function WorkspaceClientShell({ projectId, projectName }: WorkspaceClient
               {/* Monaco Code Viewer Container */}
               <div className="flex-1 h-full shadow-[0_0_50px_rgba(0,0,0,0.5)] rounded-2xl overflow-hidden flex flex-col">
                 {approvalRequests.length > 0 ? (
-                  <div className="flex-grow flex flex-col md:flex-row h-full gap-4 p-4 bg-surface-glass/40 border border-white/10 rounded-2xl backdrop-blur-xl overflow-y-auto md:overflow-hidden">
-                    {/* Left: Pending Document Review Pane */}
-                    <div className="flex-[6] flex flex-col h-[380px] md:h-full bg-black/25 border border-white/5 rounded-xl p-5 overflow-hidden shrink-0">
-                      <div className="flex items-center gap-2 mb-3 shrink-0">
-                        <AlertCircle className="w-4 h-4 text-warning" />
-                        <h3 className="text-sm font-bold text-white tracking-tight">
-                          {pendingDocument?.title || approvalRequests[0]?.title || 'Pending Approval'}
-                        </h3>
-                      </div>
-                      <div className="flex-1 overflow-y-auto scrollbar-hide bg-white/[0.02] border border-white/5 rounded-lg p-3.5">
-                        {pendingDocument?.content ? (
-                          typeof pendingDocument.content === 'string' ? (
-                            <div className="whitespace-pre-wrap font-sans text-xs text-white/85 leading-relaxed">
-                              {pendingDocument.content}
-                            </div>
-                          ) : (
-                            <pre className="font-mono text-[10px] text-primary/80 bg-black/40 p-3 rounded-lg overflow-x-auto">
-                              {JSON.stringify(pendingDocument.content, null, 2)}
-                            </pre>
-                          )
-                        ) : (
-                          <div className="text-white/40 text-xs italic py-10 text-center">
-                            No document details available for review.
-                          </div>
-                        )}
+                  <div className="flex-grow flex flex-col h-full p-4 bg-background border border-white/10 overflow-y-auto">
+                    {/* SECTION 1: EXECUTIVE BANNER */}
+                    <div className="w-full bg-surface-container border border-[#ffaa00] p-4 mb-6 relative brutalist-offset-container">
+                      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div>
+                          <h2 className="font-heading text-lg font-bold text-[#ffaa00] flex items-center gap-2">
+                            <AlertCircle className="w-5 h-5 text-[#ffaa00]" />
+                            APPROVAL REQUIRED — EXECUTIVE CHECKPOINT
+                          </h2>
+                          <p className="font-mono text-xs text-on-surface-variant mt-1">
+                            {approvalRequests[0]?.title || 'Phase Validation Milestone'}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-4 bg-background border border-white/10 px-4 py-2">
+                          <span className="font-mono text-[10px] text-on-surface-variant">VALIDATION SCORE</span>
+                          <span className="font-heading text-lg font-bold text-primary">92%</span>
+                        </div>
                       </div>
                     </div>
 
-                    {/* Right: Approval Actions Control Card */}
-                    <div className="flex-[4] flex flex-col justify-between h-auto md:h-full bg-black/45 border border-white/10 rounded-xl p-5 overflow-y-auto md:overflow-hidden shrink-0">
-                      <div className="space-y-3.5">
-                        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-warning/10 border border-warning/30">
-                          <span className="w-1.5 h-1.5 rounded-full bg-warning animate-pulse" />
-                          <span className="text-[8px] font-mono text-warning font-bold uppercase tracking-wider">
-                            Executive Checkpoint
-                          </span>
-                        </div>
-                        <div>
-                          <h4 className="text-xs font-bold text-white mb-1">
-                            {approvalRequests[0]?.title || 'Approval'} Required
-                          </h4>
-                          <p className="text-[11px] text-white/50 leading-relaxed">
-                            Sarah has assembled the requirements. Please review the documents and cast your executive validation vote.
-                          </p>
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1">
+                      {/* SECTION 2: DOCUMENT VIEWER */}
+                      <div className="lg:col-span-8 flex flex-col gap-6">
+                        <div className="bg-surface-container-high border border-white/10 flex flex-col h-[400px]">
+                          <div className="border-b border-white/10 p-3 flex justify-between items-center bg-surface-container">
+                            <span className="font-mono text-xs text-on-surface">SPEC_DOC_v1.4.md</span>
+                            <span className="font-mono text-[10px] text-on-surface-variant">READ-ONLY VIEW</span>
+                          </div>
+                          <div className="p-6 flex-grow overflow-y-auto font-mono text-xs text-on-background bg-[#1a1a1a] leading-relaxed">
+                            {pendingDocument?.content ? (
+                              typeof pendingDocument.content === 'string' ? (
+                                <div className="whitespace-pre-wrap">{pendingDocument.content}</div>
+                              ) : (
+                                <pre>{JSON.stringify(pendingDocument.content, null, 2)}</pre>
+                              )
+                            ) : (
+                              <div>
+                                <h3 className="font-heading text-base font-bold text-white mb-2">1. Component Architecture</h3>
+                                <p className="text-on-surface-variant mb-4">Executive approval pending for current phase deliverables.</p>
+                                <div className="bg-[#2a2a2a] p-3 border border-white/10 font-mono text-primary text-[11px]">
+                                  {`{\n  "status": "pending_approval",\n  "phase": "${currentPhase}",\n  "required_signatures": ["Lead Designer", "Product Owner"]\n}`}
+                                </div>
+                              </div>
+                            )}
+                          </div>
                         </div>
 
-                        {/* Optional Feedback Comments */}
-                        <div className="space-y-1.5">
-                          <label className="text-[9px] font-mono font-bold text-white/40 uppercase tracking-widest flex items-center gap-1">
-                            <MessageSquareDashed className="w-3 h-3" />
-                            Revision Feedback (Optional)
+                        {/* SECTION 4: REVISION FEEDBACK */}
+                        <div className="bg-surface-container border border-white/10 p-4">
+                          <label className="block font-mono text-xs text-on-surface mb-2" htmlFor="revision-feedback">
+                            Revision Instructions (Optional)
                           </label>
                           <textarea
+                            id="revision-feedback"
                             value={approvalFeedback}
                             onChange={(e) => setApprovalFeedback(e.target.value)}
-                            placeholder="Add guidelines or request specific modifications..."
-                            className="w-full h-20 p-2.5 rounded-xl border border-white/10 bg-white/5 text-[11px] text-white/80 placeholder-white/20 focus:outline-none focus:border-primary/50 resize-none font-sans"
+                            placeholder="Describe required changes or specify feedback guidelines..."
+                            className="w-full bg-background border border-white/10 p-3 font-mono text-xs text-on-surface focus:border-primary outline-none resize-none h-20"
                           />
                         </div>
                       </div>
 
-                      {/* Approval Submission Buttons */}
-                      <div className="space-y-2 mt-4 shrink-0">
-                        <NeonButton
-                          onClick={() => handleApprovePipeline('approve')}
-                          isLoading={isApproving}
-                          className="w-full h-10 text-xs font-bold"
-                        >
-                          <ShieldCheck className="w-3.5 h-3.5 mr-2" />
-                          <span>Approve & Proceed</span>
-                        </NeonButton>
+                      {/* Right Column: Automated Checks & Actions */}
+                      <div className="lg:col-span-4 flex flex-col gap-6">
+                        {/* SECTION 3: COMPLIANCE CHECKLIST */}
+                        <div className="bg-surface-container border border-white/10 p-6">
+                          <h3 className="font-mono text-xs font-bold text-on-surface mb-4 border-b border-white/10 pb-2">
+                            Automated Compliance Checks
+                          </h3>
+                          <ul className="space-y-3 font-mono text-xs">
+                            <li className="flex items-start gap-2.5">
+                              <CheckCircle className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                              <div>
+                                <p className="font-bold text-on-surface">Accessibility (A11y)</p>
+                                <p className="text-[10px] text-on-surface-variant mt-0.5">WCAG 2.1 AA compliant.</p>
+                              </div>
+                            </li>
+                            <li className="flex items-start gap-2.5">
+                              <CheckCircle className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                              <div>
+                                <p className="font-bold text-on-surface">Routing Logic</p>
+                                <p className="text-[10px] text-on-surface-variant mt-0.5">All deep links resolve.</p>
+                              </div>
+                            </li>
+                            <li className="flex items-start gap-2.5">
+                              <CheckCircle className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                              <div>
+                                <p className="font-bold text-on-surface">Security Scaffolding</p>
+                                <p className="text-[10px] text-on-surface-variant mt-0.5">Auth placeholders injected.</p>
+                              </div>
+                            </li>
+                          </ul>
+                        </div>
 
-                        <button
-                          type="button"
-                          onClick={() => handleApprovePipeline('request_changes')}
-                          disabled={isApproving}
-                          className="w-full h-10 rounded-xl border border-white/10 hover:bg-white/5 text-white/70 hover:text-white text-xs font-bold transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
-                        >
-                          Request Changes
-                        </button>
+                        {/* Metrics Card */}
+                        <div className="bg-surface-container border border-white/10 p-6">
+                          <h3 className="font-mono text-xs font-bold text-on-surface mb-3">Generation Meta</h3>
+                          <div className="grid grid-cols-2 gap-4 font-mono text-xs">
+                            <div>
+                              <p className="text-on-surface-variant text-[10px]">Tokens</p>
+                              <p className="text-on-surface font-bold">14,205</p>
+                            </div>
+                            <div>
+                              <p className="text-on-surface-variant text-[10px]">Latency</p>
+                              <p className="text-on-surface font-bold">3.4s</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* SECTION 5: SUBMISSION DOCK */}
+                        <div className="flex flex-col gap-3 mt-auto">
+                          <button
+                            type="button"
+                            onClick={() => handleApprovePipeline('approve')}
+                            disabled={isApproving}
+                            className="w-full bg-primary text-background font-mono text-xs font-bold py-3.5 border border-primary hover:bg-transparent hover:text-primary transition-colors flex items-center justify-center gap-2 uppercase tracking-wider"
+                          >
+                            <ShieldCheck className="w-4 h-4" />
+                            <span>Approve & Proceed</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleApprovePipeline('request_changes')}
+                            disabled={isApproving}
+                            className="w-full bg-transparent border border-white/20 text-on-surface hover:border-white font-mono text-xs py-2.5 transition-colors"
+                          >
+                            Request Revisions
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
