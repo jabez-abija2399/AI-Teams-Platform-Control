@@ -51,12 +51,12 @@ export function CodeViewer({
         { token: 'type', foreground: 'f59e0b' },     // Amber
       ],
       colors: {
-        'editor.background': '#05050A',
+        'editor.background': '#0A0D14',
         'editor.foreground': '#f8fafc',
         'editorLineNumber.foreground': '#334155',
         'editor.lineHighlightBackground': '#ffffff05',
-        'editor.selectionBackground': '#6366f140',
-        'editorCursor.foreground': '#06b6d4',
+        'editor.selectionBackground': '#00F2FE30',
+        'editorCursor.foreground': '#00F2FE',
       },
     });
 

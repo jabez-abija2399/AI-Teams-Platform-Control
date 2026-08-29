@@ -15,6 +15,7 @@ import {
   Settings,
   CheckCircle2,
   Lock,
+  Sparkles,
 } from 'lucide-react';
 import { ROUTES } from '@/config/constants';
 import { AiCredentialsForm } from '@/features/settings/components/ai-credentials-form';
@@ -109,8 +110,10 @@ export function ProjectCreationForm() {
   if (!hasApiKey) {
     return (
       <div className="space-y-6 max-w-4xl mx-auto py-8">
-        <div className="border border-warning bg-warning/5 p-6 brutalist-offset-content">
-          <p className="font-mono text-sm font-bold text-white uppercase tracking-wider">Step 1 — Connect AI Provider</p>
+        <div className="border border-warning bg-warning/5 p-6 glass-card">
+          <p className="font-mono text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+            <Lock className="w-4 h-4 text-warning" /> Step 1 — Connect AI Provider Gateway
+          </p>
           <p className="mt-2 text-xs leading-relaxed text-on-surface-variant">
             A key is required to bootstrap your workspace (Gemini Free works out of the box). Keys are stored locally and encrypted.
           </p>
@@ -131,15 +134,15 @@ export function ProjectCreationForm() {
       {/* SECTION 1: BREADCRUMB PROGRESS BAR */}
       <section className="mb-12">
         <nav aria-label="Progress">
-          <ol className="flex items-center border border-white/10 p-4 bg-surface-container-low" role="list">
+          <ol className="flex items-center border border-white/10 p-4 bg-surface/90 glass-card" role="list">
             <li className="relative pr-8 sm:pr-20">
               <div aria-hidden="true" className="absolute inset-0 flex items-center">
-                <div className="h-0.5 w-full bg-white/15"></div>
+                <div className="h-0.5 w-full bg-primary/40"></div>
               </div>
-              <div className="relative flex h-8 w-8 items-center justify-center bg-surface-container-highest border border-white/10 text-primary">
+              <div className="relative flex h-8 w-8 items-center justify-center bg-primary text-background border border-primary font-bold">
                 <Check className="w-4 h-4" />
               </div>
-              <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 font-mono text-[10px] uppercase tracking-wider text-on-surface-variant whitespace-nowrap hidden sm:block">
+              <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 font-mono text-[10px] uppercase tracking-wider text-primary font-bold whitespace-nowrap hidden sm:block">
                 Define Concept
               </span>
             </li>
@@ -147,10 +150,10 @@ export function ProjectCreationForm() {
               <div aria-hidden="true" className="absolute inset-0 flex items-center">
                 <div className="h-0.5 w-full bg-white/10"></div>
               </div>
-              <div className="relative flex h-8 w-8 items-center justify-center bg-primary text-background border border-primary font-bold font-mono text-xs">
+              <div className="relative flex h-8 w-8 items-center justify-center bg-primary text-background border border-primary font-bold font-mono text-xs glow-cyan">
                 2
               </div>
-              <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 font-mono text-[10px] uppercase tracking-wider text-primary whitespace-nowrap hidden sm:block">
+              <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 font-mono text-[10px] uppercase tracking-wider text-primary font-bold whitespace-nowrap hidden sm:block">
                 Generate Stack
               </span>
             </li>
@@ -158,7 +161,7 @@ export function ProjectCreationForm() {
               <div aria-hidden="true" className="absolute inset-0 flex items-center">
                 <div className="h-0.5 w-full bg-white/10"></div>
               </div>
-              <div className="relative flex h-8 w-8 items-center justify-center bg-surface-container border border-white/10 text-on-surface-variant font-bold font-mono text-xs">
+              <div className="relative flex h-8 w-8 items-center justify-center bg-surface border border-white/10 text-on-surface-variant font-bold font-mono text-xs">
                 3
               </div>
               <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 font-mono text-[10px] uppercase tracking-wider text-on-surface-variant whitespace-nowrap hidden sm:block">
@@ -166,7 +169,7 @@ export function ProjectCreationForm() {
               </span>
             </li>
             <li className="relative">
-              <div className="relative flex h-8 w-8 items-center justify-center bg-surface-container border border-white/10 text-on-surface-variant font-bold font-mono text-xs">
+              <div className="relative flex h-8 w-8 items-center justify-center bg-surface border border-white/10 text-on-surface-variant font-bold font-mono text-xs">
                 4
               </div>
               <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 font-mono text-[10px] uppercase tracking-wider text-on-surface-variant whitespace-nowrap hidden sm:block">
@@ -184,11 +187,11 @@ export function ProjectCreationForm() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* SECTION 2: CONCEPT DEFINITION PANEL */}
           <section className="lg:col-span-7 flex flex-col gap-4">
-            <div className="border border-white/10 p-6 bg-surface relative group">
-              <label className="block font-mono text-xs uppercase tracking-wider text-on-surface mb-4" htmlFor="concept-input">
+            <div className="border border-white/10 p-6 bg-surface glass-card relative group offset-shadow">
+              <label className="block font-mono text-xs uppercase tracking-wider text-white font-bold mb-4" htmlFor="concept-input">
                 Describe your app idea
               </label>
               <textarea
@@ -197,15 +200,16 @@ export function ProjectCreationForm() {
                 onChange={(e) => setIdea(e.target.value)}
                 placeholder="e.g., A multi-tenant SaaS platform for managing autonomous delivery drones. Needs real-time tracking, a manager dashboard, and API access for third-party logistics integrations..."
                 rows={12}
-                className="w-full bg-transparent border-none outline-none font-mono text-sm text-on-background placeholder:text-on-surface-variant/40 resize-none focus:ring-0 p-0 leading-relaxed"
+                className="w-full bg-background/80 border border-white/10 p-4 font-mono text-xs text-white placeholder:text-on-surface-variant/40 resize-none focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary leading-relaxed"
                 required
               />
               <div className="mt-4 flex justify-between items-center border-t border-white/10 pt-4">
                 <span className="font-mono text-xs text-on-surface-variant">Markdown Supported</span>
                 <button
                   type="button"
-                  className="bg-surface-container-highest border border-white/10 px-4 py-2 font-mono text-xs text-on-surface hover:bg-surface-container-high hover:text-primary transition-colors"
+                  className="bg-surface-container-high border border-white/10 px-4 py-2 font-mono text-xs text-white hover:border-primary hover:text-primary transition-colors font-bold uppercase tracking-wider flex items-center gap-1.5"
                 >
+                  <Sparkles className="w-3.5 h-3.5 text-primary" />
                   Analyze Concept
                 </button>
               </div>
@@ -214,58 +218,57 @@ export function ProjectCreationForm() {
 
           {/* SECTION 3: ARCHITECT RECOMMENDED STACK CARD */}
           <section className="lg:col-span-5 flex flex-col gap-4">
-            <div className="bg-[#464545] border border-white/10 p-6 h-full flex flex-col relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-white/5 to-transparent opacity-50 transform rotate-45 translate-x-1/2 -translate-y-1/2"></div>
+            <div className="bg-surface border border-white/10 p-6 h-full flex flex-col relative overflow-hidden glass-card offset-shadow">
               <div className="flex items-center gap-2 mb-6 relative z-10">
                 <Layers className="text-primary w-5 h-5" />
-                <h3 className="font-heading text-lg font-bold text-on-surface">System Architecture Recommendation</h3>
+                <h3 className="font-heading text-lg font-bold text-white">System Architecture Recommendation</h3>
               </div>
               <div className="flex-1 space-y-4 relative z-10">
                 {/* Stack Items */}
-                <div className="border border-white/10 bg-surface-container-highest p-4 flex items-center justify-between group hover:border-primary transition-colors cursor-pointer">
+                <div className="border border-white/10 bg-surface-container-high p-4 flex items-center justify-between group hover:border-primary transition-colors cursor-pointer">
                   <div className="flex items-center gap-4">
-                    <div className="w-8 h-8 bg-surface-container flex items-center justify-center border border-white/10 font-mono text-sm">
+                    <div className="w-8 h-8 bg-surface flex items-center justify-center border border-primary/40 font-mono text-xs font-bold text-primary">
                       Re
                     </div>
                     <div>
-                      <p className="font-mono text-xs uppercase tracking-wider text-on-surface">React / Next.js</p>
-                      <p className="font-mono text-[10px] text-on-surface-variant mt-1">Frontend Framework</p>
+                      <p className="font-mono text-xs font-bold uppercase tracking-wider text-white">React / Next.js</p>
+                      <p className="font-mono text-[10px] text-on-surface-variant mt-0.5">Frontend Framework</p>
                     </div>
                   </div>
                   <CheckCircle2 className="w-4 h-4 text-primary" />
                 </div>
-                <div className="border border-white/10 bg-surface-container-highest p-4 flex items-center justify-between group hover:border-primary transition-colors cursor-pointer">
+                <div className="border border-white/10 bg-surface-container-high p-4 flex items-center justify-between group hover:border-primary transition-colors cursor-pointer">
                   <div className="flex items-center gap-4">
-                    <div className="w-8 h-8 bg-surface-container flex items-center justify-center border border-white/10 font-mono text-sm">
+                    <div className="w-8 h-8 bg-surface flex items-center justify-center border border-primary/40 font-mono text-xs font-bold text-primary">
                       No
                     </div>
                     <div>
-                      <p className="font-mono text-xs uppercase tracking-wider text-on-surface">Node.js / Express</p>
-                      <p className="font-mono text-[10px] text-on-surface-variant mt-1">Runtime Environment</p>
+                      <p className="font-mono text-xs font-bold uppercase tracking-wider text-white">Node.js / Express</p>
+                      <p className="font-mono text-[10px] text-on-surface-variant mt-0.5">Runtime Environment</p>
                     </div>
                   </div>
                   <CheckCircle2 className="w-4 h-4 text-primary" />
                 </div>
-                <div className="border border-white/10 bg-surface-container-highest p-4 flex items-center justify-between group hover:border-primary transition-colors cursor-pointer">
+                <div className="border border-white/10 bg-surface-container-high p-4 flex items-center justify-between group hover:border-primary transition-colors cursor-pointer">
                   <div className="flex items-center gap-4">
-                    <div className="w-8 h-8 bg-surface-container flex items-center justify-center border border-white/10 font-mono text-sm">
+                    <div className="w-8 h-8 bg-surface flex items-center justify-center border border-primary/40 font-mono text-xs font-bold text-primary">
                       Pr
                     </div>
                     <div>
-                      <p className="font-mono text-xs uppercase tracking-wider text-on-surface">Prisma ORM</p>
-                      <p className="font-mono text-[10px] text-on-surface-variant mt-1">Database Client</p>
+                      <p className="font-mono text-xs font-bold uppercase tracking-wider text-white">Prisma ORM</p>
+                      <p className="font-mono text-[10px] text-on-surface-variant mt-0.5">Database Client</p>
                     </div>
                   </div>
                   <CheckCircle2 className="w-4 h-4 text-primary" />
                 </div>
-                <div className="border border-white/10 bg-surface-container-highest p-4 flex items-center justify-between group hover:border-primary transition-colors cursor-pointer">
+                <div className="border border-white/10 bg-surface-container-high p-4 flex items-center justify-between group hover:border-primary transition-colors cursor-pointer">
                   <div className="flex items-center gap-4">
-                    <div className="w-8 h-8 bg-surface-container flex items-center justify-center border border-white/10 font-mono text-sm">
+                    <div className="w-8 h-8 bg-surface flex items-center justify-center border border-primary/40 font-mono text-xs font-bold text-primary">
                       Pg
                     </div>
                     <div>
-                      <p className="font-mono text-xs uppercase tracking-wider text-on-surface">PostgreSQL</p>
-                      <p className="font-mono text-[10px] text-on-surface-variant mt-1">Relational Database</p>
+                      <p className="font-mono text-xs font-bold uppercase tracking-wider text-white">PostgreSQL</p>
+                      <p className="font-mono text-[10px] text-on-surface-variant mt-0.5">Relational Database</p>
                     </div>
                   </div>
                   <CheckCircle2 className="w-4 h-4 text-primary" />
@@ -274,9 +277,9 @@ export function ProjectCreationForm() {
               <div className="mt-6 pt-4 border-t border-white/10 relative z-10">
                 <button
                   type="button"
-                  className="w-full bg-transparent border border-white/20 hover:border-primary text-on-surface hover:text-primary py-3 font-mono text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-2"
+                  className="w-full bg-transparent border border-white/20 hover:border-primary text-white hover:text-primary py-3 font-mono text-xs font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-2"
                 >
-                  Customize Stack
+                  Customize Stack Parameters
                 </button>
               </div>
             </div>
@@ -286,22 +289,22 @@ export function ProjectCreationForm() {
         {/* SECTION 4: AGENT WORKFORCE ASSIGNMENT */}
         <section className="mb-12 border-t border-white/10 pt-8">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="font-heading text-lg font-bold text-on-surface">Agent Workforce Assignment</h3>
-            <span className="font-mono text-xs text-on-surface-variant bg-surface-container-highest px-3 py-1 border border-white/10">
+            <h3 className="font-heading text-lg font-bold text-white">Agent Workforce Assignment</h3>
+            <span className="font-mono text-xs text-primary font-bold bg-primary/10 px-3 py-1 border border-primary/30 rounded-full">
               3 Agents Assigned
             </span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Agent 1 */}
-            <div className="border border-white/10 p-5 bg-surface hover:bg-surface-container-low transition-colors group relative">
-              <div className="absolute top-4 right-4 w-2 h-2 bg-primary"></div>
+            <div className="border border-white/10 p-5 bg-surface hover:border-primary/50 transition-colors group relative glass-card offset-shadow">
+              <div className="absolute top-4 right-4 w-2.5 h-2.5 rounded-full bg-primary animate-pulse"></div>
               <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-surface-container border border-white/10 flex items-center justify-center overflow-hidden font-bold text-primary font-heading">
+                <div className="w-12 h-12 bg-surface-container border border-primary/40 flex items-center justify-center overflow-hidden font-bold text-primary font-heading text-lg">
                   SP
                 </div>
                 <div>
-                  <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-on-surface">Sarah</h4>
-                  <p className="font-mono text-[10px] text-on-surface-variant mt-1">Project Manager</p>
+                  <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-white">Sarah</h4>
+                  <p className="font-mono text-[10px] text-on-surface-variant mt-0.5">Project Manager</p>
                 </div>
               </div>
               <div className="font-mono text-xs text-on-surface-variant border-t border-white/10 pt-3 flex justify-between">
@@ -311,15 +314,15 @@ export function ProjectCreationForm() {
             </div>
 
             {/* Agent 2 */}
-            <div className="border border-white/10 p-5 bg-surface hover:bg-surface-container-low transition-colors group relative">
-              <div className="absolute top-4 right-4 w-2 h-2 bg-primary animate-pulse"></div>
+            <div className="border border-white/10 p-5 bg-surface hover:border-primary/50 transition-colors group relative glass-card offset-shadow">
+              <div className="absolute top-4 right-4 w-2.5 h-2.5 rounded-full bg-primary animate-pulse"></div>
               <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-surface-container border border-white/10 flex items-center justify-center overflow-hidden font-bold text-primary font-heading">
+                <div className="w-12 h-12 bg-surface-container border border-primary/40 flex items-center justify-center overflow-hidden font-bold text-primary font-heading text-lg">
                   MA
                 </div>
                 <div>
-                  <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-on-surface">Marcus</h4>
-                  <p className="font-mono text-[10px] text-on-surface-variant mt-1">System Architect</p>
+                  <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-white">Marcus</h4>
+                  <p className="font-mono text-[10px] text-on-surface-variant mt-0.5">System Architect</p>
                 </div>
               </div>
               <div className="font-mono text-xs text-on-surface-variant border-t border-white/10 pt-3 flex justify-between">
@@ -329,15 +332,15 @@ export function ProjectCreationForm() {
             </div>
 
             {/* Agent 3 */}
-            <div className="border border-white/10 p-5 bg-surface hover:bg-surface-container-low transition-colors group relative">
-              <div className="absolute top-4 right-4 w-2 h-2 bg-white/10"></div>
+            <div className="border border-white/10 p-5 bg-surface hover:border-primary/50 transition-colors group relative glass-card offset-shadow">
+              <div className="absolute top-4 right-4 w-2.5 h-2.5 rounded-full bg-on-surface-variant/40"></div>
               <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-surface-container border border-white/10 flex items-center justify-center overflow-hidden font-bold text-primary font-heading">
+                <div className="w-12 h-12 bg-surface-container border border-white/10 flex items-center justify-center overflow-hidden font-bold text-on-surface-variant font-heading text-lg">
                   AD
                 </div>
                 <div>
-                  <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-on-surface">Alex</h4>
-                  <p className="font-mono text-[10px] text-on-surface-variant mt-1">Full Stack Developer</p>
+                  <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-white">Alex</h4>
+                  <p className="font-mono text-[10px] text-on-surface-variant mt-0.5">Full Stack Developer</p>
                 </div>
               </div>
               <div className="font-mono text-xs text-on-surface-variant border-t border-white/10 pt-3 flex justify-between">
@@ -349,14 +352,14 @@ export function ProjectCreationForm() {
         </section>
 
         {/* SECTION 5: PRIMARY SUBMIT FOOTER */}
-        <footer className="fixed bottom-0 left-0 md:left-64 right-0 bg-background border-t border-white/10 p-6 z-50 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <footer className="fixed bottom-0 left-0 md:left-64 right-0 bg-background/95 backdrop-blur-md border-t border-white/10 p-6 z-50 flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="text-on-surface-variant font-mono text-xs">
-            Estimated build configuration time: <span className="text-on-surface font-bold">~2 mins</span>
+            Estimated build configuration time: <span className="text-primary font-bold">~2 mins</span>
           </div>
           <button
             type="submit"
             disabled={loading || !idea.trim()}
-            className="w-full sm:w-auto bg-primary text-background font-mono text-xs font-bold px-8 py-4 hover:bg-transparent hover:text-primary border border-primary transition-all flex items-center justify-center gap-2 group uppercase tracking-wider"
+            className="w-full sm:w-auto bg-primary text-background font-mono text-xs font-bold px-8 py-4 hover:bg-transparent hover:text-primary border border-primary transition-all flex items-center justify-center gap-2 group uppercase tracking-wider offset-shadow"
           >
             {loading ? 'Assembling AI Team...' : 'Confirm Stack & Assemble Team'}
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

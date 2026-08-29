@@ -18,10 +18,12 @@ import {
   ArrowUpRight,
   Check,
   Settings,
+  Sparkles,
 } from 'lucide-react';
 import { Logo } from '@/components/layout/logo';
 import { cn } from '@/lib/utils';
 import { APP_NAME, ROUTES } from '@/config/constants';
+import { CyberShader } from '@/components/ui/cyber-shader';
 
 const TRUST = ['VERCEL', 'STRIPE', 'SUPABASE'] as const;
 
@@ -57,35 +59,38 @@ const FOOTER_LINKS = [
 ] as const;
 
 /**
- * Sticky Header Navbar with Brutalist styling.
+ * Sticky Header Navbar with Glassmorphism and Glowing Cyan Accents.
  */
 export function LandingHeader() {
   return (
-    <header className="bg-background dark:bg-background text-primary dark:text-primary font-body-md text-body-md font-bold text-on-background tracking-tighter w-full top-0 sticky border-b border-[rgba(223,222,220,0.1)] z-50">
-      <div className="flex justify-between items-center px-gutter h-16 w-full max-w-full">
-        <Link href={ROUTES.home} className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-surface-container border border-white/10 text-primary">
+    <header className="bg-surface-glass backdrop-blur-md text-foreground font-sans w-full top-0 sticky border-b border-white/10 z-50 transition-all">
+      <div className="flex justify-between items-center px-6 md:px-12 h-16 w-full max-w-full">
+        <Link href={ROUTES.home} className="flex items-center gap-3 group">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-surface border border-primary/40 text-primary shadow-[0_0_12px_rgba(0,242,254,0.25)] group-hover:scale-105 transition-transform">
             <Logo size={20} />
           </div>
-          <span className="text-lg font-bold tracking-tight text-foreground">{APP_NAME}</span>
+          <span className="text-xl font-bold tracking-tight text-white group-hover:text-primary transition-colors font-heading">
+            {APP_NAME}
+          </span>
         </Link>
         <nav className="hidden md:flex gap-8">
-          <a className="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors duration-200 px-3 py-2 text-sm" href="#company">
+          <a className="text-on-surface-variant hover:text-primary transition-colors px-3 py-2 text-sm font-medium" href="#company">
             Organization
           </a>
-          <a className="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors duration-200 px-3 py-2 text-sm" href="#workspace">
+          <a className="text-on-surface-variant hover:text-primary transition-colors px-3 py-2 text-sm font-medium" href="#workspace">
             Workspace
           </a>
-          <a className="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors duration-200 px-3 py-2 text-sm" href="#features">
+          <a className="text-on-surface-variant hover:text-primary transition-colors px-3 py-2 text-sm font-medium" href="#features">
             Processes
           </a>
-          <a className="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors duration-200 px-3 py-2 text-sm" href="#pricing">
+          <a className="text-on-surface-variant hover:text-primary transition-colors px-3 py-2 text-sm font-medium" href="#pricing">
             Pricing
           </a>
         </nav>
         <Link href={ROUTES.register}>
-          <button className="bg-[#00ACAC] text-background font-mono text-[11px] font-bold px-6 py-2 border border-[#00ACAC] hover:bg-transparent hover:text-[#00ACAC] transition-colors duration-200 active:translate-y-0.5 transition-transform uppercase tracking-wider">
-            Start Building
+          <button className="bg-primary text-background font-mono text-xs font-bold px-6 py-2.5 border border-primary hover:bg-transparent hover:text-primary transition-all duration-200 uppercase tracking-wider offset-shadow flex items-center gap-2">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Start Building</span>
           </button>
         </Link>
       </div>
@@ -94,59 +99,74 @@ export function LandingHeader() {
 }
 
 /**
- * Asymmetrical Brutalist Hero Section.
+ * Asymmetrical Hero Section with WebGL Shader Canvas.
  */
 export function LandingHero() {
   return (
-    <section className="px-gutter py-24 max-w-7xl mx-auto">
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
-        <div className="md:col-span-5 flex flex-col gap-8">
-          <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-on-surface leading-tight">
-            Deploy an entire autonomous AI company to build your software.
+    <section className="relative px-6 md:px-12 py-24 max-w-7xl mx-auto overflow-hidden">
+      <CyberShader className="absolute inset-0 w-full h-full pointer-events-none opacity-40 -z-10" />
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <div className="lg:col-span-6 flex flex-col gap-8">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/30 text-primary font-mono text-xs font-bold uppercase tracking-wider w-fit">
+            <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+            Autonomous AI Enterprise v2.4
+          </div>
+          <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight">
+            Deploy an entire <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00F2FE] to-[#00ACAC]">autonomous AI company</span> to build your software.
           </h1>
-          <p className="text-base sm:text-lg leading-relaxed text-on-surface-variant">
-            Stop managing freelancers. Orchestrate intelligent agents that design, architect, and code your ideas into reality.
+          <p className="font-sans text-base md:text-lg text-on-surface-variant leading-relaxed max-w-xl">
+            Stop managing freelancers. Orchestrate intelligent agents that design, architect, code, and test your ideas into production reality.
           </p>
-          <div>
+          <div className="flex flex-wrap gap-4 pt-2">
             <Link href={ROUTES.register}>
-              <button className="bg-[#00ACAC] text-background font-mono text-xs font-bold px-8 py-4 border border-[#00ACAC] hover:bg-transparent hover:text-[#00ACAC] transition-all duration-200 offset-shadow uppercase tracking-wider">
-                Launch AI Company
+              <button className="bg-primary text-background font-mono text-xs font-bold px-8 py-4 border border-primary hover:bg-transparent hover:text-primary transition-all duration-200 offset-shadow uppercase tracking-wider flex items-center gap-2">
+                <span>Launch AI Company</span>
+                <ArrowRight className="w-4 h-4" />
               </button>
             </Link>
+            <a href="#demo">
+              <button className="bg-surface-container border border-white/10 hover:border-primary text-white font-mono text-xs font-bold px-8 py-4 transition-all uppercase tracking-wider">
+                Watch Telemetry Demo
+              </button>
+            </a>
           </div>
         </div>
-        <div className="md:col-span-7 relative">
-          <div className="glass-panel p-6 rounded-none relative z-10 offset-shadow bg-surface-container/70 backdrop-blur-md border border-white/10">
-            <div className="flex items-center justify-between border-b border-[rgba(223,222,220,0.1)] pb-4 mb-4">
+
+        <div className="lg:col-span-6 relative">
+          <div className="glass-card p-6 relative z-10 offset-shadow border-glow">
+            <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
               <div className="flex gap-2">
-                <div className="w-3 h-3 rounded-full bg-surface-container-highest"></div>
-                <div className="w-3 h-3 rounded-full bg-surface-container-highest"></div>
-                <div className="w-3 h-3 rounded-full bg-surface-container-highest"></div>
+                <div className="w-3 h-3 rounded-full bg-danger/80" />
+                <div className="w-3 h-3 rounded-full bg-warning/80" />
+                <div className="w-3 h-3 rounded-full bg-success/80" />
               </div>
-              <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">
-                Live Telemetry Workspace
-              </span>
-              <Terminal className="w-4 h-4 text-on-surface-variant" />
+              <span className="font-mono text-xs text-primary font-bold tracking-wider uppercase">Live Telemetry Workspace</span>
+              <Terminal className="w-4 h-4 text-primary" />
             </div>
-            <div className="h-64 flex items-center justify-center border border-[rgba(223,222,220,0.1)] bg-surface-container-low relative overflow-hidden">
-              <div className="absolute inset-0 flex items-center justify-center opacity-50">
+
+            <div className="h-64 flex items-center justify-center border border-white/10 bg-background/90 relative overflow-hidden">
+              {/* Abstract node chart representation */}
+              <div className="absolute inset-0 flex items-center justify-center opacity-70">
                 <svg height="100%" width="100%" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M50 150 Q 150 50, 250 150 T 450 150" fill="transparent" stroke="#00ACAC" strokeWidth="2"></path>
-                  <circle cx="50" cy="150" fill="#00ACAC" r="4"></circle>
-                  <circle cx="250" cy="150" fill="#00ACAC" r="6"></circle>
-                  <circle cx="450" cy="150" fill="#00ACAC" r="4"></circle>
+                  <path d="M50 150 Q 150 50, 250 150 T 450 150" fill="transparent" stroke="#00F2FE" strokeWidth="2" strokeDasharray="6 6" className="animate-pulse" />
+                  <circle cx="50" cy="150" fill="#00F2FE" r="5" />
+                  <circle cx="250" cy="150" fill="#00ACAC" r="7" />
+                  <circle cx="450" cy="150" fill="#00F2FE" r="5" />
                 </svg>
               </div>
-              <div className="text-center z-10">
-                <span className="font-mono text-sm text-primary font-bold block mb-2">Analyzing Architecture...</span>
-                <div className="w-48 h-1 bg-surface-container-highest mx-auto">
-                  <div className="h-full bg-primary w-2/3"></div>
+
+              <div className="text-center z-10 space-y-3">
+                <span className="font-mono text-xs text-primary font-bold block tracking-widest uppercase">
+                  Analyzing Architecture Topology...
+                </span>
+                <div className="w-56 h-1.5 bg-surface-container mx-auto rounded-full overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-[#00F2FE] to-[#00ACAC] w-3/4 animate-pulse" />
                 </div>
               </div>
             </div>
           </div>
-          {/* Decorative background grid */}
-          <div className="absolute -inset-4 border border-[rgba(223,222,220,0.05)] bg-[rgba(255,255,255,0.01)] z-0 -translate-x-4 translate-y-4"></div>
+          {/* Decorative background grid offset */}
+          <div className="absolute -inset-4 border border-primary/20 bg-primary/5 z-0 -translate-x-4 translate-y-4" />
         </div>
       </div>
     </section>
@@ -156,16 +176,16 @@ export function LandingHero() {
 /**
  * Social Proof Section.
  */
-export function LandingCompany() {
+export function LandingSocialProof() {
   return (
-    <section className="border-y border-[rgba(223,222,220,0.1)] py-12 bg-surface-container-lowest">
-      <div className="max-w-7xl mx-auto px-gutter text-center">
-        <p className="font-mono text-[11px] font-bold text-on-surface-variant mb-8 uppercase tracking-widest">
+    <section className="border-y border-white/10 py-12 bg-surface-container-lowest">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 text-center">
+        <p className="font-mono text-xs text-on-surface-variant mb-8 uppercase tracking-widest font-bold">
           Trusted by engineering teams worldwide
         </p>
-        <div className="flex flex-wrap justify-center gap-16 opacity-50 grayscale">
+        <div className="flex flex-wrap justify-center items-center gap-12 md:gap-20 opacity-70">
           {TRUST.map((name) => (
-            <span key={name} className="font-heading text-lg font-bold text-[#A6A7A2]">
+            <span key={name} className="font-heading text-xl md:text-2xl font-bold tracking-widest text-on-surface-variant hover:text-primary transition-colors">
               {name}
             </span>
           ))}
@@ -176,36 +196,42 @@ export function LandingCompany() {
 }
 
 /**
- * AI Roster Departments Section.
+ * AI Roster Departments Grid.
  */
-export function LandingShowcase() {
+export function LandingDepartments() {
   return (
-    <section id="company" className="py-24 px-gutter max-w-7xl mx-auto">
+    <section className="py-24 px-6 md:px-12 max-w-7xl mx-auto">
       <div className="mb-12">
-        <h2 className="font-heading text-3xl font-bold text-on-surface mb-4">AI Roster Departments</h2>
-        <p className="text-sm text-on-surface-variant max-w-2xl">
+        <h2 className="font-heading text-3xl md:text-4xl font-extrabold text-white mb-4">
+          AI Roster Departments
+        </h2>
+        <p className="font-sans text-base text-on-surface-variant max-w-2xl leading-relaxed">
           Specialized autonomous agents ready to tackle your complex engineering challenges.
         </p>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {TEAM.map((member) => {
           const Icon = member.icon;
           return (
-            <div key={member.role} className="border border-[rgba(223,222,220,0.1)] bg-[#464545] p-6 hover:translate-y-[-4px] transition-transform duration-300 relative group">
-              <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div
+              key={member.role}
+              className="border border-white/10 bg-surface p-8 hover:-translate-y-1.5 transition-all duration-300 relative group offset-shadow hover:border-primary/50"
+            >
+              <div className="absolute top-0 right-0 p-6 opacity-0 group-hover:opacity-100 transition-opacity">
                 <ArrowUpRight className="w-5 h-5 text-primary" />
               </div>
               <div className="mb-6 flex justify-between items-start">
-                <div className="w-12 h-12 bg-surface-container-high border border-[rgba(223,222,220,0.1)] flex items-center justify-center">
-                  <Icon className="w-6 h-6 text-on-surface" />
+                <div className="w-14 h-14 bg-surface-container border border-primary/30 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                  <Icon className="w-7 h-7" />
                 </div>
-                <span className="bg-primary text-background font-mono text-[10px] font-bold px-2 py-1 uppercase">
+                <span className="bg-primary text-background font-mono text-[10px] font-bold px-2.5 py-1 uppercase tracking-wider">
                   {member.status}
                 </span>
               </div>
-              <h3 className="font-heading text-lg font-bold text-on-surface mb-1">{member.title}</h3>
-              <p className="font-mono text-xs text-on-surface-variant mb-4">{member.role}</p>
-              <p className="text-sm text-[#c9c6c5] border-t border-[rgba(223,222,220,0.1)] pt-4 mt-4 leading-relaxed">
+              <h3 className="font-heading text-xl font-bold text-white mb-1">{member.title}</h3>
+              <p className="font-mono text-xs text-primary font-bold mb-4">{member.role}</p>
+              <p className="font-sans text-sm text-on-surface-variant border-t border-white/10 pt-4 mt-4 leading-relaxed">
                 {member.focus}
               </p>
             </div>
@@ -217,36 +243,35 @@ export function LandingShowcase() {
 }
 
 /**
- * Pipeline Steps Section.
+ * Interactive Orchestration Pipeline Steps.
  */
-export function LandingFeatures() {
-  const pipeline = ['Ideate', 'Spec', 'Build', 'Test', 'Deploy'];
+export function LandingPipeline() {
   return (
-    <section id="features" className="py-12 border-y border-[rgba(223,222,220,0.1)] bg-surface-container-low overflow-hidden">
-      <div className="max-w-7xl mx-auto px-gutter">
-        <p className="font-mono text-[11px] font-bold text-on-surface-variant mb-8 uppercase tracking-wider">
+    <section className="py-16 border-y border-white/10 bg-surface-container-low overflow-hidden">
+      <div className="max-w-7xl mx-auto px-6 md:px-12">
+        <p className="font-mono text-xs font-bold text-on-surface-variant mb-10 uppercase tracking-widest">
           Orchestration Pipeline
         </p>
-        <div className="flex items-center justify-between relative px-4">
-          {/* Connecting Line */}
-          <div className="absolute top-1/2 left-0 right-0 h-px bg-[rgba(223,222,220,0.1)] -z-10 transform -translate-y-1/2" />
-          
-          {pipeline.map((step, idx) => {
-            const isBuild = step === 'Build';
+        <div className="flex items-center justify-between relative">
+          <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-white/10 -z-10 transform -translate-y-1/2" />
+          {['Ideate', 'Spec', 'Build', 'Test', 'Deploy'].map((stage, idx) => {
+            const isActive = stage === 'Build';
             return (
-              <div key={step} className="flex flex-col items-center gap-2 relative">
-                {isBuild ? (
-                  <div className="w-6 h-6 bg-[#00ACAC] shadow-[0_0_15px_rgba(0,172,172,0.5)] rounded-full flex items-center justify-center">
-                    <div className="w-2 h-2 bg-background rounded-full"></div>
+              <div key={stage} className="flex flex-col items-center gap-3">
+                {isActive ? (
+                  <div className="w-7 h-7 bg-primary glow-cyan rounded-full flex items-center justify-center">
+                    <div className="w-2.5 h-2.5 bg-background rounded-full" />
                   </div>
                 ) : (
-                  <div className="w-4 h-4 bg-surface-container-highest border border-[rgba(223,222,220,0.5)] rounded-full"></div>
+                  <div className="w-5 h-5 bg-surface border border-white/20 rounded-full" />
                 )}
-                <span className={cn(
-                  "font-mono text-[10px]",
-                  isBuild ? "text-primary font-bold text-xs" : "text-on-surface-variant opacity-70"
-                )}>
-                  {step}
+                <span
+                  className={cn(
+                    'font-mono text-xs tracking-wider uppercase font-bold',
+                    isActive ? 'text-primary' : 'text-on-surface-variant/60',
+                  )}
+                >
+                  {stage}
                 </span>
               </div>
             );
@@ -258,30 +283,24 @@ export function LandingFeatures() {
 }
 
 /**
- * Placeholder for compatibility / layout mapping.
+ * Vision Prompt Scope Input CTA Banner.
  */
-export function LandingHowItWorks() {
-  return null;
-}
-
-/**
- * Core CTA Banner with idea description input.
- */
-export function LandingCta() {
+export function LandingCTA() {
   return (
-    <section id="workspace" className="py-24 px-gutter max-w-5xl mx-auto text-center">
-      <div className="bg-[#464545] p-12 md:p-24 border border-[rgba(223,222,220,0.1)] offset-shadow">
-        <h2 className="font-heading text-3xl font-bold text-on-surface mb-8 max-w-2xl mx-auto leading-snug">
+    <section className="py-24 px-6 md:px-12 max-w-5xl mx-auto text-center">
+      <div className="bg-surface p-10 md:p-16 border border-primary/40 offset-shadow relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-2xl pointer-events-none" />
+        <h2 className="font-heading text-3xl md:text-4xl font-extrabold text-white mb-8 max-w-2xl mx-auto leading-tight">
           Stop managing freelancers. Let AI agents write your software.
         </h2>
         <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-xl mx-auto">
           <input
-            className="bg-surface font-mono text-sm text-on-surface border border-[rgba(223,222,220,0.2)] px-4 py-3 flex-grow focus:outline-none focus:border-[#00ACAC] focus:ring-1 focus:ring-[#00ACAC] placeholder-on-surface-variant/40"
-            placeholder="Describe your app idea..."
+            className="bg-background font-mono text-xs text-white border border-white/20 px-4 py-3.5 flex-grow focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary placeholder:text-on-surface-variant/50"
+            placeholder="Describe your app idea (e.g. Drone delivery SaaS...)"
             type="text"
           />
           <Link href={ROUTES.register}>
-            <button className="w-full sm:w-auto bg-[#00ACAC] text-background font-mono text-[11px] font-bold px-8 py-4 border border-[#00ACAC] hover:bg-transparent hover:text-[#00ACAC] transition-colors duration-200 uppercase whitespace-nowrap tracking-wider">
+            <button className="w-full sm:w-auto bg-primary text-background font-mono text-xs font-bold px-8 py-3.5 border border-primary hover:bg-transparent hover:text-primary transition-all duration-200 uppercase whitespace-nowrap tracking-wider">
               Generate Scope
             </button>
           </Link>
@@ -292,24 +311,24 @@ export function LandingCta() {
 }
 
 /**
- * System Footer with Live Status Telemetry.
+ * System Status Footer.
  */
 export function LandingFooter() {
   return (
-    <footer className="bg-background dark:bg-background text-primary dark:text-primary font-mono text-xs text-on-background w-full relative border-t border-[rgba(223,222,220,0.1)]">
-      <div className="flex flex-col md:flex-row justify-between items-center px-gutter py-8 w-full gap-4 max-w-7xl mx-auto">
+    <footer className="bg-background text-on-surface-variant font-mono text-xs border-t border-white/10 w-full relative">
+      <div className="flex flex-col md:flex-row justify-between items-center px-6 md:px-12 py-8 w-full gap-4 max-w-7xl mx-auto">
         <div className="flex items-center gap-4">
-          <span className="text-on-surface-variant font-mono">© {new Date().getFullYear()} HibirDev AI Orchestration</span>
+          <span>© 2026 {APP_NAME} AI Orchestration</span>
         </div>
-        <div className="flex items-center gap-2 border border-[rgba(223,222,220,0.1)] bg-surface-container-low px-4 py-2">
-          <div className="w-2 h-2 rounded-full bg-[#00ACAC] animate-pulse"></div>
-          <span className="font-mono text-[12px] text-on-surface-variant">
-            All AI Agent Clusters Operational - Node Latency: 22ms
+        <div className="flex items-center gap-2 border border-white/10 bg-surface px-4 py-2">
+          <div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse" />
+          <span className="text-[11px] text-on-surface-variant">
+            All AI Clusters Operational — Latency: 18ms
           </span>
         </div>
         <nav className="flex gap-6">
           {FOOTER_LINKS.map((link) => (
-            <a key={link.label} className="text-on-surface-variant hover:text-primary transition-colors font-mono" href={link.href}>
+            <a key={link.label} className="hover:text-primary transition-colors" href={link.href}>
               {link.label}
             </a>
           ))}

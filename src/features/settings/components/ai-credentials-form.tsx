@@ -340,8 +340,8 @@ export function AiCredentialsForm({ embedded = false, onConfigured, className }:
                     className={cn(
                       'p-3.5 rounded-xl border text-left transition-all duration-200 backdrop-blur-md',
                       isSelected
-                        ? 'border-primary/80 bg-primary/20 shadow-[0_0_15px_rgba(99,102,241,0.25)] ring-1 ring-primary/60'
-                        : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10'
+                        ? 'border-primary bg-primary/20 glow-cyan ring-1 ring-primary'
+                        : 'border-white/10 bg-surface-container-high hover:border-primary/50'
                     )}
                   >
                     <div className="flex items-center justify-between mb-1">

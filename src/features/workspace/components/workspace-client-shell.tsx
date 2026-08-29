@@ -347,19 +347,19 @@ export function WorkspaceClientShell({ projectId, projectName }: WorkspaceClient
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
               activeTab === 'ide'
                 ? 'bg-primary text-white shadow-[0_0_12px_rgba(99,102,241,0.4)]'
-                : 'text-white/50 hover:text-white'
+                : 'text-on-surface-variant hover:text-white'
             }`}
           >
             <Code2 className="w-3.5 h-3.5" />
-            Monaco IDE
+            Code IDE
           </button>
           <button
             type="button"
             onClick={() => setActiveTab('chat')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono uppercase font-bold transition-all ${
               activeTab === 'chat'
-                ? 'bg-primary text-white shadow-[0_0_12px_rgba(99,102,241,0.4)]'
-                : 'text-white/50 hover:text-white'
+                ? 'bg-primary text-background glow-cyan font-bold'
+                : 'text-on-surface-variant hover:text-white'
             }`}
           >
             <MessageSquare className="w-3.5 h-3.5" />
@@ -368,10 +368,10 @@ export function WorkspaceClientShell({ projectId, projectName }: WorkspaceClient
           <button
             type="button"
             onClick={() => setActiveTab('debate')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono uppercase font-bold transition-all ${
               activeTab === 'debate'
-                ? 'bg-primary text-white shadow-[0_0_12px_rgba(99,102,241,0.4)]'
-                : 'text-white/50 hover:text-white'
+                ? 'bg-primary text-background glow-cyan font-bold'
+                : 'text-on-surface-variant hover:text-white'
             }`}
           >
             <Users2 className="w-3.5 h-3.5" />
@@ -380,10 +380,10 @@ export function WorkspaceClientShell({ projectId, projectName }: WorkspaceClient
           <button
             type="button"
             onClick={() => setActiveTab('architecture')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono uppercase font-bold transition-all ${
               activeTab === 'architecture'
-                ? 'bg-primary text-white shadow-[0_0_12px_rgba(99,102,241,0.4)]'
-                : 'text-white/50 hover:text-white'
+                ? 'bg-primary text-background glow-cyan font-bold'
+                : 'text-on-surface-variant hover:text-white'
             }`}
           >
             <Network className="w-3.5 h-3.5" />

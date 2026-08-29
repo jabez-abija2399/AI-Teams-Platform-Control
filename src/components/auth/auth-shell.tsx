@@ -1,7 +1,8 @@
 import React from 'react';
 import Link from 'next/link';
 import { Logo } from '@/components/layout/logo';
-import { Shield } from 'lucide-react';
+import { Shield, Sparkles } from 'lucide-react';
+import { CyberShader } from '@/components/ui/cyber-shader';
 
 export function AuthShell({ children }: { children: React.ReactNode }) {
   const simulatedLogs = `
@@ -22,18 +23,17 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
   `.trim();
 
   return (
-    <main className="bg-background text-on-background min-h-screen flex flex-col md:flex-row overflow-hidden font-body-md selection:bg-primary selection:text-on-primary">
+    <main className="bg-background text-foreground min-h-screen flex flex-col md:flex-row overflow-hidden font-sans selection:bg-primary selection:text-background">
       {/* SECTION 1: LEFT PANEL - BRAND INTRO */}
-      <div className="hidden md:flex w-1/2 relative bg-black border-r border-[rgba(223,222,220,0.1)] flex-col justify-between overflow-hidden">
-        {/* Grid & Background Effects */}
-        <div className="absolute inset-0 grid-overlay z-0"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black z-10"></div>
-        
-        {/* Simulated Logs */}
-        <div aria-hidden="true" className="absolute inset-0 z-0 opacity-20 pointer-events-none overflow-hidden font-mono text-xs text-primary flex items-start">
+      <div className="hidden md:flex w-1/2 relative bg-background border-r border-white/10 flex-col justify-between overflow-hidden">
+        <CyberShader className="absolute inset-0 w-full h-full pointer-events-none opacity-50 z-0" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background z-10" />
+
+        {/* Simulated Code Logs Stream */}
+        <div aria-hidden="true" className="absolute inset-0 z-0 opacity-25 pointer-events-none overflow-hidden font-mono text-xs text-primary flex items-start">
           <div className="log-stream whitespace-pre w-full pt-10 px-8">
             {simulatedLogs}
-            {"\n"}
+            {'\n'}
             {simulatedLogs}
           </div>
         </div>
@@ -41,25 +41,30 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
         {/* Content */}
         <div className="relative z-20 p-12 flex flex-col h-full">
           <div>
-            <div className="font-heading text-2xl font-bold flex items-center gap-2 mb-8 text-white">
-              <Logo size={32} className="text-primary" />
-              HibirDev
-            </div>
-            <h1 className="font-heading text-4xl lg:text-5xl font-bold mb-6 text-white leading-tight">
-              Orchestrate<br />with Precision.
+            <Link href="/" className="font-heading text-2xl font-bold flex items-center gap-3 mb-10 text-white group w-fit">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-surface border border-primary/40 text-primary shadow-[0_0_12px_rgba(0,242,254,0.25)] group-hover:scale-105 transition-transform">
+                <Logo size={24} />
+              </div>
+              <span className="group-hover:text-primary transition-colors">HibirDev</span>
+            </Link>
+            <h1 className="font-heading text-4xl lg:text-5xl font-extrabold mb-6 text-white leading-tight">
+              Orchestrate<br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00F2FE] to-[#00ACAC]">
+                with Precision.
+              </span>
             </h1>
-            <p className="text-base leading-relaxed text-on-surface-variant max-w-md border-l-2 border-primary pl-4 mb-8">
+            <p className="text-sm md:text-base leading-relaxed text-on-surface-variant max-w-md border-l-2 border-primary pl-4 mb-8">
               Autonomous AI orchestration built for developers. We enforce a strict Bring Your Own Key (BYOK) protocol to ensure zero-knowledge data retention across all workspace operations.
             </p>
-            <div className="flex items-center gap-2 font-mono text-xs text-on-surface-variant bg-surface-container-high w-max px-3 py-1.5 border border-[rgba(223,222,220,0.1)]">
-              <span className="w-2 h-2 rounded-full bg-primary inline-block"></span>
+            <div className="flex items-center gap-2 font-mono text-xs text-primary bg-primary/10 w-max px-3 py-1.5 border border-primary/30 rounded-full font-bold">
+              <span className="w-2 h-2 rounded-full bg-primary animate-pulse inline-block" />
               SYSTEM STATUS: ONLINE
             </div>
           </div>
-          <div className="mt-auto">
-            <div className="font-mono text-xs text-on-surface-variant flex items-center gap-2">
+          <div className="mt-auto pt-8">
+            <div className="font-mono text-xs text-on-surface-variant flex items-center gap-2 font-bold">
               <Shield className="w-4 h-4 text-primary" />
-              AES-256 SECURED NODE
+              AES-256 ENCRYPTED NODE VAULT
             </div>
           </div>
         </div>
@@ -67,9 +72,7 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
 
       {/* SECTION 2 & 3: RIGHT PANEL - SIGN-IN CARD & GATEWAY */}
       <div className="w-full md:w-1/2 flex items-center justify-center p-6 relative bg-background z-10">
-        <div className="w-full max-w-md relative">
-          {children}
-        </div>
+        <div className="w-full max-w-md relative">{children}</div>
       </div>
     </main>
   );

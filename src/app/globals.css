@@ -29,25 +29,27 @@
   --radius-2xl: calc(var(--radius) * 1.8);
 }
 
-/* Configurable Theme Color Variables (Adjust in one place) */
+/* Configurable Theme Color Variables (Rich Obsidian & Electric Cyan Palette) */
 :root {
-  --brand-black: #000000;
-  --brand-off-white: #DFDEDC;
-  --brand-dark-gray: #464545;
-  --brand-teal: #00ACAC;
-  --brand-muted-gray: #A6A7A2;
+  --brand-black: #080A0F;
+  --brand-obsidian-surface: #10141E;
+  --brand-obsidian-high: #181E2C;
+  --brand-off-white: #E2E8F0;
+  --brand-teal: #00F2FE;
+  --brand-teal-secondary: #00ACAC;
+  --brand-muted-gray: #94A3B8;
 
   /* 🌙 Dark Theme Mappings (Primary/Default mode) */
   --void: var(--brand-black);
-  --surface: var(--brand-dark-gray);
-  --surface-glass: rgba(70, 70, 69, 0.4);
-  --surface-hover: rgba(255, 255, 255, 0.05);
+  --surface: var(--brand-obsidian-surface);
+  --surface-glass: rgba(16, 20, 30, 0.75);
+  --surface-hover: rgba(0, 242, 254, 0.08);
   
   --primary: var(--brand-teal);
   --secondary: var(--brand-muted-gray);
-  --success: var(--brand-teal);
-  --warning: #eab308;
-  --danger: #ef4444;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --danger: #EF4444;
 
   --background: var(--void);
   --foreground: var(--brand-off-white);
@@ -60,19 +62,19 @@
 
 /* ☀️ Light Theme Mappings (Secondary mode) */
 html:not(.dark) {
-  --void: var(--brand-off-white);
-  --surface: #ffffff;
-  --surface-glass: rgba(255, 255, 255, 0.85);
-  --surface-hover: rgba(70, 70, 69, 0.05);
+  --void: #F8FAFC;
+  --surface: #FFFFFF;
+  --surface-glass: rgba(255, 255, 255, 0.90);
+  --surface-hover: rgba(0, 172, 172, 0.06);
   
-  --primary: var(--brand-teal);
-  --secondary: var(--brand-muted-gray);
-  --success: var(--brand-teal);
-  --warning: #d97706;
-  --danger: #dc2626;
+  --primary: #0099A8;
+  --secondary: #64748B;
+  --success: #059669;
+  --warning: #D97706;
+  --danger: #DC2626;
 
   --background: var(--void);
-  --foreground: var(--brand-black);
+  --foreground: #0F172A;
 }
 
 body {
@@ -82,82 +84,57 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-image: 
-    linear-gradient(to right, rgba(70, 69, 69, 0.08) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(70, 69, 69, 0.08) 1px, transparent 1px);
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
   background-size: 40px 40px;
 }
 
 /* Tailwind base resets and layers */
 @layer base {
   html:not(.dark) * {
-    border-color: rgba(70, 70, 69, 0.15);
+    border-color: rgba(148, 163, 184, 0.2);
   }
   .dark *, :root * {
-    border-color: var(--brand-dark-gray);
+    border-color: rgba(255, 255, 255, 0.12);
   }
 }
 
-/* Custom Light Mode Overrides for Hardcoded Dark Theme Utilities */
+/* Custom Design System Utility Classes */
 @layer utilities {
-  /* Restructure utility overrides to map to our brand colors in light mode */
-  html:not(.dark) .text-white {
-    color: var(--foreground);
+  /* Glow Utilities */
+  .glow-cyan {
+    box-shadow: 0 0 20px rgba(0, 242, 254, 0.35);
   }
-  html:not(.dark) .text-white\/80 {
-    color: rgba(0, 0, 0, 0.85);
+  .glow-cyan-lg {
+    box-shadow: 0 0 35px rgba(0, 242, 254, 0.5);
   }
-  html:not(.dark) .text-white\/70 {
-    color: rgba(0, 0, 0, 0.75);
-  }
-  html:not(.dark) .text-white\/60 {
-    color: rgba(0, 0, 0, 0.60);
-  }
-  html:not(.dark) .text-white\/50 {
-    color: rgba(0, 0, 0, 0.50);
-  }
-  html:not(.dark) .text-white\/40 {
-    color: rgba(0, 0, 0, 0.40);
-  }
-  html:not(.dark) .border-white\/10 {
-    border-color: rgba(70, 70, 69, 0.12) !important;
-  }
-  html:not(.dark) .border-white\/5 {
-    border-color: rgba(70, 70, 69, 0.06) !important;
-  }
-  html:not(.dark) .bg-white\/5 {
-    background-color: rgba(70, 70, 69, 0.04) !important;
-  }
-  html:not(.dark) .bg-white\/10 {
-    background-color: rgba(70, 70, 69, 0.08) !important;
-  }
-  html:not(.dark) .bg-black\/25 {
-    background-color: rgba(255, 255, 255, 0.50) !important;
-  }
-  html:not(.dark) .bg-black\/45 {
-    background-color: rgba(255, 255, 255, 0.90) !important;
+  .glow-border {
+    border: 1px solid rgba(0, 242, 254, 0.4);
+    box-shadow: inset 0 0 12px rgba(0, 242, 254, 0.15);
   }
 
-  /* Solid borders and regular shadow settings in Light Mode */
-  html:not(.dark) .bg-surface-glass,
-  html:not(.dark) .bg-surface {
-    background-color: #ffffff !important;
-    border: 1px solid rgba(70, 70, 69, 0.15) !important;
-    box-shadow: 0 1px 3px 0 rgba(70, 70, 69, 0.05) !important;
+  /* Glassmorphism Panel */
+  .glass-card {
+    background: var(--surface-glass);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
   }
 
+  /* Brutalist & Offset Shadows */
   .offset-shadow {
-    box-shadow: 4px 4px 0px 0px rgba(0, 172, 172, 0.15);
+    box-shadow: 4px 4px 0px 0px rgba(0, 242, 254, 0.25);
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .offset-shadow:hover {
-    box-shadow: 8px 8px 0px 0px rgba(0, 172, 172, 0.3);
+    box-shadow: 6px 6px 0px 0px rgba(0, 242, 254, 0.5);
     transform: translate(-2px, -2px);
   }
 
   .grid-overlay {
     background-size: 40px 40px;
-    background-image: linear-gradient(to right, rgba(223, 222, 220, 0.05) 1px, transparent 1px),
-                      linear-gradient(to bottom, rgba(223, 222, 220, 0.05) 1px, transparent 1px);
+    background-image: linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+                      linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
   }
   
   .log-stream {
@@ -179,7 +156,7 @@ body {
   }
 
   .brutal-border {
-    border: 1px solid rgba(223, 222, 220, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.12);
   }
   .brutal-offset-container {
     position: relative;
@@ -187,9 +164,9 @@ body {
   .brutal-offset-bg { 
     position: absolute; 
     inset: 0; 
-    background-color: #2a2a2a; 
+    background-color: var(--brand-obsidian-high); 
     transform: translate(6px, 6px); 
     z-index: -1; 
-    border: 1px solid rgba(223, 222, 220, 0.1);
+    border: 1px solid rgba(0, 242, 254, 0.3);
   }
 }

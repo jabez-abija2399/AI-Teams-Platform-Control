@@ -3,7 +3,7 @@
 import { usePathname } from 'next/navigation';
 import { Sidebar } from '@/components/layout/sidebar';
 import { Navbar } from '@/components/layout/navbar';
-import { Terminal } from 'lucide-react';
+import { Terminal, Activity } from 'lucide-react';
 
 export function DashboardLayoutClient({
   children,
@@ -36,23 +36,23 @@ export function DashboardLayoutClient({
       <Sidebar isSuperAdmin={isSuperAdmin} />
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden relative">
         <Navbar userName={userName} userImage={userImage} />
-        
+
         {/* Main Content Area */}
         <main className="relative flex-1 overflow-y-auto pb-16">
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-48 bg-[radial-gradient(ellipse_at_top,rgba(36,95,115,0.08),transparent_70%)]" />
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-48 bg-[radial-gradient(ellipse_at_top,rgba(0,242,254,0.06),transparent_70%)]" />
           <div className="relative p-5 md:p-8">{children}</div>
         </main>
 
         {/* SECTION 5: DEPLOYMENT TICKER */}
         <div className="absolute bottom-0 left-0 right-0 h-10 border-t border-white/10 bg-surface flex items-center overflow-hidden z-20">
-          <div className="flex items-center h-full px-4 border-r border-white/10 bg-surface-container z-10 shrink-0">
-            <span className="font-mono text-[10px] font-bold text-primary flex items-center gap-1">
-              <Terminal className="w-3.5 h-3.5" /> LIVE LOGS
+          <div className="flex items-center h-full px-4 border-r border-white/10 bg-surface-container-high z-10 shrink-0">
+            <span className="font-mono text-[10px] font-bold text-primary flex items-center gap-1.5 uppercase tracking-wider">
+              <Activity className="w-3.5 h-3.5 text-primary animate-pulse" /> Live Telemetry Ticker
             </span>
           </div>
-          <div className="flex-1 overflow-hidden relative h-full flex items-center">
-            <div className="font-mono text-xs text-on-surface-variant whitespace-nowrap animate-ticker inline-block">
-              {logsText} <span className="mx-8 opacity-30">|</span> {logsText}
+          <div className="flex-1 overflow-hidden relative h-full flex items-center bg-background/80">
+            <div className="font-mono text-xs text-on-surface-variant whitespace-nowrap animate-ticker inline-block font-medium">
+              {logsText} <span className="mx-8 text-primary opacity-50">||</span> {logsText}
             </div>
           </div>
         </div>

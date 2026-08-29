@@ -1,12 +1,11 @@
 import {
-  LandingCompany,
-  LandingCta,
-  LandingFeatures,
-  LandingFooter,
   LandingHeader,
   LandingHero,
-  LandingHowItWorks,
-  LandingShowcase,
+  LandingSocialProof,
+  LandingDepartments,
+  LandingPipeline,
+  LandingCTA,
+  LandingFooter,
 } from '@/components/landing/landing-sections';
 
 export default function HomePage() {
@@ -15,11 +14,10 @@ export default function HomePage() {
       <LandingHeader />
       <main className="flex-1">
         <LandingHero />
-        <LandingCompany />
-        <LandingShowcase />
-        <LandingFeatures />
-        <LandingHowItWorks />
-        <LandingCta />
+        <LandingSocialProof />
+        <LandingDepartments />
+        <LandingPipeline />
+        <LandingCTA />
       </main>
       <LandingFooter />
     </div>

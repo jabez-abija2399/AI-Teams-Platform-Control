@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { signIn } from 'next-auth/react';
-import { ChevronDown, ChevronUp, AlertCircle, Key, Loader2 } from 'lucide-react';
+import { ChevronDown, ChevronUp, AlertCircle, Key, Loader2, Lock, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { APP_NAME, ROUTES } from '@/config/constants';
 
@@ -41,7 +41,6 @@ export function LoginForm() {
         return;
       }
 
-      // If keys are provided, save them securely (optional mock action)
       if (openaiKey.trim() || anthropicKey.trim()) {
         try {
           await fetch('/api/settings/ai-credentials', {
@@ -53,7 +52,7 @@ export function LoginForm() {
             }),
           });
         } catch (err) {
-          console.error("Failed to automatically store BYOK keys:", err);
+          console.error('Failed to automatically store BYOK keys:', err);
         }
       }
 
@@ -71,7 +70,6 @@ export function LoginForm() {
       return;
     }
     setTestingByok(true);
-    // Simulate latency connection test
     setTimeout(() => {
       setTestingByok(false);
       toast.success('Connection Successful', { description: 'Keys authenticated with provider gateway. Latency: 44ms' });
@@ -80,160 +78,157 @@ export function LoginForm() {
 
   return (
     <div className="w-full relative">
-      {/* Brutalist Offset Shadow Container Background */}
-      <div className="absolute inset-0 bg-primary translate-x-2 translate-y-2 pointer-events-none"></div>
-      
-      <div className="bg-surface-container border border-white/10 relative z-10 p-0 flex flex-col">
+      <div className="absolute inset-0 bg-primary/20 translate-x-2 translate-y-2 pointer-events-none border border-primary/40" />
+
+      <div className="bg-surface border border-white/10 relative z-10 p-0 flex flex-col glass-card offset-shadow">
         {/* Card Header */}
-        <div className="border-b border-white/10 p-6 bg-surface-container-highest">
-          <h2 className="font-heading text-xl font-bold text-white">Initialize Session</h2>
-          <p className="text-xs text-on-surface-variant mt-1">Provide namespace and credentials to mount workspace.</p>
+        <div className="border-b border-white/10 p-6 bg-surface-container/60">
+          <div className="flex justify-between items-center mb-1">
+            <h2 className="font-heading text-xl font-bold text-white">Initialize Session</h2>
+            <Lock className="w-4 h-4 text-primary" />
+          </div>
+          <p className="text-xs text-on-surface-variant">Provide namespace and credentials to mount workspace.</p>
         </div>
 
         {/* Error notification banner */}
         {error && (
-          <div className="mx-6 mt-4 flex items-center gap-2.5 rounded-none border border-danger/40 bg-danger/10 p-3.5 text-xs font-semibold text-danger">
+          <div className="mx-6 mt-4 flex items-center gap-2.5 border border-danger/40 bg-danger/10 p-3.5 text-xs font-semibold text-danger">
             <AlertCircle className="h-4 w-4 shrink-0" />
             <span>{error}</span>
           </div>
         )}
 
-        {/* Form Body */}
-        <form onSubmit={handleSubmit} className="p-6 flex flex-col gap-6" noValidate>
-          <div className="flex flex-col gap-4">
-            <div>
-              <label className="font-mono text-xs uppercase tracking-wider text-on-surface block mb-2" htmlFor="namespace">
-                Workspace Namespace
-              </label>
-              <input
-                id="namespace"
-                type="text"
-                value={namespace}
-                onChange={(e) => setNamespace(e.target.value)}
-                placeholder="e.g. prd-cluster-01"
-                className="w-full bg-background border border-white/15 text-on-background font-mono text-sm p-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
-              />
-            </div>
-            <div>
-              <label className="font-mono text-xs uppercase tracking-wider text-on-surface block mb-2" htmlFor="login-email">
-                Developer Email
-              </label>
-              <input
-                id="login-email"
-                type="email"
-                required
-                autoComplete="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="dev@hibir.io"
-                className="w-full bg-background border border-white/15 text-on-background font-mono text-sm p-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
-              />
-            </div>
-            <div>
-              <label className="font-mono text-xs uppercase tracking-wider text-on-surface block mb-2" htmlFor="login-password">
-                Session Password
-              </label>
-              <input
-                id="login-password"
-                type="password"
-                required
-                autoComplete="current-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••••••"
-                className="w-full bg-background border border-white/15 text-on-background font-mono text-sm p-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
-              />
-            </div>
+        <form onSubmit={handleSubmit} className="p-6 space-y-5">
+          {/* Namespace Field */}
+          <div>
+            <label className="block font-mono text-[10px] uppercase font-bold text-on-surface-variant tracking-wider mb-2" htmlFor="namespace">
+              Cluster Namespace
+            </label>
+            <input
+              id="namespace"
+              type="text"
+              value={namespace}
+              onChange={(e) => setNamespace(e.target.value)}
+              className="w-full bg-background border border-white/10 px-4 py-2.5 font-mono text-xs text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+              required
+            />
           </div>
 
-          {/* BYOK Drawer Configuration Gate */}
-          <div className="border border-white/10 bg-surface-container-low">
+          {/* Email Field */}
+          <div>
+            <label className="block font-mono text-[10px] uppercase font-bold text-on-surface-variant tracking-wider mb-2" htmlFor="email">
+              User Identity (Email)
+            </label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="operator@hibir.dev"
+              className="w-full bg-background border border-white/10 px-4 py-2.5 font-mono text-xs text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary placeholder:text-on-surface-variant/40"
+              required
+            />
+          </div>
+
+          {/* Password Field */}
+          <div>
+            <div className="flex justify-between items-center mb-2">
+              <label className="block font-mono text-[10px] uppercase font-bold text-on-surface-variant tracking-wider" htmlFor="password">
+                Passcode Token
+              </label>
+            </div>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full bg-background border border-white/10 px-4 py-2.5 font-mono text-xs text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+              required
+            />
+          </div>
+
+          {/* BYOK Collapsible Drawer Toggle */}
+          <div className="border-t border-white/10 pt-4 mt-2">
             <button
-              onClick={() => setByokOpen(!byokOpen)}
               type="button"
-              className="w-full flex items-center justify-between p-4 focus:outline-none hover:bg-surface-container-high transition-colors text-left"
+              onClick={() => setByokOpen(!byokOpen)}
+              className="w-full flex items-center justify-between text-xs font-mono text-primary hover:text-white font-bold transition-colors py-1"
             >
-              <div className="flex items-center gap-2">
-                <Key className="text-primary w-4 h-4" />
-                <span className="font-mono text-xs uppercase tracking-wider text-on-surface">BYOK Configuration</span>
-              </div>
-              {byokOpen ? (
-                <ChevronUp className="text-on-surface-variant w-4 h-4" />
-              ) : (
-                <ChevronDown className="text-on-surface-variant w-4 h-4" />
-              )}
+              <span className="flex items-center gap-2">
+                <Key className="w-3.5 h-3.5" />
+                BYOK Configuration Gateway
+              </span>
+              {byokOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
             </button>
-            
+
             {byokOpen && (
-              <div className="border-t border-white/10 p-4 flex flex-col gap-4 bg-background/50">
+              <div className="mt-4 p-4 border border-primary/30 bg-background/80 space-y-4">
+                <p className="font-mono text-[11px] text-on-surface-variant">
+                  Inject custom API keys for isolated inference. Keys bypass shared queues.
+                </p>
                 <div>
-                  <label className="font-mono text-[10px] uppercase tracking-wider text-on-surface-variant block mb-2" htmlFor="openai-key">
-                    OpenAI API Key (Optional)
+                  <label className="block font-mono text-[10px] text-on-surface-variant mb-1" htmlFor="openaiKey">
+                    OpenAI API Key
                   </label>
                   <input
-                    id="openai-key"
+                    id="openaiKey"
                     type="password"
                     value={openaiKey}
                     onChange={(e) => setOpenaiKey(e.target.value)}
-                    placeholder="sk-..."
-                    className="w-full bg-background border border-white/10 text-on-background font-mono text-xs p-2 focus:outline-none focus:border-primary"
+                    placeholder="sk-proj-..."
+                    className="w-full bg-surface border border-white/10 px-3 py-2 font-mono text-xs text-white focus:outline-none focus:border-primary placeholder:text-on-surface-variant/40"
                   />
                 </div>
                 <div>
-                  <label className="font-mono text-[10px] uppercase tracking-wider text-on-surface-variant block mb-2" htmlFor="anthropic-key">
-                    Anthropic API Key (Optional)
+                  <label className="block font-mono text-[10px] text-on-surface-variant mb-1" htmlFor="anthropicKey">
+                    Anthropic API Key
                   </label>
                   <input
-                    id="anthropic-key"
+                    id="anthropicKey"
                     type="password"
                     value={anthropicKey}
                     onChange={(e) => setAnthropicKey(e.target.value)}
                     placeholder="sk-ant-..."
-                    className="w-full bg-background border border-white/10 text-on-background font-mono text-xs p-2 focus:outline-none focus:border-primary"
+                    className="w-full bg-surface border border-white/10 px-3 py-2 font-mono text-xs text-white focus:outline-none focus:border-primary placeholder:text-on-surface-variant/40"
                   />
                 </div>
                 <button
-                  onClick={handleTestByok}
                   type="button"
-                  className="mt-2 font-mono text-xs text-primary border border-primary px-4 py-2 hover:bg-primary hover:text-background transition-colors self-end"
+                  onClick={handleTestByok}
+                  disabled={testingByok}
+                  className="w-full py-2 bg-surface border border-white/20 text-on-surface hover:text-primary hover:border-primary font-mono text-xs font-bold transition-all flex items-center justify-center gap-2"
                 >
-                  {testingByok ? (
-                    <div className="flex items-center gap-1.5">
-                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      Testing...
-                    </div>
-                  ) : (
-                    'Test Connection'
-                  )}
+                  {testingByok ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
+                  <span>Test Connection Latency</span>
                 </button>
               </div>
             )}
           </div>
 
-          {/* Action Trigger */}
+          {/* Submit Button */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-primary text-background font-mono text-xs font-bold py-4 border border-primary hover:bg-transparent hover:text-primary transition-colors flex items-center justify-center gap-2 uppercase tracking-wider"
+            className="w-full bg-primary text-background font-mono text-xs font-bold py-3.5 border border-primary hover:bg-transparent hover:text-primary transition-all duration-200 uppercase tracking-wider flex items-center justify-center gap-2 group offset-shadow mt-4"
           >
             {loading ? (
-              <div className="flex items-center gap-2">
+              <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                Mounting Workspace...
-              </div>
+                <span>Authenticating Cluster Node...</span>
+              </>
             ) : (
-              'Initialize Session'
+              <>
+                <span>Connect & Mount Workspace</span>
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </>
             )}
           </button>
         </form>
 
-        {/* Auth Footer */}
-        <div className="border-t border-white/10 p-6 bg-surface-container-low flex flex-col items-center gap-3">
-          <a className="font-mono text-xs text-on-surface-variant hover:text-primary transition-colors" href="#">
-            Forgot Session Credentials?
-          </a>
-          <Link href={ROUTES.register} className="font-mono text-xs text-on-surface-variant hover:text-primary transition-colors">
-            Create New Workspace Namespace
+        <div className="p-4 border-t border-white/10 bg-surface-container-high/40 text-center font-mono text-xs text-on-surface-variant">
+          Need access credentials?{' '}
+          <Link href={ROUTES.register} className="text-primary hover:underline font-bold">
+            Create Account
           </Link>
         </div>
       </div>
