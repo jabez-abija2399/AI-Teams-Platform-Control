@@ -3,8 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { signIn } from 'next-auth/react';
-import { AlertCircle, Eye, EyeOff, Key, Loader2, ArrowRight, ChevronDown, ChevronUp } from 'lucide-react';
-import { toast } from 'sonner';
+import { AlertCircle, Eye, EyeOff, Key, Loader2, ArrowRight, ChevronDown, ChevronUp, Check } from 'lucide-react';
 import { APP_NAME, ROUTES } from '@/config/constants';
 
 export function LoginForm() {
@@ -13,6 +12,7 @@ export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [authorized, setAuthorized] = useState(false);
 
   // BYOK Drawer toggling
   const [byokOpen, setByokOpen] = useState(false);
@@ -21,7 +21,7 @@ export function LoginForm() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (loading) return;
+    if (loading || authorized) return;
 
     setError(null);
     setLoading(true);
@@ -35,7 +35,7 @@ export function LoginForm() {
       });
 
       if (!result || result.error || result.ok === false) {
-        setError('Invalid email or password.');
+        setError('Incorrect Credentials provided.');
         setLoading(false);
         return;
       }
@@ -55,15 +55,48 @@ export function LoginForm() {
         }
       }
 
-      window.location.assign(result.url || ROUTES.projects);
+      setLoading(false);
+      setAuthorized(true);
+      setTimeout(() => {
+        window.location.assign(result.url || ROUTES.projects);
+      }, 800);
     } catch {
       setError('Authentication failed. Please try again.');
       setLoading(false);
     }
   };
 
+  // State 04: Authorized / Success View
+  if (authorized) {
+    return (
+      <div className="w-full flex flex-col items-center justify-center text-center gap-6 py-8 relative">
+        <div className="w-14 h-14 rounded-xl bg-primary/10 border-2 border-primary flex items-center justify-center text-primary shadow-[0_0_20px_rgba(0,172,172,0.4)]">
+          <Check className="w-7 h-7" />
+        </div>
+        <div>
+          <h3 className="font-heading text-2xl font-extrabold text-white mb-2">
+            Successfully Authenticated
+          </h3>
+          <span className="font-mono text-xs text-primary bg-primary/10 border border-primary/30 px-3 py-1 rounded font-bold uppercase tracking-wider">
+            SESSION_TOKEN_GENERATED
+          </span>
+        </div>
+        <p className="font-mono text-xs text-on-surface-variant animate-pulse">
+          Redirecting to workspace...
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <div className="w-full flex flex-col gap-6">
+    <div className="w-full flex flex-col gap-6 relative">
+      {/* Top Indeterminate Loading Bar during Processing */}
+      {loading && (
+        <div className="absolute -top-6 left-0 right-0 h-0.5 bg-primary/20 overflow-hidden rounded-full">
+          <div className="h-full bg-primary animate-pulse w-full" />
+        </div>
+      )}
+
       {/* Form Title & Subtitle */}
       <div className="flex flex-col gap-2 text-center lg:text-left">
         <span className="font-mono text-[11px] font-bold text-primary uppercase tracking-widest">
@@ -72,11 +105,14 @@ export function LoginForm() {
         <h2 className="font-heading text-2xl md:text-3xl font-extrabold text-white">
           Sign in to {APP_NAME}
         </h2>
+        <p className="font-mono text-xs text-on-surface-variant">
+          Authenticate to access the engineering platform.
+        </p>
       </div>
 
       {/* Error notification banner */}
       {error && (
-        <div className="flex items-center gap-2.5 border border-danger/40 bg-danger/10 p-3.5 text-xs font-semibold text-danger rounded-xl">
+        <div className="flex items-center gap-2.5 border border-danger bg-danger/10 p-3.5 text-xs font-semibold text-danger rounded-xl font-mono">
           <AlertCircle className="h-4 w-4 shrink-0" />
           <span>{error}</span>
         </div>
@@ -92,10 +128,13 @@ export function LoginForm() {
             id="email"
             type="email"
             required
+            disabled={loading}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@example.com"
-            className="w-full bg-background border border-white/10 text-white font-mono text-xs px-4 py-3 rounded-xl focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder:text-on-surface-variant/40"
+            placeholder="architect@hibirdev.ai"
+            className={`w-full bg-background border text-white font-mono text-xs px-4 py-3 rounded-xl focus:outline-none transition-colors placeholder:text-on-surface-variant/40 ${
+              error ? 'border-danger focus:border-danger' : 'border-white/10 focus:border-primary focus:ring-1 focus:ring-primary'
+            } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
           />
         </div>
 
@@ -105,8 +144,8 @@ export function LoginForm() {
             <label className="font-mono text-xs font-bold text-on-surface-variant uppercase tracking-wider" htmlFor="password">
               Password
             </label>
-            <a href="#" className="font-mono text-xs text-on-surface-variant hover:text-primary transition-colors">
-              Forgot password?
+            <a href="#" className="font-mono text-xs text-primary hover:underline">
+              Reset
             </a>
           </div>
           <div className="relative">
@@ -114,10 +153,13 @@ export function LoginForm() {
               id="password"
               type={showPassword ? 'text' : 'password'}
               required
+              disabled={loading}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              className="w-full bg-background border border-white/10 text-white font-mono text-xs px-4 py-3 rounded-xl focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder:text-on-surface-variant/40 pr-10"
+              placeholder="••••••••••••"
+              className={`w-full bg-background border text-white font-mono text-xs px-4 py-3 rounded-xl focus:outline-none transition-colors placeholder:text-on-surface-variant/40 pr-10 ${
+                error ? 'border-danger focus:border-danger' : 'border-white/10 focus:border-primary focus:ring-1 focus:ring-primary'
+              } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
             />
             <button
               type="button"
@@ -174,17 +216,29 @@ export function LoginForm() {
           )}
         </div>
 
-        {/* Submit Button */}
+        {/* Primary CTA Button with 4 State Styles */}
         <button
           type="submit"
           disabled={loading}
-          className="mt-2 w-full bg-primary text-black font-mono text-xs font-bold py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 hover:bg-transparent hover:text-primary border border-primary transition-all duration-200 uppercase tracking-wider glow-cyan"
+          className={`mt-2 w-full font-mono text-xs font-bold py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 border transition-all duration-200 uppercase tracking-wider ${
+            error
+              ? 'bg-surface text-white border-danger hover:bg-danger/10'
+              : 'bg-primary text-black border-primary hover:bg-transparent hover:text-primary glow-cyan'
+          }`}
         >
           {loading ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
+            <>
+              <Loader2 className="w-4 h-4 animate-spin text-primary" />
+              <span>Signing In...</span>
+            </>
+          ) : error ? (
+            <>
+              <span>Retry Authentication</span>
+              <ArrowRight className="w-4 h-4" />
+            </>
           ) : (
             <>
-              <span>Sign In</span>
+              <span>Authenticate</span>
               <ArrowRight className="w-4 h-4" />
             </>
           )}
