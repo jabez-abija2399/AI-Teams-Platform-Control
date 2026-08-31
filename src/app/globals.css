@@ -60,21 +60,27 @@
   --radius: 0.75rem;
 }
 
-/* ☀️ Light Theme Mappings (Secondary mode) */
+/* ☀️ Light Theme Mappings (Exact User Blueprint Specification) */
 html:not(.dark) {
-  --void: #F8FAFC;
+  --void: #F9F9F9;
   --surface: #FFFFFF;
-  --surface-glass: rgba(255, 255, 255, 0.90);
-  --surface-hover: rgba(0, 172, 172, 0.06);
+  --surface-glass: rgba(249, 249, 249, 0.95);
+  --surface-hover: rgba(0, 172, 172, 0.08);
   
-  --primary: #0099A8;
-  --secondary: #64748B;
+  --primary: #006A6A;
+  --primary-container: #00ACAC;
+  --secondary: #5F5E5E;
+  --tertiary: #717171;
   --success: #059669;
   --warning: #D97706;
-  --danger: #DC2626;
+  --danger: #BA1A1A;
+
+  --on-surface-variant: #3C4949;
+  --outline: #6C7A79;
+  --outline-variant: #BBC9C8;
 
   --background: var(--void);
-  --foreground: #0F172A;
+  --foreground: #1A1C1C;
 }
 
 body {
@@ -84,9 +90,16 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-  background-size: 40px 40px;
+    linear-gradient(to right, rgba(70, 69, 69, 0.2) 0.5px, transparent 0.5px),
+    linear-gradient(to bottom, rgba(70, 69, 69, 0.2) 0.5px, transparent 0.5px);
+  background-size: 48px 48px;
+  background-attachment: fixed;
+}
+
+html:not(.dark) body {
+  background-image: 
+    linear-gradient(to right, #E2E2E2 0.5px, transparent 0.5px),
+    linear-gradient(to bottom, #E2E2E2 0.5px, transparent 0.5px);
 }
 
 /* Tailwind base resets and layers */
