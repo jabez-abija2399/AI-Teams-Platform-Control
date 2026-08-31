@@ -1,172 +1,234 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   ArrowRight,
   Bot,
+  Check,
   CheckCircle2,
   Code2,
   FolderTree,
   Layers,
-  Rocket,
-  Shield,
-  Terminal,
-  Cpu,
-  Zap,
-  Search,
-  ArrowUpRight,
-  Check,
-  Settings,
+  RefreshCw,
+  Hourglass,
+  Sun,
+  Moon,
+  Menu,
+  X,
   Sparkles,
+  ArrowUpRight,
+  ShieldCheck,
+  Terminal,
 } from 'lucide-react';
 import { Logo } from '@/components/layout/logo';
 import { cn } from '@/lib/utils';
 import { APP_NAME, ROUTES } from '@/config/constants';
-import { CyberShader } from '@/components/ui/cyber-shader';
-
-const TRUST = ['VERCEL', 'STRIPE', 'SUPABASE'] as const;
-
-const TEAM = [
-  {
-    role: 'Sarah PM',
-    title: 'Product Dept',
-    status: 'Active',
-    icon: Bot,
-    focus: 'Defines scope, writes requirements, and ensures alignment with business goals.',
-  },
-  {
-    role: 'Marcus Architect',
-    title: 'Architecture Dept',
-    status: 'Active',
-    icon: Layers,
-    focus: 'Designs scalable systems, selects tech stacks, and plans database schemas.',
-  },
-  {
-    role: 'Alex Developer',
-    title: 'Development Dept',
-    status: 'Active',
-    icon: Code2,
-    focus: 'Writes clean, efficient code, creates tests, and handles deployments.',
-  },
-] as const;
-
-const FOOTER_LINKS = [
-  { href: '#company', label: 'Documentation' },
-  { href: '#workspace', label: 'Security' },
-  { href: '#features', label: 'API Status' },
-  { href: '#how-it-works', label: 'Privacy' },
-] as const;
+import { useTheme } from 'next-themes';
 
 /**
- * Sticky Header Navbar with Glassmorphism and Glowing Cyan Accents.
+ * Responsive Top Navigation Bar matching Blueprint Design.
  */
 export function LandingHeader() {
+  const [mounted, setMounted] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { theme, setTheme } = useTheme();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
-    <header className="bg-surface-glass backdrop-blur-md text-foreground font-sans w-full top-0 sticky border-b border-white/10 z-50 transition-all">
-      <div className="flex justify-between items-center px-6 md:px-12 h-16 w-full max-w-full">
+    <nav className="fixed top-0 w-full z-50 bg-background/90 backdrop-blur-md border-b border-white/10 transition-all">
+      <div className="flex justify-between items-center px-6 md:px-12 py-4 max-w-7xl mx-auto">
+        {/* Logo & Title */}
         <Link href={ROUTES.home} className="flex items-center gap-3 group">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-surface border border-primary/40 text-primary shadow-[0_0_12px_rgba(0,242,254,0.25)] group-hover:scale-105 transition-transform">
             <Logo size={20} />
           </div>
-          <span className="text-xl font-bold tracking-tight text-white group-hover:text-primary transition-colors font-heading">
+          <span className="text-xl font-bold tracking-tight text-white font-heading">
             {APP_NAME}
           </span>
         </Link>
-        <nav className="hidden md:flex gap-8">
-          <a className="text-on-surface-variant hover:text-primary transition-colors px-3 py-2 text-sm font-medium" href="#company">
-            Organization
+
+        {/* Desktop Navigation Links */}
+        <div className="hidden md:flex items-center gap-8 font-sans text-sm font-medium">
+          <a className="text-on-surface-variant hover:text-primary transition-colors" href="#product">
+            Product
           </a>
-          <a className="text-on-surface-variant hover:text-primary transition-colors px-3 py-2 text-sm font-medium" href="#workspace">
+          <a className="text-on-surface-variant hover:text-primary transition-colors" href="#how-it-works">
+            How It Works
+          </a>
+          <a className="text-on-surface-variant hover:text-primary transition-colors" href="#agents">
+            Agents
+          </a>
+          <Link className="text-on-surface-variant hover:text-primary transition-colors" href={ROUTES.dashboard}>
             Workspace
-          </a>
-          <a className="text-on-surface-variant hover:text-primary transition-colors px-3 py-2 text-sm font-medium" href="#features">
-            Processes
-          </a>
-          <a className="text-on-surface-variant hover:text-primary transition-colors px-3 py-2 text-sm font-medium" href="#pricing">
-            Pricing
-          </a>
-        </nav>
-        <Link href={ROUTES.register}>
-          <button className="bg-primary text-background font-mono text-xs font-bold px-6 py-2.5 border border-primary hover:bg-transparent hover:text-primary transition-all duration-200 uppercase tracking-wider offset-shadow flex items-center gap-2">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Start Building</span>
+          </Link>
+        </div>
+
+        {/* Action Controls & Mobile Menu Toggle */}
+        <div className="flex items-center gap-3">
+          {mounted && (
+            <button
+              type="button"
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className="p-2 rounded-xl border border-white/10 hover:border-primary text-on-surface-variant hover:text-white transition-colors"
+              title="Toggle Theme"
+            >
+              {theme === 'dark' ? <Sun className="w-4 h-4 text-warning" /> : <Moon className="w-4 h-4 text-primary" />}
+            </button>
+          )}
+
+          <Link href={ROUTES.login} className="hidden sm:inline-block">
+            <button className="text-on-surface-variant hover:text-primary font-mono text-xs font-bold px-4 py-2 transition-colors">
+              Sign In
+            </button>
+          </Link>
+
+          <Link href={ROUTES.register}>
+            <button className="bg-primary text-background font-mono text-xs font-bold px-5 py-2.5 border border-primary hover:bg-transparent hover:text-primary transition-all duration-200 uppercase tracking-wider glow-cyan">
+              Start Building
+            </button>
+          </Link>
+
+          {/* Mobile Hamburger Toggle */}
+          <button
+            type="button"
+            onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+            className="md:hidden p-2 text-on-surface-variant hover:text-white"
+          >
+            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
-        </Link>
+        </div>
       </div>
-    </header>
+
+      {/* Mobile Navigation Drawer */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden border-b border-white/10 bg-surface p-6 space-y-4 font-mono text-xs">
+          <a
+            href="#product"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="block text-on-surface-variant hover:text-white py-2"
+          >
+            Product
+          </a>
+          <a
+            href="#how-it-works"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="block text-on-surface-variant hover:text-white py-2"
+          >
+            How It Works
+          </a>
+          <a
+            href="#agents"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="block text-on-surface-variant hover:text-white py-2"
+          >
+            Agents
+          </a>
+          <Link
+            href={ROUTES.dashboard}
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="block text-on-surface-variant hover:text-white py-2"
+          >
+            Workspace
+          </Link>
+          <div className="pt-2 border-t border-white/10 flex justify-between items-center">
+            <Link href={ROUTES.login} onClick={() => setIsMobileMenuOpen(false)}>
+              <span className="text-primary font-bold">Sign In</span>
+            </Link>
+          </div>
+        </div>
+      )}
+    </nav>
   );
 }
 
 /**
- * Asymmetrical Hero Section with WebGL Shader Canvas.
+ * Blueprint Hero Section.
  */
 export function LandingHero() {
   return (
-    <section className="relative px-6 md:px-12 py-24 max-w-7xl mx-auto overflow-hidden">
-      <CyberShader className="absolute inset-0 w-full h-full pointer-events-none opacity-40 -z-10" />
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-        <div className="lg:col-span-6 flex flex-col gap-8">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/30 text-primary font-mono text-xs font-bold uppercase tracking-wider w-fit">
+    <section id="product" className="pt-32 pb-16 px-6 md:px-12 max-w-7xl mx-auto">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 blueprint-border p-6 md:p-12 bg-surface relative overflow-hidden glass-card">
+        {/* Content Column */}
+        <div className="lg:col-span-6 flex flex-col justify-center gap-6 relative z-10">
+          <div className="inline-flex items-center gap-2 px-3 py-1 border border-primary/40 bg-primary/10 text-primary font-mono text-xs font-bold uppercase tracking-wider w-fit rounded-full">
             <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
             Autonomous AI Enterprise v2.4
           </div>
-          <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight">
-            Deploy an entire <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00F2FE] to-[#00ACAC]">autonomous AI company</span> to build your software.
+
+          <h1 className="font-heading text-3xl md:text-5xl font-extrabold text-white leading-tight">
+            Build Software With an <span className="text-primary font-bold">AI Team.</span>
           </h1>
-          <p className="font-sans text-base md:text-lg text-on-surface-variant leading-relaxed max-w-xl">
-            Stop managing freelancers. Orchestrate intelligent agents that design, architect, code, and test your ideas into production reality.
+
+          <p className="font-sans text-sm md:text-base text-on-surface-variant max-w-lg leading-relaxed">
+            HibirDev AI turns your software idea into product requirements, technical architecture, user experience, and implementation through four specialized AI agents.
           </p>
-          <div className="flex flex-wrap gap-4 pt-2">
+
+          <div className="pt-2 flex flex-wrap gap-4">
             <Link href={ROUTES.register}>
-              <button className="bg-primary text-background font-mono text-xs font-bold px-8 py-4 border border-primary hover:bg-transparent hover:text-primary transition-all duration-200 offset-shadow uppercase tracking-wider flex items-center gap-2">
-                <span>Launch AI Company</span>
+              <button className="bg-primary text-background font-mono text-xs font-bold py-3.5 px-6 border border-primary hover:bg-transparent hover:text-primary transition-all duration-200 uppercase tracking-wider flex items-center gap-2 offset-shadow">
+                <span>Start Building</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </Link>
-            <a href="#demo">
-              <button className="bg-surface-container border border-white/10 hover:border-primary text-white font-mono text-xs font-bold px-8 py-4 transition-all uppercase tracking-wider">
-                Watch Telemetry Demo
+            <a href="#how-it-works">
+              <button className="bg-surface-container-high border border-white/10 hover:border-primary text-white font-mono text-xs font-bold py-3.5 px-6 transition-all uppercase tracking-wider">
+                Explore Workflow
               </button>
             </a>
           </div>
         </div>
 
-        <div className="lg:col-span-6 relative">
-          <div className="glass-card p-6 relative z-10 offset-shadow border-glow">
-            <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
-              <div className="flex gap-2">
-                <div className="w-3 h-3 rounded-full bg-danger/80" />
-                <div className="w-3 h-3 rounded-full bg-warning/80" />
-                <div className="w-3 h-3 rounded-full bg-success/80" />
+        {/* Visual Live Agent Status Simulation */}
+        <div className="lg:col-span-6 relative bg-background border border-white/10 rounded-xl p-4 md:p-6 flex flex-col justify-between">
+          <div className="font-mono text-xs font-bold text-on-surface-variant mb-4 flex justify-between items-center border-b border-white/10 pb-3">
+            <span>PROJECT_ID: STUDYMATE</span>
+            <span className="text-primary font-bold flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+              STATUS: COMPILING
+            </span>
+          </div>
+
+          <div className="space-y-3 font-mono text-xs">
+            {/* CEO Agent */}
+            <div className="flex items-center justify-between p-3 border border-white/10 bg-surface rounded-lg">
+              <div className="flex items-center gap-2.5">
+                <Check className="w-4 h-4 text-success" />
+                <span className="text-white font-bold">CEO_AGENT</span>
               </div>
-              <span className="font-mono text-xs text-primary font-bold tracking-wider uppercase">Live Telemetry Workspace</span>
-              <Terminal className="w-4 h-4 text-primary" />
+              <span className="text-success font-bold">[DONE]</span>
             </div>
 
-            <div className="h-64 flex items-center justify-center border border-white/10 bg-background/90 relative overflow-hidden">
-              {/* Abstract node chart representation */}
-              <div className="absolute inset-0 flex items-center justify-center opacity-70">
-                <svg height="100%" width="100%" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M50 150 Q 150 50, 250 150 T 450 150" fill="transparent" stroke="#00F2FE" strokeWidth="2" strokeDasharray="6 6" className="animate-pulse" />
-                  <circle cx="50" cy="150" fill="#00F2FE" r="5" />
-                  <circle cx="250" cy="150" fill="#00ACAC" r="7" />
-                  <circle cx="450" cy="150" fill="#00F2FE" r="5" />
-                </svg>
+            {/* Architect Agent */}
+            <div className="flex items-center justify-between p-3 border border-white/10 bg-surface rounded-lg">
+              <div className="flex items-center gap-2.5">
+                <Check className="w-4 h-4 text-success" />
+                <span className="text-white font-bold">ARCHITECT_AGENT</span>
               </div>
+              <span className="text-success font-bold">[DONE]</span>
+            </div>
 
-              <div className="text-center z-10 space-y-3">
-                <span className="font-mono text-xs text-primary font-bold block tracking-widest uppercase">
-                  Analyzing Architecture Topology...
-                </span>
-                <div className="w-56 h-1.5 bg-surface-container mx-auto rounded-full overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-[#00F2FE] to-[#00ACAC] w-3/4 animate-pulse" />
-                </div>
+            {/* Designer Agent */}
+            <div className="flex items-center justify-between p-3 border border-primary bg-primary/10 rounded-lg glow-border">
+              <div className="flex items-center gap-2.5">
+                <RefreshCw className="w-4 h-4 text-primary animate-spin" />
+                <span className="text-primary font-bold">DESIGNER_AGENT</span>
               </div>
+              <span className="text-primary font-bold">[ACTIVE]</span>
+            </div>
+
+            {/* Developer Agent */}
+            <div className="flex items-center justify-between p-3 border border-white/10 bg-surface/50 opacity-60 rounded-lg">
+              <div className="flex items-center gap-2.5">
+                <Hourglass className="w-4 h-4 text-on-surface-variant" />
+                <span className="text-on-surface-variant">DEVELOPER_AGENT</span>
+              </div>
+              <span className="text-on-surface-variant">[PENDING]</span>
             </div>
           </div>
-          {/* Decorative background grid offset */}
-          <div className="absolute -inset-4 border border-primary/20 bg-primary/5 z-0 -translate-x-4 translate-y-4" />
         </div>
       </div>
     </section>
@@ -174,21 +236,33 @@ export function LandingHero() {
 }
 
 /**
- * Social Proof Section.
+ * Workflow Spine Section.
  */
 export function LandingSocialProof() {
   return (
-    <section className="border-y border-white/10 py-12 bg-surface-container-lowest">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 text-center">
-        <p className="font-mono text-xs text-on-surface-variant mb-8 uppercase tracking-widest font-bold">
-          Trusted by engineering teams worldwide
+    <section id="how-it-works" className="py-12 max-w-7xl mx-auto px-6 md:px-12">
+      <div className="border-t border-b border-white/10 py-8">
+        <p className="font-mono text-xs font-bold text-on-surface-variant mb-6 uppercase tracking-widest text-center md:text-left">
+          Autonomous Orchestration Spine
         </p>
-        <div className="flex flex-wrap justify-center items-center gap-12 md:gap-20 opacity-70">
-          {TRUST.map((name) => (
-            <span key={name} className="font-heading text-xl md:text-2xl font-bold tracking-widest text-on-surface-variant hover:text-primary transition-colors">
-              {name}
-            </span>
-          ))}
+        <div className="flex flex-wrap items-center justify-between gap-4 font-mono text-xs font-bold text-on-surface-variant">
+          <span className="text-primary">IDEA</span>
+          <div className="h-px flex-1 min-w-[30px] bg-white/10 relative">
+            <div className="absolute left-0 top-0 h-full bg-primary w-full" />
+          </div>
+          <span className="text-primary">PRODUCT</span>
+          <div className="h-px flex-1 min-w-[30px] bg-white/10 relative">
+            <div className="absolute left-0 top-0 h-full bg-primary w-1/2" />
+          </div>
+          <span className="text-white">ARCHITECTURE</span>
+          <div className="h-px flex-1 min-w-[30px] bg-white/10 relative">
+            <div className="absolute left-0 top-0 h-full bg-white/20 w-0" />
+          </div>
+          <span className="text-on-surface-variant">DESIGN</span>
+          <div className="h-px flex-1 min-w-[30px] bg-white/10 relative">
+            <div className="absolute left-0 top-0 h-full bg-white/20 w-0" />
+          </div>
+          <span className="text-on-surface-variant">CODE</span>
         </div>
       </div>
     </section>
@@ -196,44 +270,74 @@ export function LandingSocialProof() {
 }
 
 /**
- * AI Roster Departments Grid.
+ * AI Roster Departments Section.
  */
 export function LandingDepartments() {
+  const AGENTS = [
+    {
+      role: 'CEO_AGENT',
+      title: 'Product & Scope',
+      status: 'ACTIVE',
+      focus: 'Analyzes user prompts, defines product specs, writes requirements, and locks scope.',
+      icon: Bot,
+    },
+    {
+      role: 'ARCHITECT_AGENT',
+      title: 'System Blueprint',
+      status: 'ACTIVE',
+      focus: 'Selects tech stacks (Next.js, Prisma, PostgreSQL), models DB schemas, and designs topology.',
+      icon: Layers,
+    },
+    {
+      role: 'DESIGNER_AGENT',
+      title: 'UI/UX Engineering',
+      status: 'ACTIVE',
+      focus: 'Generates responsive design systems, color tokens, layout containers, and components.',
+      icon: Sparkles,
+    },
+    {
+      role: 'DEVELOPER_AGENT',
+      title: 'Full-Stack Execution',
+      status: 'ACTIVE',
+      focus: 'Writes clean TypeScript code, handles API integration, runs builds, and deploys.',
+      icon: Code2,
+    },
+  ];
+
   return (
-    <section className="py-24 px-6 md:px-12 max-w-7xl mx-auto">
+    <section id="agents" className="py-16 max-w-7xl mx-auto px-6 md:px-12">
       <div className="mb-12">
-        <h2 className="font-heading text-3xl md:text-4xl font-extrabold text-white mb-4">
-          AI Roster Departments
+        <h2 className="font-heading text-3xl font-bold text-white mb-3">
+          Specialized Autonomous AI Agents
         </h2>
-        <p className="font-sans text-base text-on-surface-variant max-w-2xl leading-relaxed">
-          Specialized autonomous agents ready to tackle your complex engineering challenges.
+        <p className="font-sans text-sm text-on-surface-variant max-w-2xl leading-relaxed">
+          Four synchronized AI agents operating as an integrated engineering department.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {TEAM.map((member) => {
-          const Icon = member.icon;
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {AGENTS.map((agent) => {
+          const Icon = agent.icon;
           return (
             <div
-              key={member.role}
-              className="border border-white/10 bg-surface p-8 hover:-translate-y-1.5 transition-all duration-300 relative group offset-shadow hover:border-primary/50"
+              key={agent.role}
+              className="border border-white/10 bg-surface p-6 rounded-2xl flex flex-col justify-between hover:border-primary transition-all duration-300 glass-card offset-shadow"
             >
-              <div className="absolute top-0 right-0 p-6 opacity-0 group-hover:opacity-100 transition-opacity">
-                <ArrowUpRight className="w-5 h-5 text-primary" />
-              </div>
-              <div className="mb-6 flex justify-between items-start">
-                <div className="w-14 h-14 bg-surface-container border border-primary/30 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
-                  <Icon className="w-7 h-7" />
+              <div>
+                <div className="flex justify-between items-start mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-surface-container-high border border-primary/30 flex items-center justify-center text-primary">
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <span className="font-mono text-[9px] font-bold text-primary bg-primary/10 border border-primary/30 px-2 py-0.5 uppercase tracking-wider rounded-full">
+                    {agent.status}
+                  </span>
                 </div>
-                <span className="bg-primary text-background font-mono text-[10px] font-bold px-2.5 py-1 uppercase tracking-wider">
-                  {member.status}
-                </span>
+                <h3 className="font-heading text-base font-bold text-white mb-1">{agent.title}</h3>
+                <p className="font-mono text-xs text-primary font-bold mb-3">{agent.role}</p>
+                <p className="font-sans text-xs text-on-surface-variant leading-relaxed">
+                  {agent.focus}
+                </p>
               </div>
-              <h3 className="font-heading text-xl font-bold text-white mb-1">{member.title}</h3>
-              <p className="font-mono text-xs text-primary font-bold mb-4">{member.role}</p>
-              <p className="font-sans text-sm text-on-surface-variant border-t border-white/10 pt-4 mt-4 leading-relaxed">
-                {member.focus}
-              </p>
             </div>
           );
         })}
@@ -243,39 +347,36 @@ export function LandingDepartments() {
 }
 
 /**
- * Interactive Orchestration Pipeline Steps.
+ * Pipeline Section.
  */
 export function LandingPipeline() {
   return (
-    <section className="py-16 border-y border-white/10 bg-surface-container-low overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
-        <p className="font-mono text-xs font-bold text-on-surface-variant mb-10 uppercase tracking-widest">
-          Orchestration Pipeline
-        </p>
-        <div className="flex items-center justify-between relative">
-          <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-white/10 -z-10 transform -translate-y-1/2" />
-          {['Ideate', 'Spec', 'Build', 'Test', 'Deploy'].map((stage, idx) => {
-            const isActive = stage === 'Build';
-            return (
-              <div key={stage} className="flex flex-col items-center gap-3">
-                {isActive ? (
-                  <div className="w-7 h-7 bg-primary glow-cyan rounded-full flex items-center justify-center">
-                    <div className="w-2.5 h-2.5 bg-background rounded-full" />
-                  </div>
-                ) : (
-                  <div className="w-5 h-5 bg-surface border border-white/20 rounded-full" />
-                )}
-                <span
-                  className={cn(
-                    'font-mono text-xs tracking-wider uppercase font-bold',
-                    isActive ? 'text-primary' : 'text-on-surface-variant/60',
-                  )}
-                >
-                  {stage}
-                </span>
-              </div>
-            );
-          })}
+    <section className="py-16 max-w-7xl mx-auto px-6 md:px-12">
+      <div className="border border-white/10 bg-surface p-8 rounded-2xl glass-card">
+        <h3 className="font-mono text-xs font-bold text-primary uppercase tracking-widest mb-6">
+          5-Stage Autonomous Execution Pipeline
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-5 gap-4 font-mono text-xs">
+          <div className="p-4 border border-white/10 bg-background rounded-xl">
+            <span className="text-primary font-bold block mb-1">01. SCOPE</span>
+            <p className="text-[11px] text-on-surface-variant">Write specification requirements.</p>
+          </div>
+          <div className="p-4 border border-white/10 bg-background rounded-xl">
+            <span className="text-primary font-bold block mb-1">02. ARCH</span>
+            <p className="text-[11px] text-on-surface-variant">Design DB schema & topology.</p>
+          </div>
+          <div className="p-4 border border-primary bg-primary/10 rounded-xl glow-border">
+            <span className="text-primary font-bold block mb-1">03. DESIGN</span>
+            <p className="text-[11px] text-on-surface-variant">Incorporate responsive tokens.</p>
+          </div>
+          <div className="p-4 border border-white/10 bg-background rounded-xl">
+            <span className="text-white font-bold block mb-1">04. CODE</span>
+            <p className="text-[11px] text-on-surface-variant">Stream live code generation.</p>
+          </div>
+          <div className="p-4 border border-white/10 bg-background rounded-xl">
+            <span className="text-white font-bold block mb-1">05. DEPLOY</span>
+            <p className="text-[11px] text-on-surface-variant">Compile live preview sandbox.</p>
+          </div>
         </div>
       </div>
     </section>
@@ -287,20 +388,19 @@ export function LandingPipeline() {
  */
 export function LandingCTA() {
   return (
-    <section className="py-24 px-6 md:px-12 max-w-5xl mx-auto text-center">
-      <div className="bg-surface p-10 md:p-16 border border-primary/40 offset-shadow relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-2xl pointer-events-none" />
-        <h2 className="font-heading text-3xl md:text-4xl font-extrabold text-white mb-8 max-w-2xl mx-auto leading-tight">
-          Stop managing freelancers. Let AI agents write your software.
+    <section className="py-20 px-6 md:px-12 max-w-5xl mx-auto text-center">
+      <div className="bg-surface p-8 md:p-14 border border-primary/40 rounded-2xl glass-card offset-shadow relative overflow-hidden">
+        <h2 className="font-heading text-2xl md:text-4xl font-bold text-white mb-6 leading-tight max-w-2xl mx-auto">
+          Start Building With Your Autonomous AI Team Today.
         </h2>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-xl mx-auto">
+        <div className="flex flex-col sm:flex-row gap-3 justify-center max-w-lg mx-auto">
           <input
-            className="bg-background font-mono text-xs text-white border border-white/20 px-4 py-3.5 flex-grow focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary placeholder:text-on-surface-variant/50"
-            placeholder="Describe your app idea (e.g. Drone delivery SaaS...)"
+            className="bg-background font-mono text-xs text-white border border-white/20 px-4 py-3.5 flex-grow focus:outline-none focus:border-primary rounded-xl placeholder:text-on-surface-variant/40"
+            placeholder="Describe your app idea (e.g. AI CRM platform...)"
             type="text"
           />
           <Link href={ROUTES.register}>
-            <button className="w-full sm:w-auto bg-primary text-background font-mono text-xs font-bold px-8 py-3.5 border border-primary hover:bg-transparent hover:text-primary transition-all duration-200 uppercase whitespace-nowrap tracking-wider">
+            <button className="w-full sm:w-auto bg-primary text-background font-mono text-xs font-bold px-6 py-3.5 border border-primary hover:bg-transparent hover:text-primary transition-all duration-200 uppercase tracking-wider rounded-xl">
               Generate Scope
             </button>
           </Link>
@@ -311,28 +411,33 @@ export function LandingCTA() {
 }
 
 /**
- * System Status Footer.
+ * Footer matching Blueprint Design.
  */
 export function LandingFooter() {
   return (
-    <footer className="bg-background text-on-surface-variant font-mono text-xs border-t border-white/10 w-full relative">
-      <div className="flex flex-col md:flex-row justify-between items-center px-6 md:px-12 py-8 w-full gap-4 max-w-7xl mx-auto">
-        <div className="flex items-center gap-4">
-          <span>© 2026 {APP_NAME} AI Orchestration</span>
-        </div>
-        <div className="flex items-center gap-2 border border-white/10 bg-surface px-4 py-2">
-          <div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse" />
-          <span className="text-[11px] text-on-surface-variant">
-            All AI Clusters Operational — Latency: 18ms
+    <footer className="bg-background text-on-surface-variant font-mono text-xs border-t border-white/10 w-full mt-auto">
+      <div className="grid grid-cols-1 md:grid-cols-6 gap-6 px-6 md:px-12 py-12 max-w-7xl mx-auto">
+        <div className="md:col-span-2 flex flex-col gap-2">
+          <span className="font-heading text-lg font-bold text-white">{APP_NAME}</span>
+          <span className="text-on-surface-variant opacity-80">
+            © 2026 HibirDev AI. Engineering Excellence.
           </span>
         </div>
-        <nav className="flex gap-6">
-          {FOOTER_LINKS.map((link) => (
-            <a key={link.label} className="hover:text-primary transition-colors" href={link.href}>
-              {link.label}
-            </a>
-          ))}
-        </nav>
+
+        <div className="md:col-span-4 flex flex-wrap gap-6 justify-start md:justify-end items-center">
+          <a className="text-on-surface-variant hover:text-primary transition-colors" href="#product">
+            Product
+          </a>
+          <a className="text-on-surface-variant hover:text-primary transition-colors" href="#how-it-works">
+            How It Works
+          </a>
+          <a className="text-on-surface-variant hover:text-primary transition-colors" href="#agents">
+            Agents
+          </a>
+          <Link className="text-on-surface-variant hover:text-primary transition-colors" href={ROUTES.dashboard}>
+            Workspace
+          </Link>
+        </div>
       </div>
     </footer>
   );

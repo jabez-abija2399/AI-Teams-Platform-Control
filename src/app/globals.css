@@ -169,4 +169,18 @@ body {
     z-index: -1; 
     border: 1px solid rgba(0, 242, 254, 0.3);
   }
+
+  /* Blueprint Grid System */
+  .blueprint-line { border-color: rgba(148, 163, 184, 0.2); }
+  .dark .blueprint-line { border-color: rgba(255, 255, 255, 0.12); }
+  .blueprint-border { border: 1px solid rgba(148, 163, 184, 0.2); }
+  .dark .blueprint-border { border: 1px solid rgba(255, 255, 255, 0.12); }
+  .blueprint-border-t { border-top: 1px solid rgba(148, 163, 184, 0.2); }
+  .dark .blueprint-border-t { border-top: 1px solid rgba(255, 255, 255, 0.12); }
+  .blueprint-border-b { border-bottom: 1px solid rgba(148, 163, 184, 0.2); }
+  .dark .blueprint-border-b { border-bottom: 1px solid rgba(255, 255, 255, 0.12); }
+  .blueprint-border-l { border-left: 1px solid rgba(148, 163, 184, 0.2); }
+  .dark .blueprint-border-l { border-left: 1px solid rgba(255, 255, 255, 0.12); }
+  .blueprint-border-r { border-right: 1px solid rgba(148, 163, 184, 0.2); }
+  .dark .blueprint-border-r { border-right: 1px solid rgba(255, 255, 255, 0.12); }
 }
