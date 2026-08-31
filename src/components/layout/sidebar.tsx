@@ -24,9 +24,6 @@ export function Sidebar({ isSuperAdmin = false }: SidebarProps) {
 
   const navItems = [
     { href: ROUTES.dashboard, label: 'Dashboard', icon: LayoutDashboard },
-    { href: '/dashboard/mission-control', label: 'Mission Control', icon: Activity },
-    { href: '/dashboard/architecture', label: 'System Architecture', icon: Workflow },
-    { href: '/dashboard/artifacts', label: 'Artifacts Registry', icon: Terminal },
     { href: ROUTES.projects, label: 'Workspace', icon: Layers },
     { href: '/dashboard/settings', label: 'Settings & Providers', icon: Settings },
   ];
@@ -79,13 +76,6 @@ export function Sidebar({ isSuperAdmin = false }: SidebarProps) {
 
       {/* Footer Navigation */}
       <div className="mt-auto pt-4 border-t border-white/10 flex flex-col gap-1 font-sans text-xs font-medium">
-        <a
-          href="#settings"
-          className="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high/30 hover:text-white transition-colors"
-        >
-          <Settings className="w-4 h-4 text-on-surface-variant" />
-          <span>Settings</span>
-        </a>
         <a
           href="#support"
           className="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high/30 hover:text-white transition-colors"
