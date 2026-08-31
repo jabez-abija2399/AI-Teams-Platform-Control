@@ -1,10 +1,7 @@
 import {
   LandingHeader,
   LandingHero,
-  LandingSocialProof,
-  LandingDepartments,
-  LandingPipeline,
-  LandingCTA,
+  LandingWorkflowSpine,
   LandingFooter,
 } from '@/components/landing/landing-sections';
 
@@ -14,10 +11,7 @@ export default function HomePage() {
       <LandingHeader />
       <main className="flex-1">
         <LandingHero />
-        <LandingSocialProof />
-        <LandingDepartments />
-        <LandingPipeline />
-        <LandingCTA />
+        <LandingWorkflowSpine />
       </main>
       <LandingFooter />
     </div>
