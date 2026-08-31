@@ -3,32 +3,25 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Lock, Mail, User, ArrowRight, Sparkles, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { AlertCircle, Eye, EyeOff, Loader2, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { APP_NAME, ROUTES } from '@/config/constants';
-import { GlassCard, NeonButton } from '@/packages/ui';
 
 export function SignupForm() {
   const router = useRouter();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    e.stopPropagation();
     if (loading) return;
 
     setError(null);
     setSuccess(null);
-
-    if (password !== confirmPassword) {
-      setError('Passwords do not match.');
-      return;
-    }
 
     if (password.length < 8) {
       setError('Password must be at least 8 characters long.');
@@ -62,141 +55,161 @@ export function SignupForm() {
     }
   };
 
+  const getPasswordStrength = () => {
+    if (!password) return 0;
+    let score = 0;
+    if (password.length >= 8) score++;
+    if (/[A-Z]/.test(password) && /[a-z]/.test(password)) score++;
+    if (/[0-9]/.test(password) || /[^A-Za-z0-9]/.test(password)) score++;
+    return score;
+  };
+
+  const strength = getPasswordStrength();
+
   return (
-    <div className="w-full text-white">
-      {/* Brand Header */}
-      <div className="mb-6">
-        <Link href={ROUTES.home} className="mb-4 inline-flex items-center gap-2.5">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-secondary text-white shadow-[0_0_15px_rgba(99,102,241,0.5)]">
-            <Sparkles className="h-5 w-5" />
-          </div>
-          <span className="text-xl font-bold tracking-tight text-white">{APP_NAME}</span>
-        </Link>
-        <h1 className="text-3xl font-bold tracking-tight text-white">Create your account</h1>
-        <p className="mt-2 text-sm leading-relaxed text-white/60">
-          Launch your autonomous AI software company in minutes.
+    <div className="w-full flex flex-col gap-6">
+      {/* Form Title & Subtitle */}
+      <div className="flex flex-col gap-2">
+        <h2 className="font-heading text-2xl md:text-3xl font-extrabold text-white">
+          Create Account
+        </h2>
+        <p className="font-sans text-xs text-on-surface-variant">
+          Configure your account to begin building with AI.
         </p>
       </div>
 
-      {/* Glassmorphic Form Card */}
-      <GlassCard className="p-8 border-white/10 shadow-2xl bg-surface-glass/90">
-        {error && (
-          <div className="mb-4 flex items-center gap-2.5 rounded-xl border border-danger/40 bg-danger/10 p-3.5 text-xs font-medium text-danger">
-            <AlertCircle className="h-4 w-4 shrink-0" />
-            <span>{error}</span>
-          </div>
-        )}
-        {success && (
-          <div className="mb-4 flex items-center gap-2.5 rounded-xl border border-success/40 bg-success/10 p-3.5 text-xs font-medium text-success">
-            <CheckCircle2 className="h-4 w-4 shrink-0 text-success" />
-            <span>{success}</span>
-          </div>
-        )}
+      {/* Notifications */}
+      {error && (
+        <div className="flex items-center gap-2.5 border border-danger/40 bg-danger/10 p-3.5 text-xs font-semibold text-danger rounded-xl">
+          <AlertCircle className="h-4 w-4 shrink-0" />
+          <span>{error}</span>
+        </div>
+      )}
+      {success && (
+        <div className="flex items-center gap-2.5 border border-success/40 bg-success/10 p-3.5 text-xs font-semibold text-success rounded-xl">
+          <CheckCircle2 className="h-4 w-4 shrink-0 text-success" />
+          <span>{success}</span>
+        </div>
+      )}
 
-        <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-          <div className="space-y-1.5">
-            <label htmlFor="signup-name" className="text-xs font-bold uppercase tracking-wider text-white/70">
-              Full Name
-            </label>
-            <div className="relative">
-              <User className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
-              <input
-                id="signup-name"
-                type="text"
-                required
-                autoComplete="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Jane Doe"
-                className="w-full h-11 rounded-xl border border-white/10 bg-white/5 pl-10 pr-4 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/20 backdrop-blur-md transition-all"
-              />
-            </div>
-          </div>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+        {/* Full Name */}
+        <div className="flex flex-col gap-2">
+          <label className="font-mono text-xs font-bold text-on-surface-variant uppercase tracking-wider" htmlFor="signup-name">
+            FULL_NAME
+          </label>
+          <input
+            id="signup-name"
+            type="text"
+            required
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Jane Doe"
+            className="w-full bg-background border border-white/10 text-white font-mono text-xs px-4 py-3 rounded-xl focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder:text-on-surface-variant/40"
+          />
+        </div>
 
-          <div className="space-y-1.5">
-            <label htmlFor="signup-email" className="text-xs font-bold uppercase tracking-wider text-white/70">
-              Email
-            </label>
-            <div className="relative">
-              <Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
-              <input
-                id="signup-email"
-                type="email"
-                required
-                autoComplete="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="name@company.com"
-                className="w-full h-11 rounded-xl border border-white/10 bg-white/5 pl-10 pr-4 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/20 backdrop-blur-md transition-all"
-              />
-            </div>
-          </div>
+        {/* Email Address */}
+        <div className="flex flex-col gap-2">
+          <label className="font-mono text-xs font-bold text-on-surface-variant uppercase tracking-wider" htmlFor="signup-email">
+            EMAIL_ADDRESS
+          </label>
+          <input
+            id="signup-email"
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="jane@example.com"
+            className="w-full bg-background border border-white/10 text-white font-mono text-xs px-4 py-3 rounded-xl focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder:text-on-surface-variant/40"
+          />
+        </div>
 
-          <div className="space-y-1.5">
-            <label htmlFor="signup-password" className="text-xs font-bold uppercase tracking-wider text-white/70">
-              Password
-            </label>
-            <div className="relative">
-              <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
-              <input
-                id="signup-password"
-                type="password"
-                required
-                autoComplete="new-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Min 8 characters"
-                className="w-full h-11 rounded-xl border border-white/10 bg-white/5 pl-10 pr-4 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/20 backdrop-blur-md transition-all font-mono"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-1.5">
-            <label htmlFor="signup-confirm-password" className="text-xs font-bold uppercase tracking-wider text-white/70">
-              Confirm Password
-            </label>
-            <div className="relative">
-              <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
-              <input
-                id="signup-confirm-password"
-                type="password"
-                required
-                autoComplete="new-password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full h-11 rounded-xl border border-white/10 bg-white/5 pl-10 pr-4 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/20 backdrop-blur-md transition-all font-mono"
-              />
-            </div>
-          </div>
-
-          <div className="pt-2">
-            <NeonButton
-              type="submit"
-              variant="primary"
-              isLoading={loading}
-              disabled={loading || !email.trim() || !password || !confirmPassword}
-              className="w-full h-11 text-xs font-bold shadow-xl flex items-center justify-center gap-2"
+        {/* Secure Key (Password) */}
+        <div className="flex flex-col gap-2">
+          <label className="font-mono text-xs font-bold text-on-surface-variant uppercase tracking-wider" htmlFor="signup-password">
+            SECURE_KEY
+          </label>
+          <div className="relative">
+            <input
+              id="signup-password"
+              type={showPassword ? 'text' : 'password'}
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••••••"
+              className="w-full bg-background border border-white/10 text-white font-mono text-xs px-4 py-3 rounded-xl focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder:text-on-surface-variant/40 pr-10"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors"
+              title={showPassword ? 'Hide password' : 'Show password'}
             >
-              {loading ? (
-                'Creating Account...'
-              ) : (
-                <>
-                  <span>Create AI Company Account</span>
-                  <ArrowRight className="w-4 h-4 ml-1" />
-                </>
-              )}
-            </NeonButton>
+              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
           </div>
-        </form>
-      </GlassCard>
 
-      <p className="mt-6 text-center text-sm text-white/50 lg:text-left">
-        Already have an account?{' '}
-        <Link href={ROUTES.login} className="font-bold text-primary hover:underline">
+          {/* Password Strength Bar */}
+          <div className="flex gap-1 mt-1">
+            <div className={`h-1 w-1/3 rounded-full transition-all ${strength >= 1 ? 'bg-primary' : 'bg-white/10'}`} />
+            <div className={`h-1 w-1/3 rounded-full transition-all ${strength >= 2 ? 'bg-primary' : 'bg-white/10'}`} />
+            <div className={`h-1 w-1/3 rounded-full transition-all ${strength >= 3 ? 'bg-primary' : 'bg-white/10'}`} />
+          </div>
+        </div>
+
+        {/* Primary CTA Button */}
+        <button
+          type="submit"
+          disabled={loading}
+          className="mt-2 w-full bg-primary text-black font-mono text-xs font-bold py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 hover:bg-transparent hover:text-primary border border-primary transition-all duration-200 uppercase tracking-wider glow-cyan"
+        >
+          {loading ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <>
+              <span>Create Account</span>
+              <ArrowRight className="w-4 h-4" />
+            </>
+          )}
+        </button>
+      </form>
+
+      {/* Divider */}
+      <div className="flex items-center gap-4 w-full my-1">
+        <div className="h-px flex-1 bg-white/10" />
+        <span className="font-mono text-[10px] text-on-surface-variant uppercase tracking-wider font-bold">
+          Auth_Providers
+        </span>
+        <div className="h-px flex-1 bg-white/10" />
+      </div>
+
+      {/* Social Auth Buttons */}
+      <div className="flex flex-col gap-2.5 font-mono text-xs">
+        <button
+          type="button"
+          className="w-full bg-surface border border-white/10 hover:border-primary py-2.5 rounded-xl flex items-center justify-center gap-3 text-white transition-colors"
+        >
+          <span>Continue with Google</span>
+        </button>
+        <button
+          type="button"
+          className="w-full bg-surface border border-white/10 hover:border-primary py-2.5 rounded-xl flex items-center justify-center gap-3 text-white transition-colors"
+        >
+          <span>Continue with GitHub</span>
+        </button>
+      </div>
+
+      {/* Footer Redirect */}
+      <div className="text-center mt-2">
+        <span className="font-sans text-xs text-on-surface-variant">Already have an account? </span>
+        <Link
+          href={ROUTES.login}
+          className="font-mono text-xs font-bold text-primary border-b border-primary hover:text-white transition-colors pb-0.5"
+        >
           Sign in
         </Link>
-      </p>
+      </div>
     </div>
   );
 }

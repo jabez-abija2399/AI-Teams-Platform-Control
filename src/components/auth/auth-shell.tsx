@@ -2,12 +2,15 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Logo } from '@/components/layout/logo';
-import { Brain, Layers, Sparkles, Terminal, Sun, Moon } from 'lucide-react';
+import { ArrowDown, Brain, Layers, Sparkles, Terminal, Sun, Moon } from 'lucide-react';
 import { APP_NAME, ROUTES } from '@/config/constants';
 import { useTheme } from 'next-themes';
 
 export function AuthShell({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const isSignup = pathname?.includes('signup') || pathname?.includes('register');
   const [mounted, setMounted] = useState(false);
   const { theme, setTheme } = useTheme();
 
@@ -46,64 +49,84 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
         <div className="z-10 flex flex-col gap-8 max-w-md my-auto">
           <div>
             <h1 className="font-heading text-4xl lg:text-5xl font-extrabold text-white mb-4 leading-tight">
-              Your AI software team is ready.
+              {isSignup ? 'Start building with your AI team.' : 'Your AI software team is ready.'}
             </h1>
             <p className="font-sans text-base text-on-surface-variant leading-relaxed">
               Deploy specialized autonomous agents. Scale your architecture with precision engineering.
             </p>
           </div>
 
-          {/* Agent Hierarchy Visual */}
-          <div className="flex flex-col gap-3 mt-4 pl-4 border-l border-white/10">
-            {/* CEO Agent */}
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-surface border border-white/10 flex items-center justify-center text-on-surface-variant">
-                <Brain className="w-4 h-4" />
+          {/* Workflow Pipeline Visual for Signup / Login */}
+          {isSignup ? (
+            <div className="flex flex-col gap-2 font-mono text-xs font-bold text-on-surface-variant uppercase tracking-widest pl-3 border-l-2 border-white/10">
+              <div className="flex items-center gap-3">
+                <span className="text-primary font-bold">IDEA</span>
               </div>
-              <span className="font-mono text-xs font-bold text-on-surface-variant uppercase tracking-wider">
-                CEO Agent
-              </span>
+              <ArrowDown className="w-4 h-4 text-on-surface-variant opacity-60 ml-0.5" />
+              <div className="flex items-center gap-3">
+                <span>CEO</span>
+              </div>
+              <ArrowDown className="w-4 h-4 text-on-surface-variant opacity-60 ml-0.5" />
+              <div className="flex items-center gap-3">
+                <span>ARCHITECT</span>
+              </div>
+              <ArrowDown className="w-4 h-4 text-on-surface-variant opacity-60 ml-0.5" />
+              <div className="flex items-center gap-3">
+                <span>DESIGNER</span>
+              </div>
+              <ArrowDown className="w-4 h-4 text-on-surface-variant opacity-60 ml-0.5" />
+              <div className="flex items-center gap-3">
+                <span className="text-primary font-bold">DEVELOPER</span>
+              </div>
             </div>
-            <div className="w-px h-3 bg-white/10 ml-4" />
+          ) : (
+            <div className="flex flex-col gap-3 pl-4 border-l border-white/10">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-surface border border-white/10 flex items-center justify-center text-on-surface-variant">
+                  <Brain className="w-4 h-4" />
+                </div>
+                <span className="font-mono text-xs font-bold text-on-surface-variant uppercase tracking-wider">
+                  CEO Agent
+                </span>
+              </div>
+              <div className="w-px h-3 bg-white/10 ml-4" />
 
-            {/* Architect Agent */}
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-surface border border-white/10 flex items-center justify-center text-on-surface-variant">
-                <Layers className="w-4 h-4" />
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-surface border border-white/10 flex items-center justify-center text-on-surface-variant">
+                  <Layers className="w-4 h-4" />
+                </div>
+                <span className="font-mono text-xs font-bold text-on-surface-variant uppercase tracking-wider">
+                  Architect
+                </span>
               </div>
-              <span className="font-mono text-xs font-bold text-on-surface-variant uppercase tracking-wider">
-                Architect
-              </span>
-            </div>
-            <div className="w-px h-3 bg-white/10 ml-4" />
+              <div className="w-px h-3 bg-white/10 ml-4" />
 
-            {/* Designer Agent */}
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-surface border border-white/10 flex items-center justify-center text-on-surface-variant">
-                <Sparkles className="w-4 h-4" />
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-surface border border-white/10 flex items-center justify-center text-on-surface-variant">
+                  <Sparkles className="w-4 h-4" />
+                </div>
+                <span className="font-mono text-xs font-bold text-on-surface-variant uppercase tracking-wider">
+                  Designer
+                </span>
               </div>
-              <span className="font-mono text-xs font-bold text-on-surface-variant uppercase tracking-wider">
-                Designer
-              </span>
-            </div>
-            <div className="w-px h-3 bg-white/10 ml-4" />
+              <div className="w-px h-3 bg-white/10 ml-4" />
 
-            {/* Developer Agent */}
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-surface border border-primary/40 flex items-center justify-center text-primary glow-border">
-                <Terminal className="w-4 h-4 text-primary" />
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-surface border border-primary/40 flex items-center justify-center text-primary glow-border">
+                  <Terminal className="w-4 h-4 text-primary" />
+                </div>
+                <span className="font-mono text-xs font-bold text-primary uppercase tracking-wider">
+                  Developer
+                </span>
               </div>
-              <span className="font-mono text-xs font-bold text-primary uppercase tracking-wider">
-                Developer
-              </span>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Bottom Text */}
         <div className="z-10">
           <span className="font-mono text-[11px] font-bold text-on-surface-variant uppercase tracking-widest">
-            {APP_NAME.toUpperCase()} / WORKSPACE
+            {APP_NAME.toUpperCase()} / SOFTWARE ENGINEERING PLATFORM / NODE: 01
           </span>
         </div>
 
@@ -138,7 +161,7 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
           )}
         </div>
 
-        <div className="w-full max-w-[420px] flex flex-col gap-8 z-10">{children}</div>
+        <div className="w-full max-w-[440px] flex flex-col gap-8 z-10">{children}</div>
 
         {/* Technical Status Footer */}
         <div className="absolute bottom-6 left-0 right-0 text-center pointer-events-none">

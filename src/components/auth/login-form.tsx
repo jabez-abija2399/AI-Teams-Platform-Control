@@ -178,7 +178,7 @@ export function LoginForm() {
         <button
           type="submit"
           disabled={loading}
-          className="mt-2 w-full bg-primary text-background font-mono text-xs font-bold py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 hover:bg-transparent hover:text-primary border border-primary transition-all duration-200 uppercase tracking-wider glow-cyan"
+          className="mt-2 w-full bg-primary text-black font-mono text-xs font-bold py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 hover:bg-transparent hover:text-primary border border-primary transition-all duration-200 uppercase tracking-wider glow-cyan"
         >
           {loading ? (
             <Loader2 className="w-4 h-4 animate-spin" />

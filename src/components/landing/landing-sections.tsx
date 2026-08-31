@@ -76,7 +76,7 @@ export function LandingHeader() {
           </Link>
 
           <Link href={ROUTES.register}>
-            <button className="bg-primary text-background font-sans text-sm font-bold py-2 px-4 rounded hover:opacity-90 transition-opacity">
+            <button className="bg-primary text-black font-sans text-sm font-bold py-2 px-4 rounded hover:opacity-90 transition-opacity">
               Start Building
             </button>
           </Link>
@@ -129,7 +129,7 @@ export function LandingHero() {
           </p>
           <div className="pt-2">
             <Link href={ROUTES.register}>
-              <button className="bg-primary text-background font-sans text-sm font-bold py-3 px-6 rounded hover:opacity-90 transition-opacity">
+              <button className="bg-primary text-black font-sans text-sm font-bold py-3 px-6 rounded hover:opacity-90 transition-opacity">
                 Start Building
               </button>
             </Link>

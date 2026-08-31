@@ -29,58 +29,64 @@
   --radius-2xl: calc(var(--radius) * 1.8);
 }
 
-/* Configurable Theme Color Variables (Rich Obsidian & Electric Cyan Palette) */
+/* Configurable Theme Color Variables (Technical Precision Core Palette) */
 :root {
-  --brand-black: #080A0F;
-  --brand-obsidian-surface: #10141E;
-  --brand-obsidian-high: #181E2C;
-  --brand-off-white: #E2E8F0;
-  --brand-teal: #00F2FE;
-  --brand-teal-secondary: #00ACAC;
-  --brand-muted-gray: #94A3B8;
+  --brand-black: #000000;
+  --brand-obsidian-surface: #131313;
+  --brand-obsidian-high: #1B1B1B;
+  --brand-off-white: #DFDEDC;
+  --brand-teal: #00ACAC;
+  --brand-muted-gray: #A6A7A2;
+  --brand-border-dark: #464545;
 
-  /* 🌙 Dark Theme Mappings (Primary/Default mode) */
-  --void: var(--brand-black);
-  --surface: var(--brand-obsidian-surface);
-  --surface-glass: rgba(16, 20, 30, 0.75);
-  --surface-hover: rgba(0, 242, 254, 0.08);
+  /* 🌙 Dark Theme Mappings (Technical Precision Dark) */
+  --void: #000000;
+  --surface: #131313;
+  --surface-container-high: #1B1B1B;
+  --surface-glass: rgba(19, 19, 19, 0.85);
+  --surface-hover: rgba(0, 172, 172, 0.08);
   
-  --primary: var(--brand-teal);
-  --secondary: var(--brand-muted-gray);
-  --success: #10B981;
+  --primary: #00ACAC;
+  --primary-container: #00ACAC;
+  --secondary: #A6A7A2;
+  --success: #00ACAC;
   --warning: #F59E0B;
   --danger: #EF4444;
 
-  --background: var(--void);
-  --foreground: var(--brand-off-white);
+  --background: #000000;
+  --foreground: #DFDEDC;
+  --on-surface-variant: #A6A7A2;
+  --outline: #464545;
+  --outline-variant: #464545;
   
   --font-sans: 'Inter', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
   
-  --radius: 0.75rem;
+  --radius: 0.25rem;
 }
 
-/* ☀️ Light Theme Mappings (Exact User Blueprint Specification) */
+/* ☀️ Light Theme Mappings (Technical Precision Light) */
 html:not(.dark) {
   --void: #F9F9F9;
   --surface: #FFFFFF;
+  --surface-container-high: #F3F3F4;
   --surface-glass: rgba(249, 249, 249, 0.95);
   --surface-hover: rgba(0, 172, 172, 0.08);
   
-  --primary: #006A6A;
+  --primary: #00ACAC;
   --primary-container: #00ACAC;
-  --secondary: #5F5E5E;
+  --secondary: #464545;
   --tertiary: #717171;
-  --success: #059669;
+  --success: #00ACAC;
   --warning: #D97706;
   --danger: #BA1A1A;
 
-  --on-surface-variant: #3C4949;
-  --outline: #6C7A79;
-  --outline-variant: #BBC9C8;
+  --on-surface-variant: #464545;
+  --outline: #DADADA;
+  --outline-variant: #F3F3F4;
 
-  --background: var(--void);
-  --foreground: #1A1C1C;
+  --background: #F9F9F9;
+  --foreground: #000000;
 }
 
 body {
@@ -90,16 +96,16 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-image: 
-    linear-gradient(to right, rgba(70, 69, 69, 0.2) 0.5px, transparent 0.5px),
-    linear-gradient(to bottom, rgba(70, 69, 69, 0.2) 0.5px, transparent 0.5px);
+    linear-gradient(to right, #464545 0.5px, transparent 0.5px),
+    linear-gradient(to bottom, #464545 0.5px, transparent 0.5px);
   background-size: 48px 48px;
   background-attachment: fixed;
 }
 
 html:not(.dark) body {
   background-image: 
-    linear-gradient(to right, #E2E2E2 0.5px, transparent 0.5px),
-    linear-gradient(to bottom, #E2E2E2 0.5px, transparent 0.5px);
+    linear-gradient(to right, #DADADA 0.5px, transparent 0.5px),
+    linear-gradient(to bottom, #DADADA 0.5px, transparent 0.5px);
 }
 
 /* Tailwind base resets and layers */
