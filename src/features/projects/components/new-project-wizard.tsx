@@ -67,8 +67,9 @@ export function NewProjectWizard() {
 
       setCreatedProjectId(result.data.id);
       setLoading(false);
-      setStep(4);
-      toast.success('AI Workforce deployed! Entering Mission Control...');
+      toast.success('AI Workforce deployed! Launching Mission Control Workspace...');
+      router.push(`${ROUTES.projects}/${result.data.id}/workspace`);
+      router.refresh();
     } catch {
       toast.error('Project creation failed. Please try again.');
       setLoading(false);
