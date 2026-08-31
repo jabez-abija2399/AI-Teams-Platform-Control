@@ -11,11 +11,15 @@ import {
   Terminal,
   Lightbulb,
   CheckCircle2,
-  AlertTriangle,
   RefreshCw,
-  Loader2,
   ChevronRight,
   Settings,
+  FolderOpen,
+  Folder,
+  FileCode,
+  Send,
+  Bot,
+  ChevronDown,
 } from 'lucide-react';
 import { ROUTES } from '@/config/constants';
 
@@ -24,7 +28,9 @@ export function NewProjectWizard() {
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [ideaText, setIdeaText] = useState('');
   const [projectName, setProjectName] = useState('');
+  const [createdProjectId, setCreatedProjectId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [promptText, setPromptText] = useState('');
 
   const handleStep1Submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,7 +46,6 @@ export function NewProjectWizard() {
   const handleLaunchProject = async () => {
     if (loading) return;
     setLoading(true);
-    setStep(4);
 
     try {
       const res = await fetch('/api/projects', {
@@ -57,19 +62,16 @@ export function NewProjectWizard() {
       if (!result.success) {
         toast.error(result.error?.message || 'Failed to initialize project.');
         setLoading(false);
-        setStep(3);
         return;
       }
 
-      toast.success('AI Workforce deployed! Launching workspace...');
-      setTimeout(() => {
-        router.push(`${ROUTES.projects}/${result.data.id}/workspace`);
-        router.refresh();
-      }, 1200);
+      setCreatedProjectId(result.data.id);
+      setLoading(false);
+      setStep(4);
+      toast.success('AI Workforce deployed! Entering Mission Control...');
     } catch {
       toast.error('Project creation failed. Please try again.');
       setLoading(false);
-      setStep(3);
     }
   };
 
@@ -98,7 +100,7 @@ export function NewProjectWizard() {
           </span>
           <ChevronRight className="w-3 h-3 opacity-40" />
           <span className={step === 4 ? 'text-primary border-b border-primary pb-0.5 font-bold' : ''}>
-            04 / Launch
+            04 / Mission Control
           </span>
         </div>
 
@@ -316,34 +318,126 @@ export function NewProjectWizard() {
               <button
                 type="button"
                 onClick={handleLaunchProject}
+                disabled={loading}
                 className="bg-primary text-black font-mono text-xs font-bold px-8 py-3.5 rounded-xl hover:bg-primary-container transition-colors flex items-center gap-2 uppercase tracking-wider glow-cyan"
               >
-                <span>Confirm Workforce & Launch</span>
+                <span>{loading ? 'Deploying...' : 'Confirm Workforce & Launch Mission Control'}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
           </div>
         )}
 
-        {/* STEP 4: LAUNCH / AI PROCESSING */}
+        {/* STEP 4: MISSION CONTROL VIEW (ONBOARDING ----> MISSION CONTROL) */}
         {step === 4 && (
-          <div className="bg-surface border border-white/10 w-full max-w-2xl p-8 rounded-xl text-center flex flex-col items-center gap-6">
-            <div className="w-16 h-16 rounded-full border-2 border-primary bg-primary/10 flex items-center justify-center text-primary glow-cyan">
-              <Loader2 className="w-8 h-8 animate-spin" />
+          <div className="w-full max-w-6xl bg-surface border border-white/10 rounded-xl overflow-hidden flex flex-col h-[650px] shadow-2xl">
+            {/* Header Strip */}
+            <div className="h-10 bg-background border-b border-white/10 px-4 flex items-center justify-between font-mono text-xs shrink-0">
+              <div className="flex items-center gap-3">
+                <span className="text-primary font-bold">04 / MISSION CONTROL</span>
+                <span className="text-on-surface-variant opacity-40">|</span>
+                <span className="text-white font-bold">{projectName || 'StudyMate'}</span>
+              </div>
+
+              {createdProjectId && (
+                <button
+                  type="button"
+                  onClick={() => router.push(`${ROUTES.projects}/${createdProjectId}/workspace`)}
+                  className="bg-primary text-black font-mono text-xs font-bold px-4 py-1.5 rounded hover:bg-primary-container transition-colors uppercase tracking-wider flex items-center gap-2 glow-cyan"
+                >
+                  <span>Open Full IDE Workspace</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              )}
             </div>
-            <div>
-              <h2 className="font-heading text-2xl font-extrabold text-white mb-2">
-                Deploying Autonomous AI Workforce...
-              </h2>
-              <p className="font-mono text-xs text-on-surface-variant">
-                Mounting workspace workspace for {projectName || 'AI Software Build'}
-              </p>
-            </div>
-            <div className="w-full bg-background border border-white/10 p-4 rounded-xl font-mono text-xs text-primary text-left space-y-1">
-              <div>[SYS] Initializing Node 0x9f3A...</div>
-              <div>[CEO_AGENT] Synthesizing Product Requirements Document</div>
-              <div>[ARCHITECT_AGENT] Drafting system architecture graph</div>
-              <div className="animate-pulse">[NET] Mounting IDE workspace node...</div>
+
+            {/* 3-Column Mission Control UI */}
+            <div className="flex-1 flex overflow-hidden">
+              {/* Col 1: Explorer */}
+              <aside className="w-56 bg-surface-container-low border-r border-white/10 p-3 font-mono text-xs shrink-0 space-y-2">
+                <div className="text-[10px] text-on-surface-variant uppercase font-bold border-b border-white/10 pb-1">
+                  Explorer
+                </div>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-1 text-primary font-bold">
+                    <ChevronDown className="w-3.5 h-3.5" />
+                    <FolderOpen className="w-3.5 h-3.5" />
+                    <span>{projectName || 'StudyMate'}</span>
+                  </div>
+                  <div className="pl-4 space-y-1 text-on-surface-variant">
+                    <div className="flex items-center gap-1.5 py-0.5 text-primary font-bold">
+                      <FileCode className="w-3.5 h-3.5" />
+                      <span>page.tsx</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 py-0.5">
+                      <FileCode className="w-3.5 h-3.5" />
+                      <span>layout.tsx</span>
+                    </div>
+                  </div>
+                </div>
+              </aside>
+
+              {/* Col 2: Pipeline & Code Editor & Terminal */}
+              <main className="flex-1 flex flex-col bg-background min-w-0">
+                <div className="h-9 bg-surface border-b border-white/10 flex items-center px-4 gap-3 font-mono text-xs shrink-0">
+                  <span className="text-on-surface-variant text-[10px] uppercase font-bold">Pipeline:</span>
+                  <span className="line-through text-on-surface-variant/60">CEO</span>
+                  <ChevronRight className="w-3 h-3 text-white/20" />
+                  <span className="line-through text-on-surface-variant/60">Architect</span>
+                  <ChevronRight className="w-3 h-3 text-white/20" />
+                  <span className="line-through text-on-surface-variant/60">Designer</span>
+                  <ChevronRight className="w-3 h-3 text-white/20" />
+                  <span className="bg-primary/10 text-primary px-2 py-0.5 rounded border border-primary/40 font-bold glow-cyan flex items-center gap-1">
+                    <RefreshCw className="w-3 h-3 animate-spin" /> DEVELOPER (Working)
+                  </span>
+                </div>
+
+                <div className="flex-1 p-4 font-mono text-xs overflow-auto bg-background relative">
+                  <div className="absolute top-4 right-4 bg-surface border border-primary px-3 py-1 rounded text-primary font-bold flex items-center gap-2 glow-cyan">
+                    <Bot className="w-4 h-4 animate-pulse" />
+                    <span>AI Developing Code...</span>
+                  </div>
+                  <pre className="text-on-surface-variant leading-relaxed">
+                    <code>
+                      <span className="text-primary font-bold">import</span> React <span className="text-primary font-bold">from</span> <span className="text-tertiary">'react'</span>;<br />
+                      <span className="text-primary font-bold">export default function</span> <span className="text-white font-bold">DashboardPage</span>() &#123;<br />
+                      &nbsp;&nbsp;<span className="text-primary">return</span> &lt;<span className="text-primary font-bold">div</span> className="p-6"&gt;StudyMate Platform&lt;/<span className="text-primary font-bold">div</span>&gt;;<br />
+                      &#123;
+                    </code>
+                  </pre>
+                </div>
+
+                <div className="h-28 bg-surface border-t border-white/10 p-3 font-mono text-[11px] shrink-0 text-on-surface-variant space-y-1">
+                  <div className="text-white font-bold border-b border-white/10 pb-1">TERMINAL OUTPUT</div>
+                  <div>&gt; next build</div>
+                  <div className="text-primary">✓ Compiled /app/dashboard/page.tsx in 44ms</div>
+                </div>
+              </main>
+
+              {/* Col 3: AI Context Panel */}
+              <aside className="w-64 bg-surface-container-low border-l border-white/10 p-3 font-mono text-xs shrink-0 flex flex-col justify-between">
+                <div className="space-y-3">
+                  <div className="text-primary font-bold uppercase border-b border-white/10 pb-1 flex items-center gap-1.5">
+                    <Brain className="w-4 h-4" /> AI CONTEXT
+                  </div>
+                  <div className="bg-background border border-white/10 p-2.5 rounded text-[11px]">
+                    <span className="text-tertiary font-bold block mb-1">Architect Note:</span>
+                    Single source of truth established.
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-white/10">
+                  <div className="relative">
+                    <textarea
+                      value={promptText}
+                      onChange={(e) => setPromptText(e.target.value)}
+                      placeholder="Instruct AI developer..."
+                      className="w-full bg-background border border-white/10 text-white font-mono text-[11px] p-2 pr-6 h-16 rounded focus:outline-none focus:border-primary resize-none"
+                    />
+                    <Send className="w-3.5 h-3.5 text-primary absolute bottom-2 right-2 cursor-pointer" />
+                  </div>
+                </div>
+              </aside>
             </div>
           </div>
         )}
