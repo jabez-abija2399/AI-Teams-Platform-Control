@@ -24,10 +24,10 @@ export function Sidebar({ isSuperAdmin = false }: SidebarProps) {
 
   const navItems = [
     { href: ROUTES.dashboard, label: 'Dashboard', icon: LayoutDashboard },
+    { href: '/dashboard/mission-control', label: 'Mission Control', icon: Activity },
+    { href: '/dashboard/architecture', label: 'System Architecture', icon: Workflow },
+    { href: '/dashboard/artifacts', label: 'Artifacts Registry', icon: Terminal },
     { href: ROUTES.projects, label: 'Workspace', icon: Layers },
-    { href: '#pipeline', label: 'Agent Pipeline', icon: Workflow },
-    { href: '#artifacts', label: 'Artifacts', icon: Terminal },
-    { href: '#status', label: 'System Status', icon: Activity },
   ];
 
   return (
