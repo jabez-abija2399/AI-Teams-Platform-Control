@@ -43,3 +43,6 @@ next-env.d.ts
 
 # prisma generated
 /prisma/generated/
+
+# Reference materials
+hibirdev_ai_desing_experience/
