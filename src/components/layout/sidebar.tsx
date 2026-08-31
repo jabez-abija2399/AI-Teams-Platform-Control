@@ -28,6 +28,7 @@ export function Sidebar({ isSuperAdmin = false }: SidebarProps) {
     { href: '/dashboard/architecture', label: 'System Architecture', icon: Workflow },
     { href: '/dashboard/artifacts', label: 'Artifacts Registry', icon: Terminal },
     { href: ROUTES.projects, label: 'Workspace', icon: Layers },
+    { href: '/dashboard/settings', label: 'Settings & Providers', icon: Settings },
   ];
 
   return (
