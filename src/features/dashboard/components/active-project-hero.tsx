@@ -2,7 +2,8 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ArrowRight, CheckCircle2, RefreshCw, Clock } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Loader2, Clock } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { ROUTES } from '@/config/constants';
 import type { Project } from '../../../../prisma/generated/prisma/client';
 
@@ -10,77 +11,121 @@ interface ActiveProjectHeroProps {
   project?: Project | null;
 }
 
+const PIPELINE_STEPS = ['CEO', 'ARCHITECT', 'DESIGNER', 'DEVELOPER'] as const;
+
 export function ActiveProjectHero({ project }: ActiveProjectHeroProps) {
-  const name = project?.name || 'StudyMate';
-  const description = project?.description || 'AI-powered study assistant application';
+  const name = project?.name ?? 'No active project';
+  const description = project?.description ?? '';
   const projectId = project?.id;
+  const isBuilding = project?.status === 'IN_PROGRESS';
+  const isCompleted = project?.status === 'COMPLETED';
 
   return (
-    <section className="lg:col-span-2 bg-surface rounded-lg p-6 relative overflow-hidden flex flex-col justify-between min-h-[320px] border border-white/10">
-      <div>
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded bg-surface-container-high border border-white/10 mb-3">
-              <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-              <span className="font-mono text-[10px] uppercase tracking-wider text-foreground font-bold">
-                ACTIVE PROJECT
-              </span>
-            </div>
-            <h3 className="font-heading text-3xl font-extrabold text-foreground mb-1">{name}</h3>
-            <p className="font-sans text-xs text-on-surface-variant">{description}</p>
-          </div>
+    <section className="lg:col-span-2 border border-outline-variant/60 bg-surface-container-low p-5 flex flex-col justify-between gap-4 rounded-sm relative overflow-hidden">
+      {/* Blueprint bg */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-15"
+        aria-hidden="true"
+        style={{
+          backgroundImage:
+            'linear-gradient(to right, rgba(60,73,73,0.5) 0.5px, transparent 0.5px), linear-gradient(to bottom, rgba(60,73,73,0.5) 0.5px, transparent 0.5px)',
+          backgroundSize: '48px 48px',
+        }}
+      />
 
-          {projectId && (
-            <Link href={`${ROUTES.projects}/${projectId}/workspace`}>
-              <button
-                type="button"
-                className="bg-primary text-black font-mono text-xs font-bold px-4 py-2.5 rounded hover:bg-primary-container transition-colors flex items-center gap-2 uppercase tracking-wider glow-cyan"
-              >
-                <span>Continue Building</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </Link>
+      <div className="relative z-10 flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <div className="inline-flex items-center gap-1.5 border border-outline-variant/60 bg-surface-container px-2.5 py-0.5 rounded-sm mb-2">
+            {isBuilding && <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />}
+            {isCompleted && <span className="h-1.5 w-1.5 rounded-full bg-success" />}
+            {!isBuilding && !isCompleted && <span className="h-1.5 w-1.5 rounded-full bg-on-surface-variant/40" />}
+            <span className="font-mono text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">
+              {isBuilding ? 'Active Build' : isCompleted ? 'Completed' : 'Latest Project'}
+            </span>
+          </div>
+          <h3 className="font-sans text-xl md:text-2xl font-bold text-on-surface leading-tight truncate">
+            {name}
+          </h3>
+          {description && (
+            <p className="font-sans text-xs text-on-surface-variant mt-1 line-clamp-2 max-w-sm leading-relaxed">
+              {description}
+            </p>
           )}
         </div>
+
+        {projectId && (
+          <Link href={`${ROUTES.projects}/${projectId}/workspace`} className="shrink-0">
+            <button
+              type="button"
+              className="bg-primary text-black font-mono text-xs font-bold px-3.5 py-1.5 rounded-sm hover:bg-primary-container transition-colors flex items-center gap-1.5"
+            >
+              {isCompleted ? 'Open Studio' : 'Continue'}
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </Link>
+        )}
       </div>
 
-      {/* Pipeline Progress Footer */}
-      <div className="mt-auto bg-background/80 p-4 rounded border border-white/10 backdrop-blur-sm">
-        <div className="flex items-center justify-between mb-2 font-mono text-xs">
-          <span className="text-on-surface-variant">
-            PHASE: <span className="text-primary font-bold">DESIGN</span>
-          </span>
-          <span className="text-on-surface-variant font-bold">STEP 03/04</span>
+      {/* Pipeline bar */}
+      <div className="relative z-10 border border-outline-variant/40 bg-background p-3.5 rounded-sm">
+        <div className="flex items-center justify-between mb-2.5 font-mono text-[10px] text-on-surface-variant">
+          <span className="uppercase tracking-wider">Build Pipeline</span>
+          {isBuilding && (
+            <span className="text-primary font-bold flex items-center gap-1">
+              <Loader2 className="w-3 h-3 animate-spin" /> Running
+            </span>
+          )}
+          {isCompleted && (
+            <span className="text-success font-bold flex items-center gap-1">
+              <CheckCircle2 className="w-3 h-3" /> Complete
+            </span>
+          )}
         </div>
 
-        {/* Progress Bar */}
-        <div className="h-1 w-full bg-white/10 rounded-full overflow-hidden mb-3 flex">
-          <div className="h-full bg-primary w-1/4" />
-          <div className="h-full bg-primary w-1/4" />
-          <div className="h-full bg-primary w-1/4 animate-pulse" />
-          <div className="h-full bg-transparent w-1/4" />
-        </div>
+        <div className="flex items-center justify-between gap-1">
+          {PIPELINE_STEPS.map((step, i) => {
+            // Simple heuristic: completed projects = all done; building = first two done
+            const isDone = isCompleted || (isBuilding && i < 2);
+            const isActive = isBuilding && i === 2;
+            const isPending = !isDone && !isActive;
 
-        <div className="flex items-center justify-between font-mono text-[11px] uppercase">
-          <div className="flex items-center gap-1.5 text-on-surface-variant opacity-60">
-            <CheckCircle2 className="w-3.5 h-3.5 text-on-surface-variant" />
-            <span>CEO</span>
-          </div>
-          <div className="w-4 h-px bg-white/10" />
-          <div className="flex items-center gap-1.5 text-on-surface-variant opacity-60">
-            <CheckCircle2 className="w-3.5 h-3.5 text-on-surface-variant" />
-            <span>ARCHITECT</span>
-          </div>
-          <div className="w-4 h-px bg-white/10" />
-          <div className="flex items-center gap-1.5 text-primary font-bold">
-            <RefreshCw className="w-3.5 h-3.5 text-primary animate-spin" />
-            <span>DESIGNER</span>
-          </div>
-          <div className="w-4 h-px bg-white/10" />
-          <div className="flex items-center gap-1.5 text-on-surface-variant opacity-30">
-            <Clock className="w-3.5 h-3.5" />
-            <span>DEVELOPER</span>
-          </div>
+            return (
+              <React.Fragment key={step}>
+                <div className="flex flex-col items-center gap-1 flex-1">
+                  <div
+                    className={cn(
+                      'flex items-center justify-center w-5 h-5 rounded-sm border',
+                      isDone && 'border-primary/30 bg-primary/10 text-primary',
+                      isActive && 'border-primary bg-primary/10 text-primary',
+                      isPending && 'border-outline-variant/40 bg-background text-on-surface-variant/30',
+                    )}
+                  >
+                    {isDone && <CheckCircle2 className="w-3 h-3" />}
+                    {isActive && <Loader2 className="w-3 h-3 animate-spin" />}
+                    {isPending && <Clock className="w-3 h-3" />}
+                  </div>
+                  <span
+                    className={cn(
+                      'font-mono text-[9px] font-bold uppercase',
+                      isDone && 'text-on-surface-variant line-through opacity-60',
+                      isActive && 'text-primary',
+                      isPending && 'text-on-surface-variant/30',
+                    )}
+                  >
+                    {step}
+                  </span>
+                </div>
+                {i < PIPELINE_STEPS.length - 1 && (
+                  <div
+                    className={cn(
+                      'h-px flex-1 mb-3',
+                      isDone ? 'bg-primary/30' : 'bg-outline-variant/30',
+                    )}
+                  />
+                )}
+              </React.Fragment>
+            );
+          })}
         </div>
       </div>
     </section>

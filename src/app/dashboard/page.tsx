@@ -56,18 +56,18 @@ export default async function DashboardPage() {
           {/* ALL WORKSPACE PROJECTS Grid */}
           <section className="flex flex-col gap-4">
             <div className="flex items-center justify-between">
-              <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-on-surface-variant">
-                ALL WORKSPACE PROJECTS ({stats.totalProjects})
+              <h3 className="font-mono text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">
+                All Projects ({stats.totalProjects})
               </h3>
               <Link
                 href={`${ROUTES.projects}/new`}
-                className="font-mono text-xs font-bold text-primary hover:underline flex items-center gap-1"
+                className="font-mono text-[11px] font-bold text-primary hover:underline flex items-center gap-1"
               >
-                <span>+ New Project</span>
+                + New Project
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {recentProjects.map((project) => (
                 <ProjectCard key={project.id} project={project} />
               ))}
