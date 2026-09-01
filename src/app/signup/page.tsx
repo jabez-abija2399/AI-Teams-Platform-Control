@@ -2,7 +2,7 @@ import { SignupForm } from '@/components/auth/signup-form';
 import { AuthShell } from '@/components/auth/auth-shell';
 
 export const metadata = {
-  title: 'Sign Up | AI Teams Platform',
+  title: 'Create Account | HibirDev AI',
   description: 'Create an account and launch your AI software company.',
 };
 

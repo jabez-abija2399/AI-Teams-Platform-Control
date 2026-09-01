@@ -47,8 +47,22 @@ export function SignupForm() {
         throw new Error(data.error?.message || 'Registration failed.');
       }
 
-      setSuccess('Account created. Redirecting to sign in...');
-      setTimeout(() => router.push(ROUTES.login), 900);
+      setSuccess('Account created. Signing you in...');
+      // Auto-login after register then redirect to welcome for new users
+      setTimeout(async () => {
+        try {
+          const { signIn } = await import('next-auth/react');
+          await signIn('credentials', {
+            email: email.trim(),
+            password,
+            redirect: false,
+          });
+          router.push('/welcome');
+          router.refresh();
+        } catch {
+          router.push(ROUTES.login + '?registered=1');
+        }
+      }, 900);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed.');
       setLoading(false);
