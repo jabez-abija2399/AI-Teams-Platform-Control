@@ -10,7 +10,13 @@ export const ROUTES = {
   settings: '/dashboard/settings',
   admin: '/dashboard/admin',
   adminUsers: '/dashboard/admin/users',
+  welcome: '/welcome',
 } as const;
+
+/** Returns the completion page route for a project */
+export function projectCompleteRoute(projectId: string): string {
+  return `/dashboard/projects/${projectId}/complete`;
+}
 
 export const PROJECT_STATUS = {
   PLANNING: 'PLANNING',

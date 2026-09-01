@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const PROTECTED_PREFIXES = ['/dashboard'];
+const PROTECTED_PREFIXES = ['/dashboard', '/welcome', '/projects'];
 const AUTH_ROUTES = ['/login', '/register', '/signup'];
 
 function hasSessionToken(request: NextRequest): boolean {
