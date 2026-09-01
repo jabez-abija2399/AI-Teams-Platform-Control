@@ -208,6 +208,10 @@ model Project {
   handoffRecords        AgentHandoffRecord[]
   artifactLifecycleRecords ArtifactLifecycleRecord[]
   approvalHistories     ApprovalHistory[]
+  architectureDecisionRecords ArchitectureDecisionRecord[]
+  designDecisionRecords DesignDecisionRecord[]
+  requirementTraceabilityRecords RequirementTraceabilityRecord[]
+  feedbackEscalationRecords FeedbackEscalationRecord[]
 
   recentProjects   RecentProject[]
   favoriteProjects FavoriteProject[]
@@ -2758,5 +2762,83 @@ model ValidationRun {
   @@index([projectId, stage, passed])
   @@map("validation_runs")
 }
+
+model ArchitectureDecisionRecord {
+  id           String   @id @default(cuid())
+  projectId    String
+  project      Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  adrNumber    String
+  title        String
+  ownerRole    String   @default("ARCHITECT")
+  decision     String
+  reason       String
+  alternatives String?
+  status       String   @default("APPROVED")
+  metadata     Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([projectId, adrNumber])
+  @@map("architecture_decision_records")
+}
+
+model DesignDecisionRecord {
+  id           String   @id @default(cuid())
+  projectId    String
+  project      Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  desNumber    String
+  title        String
+  ownerRole    String   @default("DESIGNER")
+  decision     String
+  reason       String
+  alternatives String?
+  status       String   @default("APPROVED")
+  metadata     Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([projectId, desNumber])
+  @@map("design_decision_records")
+}
+
+model RequirementTraceabilityRecord {
+  id                 String   @id @default(cuid())
+  projectId          String
+  project            Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  requirementId      String   // e.g. REQ-001
+  title              String
+  ceoSpecVersion     Int      @default(1)
+  architectAdrId     String?
+  designerDesId      String?
+  sourceFiles        Json     @default("[]")
+  testCases          Json     @default("[]")
+  verificationStatus String   @default("UNVERIFIED") // UNVERIFIED | VERIFIED | FAILED
+  metadata           Json?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([projectId, requirementId])
+  @@map("requirement_traceability_records")
+}
+
+model FeedbackEscalationRecord {
+  id                 String   @id @default(cuid())
+  projectId          String
+  project            Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  fromAgentRole      String   // e.g. DEVELOPER
+  toAgentRole        String   // e.g. ARCHITECT | DESIGNER | CEO
+  issueType          String   // TECHNICAL_BLOCKER | DESIGN_CONFLICT | IMPOSSIBLE_REQUIREMENT
+  description        String
+  targetArtifactType String?  // ARCHITECTURE | DESIGN_SPEC | PRODUCT_SPEC
+  targetVersion      Int?
+  resolutionStatus   String   @default("OPEN") // OPEN | RESOLVED | REJECTED
+  metadata           Json?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([projectId, fromAgentRole, toAgentRole])
+  @@map("feedback_escalation_records")
+}
+
 
 

@@ -1,20 +1,24 @@
 'use client';
 
+import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Play, Pause, Settings, Sparkles, Code2, Clock } from 'lucide-react';
+import { Play, Pause, Settings, Sparkles, Code2, Clock, Layers } from 'lucide-react';
 import type { WorkspaceState } from '@/core/workspace/types';
+import { PersistentPipelineIndicator } from './persistent-pipeline-indicator';
 
 interface TopNavProps {
   state: WorkspaceState;
   onToggleMode: () => void;
   onTogglePause: () => void;
+  onToggleDrawer?: () => void;
+  onSelectStage?: (stage: any) => void;
 }
 
-export function TopNav({ state, onToggleMode, onTogglePause }: TopNavProps) {
+export function TopNav({ state, onToggleMode, onTogglePause, onToggleDrawer, onSelectStage }: TopNavProps) {
   return (
-    <header className="border-b border-gray-800 bg-gray-950/80 backdrop-blur px-6 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4 text-white">
+    <header className="border-b border-gray-800 bg-gray-950/80 backdrop-blur px-6 py-4 flex flex-col xl:flex-row xl:items-center justify-between gap-4 text-white">
       {/* Left: Project Info & Current Phase */}
       <div className="flex items-center gap-4">
         <div>
@@ -24,26 +28,41 @@ export function TopNav({ state, onToggleMode, onTogglePause }: TopNavProps) {
               {state.currentPhase}
             </Badge>
           </div>
-          <p className="text-xs text-gray-400 mt-0.5 flex items-center gap-1.5">
+          <p className="text-xs text-gray-400 mt-0.5 flex items-center gap-1.5 font-mono">
             <Clock className="w-3.5 h-3.5 text-gray-500" />
             Estimated Remaining: <span className="text-gray-300 font-medium">{state.estimatedTimeRemaining}</span>
           </p>
         </div>
       </div>
 
-      {/* Center: Overall Progress */}
-      <div className="flex-1 max-w-xs space-y-1.5">
-        <div className="flex items-center justify-between text-xs">
-          <span className="text-gray-400">Company Progress</span>
-          <span className="text-indigo-400 font-bold">{state.overallProgress}%</span>
+      {/* Center: Persistent Pipeline Indicator */}
+      <div className="flex items-center gap-4">
+        <PersistentPipelineIndicator onSelectStage={onSelectStage} />
+        
+        <div className="hidden lg:block w-36 space-y-1">
+          <div className="flex items-center justify-between text-[11px]">
+            <span className="text-gray-400 font-mono">Progress</span>
+            <span className="text-indigo-400 font-bold">{state.overallProgress}%</span>
+          </div>
+          <Progress value={state.overallProgress} className="h-1.5 bg-gray-800" />
         </div>
-        <Progress value={state.overallProgress} className="h-2 bg-gray-800" />
       </div>
 
-      {/* Right: Controls & Creator/Dev Mode Toggle */}
+      {/* Right: Controls, Context Drawer & Creator/Dev Mode Toggle */}
       <div className="flex items-center gap-3">
+        {/* Context & Artifact Drawer Toggle */}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onToggleDrawer}
+          className="border-gray-800 text-xs gap-1.5 bg-gray-900 text-gray-300 hover:bg-gray-800 hover:text-white font-mono"
+        >
+          <Layers className="w-3.5 h-3.5 text-indigo-400" />
+          Context & Artifacts
+        </Button>
+
         {/* Creator / Developer Mode Switcher */}
-        <div className="bg-gray-900 border border-gray-800 rounded-lg p-1 flex items-center gap-1 text-xs">
+        <div className="bg-gray-900 border border-gray-800 rounded-lg p-1 flex items-center gap-1 text-xs font-mono">
           <button
             onClick={onToggleMode}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-colors ${
@@ -73,7 +92,7 @@ export function TopNav({ state, onToggleMode, onTogglePause }: TopNavProps) {
           variant="outline"
           size="sm"
           onClick={onTogglePause}
-          className={`border-gray-800 text-xs gap-1.5 ${
+          className={`border-gray-800 text-xs gap-1.5 font-mono ${
             state.isPaused
               ? 'bg-amber-500/10 text-amber-400 border-amber-500/40 hover:bg-amber-500/20'
               : 'bg-gray-900 text-gray-300 hover:bg-gray-800 hover:text-white'
@@ -100,3 +119,4 @@ export function TopNav({ state, onToggleMode, onTogglePause }: TopNavProps) {
     </header>
   );
 }
+

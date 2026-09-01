@@ -30,7 +30,7 @@ export class IntegrationValidator {
       warnings.push(`Prisma database check generated a warning: ${err?.message || err}`);
     }
 
-    const requiredTransitions = ['CREATED', 'DISCOVERY', 'PLANNING', 'ARCHITECTURE', 'EXECUTION', 'REVIEW', 'DEPLOYMENT_READY', 'COMPLETED'];
+    const requiredTransitions = ['CREATED', 'DISCOVERY', 'PLANNING', 'ARCHITECTURE', 'DESIGN', 'EXECUTION', 'DEBATE', 'REVIEW', 'DEPLOYMENT_READY', 'COMPLETED'];
     for (let i = 0; i < requiredTransitions.length - 1; i++) {
       const from = requiredTransitions[i] as any;
       const to = requiredTransitions[i + 1] as any;

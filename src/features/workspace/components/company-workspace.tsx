@@ -133,7 +133,20 @@ function CompanyWorkspaceInner({
     setApproving(true);
     setStartError(null);
     try {
-      await approve(artifact);
+      const isArchApproval = artifact.toLowerCase().includes('architecture');
+      if (isArchApproval) {
+        const res = await fetch(`/api/projects/${projectId}/architecture/approve`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ approvedBy: userName, notes: 'Approved via Mission Control' }),
+        });
+        if (!res.ok) {
+          const body = await res.json().catch(() => null);
+          throw new Error(body?.error?.message || 'Architecture approval failed');
+        }
+      } else {
+        await approve(artifact);
+      }
       toast.success('Approved', { description: 'Pipeline continuing to the next phase.' });
       setTimeout(refresh, 1200);
       setTimeout(refresh, 3500);

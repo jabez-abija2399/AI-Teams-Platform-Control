@@ -37,6 +37,7 @@ export class PipelineManager {
     config: PipelineConfig = { autoAdvance: true, maxRetries: 1, recoverOnFailure: true },
   ): Promise<ApiResult<any>> {
     try {
+      await companyEventBus.publish('PROJECT_CREATED', projectId, { userIdea }, 'PipelineManager');
       const engine = new PipelineEngine(this.getNodesFromPhase('PLANNING'));
       const initialContext: ExecutionContext = {
         projectId,
@@ -90,8 +91,8 @@ export class PipelineManager {
       const context: ExecutionContext = {
         projectId,
         userIdea: resumeData.userIdea || 'Resume idea',
-        prd: resumeData.prd,
-        architecture: resumeData.architecture,
+        prd: resumeData.prd || (resumeData.pmData ? { requirements: resumeData.pmData } : { requirements: resumeData.requirements || [] }),
+        architecture: resumeData.architecture || resumeData.archData || { systemDesign: 'System Architecture' },
         design: resumeData.design,
         execution: resumeData.execution,
         metadata: { startTime: Date.now(), errors: [], attempts: {} }
@@ -120,8 +121,8 @@ export class PipelineManager {
       const context: ExecutionContext = {
         projectId,
         userIdea: retryData.userIdea || 'Retry idea',
-        prd: retryData.prd,
-        architecture: retryData.architecture,
+        prd: retryData.prd || (retryData.pmData ? { requirements: retryData.pmData } : { requirements: retryData.requirements || [] }),
+        architecture: retryData.architecture || retryData.archData || { systemDesign: 'System Architecture' },
         design: retryData.design,
         execution: retryData.execution,
         metadata: { startTime: Date.now(), errors: [], attempts: {} }

@@ -252,8 +252,64 @@ Artifact and memory systems.
 
 # Active Task
 
-Task Name: Phases 25-30 Autonomous Software Company Intelligence Engines Mission
+Task Name: HibirDev AI Frontend-Backend Integration & Production Readiness
 Status: Completed
+
+### What Changed
+- **Authentication & Post-Login Smart Routing:**
+  - `src/components/auth/login-form.tsx`: Added post-auth project count check to automatically route new users (0 projects) to `/welcome` and returning users to `/dashboard/projects`.
+
+- **Complete Page Security Guard:**
+  - `src/app/dashboard/projects/[id]/complete/page.tsx`: Added guard redirect (`project.status !== 'COMPLETED'`) to enforce that non-completed projects are redirected back to their active Mission Control Workspace.
+
+- **Design Workspace Room & Router Integration:**
+  - `src/features/workspace/components/rooms/design-room.tsx`: Created dedicated `DesignRoom` workspace view displaying UI/UX Design Specifications, visual tokens, and approval dialogs.
+  - `src/features/workspace/components/rooms/room-router.tsx` & `index.ts`: Integrated `"design"` phase into `PipelinePhaseId` and workspace room router switch.
+
+- **Proposal API Response Standardization:**
+  - `src/app/api/projects/[id]/proposal/route.ts`: Standardized response payload to `{ success: true, data: { proposal, score } }`.
+  - `src/features/projects/components/new-project-wizard.tsx`: Aligned proposal extraction in onboarding wizard.
+
+- **Architecture-Specific Approval Routing:**
+  - `src/features/workspace/components/company-workspace.tsx`: Routed architecture approvals directly to `POST /api/projects/[id]/architecture/approve`.
+
+- **Active Project Dashboard Hero Hydration:**
+  - `src/features/dashboard/components/active-project-hero.tsx`: Replaced static heuristics with real-time pipeline status hydration from `GET /api/projects/[id]/pipeline/status`.
+
+- **Dedicated Project Engineering History Route:**
+  - `src/app/dashboard/projects/[id]/history/page.tsx`: Created standalone route for Screen 16 presenting complete decision history and artifact version lineage.
+
+- **Verification:**
+  - Ran `npx tsc --noEmit` -> 0 errors.
+  - Ran `npx vitest run` -> 3/3 test suites passed (9/9 tests passed).
+
+### What Changed
+- **Database Schema Models & Relations:**
+  - Created `ArchitectureDecisionRecord` (`ADR-xxx`), `DesignDecisionRecord` (`DES-xxx`), `RequirementTraceabilityRecord`, and `FeedbackEscalationRecord` in `prisma/schema.prisma`.
+  - Updated Prisma Client bindings with `npx prisma generate`.
+
+- **Strategic Core Services:**
+  - Created `src/core/traceability/traceability.service.ts` & `types.ts`. Mapped `REQ-xxx` → `ADR`/`DES` → Code Files → Tests with 100% matrix coverage calculation.
+  - Created `src/core/feedback/controlled-feedback.engine.ts` & `types.ts`. Implemented structured upward feedback loops (`DEVELOPER_TO_ARCHITECT`, `DEVELOPER_TO_DESIGNER`, `DEVELOPER_TO_CEO`).
+  - Created `src/core/artifacts/artifact-version.service.ts`. Enforced strict domain artifact ownership (`CEO` → `PRODUCT_SPEC`, `ARCHITECT` → `ARCHITECTURE`, `DESIGNER` → `DESIGN_SPEC`, `DEVELOPER` → `IMPLEMENTATION`).
+
+- **API Layer Routes:**
+  - `src/app/api/projects/[id]/traceability/route.ts`
+  - `src/app/api/projects/[id]/feedback/escalate/route.ts`
+  - `src/app/api/projects/[id]/artifacts/versions/route.ts`
+
+- **Workspace UX & 16-Screen Journey Components:**
+  - Created `src/components/workspace/persistent-pipeline-indicator.tsx` rendering `CEO ✓ → Architect ✓ → Designer ● → Developer ○`.
+  - Created `src/components/workspace/context-artifact-drawer.tsx` for inspecting project context, ADR/DES decisions, and artifact lineage.
+  - Created checkpoint gates: `ceo-review-checkpoint.tsx`, `architect-review-checkpoint.tsx`, `designer-review-checkpoint.tsx`.
+  - Created stage views: `verification-stage-view.tsx` (Screen 14) and `project-history-stage-view.tsx` (Screen 16).
+  - Integrated persistent indicator, context drawer toggle, and stage navigation into `top-nav.tsx` and `mission-control-workspace.tsx`.
+
+- **Automated Tests:**
+  - `tests/traceability/traceability.test.ts`
+  - `tests/feedback/controlled-feedback.test.ts`
+  - `tests/artifacts/artifact-version.test.ts`
+
 
 ### What Changed
 - **Phase 25 (AI Review Committee Engine):**

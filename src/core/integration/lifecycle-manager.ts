@@ -38,7 +38,8 @@ export class LifecycleManager {
       case 'CREATED': return 'DISCOVERY';
       case 'DISCOVERY': return 'PLANNING';
       case 'PLANNING': return 'ARCHITECTURE';
-      case 'ARCHITECTURE': return 'EXECUTION';
+      case 'ARCHITECTURE': return 'DESIGN';
+      case 'DESIGN': return 'EXECUTION';
       case 'EXECUTION': return 'REVIEW';
       case 'REVIEW': return 'DEPLOYMENT_READY';
       case 'DEPLOYMENT_READY': return 'COMPLETED';

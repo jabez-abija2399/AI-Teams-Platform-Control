@@ -5,6 +5,9 @@ import { TopNav } from './top-nav';
 import { MissionTimeline } from './mission-timeline';
 import { AIEmployeePanel } from './ai-employee-panel';
 import { ActivityFeedPanel } from './activity-feed-panel';
+import { ContextArtifactDrawer } from './context-artifact-drawer';
+import { VerificationStageView } from './stages/verification-stage-view';
+import { ProjectHistoryStageView } from './stages/project-history-stage-view';
 import type { WorkspaceState } from '@/core/workspace/types';
 
 export function MissionControlWorkspace({
@@ -15,6 +18,8 @@ export function MissionControlWorkspace({
   projectName?: string;
 }) {
   const [state, setState] = useState<WorkspaceState | null>(null);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [activeStageTab, setActiveStageTab] = useState<'timeline' | 'verification' | 'history'>('timeline');
   const eventSourceRef = useRef<EventSource | null>(null);
 
   const fetchState = useCallback(async () => {
@@ -72,6 +77,14 @@ export function MissionControlWorkspace({
     } catch {}
   };
 
+  const handleSelectStage = (stage: string) => {
+    if (stage === 'DEVELOPER') {
+      setActiveStageTab('verification');
+    } else {
+      setActiveStageTab('timeline');
+    }
+  };
+
   if (!state) {
     return (
       <div className="flex items-center justify-center min-h-[650px] bg-gradient-to-br from-gray-950 via-slate-950 to-indigo-950/30 text-white rounded-2xl border border-white/10 shadow-2xl backdrop-blur-3xl">
@@ -95,22 +108,78 @@ export function MissionControlWorkspace({
       <div className="absolute top-0 left-1/4 right-1/4 h-[1px] bg-gradient-to-r from-transparent via-indigo-500 to-transparent opacity-75" />
 
       {/* Top Navigation */}
-      <TopNav state={state} onToggleMode={handleToggleMode} onTogglePause={handleTogglePause} />
+      <TopNav
+        state={state}
+        onToggleMode={handleToggleMode}
+        onTogglePause={handleTogglePause}
+        onToggleDrawer={() => setIsDrawerOpen(!isDrawerOpen)}
+        onSelectStage={handleSelectStage}
+      />
 
-      {/* Main Grid: Left Timeline + Right Employee Panel */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 flex-1 divide-y lg:divide-y-0 lg:divide-x divide-white/10">
-        <div className="lg:col-span-2 overflow-y-auto max-h-[calc(100vh-250px)] custom-scrollbar">
-          <MissionTimeline timeline={state.timeline} mode={state.mode} />
-        </div>
-        <div className="lg:col-span-1 overflow-y-auto max-h-[calc(100vh-250px)] custom-scrollbar bg-black/20">
-          <AIEmployeePanel employees={state.employees} mode={state.mode} />
+      {/* Sub-header Navigation Tabs */}
+      <div className="flex items-center justify-between px-6 py-2 bg-black/30 border-b border-white/5 text-xs font-mono">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setActiveStageTab('timeline')}
+            className={`px-3 py-1.5 rounded transition-colors ${
+              activeStageTab === 'timeline'
+                ? 'bg-indigo-600/30 text-indigo-300 font-bold border border-indigo-500/40'
+                : 'text-gray-400 hover:text-white'
+            }`}
+          >
+            Mission Timeline
+          </button>
+          <button
+            onClick={() => setActiveStageTab('verification')}
+            className={`px-3 py-1.5 rounded transition-colors ${
+              activeStageTab === 'verification'
+                ? 'bg-emerald-600/30 text-emerald-300 font-bold border border-emerald-500/40'
+                : 'text-gray-400 hover:text-white'
+            }`}
+          >
+            Verification Matrix
+          </button>
+          <button
+            onClick={() => setActiveStageTab('history')}
+            className={`px-3 py-1.5 rounded transition-colors ${
+              activeStageTab === 'history'
+                ? 'bg-purple-600/30 text-purple-300 font-bold border border-purple-500/40'
+                : 'text-gray-400 hover:text-white'
+            }`}
+          >
+            Engineering History Log
+          </button>
         </div>
       </div>
+
+      {/* Main Content View */}
+      {activeStageTab === 'verification' ? (
+        <div className="p-6 flex-1 overflow-y-auto">
+          <VerificationStageView projectId={projectId} onProceedToSoftware={() => setActiveStageTab('timeline')} />
+        </div>
+      ) : activeStageTab === 'history' ? (
+        <div className="p-6 flex-1 overflow-y-auto">
+          <ProjectHistoryStageView projectId={projectId} />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-3 flex-1 divide-y lg:divide-y-0 lg:divide-x divide-white/10">
+          <div className="lg:col-span-2 overflow-y-auto max-h-[calc(100vh-270px)] custom-scrollbar">
+            <MissionTimeline timeline={state.timeline} mode={state.mode} />
+          </div>
+          <div className="lg:col-span-1 overflow-y-auto max-h-[calc(100vh-270px)] custom-scrollbar bg-black/20">
+            <AIEmployeePanel employees={state.employees} mode={state.mode} />
+          </div>
+        </div>
+      )}
 
       {/* Bottom Company Activity Feed */}
       <div className="border-t border-white/10 bg-black/40 backdrop-blur-md">
         <ActivityFeedPanel activities={state.activityFeed} mode={state.mode} />
       </div>
+
+      {/* Sliding Context & Artifact Drawer */}
+      <ContextArtifactDrawer projectId={projectId} isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} />
     </div>
   );
 }
+

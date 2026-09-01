@@ -15,8 +15,10 @@ export async function GET(
 
     return NextResponse.json({
       success: true,
-      proposal: result.proposal,
-      score: result.score,
+      data: {
+        proposal: result.proposal,
+        score: result.score,
+      },
     });
   } catch (error) {
     return NextResponse.json(

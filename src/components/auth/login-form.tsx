@@ -57,8 +57,22 @@ export function LoginForm() {
 
       setLoading(false);
       setAuthorized(true);
+
+      // Check project count to determine target destination
+      let targetRoute: string = ROUTES.projects;
+      try {
+        const checkRes = await fetch('/api/projects', { credentials: 'same-origin' });
+        const checkData = await checkRes.json();
+        const projectList = Array.isArray(checkData?.data) ? checkData.data : checkData?.projects || [];
+        if (projectList.length === 0) {
+          targetRoute = ROUTES.welcome;
+        }
+      } catch (err) {
+        console.error('Failed project count check post-auth:', err);
+      }
+
       setTimeout(() => {
-        window.location.assign(result.url || ROUTES.projects);
+        window.location.assign(targetRoute);
       }, 800);
     } catch {
       setError('Authentication failed. Please try again.');

@@ -4,6 +4,7 @@ export { ProposalRoom } from "./proposal-room";
 export { StrategyRoom } from "./strategy-room";
 export { ProductRoom } from "./product-room";
 export { ArchitectureRoom } from "./architecture-room";
+export { DesignRoom } from "./design-room";
 export { PlanningRoom } from "./planning-room";
 export { DevelopmentRoom } from "./development-room";
 export { ReviewRoom } from "./review-room";

@@ -40,7 +40,7 @@ const STATUS_MAP: Record<string, { label: string; chipClass: string; dotClass: s
 };
 
 export function ProjectCard({ project, stack }: ProjectCardProps) {
-  const s = STATUS_MAP[project.status] ?? STATUS_MAP.PLANNING;
+  const statusInfo = (STATUS_MAP[project.status as string] || STATUS_MAP.PLANNING)!;
   const isBuilding = project.status === 'IN_PROGRESS';
   const isCompleted = project.status === 'COMPLETED';
 
@@ -67,11 +67,11 @@ export function ProjectCard({ project, stack }: ProjectCardProps) {
           <span
             className={cn(
               'inline-flex items-center gap-1 border px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider rounded-sm',
-              s.chipClass,
+              statusInfo.chipClass,
             )}
           >
-            <span className={cn('h-1.5 w-1.5 rounded-full shrink-0', s.dotClass)} />
-            {s.label}
+            <span className={cn('h-1.5 w-1.5 rounded-full shrink-0', statusInfo.dotClass)} />
+            {statusInfo.label}
           </span>
           <span className="border border-outline-variant/40 bg-surface-container px-2 py-0.5 font-mono text-[10px] text-on-surface-variant uppercase font-bold rounded-sm">
             {stack ?? 'NEXT.JS'}

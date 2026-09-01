@@ -20,6 +20,21 @@ export function ActiveProjectHero({ project }: ActiveProjectHeroProps) {
   const isBuilding = project?.status === 'IN_PROGRESS';
   const isCompleted = project?.status === 'COMPLETED';
 
+  const [currentPhase, setCurrentPhase] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (projectId && isBuilding) {
+      fetch(`/api/projects/${projectId}/pipeline/status`)
+        .then((res) => res.json())
+        .then((json) => {
+          if (json.success && json.data?.currentPhase) {
+            setCurrentPhase(json.data.currentPhase.toUpperCase());
+          }
+        })
+        .catch(() => {});
+    }
+  }, [projectId, isBuilding]);
+
   return (
     <section className="lg:col-span-2 border border-outline-variant/60 bg-surface-container-low p-5 flex flex-col justify-between gap-4 rounded-sm relative overflow-hidden">
       {/* Blueprint bg */}
@@ -84,9 +99,12 @@ export function ActiveProjectHero({ project }: ActiveProjectHeroProps) {
 
         <div className="flex items-center justify-between gap-1">
           {PIPELINE_STEPS.map((step, i) => {
-            // Simple heuristic: completed projects = all done; building = first two done
-            const isDone = isCompleted || (isBuilding && i < 2);
-            const isActive = isBuilding && i === 2;
+            const stepPhaseIndex = currentPhase
+              ? PIPELINE_STEPS.findIndex((s) => currentPhase.includes(s))
+              : -1;
+
+            const isDone = isCompleted || (stepPhaseIndex >= 0 ? i < stepPhaseIndex : i < 2);
+            const isActive = isBuilding && (stepPhaseIndex >= 0 ? i === stepPhaseIndex : i === 2);
             const isPending = !isDone && !isActive;
 
             return (

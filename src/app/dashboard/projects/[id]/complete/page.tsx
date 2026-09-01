@@ -37,14 +37,22 @@ export default async function ProjectCompletePage({
   } catch {
     throw new Error('Could not load project');
   }
-  if (!project) notFound();
+  if (!project || project.status !== 'COMPLETED') {
+    redirect(`${ROUTES.projects}/${id}/workspace`);
+  }
 
   // Fetch artifacts for this project
-  const artifacts = await prisma.artifact.findMany({
+  const artifactRecords = await prisma.artifactLifecycleRecord.findMany({
     where: { projectId: id },
     orderBy: { createdAt: 'desc' },
     take: 12,
   });
+
+  const artifacts = artifactRecords.map((art) => ({
+    id: art.id,
+    name: art.contentSummary || art.artifactType,
+    type: art.artifactType,
+  }));
 
   const agentPipeline = [
     { label: 'CEO', icon: Brain, artifact: 'Product Specification' },

@@ -6,6 +6,7 @@ import { ProposalRoom } from "./proposal-room";
 import { StrategyRoom } from "./strategy-room";
 import { ProductRoom } from "./product-room";
 import { ArchitectureRoom } from "./architecture-room";
+import { DesignRoom } from "./design-room";
 import { PlanningRoom } from "./planning-room";
 import { DevelopmentRoom } from "./development-room";
 import { ReviewRoom } from "./review-room";
@@ -19,6 +20,7 @@ export type PipelinePhaseId =
   | "strategy"
   | "product"
   | "architecture"
+  | "design"
   | "planning"
   | "development"
   | "testing"
@@ -53,6 +55,8 @@ export function RoomRouter({
       return <ProductRoom projectId={projectId} />;
     case "architecture":
       return <ArchitectureRoom projectId={projectId} />;
+    case "design":
+      return <DesignRoom projectId={projectId} />;
     case "planning":
       return <PlanningRoom projectId={projectId} />;
     case "development":
