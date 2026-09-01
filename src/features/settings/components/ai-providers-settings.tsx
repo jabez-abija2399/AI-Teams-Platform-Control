@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Cpu, CheckCircle2, RefreshCw, Key, Shield, Plus, Lock, Globe, Server, Check } from 'lucide-react';
 import { toast } from 'sonner';
+import { SettingsNavTabs } from './settings-nav-tabs';
 
 interface ProviderCardProps {
   name: string;
@@ -176,6 +177,8 @@ export function AiProvidersSettings() {
           </button>
         </div>
       </div>
+
+      <SettingsNavTabs />
 
       {/* Providers Grid */}
       <section>

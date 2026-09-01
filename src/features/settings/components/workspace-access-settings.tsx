@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Shield, UserPlus, Trash2, Key, Check, Server } from 'lucide-react';
 import { toast } from 'sonner';
+import { SettingsNavTabs } from './settings-nav-tabs';
 
 interface Member {
   id: string;
@@ -64,6 +65,8 @@ export function WorkspaceAccessSettings() {
           Manage workspace identity, fallback operational parameters, and member role-based access controls.
         </p>
       </div>
+
+      <SettingsNavTabs />
 
       {/* Workspace Details Form */}
       <section className="bg-surface border border-white/10 p-6 rounded-xl space-y-6 font-mono text-xs">
