@@ -1,8 +1,7 @@
 import { redirect, notFound } from 'next/navigation';
 import { getAuthSession } from '@/lib/session-helper';
 import { getProject } from '@/features/projects/services/project.service';
-import { ProjectDetails } from '@/features/projects/components/project-details';
-import { ProjectTabsClient } from './project-tabs-client';
+import { ProjectOverviewClient } from '@/features/projects/components/project-overview-client';
 
 export default async function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -21,12 +20,12 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
   if (!project) notFound();
 
   return (
-    <div className="space-y-6">
-      <ProjectDetails project={project} />
-      <ProjectTabsClient
-        projectId={id}
-        defaultIdea={project.description || project.name}
-      />
-    </div>
+    <ProjectOverviewClient
+      projectId={project.id}
+      projectName={project.name}
+      projectDescription={project.description ?? ''}
+      projectStatus={project.status}
+      createdAt={project.createdAt.toISOString()}
+    />
   );
 }
