@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import {
@@ -13,432 +13,556 @@ import {
   CheckCircle2,
   RefreshCw,
   ChevronRight,
-  Settings,
-  FolderOpen,
-  Folder,
-  FileCode,
-  Send,
-  Bot,
-  ChevronDown,
+  Loader2,
+  AlertTriangle,
+  RotateCcw,
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { ROUTES } from '@/config/constants';
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+type WizardStep = 'define' | 'review' | 'prepare' | 'launching';
+
+interface ProposalData {
+  productName?: string;
+  vision?: string;
+  problemStatement?: string;
+  targetAudience?: string;
+  platform?: string;
+  complexity?: string;
+  mvpFeatures?: string[];
+  overallScore?: number;
+}
+
+// ─── Step indicator ───────────────────────────────────────────────────────────
+
+const STEPS: { id: WizardStep; label: string; code: string }[] = [
+  { id: 'define', label: 'Define', code: '01' },
+  { id: 'review', label: 'Review', code: '02' },
+  { id: 'prepare', label: 'Prepare', code: '03' },
+  { id: 'launching', label: 'Launch', code: '04' },
+];
+
+function StepIndicator({ current }: { current: WizardStep }) {
+  const currentIdx = STEPS.findIndex((s) => s.id === current);
+  return (
+    <div className="flex items-center gap-1.5 font-mono text-xs text-on-surface-variant">
+      {STEPS.map((step, i) => (
+        <React.Fragment key={step.id}>
+          <span
+            className={cn(
+              i === currentIdx && 'text-primary font-bold border-b border-primary pb-0.5',
+              i < currentIdx && 'text-on-surface-variant/50 line-through',
+            )}
+          >
+            {step.code} / {step.label}
+          </span>
+          {i < STEPS.length - 1 && (
+            <ChevronRight className="w-3 h-3 opacity-30" />
+          )}
+        </React.Fragment>
+      ))}
+    </div>
+  );
+}
+
+// ─── Main Wizard ──────────────────────────────────────────────────────────────
 
 export function NewProjectWizard() {
   const router = useRouter();
-  const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
+  const [step, setStep] = useState<WizardStep>('define');
   const [ideaText, setIdeaText] = useState('');
   const [projectName, setProjectName] = useState('');
-  const [createdProjectId, setCreatedProjectId] = useState<string | null>(null);
+  const [projectId, setProjectId] = useState<string | null>(null);
+  const [proposal, setProposal] = useState<ProposalData | null>(null);
+  const [revisionComment, setRevisionComment] = useState('');
   const [loading, setLoading] = useState(false);
-  const [promptText, setPromptText] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [launchProgress, setLaunchProgress] = useState(0);
 
-  const handleStep1Submit = (e: React.FormEvent) => {
+  // ── Step 1 → create project & fetch proposal ────────────────────────────────
+
+  const handleDefineSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     if (!ideaText.trim()) {
-      toast.error('Please enter a description for your software project.');
+      toast.error('Please describe your software idea.');
       return;
     }
-    const generatedName = ideaText.split(' ').slice(0, 3).join(' ') || 'New AI Project';
-    setProjectName(generatedName);
-    setStep(2);
-  };
 
-  const handleLaunchProject = async () => {
-    if (loading) return;
+    const generatedName = ideaText.trim().split(/\s+/).slice(0, 3).join(' ') || 'AI Project';
+    const name = projectName.trim() || generatedName;
+
     setLoading(true);
+    setError(null);
 
     try {
-      const res = await fetch('/api/projects', {
+      // 1. Create project
+      const createRes = await fetch('/api/projects', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: projectName || 'AI Software Build',
-          description: ideaText,
-        }),
+        body: JSON.stringify({ name, description: ideaText.trim() }),
       });
-
-      const result = await res.json();
-
-      if (!result.success) {
-        toast.error(result.error?.message || 'Failed to initialize project.');
-        setLoading(false);
-        return;
+      const createData = await createRes.json();
+      if (!createRes.ok || !createData.success) {
+        throw new Error(createData.error?.message || 'Failed to create project.');
       }
 
-      setCreatedProjectId(result.data.id);
-      setLoading(false);
-      toast.success('AI Workforce deployed! Launching Mission Control Workspace...');
-      router.push(`${ROUTES.projects}/${result.data.id}/workspace`);
-      router.refresh();
-    } catch {
-      toast.error('Project creation failed. Please try again.');
+      const id = createData.data.id as string;
+      setProjectId(id);
+      setProjectName(name);
+
+      // 2. Fetch proposal (may or may not exist yet — try once, show skeleton if not ready)
+      try {
+        const proposalRes = await fetch(`/api/projects/${id}/proposal`, {
+          headers: { 'Content-Type': 'application/json' },
+        });
+        const proposalData = await proposalRes.json();
+        if (proposalRes.ok && proposalData.success && proposalData.data?.proposal) {
+          setProposal(proposalData.data.proposal as ProposalData);
+        }
+        // If no proposal yet, proposal stays null — review step shows a placeholder
+      } catch {
+        // Proposal endpoint may not respond yet; proceed anyway
+      }
+
+      setStep('review');
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Project creation failed.';
+      setError(msg);
+      toast.error(msg);
+    } finally {
       setLoading(false);
     }
-  };
+  }, [ideaText, projectName]);
+
+  // ── Step 2 → approve proposal ─────────────────────────────────────────────
+
+  const handleApproveProposal = useCallback(async () => {
+    if (!projectId) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/projects/${projectId}/proposal/approve`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ approved: true }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        // If proposal doesn't exist yet, just continue
+        if (res.status === 404) {
+          setStep('prepare');
+          return;
+        }
+        throw new Error(data.error?.message || 'Approval failed.');
+      }
+      toast.success('Proposal approved.');
+      setStep('prepare');
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Approval failed.';
+      setError(msg);
+      toast.error(msg);
+    } finally {
+      setLoading(false);
+    }
+  }, [projectId]);
+
+  // ── Step 2 → request revision ─────────────────────────────────────────────
+
+  const handleRequestRevision = useCallback(async () => {
+    if (!projectId || !revisionComment.trim()) {
+      toast.error('Please enter your revision feedback.');
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/projects/${projectId}/proposal/update`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ feedback: revisionComment.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        if (res.status === 404) {
+          // No proposal engine — just proceed
+          setRevisionComment('');
+          setStep('prepare');
+          return;
+        }
+        throw new Error(data.error?.message || 'Revision request failed.');
+      }
+      // Refresh proposal
+      const updated = await fetch(`/api/projects/${projectId}/proposal`);
+      const updatedData = await updated.json();
+      if (updatedData.success && updatedData.data?.proposal) {
+        setProposal(updatedData.data.proposal as ProposalData);
+      }
+      setRevisionComment('');
+      toast.success('Revision requested. Proposal updated.');
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Revision failed.';
+      setError(msg);
+      toast.error(msg);
+    } finally {
+      setLoading(false);
+    }
+  }, [projectId, revisionComment]);
+
+  // ── Step 3 → confirm & launch ─────────────────────────────────────────────
+
+  const handleLaunchProject = useCallback(async () => {
+    if (!projectId) return;
+    setLoading(true);
+    setError(null);
+    setStep('launching');
+    setLaunchProgress(0);
+
+    // Animate progress bar
+    const interval = window.setInterval(() => {
+      setLaunchProgress((prev) => {
+        if (prev >= 85) {
+          window.clearInterval(interval);
+          return 85;
+        }
+        return prev + Math.random() * 12;
+      });
+    }, 400);
+
+    try {
+      const res = await fetch(`/api/projects/${projectId}/lifecycle/start`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userIdea: ideaText || projectName }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error?.message || `Could not start pipeline (${res.status})`);
+      }
+
+      window.clearInterval(interval);
+      setLaunchProgress(100);
+      toast.success('AI company deployed!', { description: 'Redirecting to Mission Control…' });
+
+      setTimeout(() => {
+        router.push(`${ROUTES.projects}/${projectId}/workspace`);
+        router.refresh();
+      }, 800);
+    } catch (err) {
+      window.clearInterval(interval);
+      const msg = err instanceof Error ? err.message : 'Could not start pipeline.';
+      setError(msg);
+      toast.error('Launch failed', { description: msg });
+      setStep('prepare');
+    } finally {
+      setLoading(false);
+    }
+  }, [projectId, ideaText, projectName, router]);
+
+  // ─── Render ──────────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-background text-on-background flex flex-col font-sans selection:bg-primary selection:text-black">
-      {/* Top Navigation Anchor */}
-      <header className="bg-background border-b border-white/10 flex justify-between items-center w-full px-6 py-4 h-16 sticky top-0 z-50">
-        <div className="flex items-center gap-3">
-          <span className="font-mono text-xs font-bold text-primary border border-primary px-2.5 py-1 uppercase">
-            NEURAL_FLOW
-          </span>
-        </div>
-
-        {/* Progress Bar Indicator */}
-        <div className="flex items-center gap-2 font-mono text-xs text-on-surface-variant">
-          <span className={step === 1 ? 'text-primary border-b border-primary pb-0.5 font-bold' : ''}>
-            01 / Define
-          </span>
-          <ChevronRight className="w-3 h-3 opacity-40" />
-          <span className={step === 2 ? 'text-primary border-b border-primary pb-0.5 font-bold' : ''}>
-            02 / Understand
-          </span>
-          <ChevronRight className="w-3 h-3 opacity-40" />
-          <span className={step === 3 ? 'text-primary border-b border-primary pb-0.5 font-bold' : ''}>
-            03 / Prepare
-          </span>
-          <ChevronRight className="w-3 h-3 opacity-40" />
-          <span className={step === 4 ? 'text-primary border-b border-primary pb-0.5 font-bold' : ''}>
-            04 / Mission Control
-          </span>
-        </div>
-
-        <div className="flex items-center gap-3 text-on-surface-variant">
-          <Settings className="w-4 h-4 cursor-pointer hover:text-white transition-colors" />
-          <Terminal className="w-4 h-4 cursor-pointer hover:text-white transition-colors" />
-        </div>
+    <div className="min-h-screen bg-background text-on-surface flex flex-col font-sans selection:bg-primary selection:text-black">
+      {/* Top Navigation */}
+      <header className="bg-background border-b border-outline-variant/60 flex justify-between items-center w-full px-6 py-3.5 h-14 sticky top-0 z-50">
+        <span className="font-mono text-xs font-bold text-primary border border-primary/30 px-2.5 py-1 rounded-sm">
+          HibirDev AI
+        </span>
+        <StepIndicator current={step} />
+        <div className="w-24" /> {/* balance */}
       </header>
 
-      {/* Main Workspace Body */}
-      <main className="flex-1 flex items-center justify-center p-6 md:p-12 relative z-10">
-        {/* STEP 1: DEFINE */}
-        {step === 1 && (
-          <div className="bg-surface border border-white/10 w-full max-w-4xl flex flex-col rounded-xl overflow-hidden">
-            <div className="p-6 md:p-8 border-b border-white/10 flex items-center justify-between">
+      {/* Main Content */}
+      <main className="flex-1 flex items-center justify-center p-4 md:p-10">
+
+        {/* ── STEP: DEFINE ── */}
+        {step === 'define' && (
+          <div className="bg-surface-container-low border border-outline-variant/60 w-full max-w-3xl flex flex-col rounded-sm overflow-hidden">
+            <div className="p-6 md:p-8 border-b border-outline-variant/60 flex items-center justify-between">
               <div>
-                <h1 className="font-heading text-3xl font-extrabold text-white mb-1">Define Your Idea</h1>
-                <p className="font-sans text-xs text-on-surface-variant max-w-2xl">
-                  Describe the product you have in mind. Don't worry about getting everything perfect—we'll structure it with you.
+                <h1 className="font-sans text-2xl font-bold text-on-surface mb-1">Define Your Idea</h1>
+                <p className="font-sans text-xs text-on-surface-variant max-w-lg">
+                  Describe the product you want to build. Be as detailed as you like — the AI CEO will structure it.
                 </p>
               </div>
-              <div className="font-mono text-xs text-on-surface-variant px-3 py-1 border border-white/10 rounded">
-                STEP_01_INIT
-              </div>
+              <span className="font-mono text-[10px] text-on-surface-variant px-2.5 py-1 border border-outline-variant/60 rounded-sm hidden sm:block">
+                STEP_01_DEFINE
+              </span>
             </div>
 
-            <form onSubmit={handleStep1Submit} className="p-6 md:p-8 flex flex-col gap-6 relative">
-              <div className="relative">
-                <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-primary" />
-                <textarea
-                  value={ideaText}
-                  onChange={(e) => setIdeaText(e.target.value)}
-                  placeholder="Describe your software idea... (e.g. Build an AI-powered study assistant application with real-time markdown notes, automated flashcard generation, and spaced repetition algorithm)."
-                  className="w-full bg-background border border-white/10 focus:border-primary text-white font-mono text-xs p-4 min-h-[260px] resize-none outline-none transition-colors rounded-xl pl-4"
-                  spellCheck={false}
+            <form onSubmit={handleDefineSubmit} className="p-6 md:p-8 flex flex-col gap-5">
+              {/* Optional project name */}
+              <div className="flex flex-col gap-1.5">
+                <label className="font-mono text-[11px] font-bold text-on-surface-variant uppercase tracking-wider" htmlFor="project-name">
+                  Project Name <span className="text-on-surface-variant/50 normal-case tracking-normal">(optional)</span>
+                </label>
+                <input
+                  id="project-name"
+                  type="text"
+                  value={projectName}
+                  onChange={(e) => setProjectName(e.target.value)}
+                  placeholder="Auto-generated from your idea if blank"
+                  className="w-full bg-background border border-outline-variant/60 focus:border-primary text-on-surface font-mono text-xs p-3 outline-none transition-colors rounded-sm"
                 />
               </div>
 
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-4 border-t border-white/10">
-                <div className="flex items-center gap-2">
-                  <Lightbulb className="w-4 h-4 text-primary" />
-                  <span className="font-mono text-xs text-on-surface-variant">
-                    Try including: Who is it for? What problem does it solve?
-                  </span>
+              {/* Idea textarea */}
+              <div className="flex flex-col gap-1.5">
+                <label className="font-mono text-[11px] font-bold text-on-surface-variant uppercase tracking-wider" htmlFor="idea-text">
+                  Software Idea <span className="text-danger">*</span>
+                </label>
+                <div className="relative">
+                  <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-primary" />
+                  <textarea
+                    id="idea-text"
+                    value={ideaText}
+                    onChange={(e) => setIdeaText(e.target.value)}
+                    placeholder="Describe your software idea in detail. E.g. Build an AI-powered study assistant with real-time markdown notes, automated flashcard generation, and spaced repetition..."
+                    className="w-full bg-background border border-outline-variant/60 focus:border-primary text-on-surface font-mono text-xs p-4 pl-5 min-h-[200px] resize-none outline-none transition-colors rounded-sm"
+                    spellCheck={false}
+                    required
+                  />
+                </div>
+              </div>
+
+              {error && (
+                <div className="flex items-center gap-2 border border-danger/30 bg-danger/10 p-3 rounded-sm text-xs text-danger font-mono">
+                  <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                  <span>{error}</span>
+                </div>
+              )}
+
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-2 border-t border-outline-variant/60">
+                <div className="flex items-center gap-2 text-on-surface-variant">
+                  <Lightbulb className="w-3.5 h-3.5 text-primary" />
+                  <span className="font-mono text-[11px]">Include: who is it for? what problem does it solve?</span>
                 </div>
                 <button
                   type="submit"
-                  className="bg-primary text-black font-mono text-xs font-bold px-6 py-3 rounded-xl hover:bg-primary-container transition-colors flex items-center gap-2 uppercase tracking-wider glow-cyan"
+                  disabled={loading || !ideaText.trim()}
+                  className="bg-primary text-black font-mono text-xs font-bold px-6 py-2.5 rounded-sm hover:bg-primary-container transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <span>Continue</span>
-                  <ArrowRight className="w-4 h-4" />
+                  {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : (
+                    <>Continue <ArrowRight className="w-3.5 h-3.5" /></>
+                  )}
                 </button>
               </div>
             </form>
           </div>
         )}
 
-        {/* STEP 2: UNDERSTAND */}
-        {step === 2 && (
-          <div className="bg-surface border border-white/10 w-full max-w-4xl flex flex-col rounded-xl overflow-hidden">
-            <div className="p-6 md:p-8 border-b border-white/10 flex items-center justify-between">
+        {/* ── STEP: CEO REVIEW ── */}
+        {step === 'review' && (
+          <div className="bg-surface-container-low border border-outline-variant/60 w-full max-w-3xl flex flex-col rounded-sm overflow-hidden">
+            <div className="p-6 md:p-8 border-b border-outline-variant/60 flex items-center justify-between">
               <div>
-                <h1 className="font-heading text-3xl font-extrabold text-white mb-1">Requirements Analysis</h1>
-                <p className="font-sans text-xs text-on-surface-variant max-w-2xl">
-                  AI CEO & Architect have processed your project prompt into functional specifications.
+                <h1 className="font-sans text-2xl font-bold text-on-surface mb-1">CEO Review</h1>
+                <p className="font-sans text-xs text-on-surface-variant">
+                  Review the AI CEO's product analysis. Approve to continue or request revisions.
                 </p>
               </div>
-              <div className="font-mono text-xs text-primary px-3 py-1 border border-primary/40 rounded font-bold">
-                02 / UNDERSTAND
-              </div>
+              <span className="font-mono text-[10px] text-primary px-2.5 py-1 border border-primary/30 rounded-sm font-bold hidden sm:block">
+                02 / REVIEW
+              </span>
             </div>
 
-            <div className="p-6 md:p-8 flex flex-col gap-6 font-mono text-xs">
-              {/* Target Audience */}
-              <div className="bg-background border border-white/10 p-5 rounded-xl">
-                <div className="flex justify-between items-center mb-3 border-b border-white/10 pb-2">
-                  <h3 className="font-sans text-sm font-bold text-white">Target Audience</h3>
-                  <span className="text-[10px] text-primary bg-primary/10 border border-primary/30 px-2 py-0.5 rounded font-bold">
-                    INFERRED
-                  </span>
+            <div className="p-6 md:p-8 flex flex-col gap-5">
+              {proposal ? (
+                <>
+                  {proposal.productName && (
+                    <div className="bg-background border border-outline-variant/60 p-4 rounded-sm">
+                      <p className="font-mono text-[11px] text-on-surface-variant uppercase tracking-wider mb-1">Product Name</p>
+                      <p className="font-sans text-base font-bold text-on-surface">{proposal.productName}</p>
+                    </div>
+                  )}
+                  {proposal.vision && (
+                    <div className="bg-background border border-outline-variant/60 p-4 rounded-sm">
+                      <p className="font-mono text-[11px] text-on-surface-variant uppercase tracking-wider mb-1">Vision</p>
+                      <p className="font-sans text-sm text-on-surface leading-relaxed">{proposal.vision}</p>
+                    </div>
+                  )}
+                  {proposal.problemStatement && (
+                    <div className="bg-background border border-outline-variant/60 p-4 rounded-sm">
+                      <p className="font-mono text-[11px] text-on-surface-variant uppercase tracking-wider mb-1">Problem Statement</p>
+                      <p className="font-sans text-sm text-on-surface-variant leading-relaxed">{proposal.problemStatement}</p>
+                    </div>
+                  )}
+                  {(proposal.mvpFeatures ?? []).length > 0 && (
+                    <div className="bg-background border border-outline-variant/60 p-4 rounded-sm">
+                      <p className="font-mono text-[11px] text-on-surface-variant uppercase tracking-wider mb-2">MVP Features</p>
+                      <ul className="space-y-1.5">
+                        {(proposal.mvpFeatures ?? []).map((f, i) => (
+                          <li key={i} className="flex items-start gap-2 font-sans text-xs text-on-surface-variant">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
+                            <span>{f}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {proposal.overallScore !== undefined && (
+                    <div className="flex items-center gap-2 font-mono text-xs text-on-surface-variant">
+                      <span>Proposal Score:</span>
+                      <span className="text-primary font-bold">{Math.round(proposal.overallScore * 100)}%</span>
+                    </div>
+                  )}
+                </>
+              ) : (
+                // No proposal available — show idea summary as fallback
+                <div className="bg-background border border-outline-variant/60 p-4 rounded-sm">
+                  <p className="font-mono text-[11px] text-on-surface-variant uppercase tracking-wider mb-2">Your Idea</p>
+                  <p className="font-sans text-sm text-on-surface-variant leading-relaxed">{ideaText}</p>
                 </div>
-                <ul className="space-y-1.5 text-on-surface-variant pl-2 border-l-2 border-primary">
-                  <li className="flex items-center gap-2">• Students & Researchers requiring structured synthesis</li>
-                  <li className="flex items-center gap-2">• Developers building automated learning tools</li>
-                  <li className="flex items-center gap-2">• Technical PMs requiring concise specification summaries</li>
-                </ul>
+              )}
+
+              {/* Revision input */}
+              <div className="flex flex-col gap-1.5">
+                <label className="font-mono text-[11px] text-on-surface-variant uppercase tracking-wider" htmlFor="revision">
+                  Request Revision <span className="text-on-surface-variant/50 normal-case">(optional)</span>
+                </label>
+                <textarea
+                  id="revision"
+                  value={revisionComment}
+                  onChange={(e) => setRevisionComment(e.target.value)}
+                  placeholder="Describe any changes you'd like the CEO to incorporate..."
+                  className="w-full bg-background border border-outline-variant/60 focus:border-primary text-on-surface font-mono text-xs p-3 h-20 resize-none outline-none transition-colors rounded-sm"
+                />
               </div>
 
-              {/* Core Features Table */}
-              <div className="bg-background border border-white/10 p-5 rounded-xl">
-                <div className="flex justify-between items-center mb-3 border-b border-white/10 pb-2">
-                  <h3 className="font-sans text-sm font-bold text-white">Core Features Architecture</h3>
-                  <span className="text-[10px] text-primary bg-primary/10 border border-primary/30 px-2 py-0.5 rounded font-bold">
-                    SPECIFIED
-                  </span>
+              {error && (
+                <div className="flex items-center gap-2 border border-danger/30 bg-danger/10 p-3 rounded-sm text-xs text-danger font-mono">
+                  <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                  <span>{error}</span>
                 </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center py-2 border-b border-white/10">
-                    <span className="text-white font-bold">AI Flashcard Generator</span>
-                    <span className="text-primary font-bold">INFERRED</span>
-                  </div>
-                  <div className="flex justify-between items-center py-2 border-b border-white/10">
-                    <span className="text-white font-bold">Spaced Repetition Scheduler</span>
-                    <span className="text-primary font-bold">PROVIDED</span>
-                  </div>
-                  <div className="flex justify-between items-center py-2">
-                    <span className="text-white font-bold">Vector Database Search</span>
-                    <span className="text-warning font-bold">READY</span>
-                  </div>
-                </div>
-              </div>
+              )}
 
-              <div className="flex justify-between items-center pt-4 border-t border-white/10">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pt-2 border-t border-outline-variant/60">
                 <button
                   type="button"
-                  onClick={() => setStep(1)}
-                  className="text-on-surface-variant hover:text-white font-mono text-xs px-4 py-2"
+                  onClick={() => setStep('define')}
+                  className="text-on-surface-variant hover:text-on-surface font-mono text-xs px-3 py-2 flex items-center gap-1.5"
                 >
-                  ← Edit Scope
+                  <RotateCcw className="w-3 h-3" /> Edit idea
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setStep(3)}
-                  className="bg-primary text-black font-mono text-xs font-bold px-6 py-3 rounded-xl hover:bg-primary-container transition-colors flex items-center gap-2 uppercase tracking-wider glow-cyan"
-                >
-                  <span>Prepare AI Team</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
+                <div className="flex items-center gap-2">
+                  {revisionComment.trim() && (
+                    <button
+                      type="button"
+                      onClick={() => void handleRequestRevision()}
+                      disabled={loading}
+                      className="font-mono text-xs text-on-surface-variant border border-outline-variant/60 px-4 py-2.5 rounded-sm hover:border-primary hover:text-primary transition-colors flex items-center gap-1.5 disabled:opacity-50"
+                    >
+                      {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
+                      Request Revision
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => void handleApproveProposal()}
+                    disabled={loading}
+                    className="bg-primary text-black font-mono text-xs font-bold px-6 py-2.5 rounded-sm hover:bg-primary-container transition-colors flex items-center gap-2 disabled:opacity-50"
+                  >
+                    {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : (
+                      <>Approve & Continue <ArrowRight className="w-3.5 h-3.5" /></>
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         )}
 
-        {/* STEP 3: PREPARE */}
-        {step === 3 && (
-          <div className="bg-surface border border-white/10 w-full max-w-4xl flex flex-col rounded-xl overflow-hidden">
-            <div className="p-6 md:p-8 border-b border-white/10 text-center">
-              <div className="inline-flex items-center justify-center border border-primary/40 px-3 py-1 mb-3 rounded">
-                <span className="font-mono text-[10px] text-primary uppercase font-bold flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" /> SYSTEM READY
+        {/* ── STEP: PREPARE ── */}
+        {step === 'prepare' && (
+          <div className="bg-surface-container-low border border-outline-variant/60 w-full max-w-3xl flex flex-col rounded-sm overflow-hidden">
+            <div className="p-6 md:p-8 border-b border-outline-variant/60 text-center">
+              <div className="inline-flex items-center gap-2 border border-primary/20 bg-primary/5 px-3 py-1 rounded-sm mb-3">
+                <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+                <span className="font-mono text-[10px] font-bold text-primary uppercase tracking-wider">
+                  SYSTEM READY
                 </span>
               </div>
-              <h1 className="font-heading text-3xl font-extrabold text-white mb-2">Your software team is ready.</h1>
-              <p className="font-sans text-xs text-on-surface-variant max-w-xl mx-auto">
-                Each specialist handles a different part of the software-building process. They are connected and ready for execution.
+              <h1 className="font-sans text-2xl font-bold text-on-surface mb-2">
+                Your AI team is ready.
+              </h1>
+              <p className="font-sans text-xs text-on-surface-variant max-w-md mx-auto">
+                Four specialized agents will build your software end-to-end. You'll review their work at each checkpoint.
               </p>
             </div>
 
-            <div className="p-6 md:p-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* CEO */}
-              <div className="bg-background border border-white/10 p-4 rounded-xl flex flex-col gap-3">
-                <div className="flex items-center justify-between border-b border-white/10 pb-2">
-                  <span className="font-mono text-xs font-bold text-primary">NODE_01</span>
-                  <Brain className="w-4 h-4 text-on-surface-variant" />
+            <div className="p-6 md:p-8 grid grid-cols-2 lg:grid-cols-4 gap-3">
+              {[
+                { node: 'NODE_01', icon: Brain, label: 'CEO', desc: 'Product Strategy & PRD' },
+                { node: 'NODE_02', icon: Layers, label: 'ARCHITECT', desc: 'System Architecture' },
+                { node: 'NODE_03', icon: Sparkles, label: 'DESIGNER', desc: 'UI/UX & Design Tokens' },
+                { node: 'NODE_04', icon: Terminal, label: 'DEVELOPER', desc: 'Code & Implementation' },
+              ].map(({ node, icon: Icon, label, desc }) => (
+                <div key={node} className="bg-background border border-outline-variant/60 p-4 rounded-sm flex flex-col gap-3">
+                  <div className="flex items-center justify-between border-b border-outline-variant/40 pb-2">
+                    <span className="font-mono text-[10px] font-bold text-primary">{node}</span>
+                    <Icon className="w-4 h-4 text-on-surface-variant" />
+                  </div>
+                  <h3 className="font-sans text-sm font-bold text-on-surface">{label}</h3>
+                  <p className="font-mono text-[11px] text-on-surface-variant">{desc}</p>
+                  <div className="mt-auto pt-2 border-t border-outline-variant/40 flex justify-between items-center font-mono text-[10px]">
+                    <span className="text-on-surface-variant">STATUS</span>
+                    <span className="text-primary font-bold">READY</span>
+                  </div>
                 </div>
-                <h3 className="font-sans text-sm font-bold text-white">CEO</h3>
-                <p className="font-mono text-[11px] text-on-surface-variant">Product Strategy & PRD</p>
-                <div className="mt-auto pt-2 border-t border-white/10 flex justify-between items-center font-mono text-[10px]">
-                  <span className="text-on-surface-variant">STATUS</span>
-                  <span className="text-primary font-bold">READY</span>
-                </div>
-              </div>
-
-              {/* Architect */}
-              <div className="bg-background border border-white/10 p-4 rounded-xl flex flex-col gap-3">
-                <div className="flex items-center justify-between border-b border-white/10 pb-2">
-                  <span className="font-mono text-xs font-bold text-primary">NODE_02</span>
-                  <Layers className="w-4 h-4 text-on-surface-variant" />
-                </div>
-                <h3 className="font-sans text-sm font-bold text-white">ARCHITECT</h3>
-                <p className="font-mono text-[11px] text-on-surface-variant">System Architecture</p>
-                <div className="mt-auto pt-2 border-t border-white/10 flex justify-between items-center font-mono text-[10px]">
-                  <span className="text-on-surface-variant">STATUS</span>
-                  <span className="text-primary font-bold">READY</span>
-                </div>
-              </div>
-
-              {/* Designer */}
-              <div className="bg-background border border-white/10 p-4 rounded-xl flex flex-col gap-3">
-                <div className="flex items-center justify-between border-b border-white/10 pb-2">
-                  <span className="font-mono text-xs font-bold text-primary">NODE_03</span>
-                  <Sparkles className="w-4 h-4 text-on-surface-variant" />
-                </div>
-                <h3 className="font-sans text-sm font-bold text-white">DESIGNER</h3>
-                <p className="font-mono text-[11px] text-on-surface-variant">UI/UX & Design Tokens</p>
-                <div className="mt-auto pt-2 border-t border-white/10 flex justify-between items-center font-mono text-[10px]">
-                  <span className="text-on-surface-variant">STATUS</span>
-                  <span className="text-primary font-bold">READY</span>
-                </div>
-              </div>
-
-              {/* Developer */}
-              <div className="bg-background border border-white/10 p-4 rounded-xl flex flex-col gap-3">
-                <div className="flex items-center justify-between border-b border-white/10 pb-2">
-                  <span className="font-mono text-xs font-bold text-primary">NODE_04</span>
-                  <Terminal className="w-4 h-4 text-on-surface-variant" />
-                </div>
-                <h3 className="font-sans text-sm font-bold text-white">DEVELOPER</h3>
-                <p className="font-mono text-[11px] text-on-surface-variant">Code & Implementation</p>
-                <div className="mt-auto pt-2 border-t border-white/10 flex justify-between items-center font-mono text-[10px]">
-                  <span className="text-on-surface-variant">STATUS</span>
-                  <span className="text-primary font-bold">READY</span>
-                </div>
-              </div>
+              ))}
             </div>
 
             <div className="p-6 md:p-8 pt-0 flex justify-between items-center">
               <button
                 type="button"
-                onClick={() => setStep(2)}
-                className="text-on-surface-variant hover:text-white font-mono text-xs px-4 py-2"
+                onClick={() => setStep('review')}
+                className="text-on-surface-variant hover:text-on-surface font-mono text-xs px-3 py-2"
               >
                 ← Back
               </button>
               <button
                 type="button"
-                onClick={handleLaunchProject}
+                onClick={() => void handleLaunchProject()}
                 disabled={loading}
-                className="bg-primary text-black font-mono text-xs font-bold px-8 py-3.5 rounded-xl hover:bg-primary-container transition-colors flex items-center gap-2 uppercase tracking-wider glow-cyan"
+                className="bg-primary text-black font-mono text-xs font-bold px-8 py-3 rounded-sm hover:bg-primary-container transition-colors flex items-center gap-2 disabled:opacity-50"
               >
-                <span>{loading ? 'Deploying...' : 'Confirm Workforce & Launch Mission Control'}</span>
+                <span>Confirm & Launch Mission Control</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
           </div>
         )}
 
-        {/* STEP 4: MISSION CONTROL VIEW (ONBOARDING ----> MISSION CONTROL) */}
-        {step === 4 && (
-          <div className="w-full max-w-6xl bg-surface border border-white/10 rounded-xl overflow-hidden flex flex-col h-[650px] shadow-2xl">
-            {/* Header Strip */}
-            <div className="h-10 bg-background border-b border-white/10 px-4 flex items-center justify-between font-mono text-xs shrink-0">
-              <div className="flex items-center gap-3">
-                <span className="text-primary font-bold">04 / MISSION CONTROL</span>
-                <span className="text-on-surface-variant opacity-40">|</span>
-                <span className="text-white font-bold">{projectName || 'StudyMate'}</span>
+        {/* ── STEP: LAUNCHING ── */}
+        {step === 'launching' && (
+          <div className="bg-surface-container-low border border-outline-variant/60 w-full max-w-xl flex flex-col rounded-sm overflow-hidden">
+            <div className="p-8 md:p-12 flex flex-col items-center gap-6 text-center">
+              <div className="flex h-16 w-16 items-center justify-center rounded-sm border border-primary/30 bg-primary/5">
+                <Loader2 className="w-8 h-8 text-primary animate-spin" />
+              </div>
+              <div>
+                <h1 className="font-sans text-2xl font-bold text-on-surface mb-2">Deploying AI Workforce…</h1>
+                <p className="font-sans text-xs text-on-surface-variant">Your agents are being initialized and connected.</p>
               </div>
 
-              {createdProjectId && (
-                <button
-                  type="button"
-                  onClick={() => router.push(`${ROUTES.projects}/${createdProjectId}/workspace`)}
-                  className="bg-primary text-black font-mono text-xs font-bold px-4 py-1.5 rounded hover:bg-primary-container transition-colors uppercase tracking-wider flex items-center gap-2 glow-cyan"
-                >
-                  <span>Open Full IDE Workspace</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
+              {/* Progress bar */}
+              <div className="w-full bg-background border border-outline-variant/40 rounded-sm h-1.5 overflow-hidden">
+                <div
+                  className="h-full bg-primary transition-all duration-500"
+                  style={{ width: `${Math.min(launchProgress, 100)}%` }}
+                />
+              </div>
+              <span className="font-mono text-xs text-primary font-bold tabular-nums">
+                {Math.round(Math.min(launchProgress, 100))}%
+              </span>
+
+              {error && (
+                <div className="flex items-center gap-2 border border-danger/30 bg-danger/10 p-3 rounded-sm text-xs text-danger font-mono w-full text-left">
+                  <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                  <span>{error}</span>
+                </div>
               )}
-            </div>
-
-            {/* 3-Column Mission Control UI */}
-            <div className="flex-1 flex overflow-hidden">
-              {/* Col 1: Explorer */}
-              <aside className="w-56 bg-surface-container-low border-r border-white/10 p-3 font-mono text-xs shrink-0 space-y-2">
-                <div className="text-[10px] text-on-surface-variant uppercase font-bold border-b border-white/10 pb-1">
-                  Explorer
-                </div>
-                <div className="space-y-1">
-                  <div className="flex items-center gap-1 text-primary font-bold">
-                    <ChevronDown className="w-3.5 h-3.5" />
-                    <FolderOpen className="w-3.5 h-3.5" />
-                    <span>{projectName || 'StudyMate'}</span>
-                  </div>
-                  <div className="pl-4 space-y-1 text-on-surface-variant">
-                    <div className="flex items-center gap-1.5 py-0.5 text-primary font-bold">
-                      <FileCode className="w-3.5 h-3.5" />
-                      <span>page.tsx</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 py-0.5">
-                      <FileCode className="w-3.5 h-3.5" />
-                      <span>layout.tsx</span>
-                    </div>
-                  </div>
-                </div>
-              </aside>
-
-              {/* Col 2: Pipeline & Code Editor & Terminal */}
-              <main className="flex-1 flex flex-col bg-background min-w-0">
-                <div className="h-9 bg-surface border-b border-white/10 flex items-center px-4 gap-3 font-mono text-xs shrink-0">
-                  <span className="text-on-surface-variant text-[10px] uppercase font-bold">Pipeline:</span>
-                  <span className="line-through text-on-surface-variant/60">CEO</span>
-                  <ChevronRight className="w-3 h-3 text-white/20" />
-                  <span className="line-through text-on-surface-variant/60">Architect</span>
-                  <ChevronRight className="w-3 h-3 text-white/20" />
-                  <span className="line-through text-on-surface-variant/60">Designer</span>
-                  <ChevronRight className="w-3 h-3 text-white/20" />
-                  <span className="bg-primary/10 text-primary px-2 py-0.5 rounded border border-primary/40 font-bold glow-cyan flex items-center gap-1">
-                    <RefreshCw className="w-3 h-3 animate-spin" /> DEVELOPER (Working)
-                  </span>
-                </div>
-
-                <div className="flex-1 p-4 font-mono text-xs overflow-auto bg-background relative">
-                  <div className="absolute top-4 right-4 bg-surface border border-primary px-3 py-1 rounded text-primary font-bold flex items-center gap-2 glow-cyan">
-                    <Bot className="w-4 h-4 animate-pulse" />
-                    <span>AI Developing Code...</span>
-                  </div>
-                  <pre className="text-on-surface-variant leading-relaxed">
-                    <code>
-                      <span className="text-primary font-bold">import</span> React <span className="text-primary font-bold">from</span> <span className="text-tertiary">'react'</span>;<br />
-                      <span className="text-primary font-bold">export default function</span> <span className="text-white font-bold">DashboardPage</span>() &#123;<br />
-                      &nbsp;&nbsp;<span className="text-primary">return</span> &lt;<span className="text-primary font-bold">div</span> className="p-6"&gt;StudyMate Platform&lt;/<span className="text-primary font-bold">div</span>&gt;;<br />
-                      &#123;
-                    </code>
-                  </pre>
-                </div>
-
-                <div className="h-28 bg-surface border-t border-white/10 p-3 font-mono text-[11px] shrink-0 text-on-surface-variant space-y-1">
-                  <div className="text-white font-bold border-b border-white/10 pb-1">TERMINAL OUTPUT</div>
-                  <div>&gt; next build</div>
-                  <div className="text-primary">✓ Compiled /app/dashboard/page.tsx in 44ms</div>
-                </div>
-              </main>
-
-              {/* Col 3: AI Context Panel */}
-              <aside className="w-64 bg-surface-container-low border-l border-white/10 p-3 font-mono text-xs shrink-0 flex flex-col justify-between">
-                <div className="space-y-3">
-                  <div className="text-primary font-bold uppercase border-b border-white/10 pb-1 flex items-center gap-1.5">
-                    <Brain className="w-4 h-4" /> AI CONTEXT
-                  </div>
-                  <div className="bg-background border border-white/10 p-2.5 rounded text-[11px]">
-                    <span className="text-tertiary font-bold block mb-1">Architect Note:</span>
-                    Single source of truth established.
-                  </div>
-                </div>
-
-                <div className="pt-2 border-t border-white/10">
-                  <div className="relative">
-                    <textarea
-                      value={promptText}
-                      onChange={(e) => setPromptText(e.target.value)}
-                      placeholder="Instruct AI developer..."
-                      className="w-full bg-background border border-white/10 text-white font-mono text-[11px] p-2 pr-6 h-16 rounded focus:outline-none focus:border-primary resize-none"
-                    />
-                    <Send className="w-3.5 h-3.5 text-primary absolute bottom-2 right-2 cursor-pointer" />
-                  </div>
-                </div>
-              </aside>
             </div>
           </div>
         )}
