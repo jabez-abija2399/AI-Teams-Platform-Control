@@ -1,43 +1,44 @@
-// This file defines the core color palette for the entire application.
-// We strictly use HSL (Hue, Saturation, Lightness) values without the `hsl()` wrapper.
-// This allows Tailwind CSS to dynamically apply opacity modifiers (e.g., bg-void/50).
+/** Technical Precision design tokens — synced with desing/hibirdev_ai_core/DESIGN.md */
 export const colors = {
-  // The 'void' is our darkest background color, representing deep space.
-  // It has a hue of 240 (blue/indigo), 40% saturation for richness, and 2% lightness for near-black.
-  void: '240 40% 2%',
-  
-  // The 'surface' is slightly lighter than the void, used for elevated elements like cards.
-  surface: '240 20% 6%',
-  
-  // 'surface-glass' is the base color for translucent elements, meant to be used with backdrop-blur.
-  surfaceGlass: '240 20% 6%',
-  
-  // 'surface-hover' is a slightly brighter version of the surface for interactive states.
-  surfaceHover: '240 20% 10%',
+  void: '#000000',
+  background: '#0e1414',
+  surface: '#0e1414',
+  surfaceContainerLowest: '#090f0f',
+  surfaceContainerLow: '#171d1d',
+  surfaceContainer: '#1b2121',
+  surfaceContainerHigh: '#252b2b',
+  surfaceContainerHighest: '#303636',
+  onSurface: '#dee4e3',
+  onSurfaceVariant: '#bbc9c8',
+  onBackground: '#dee4e3',
+  primary: '#56d9d9',
+  primaryContainer: '#00acac',
+  onPrimary: '#003737',
+  secondary: '#c6c7c2',
+  outline: '#869393',
+  outlineVariant: '#3c4949',
+  error: '#ffb4ab',
+  success: '#00ACAC',
+  warning: '#F59E0B',
+  danger: '#ffb4ab',
+  borderDark: '#464545',
+  offWhite: '#DFDEDC',
+} as const;
 
-  // 'primary' is our main brand color: Electric Indigo. It provides high contrast against the void.
-  primary: '250 100% 65%',
-  
-  // 'secondary' is Cyber Cyan, used for gradients and secondary actions.
-  secondary: '190 100% 50%',
-  
-  // 'success' is Emerald Matrix, used for healthy pipeline states and completed tasks.
-  success: '150 100% 50%',
-  
-  // 'warning' is Solar Orange, used for paused states or non-critical alerts.
-  warning: '35 100% 55%',
-  
-  // 'danger' is Crimson Red, used for failed pipelines or destructive actions.
-  danger: '350 100% 60%',
+export const spacing = {
+  unit: 4,
+  xs: 8,
+  sm: 16,
+  md: 24,
+  lg: 48,
+  xl: 64,
+  gridLine: 0.5,
+} as const;
 
-  text: {
-    // Pure white for primary readable text to contrast with the dark backgrounds.
-    primary: '0 0% 100%',
-    
-    // Muted silver-blue for secondary text like descriptions or subtitles.
-    secondary: '240 10% 70%',
-    
-    // Darker grey for placeholders or extremely subtle tertiary text.
-    tertiary: '240 10% 40%',
-  }
-} as const; // Export as a strict constant object to prevent accidental mutation.
+export const radius = {
+  sm: '0.125rem',
+  default: '0.25rem',
+  md: '0.375rem',
+  lg: '0.5rem',
+  xl: '0.75rem',
+} as const;

@@ -15,8 +15,19 @@
   --color-surface: var(--surface);
   --color-surface-glass: var(--surface-glass);
   --color-surface-hover: var(--surface-hover);
+  --color-surface-container-lowest: var(--surface-container-lowest);
+  --color-surface-container-low: var(--surface-container-low);
+  --color-surface-container: var(--surface-container);
+  --color-surface-container-high: var(--surface-container-high);
+  --color-surface-container-highest: var(--surface-container-highest);
+  --color-on-surface: var(--on-surface);
+  --color-on-surface-variant: var(--on-surface-variant);
+  --color-outline: var(--outline);
+  --color-outline-variant: var(--outline-variant);
+  --color-on-background: var(--on-background);
   
   --color-primary: var(--primary);
+  --color-primary-container: var(--primary-container);
   --color-secondary: var(--secondary);
   --color-success: var(--success);
   --color-warning: var(--warning);
@@ -39,25 +50,31 @@
   --brand-muted-gray: #A6A7A2;
   --brand-border-dark: #464545;
 
-  /* 🌙 Dark Theme Mappings (Technical Precision Dark) */
+  /* Dark Theme — Technical Precision (from desing/hibirdev_ai_core/DESIGN.md) */
   --void: #000000;
-  --surface: #131313;
-  --surface-container-high: #1B1B1B;
-  --surface-glass: rgba(19, 19, 19, 0.85);
+  --surface: #0e1414;
+  --surface-container-lowest: #090f0f;
+  --surface-container-low: #171d1d;
+  --surface-container: #1b2121;
+  --surface-container-high: #252b2b;
+  --surface-container-highest: #303636;
+  --surface-glass: rgba(14, 20, 20, 0.92);
   --surface-hover: rgba(0, 172, 172, 0.08);
+  --on-surface: #dee4e3;
+  --on-background: #dee4e3;
   
-  --primary: #00ACAC;
-  --primary-container: #00ACAC;
-  --secondary: #A6A7A2;
+  --primary: #56d9d9;
+  --primary-container: #00acac;
+  --secondary: #c6c7c2;
   --success: #00ACAC;
   --warning: #F59E0B;
-  --danger: #EF4444;
+  --danger: #ffb4ab;
 
-  --background: #000000;
-  --foreground: #DFDEDC;
-  --on-surface-variant: #A6A7A2;
-  --outline: #464545;
-  --outline-variant: #464545;
+  --background: #0e1414;
+  --foreground: #dee4e3;
+  --on-surface-variant: #bbc9c8;
+  --outline: #869393;
+  --outline-variant: #3c4949;
   
   --font-sans: 'Inter', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
@@ -96,8 +113,8 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-image: 
-    linear-gradient(to right, #464545 0.5px, transparent 0.5px),
-    linear-gradient(to bottom, #464545 0.5px, transparent 0.5px);
+    linear-gradient(to right, #3c4949 0.5px, transparent 0.5px),
+    linear-gradient(to bottom, #3c4949 0.5px, transparent 0.5px);
   background-size: 48px 48px;
   background-attachment: fixed;
 }
@@ -202,4 +219,43 @@ html:not(.dark) body {
   .dark .blueprint-border-l { border-left: 1px solid rgba(255, 255, 255, 0.12); }
   .blueprint-border-r { border-right: 1px solid rgba(148, 163, 184, 0.2); }
   .dark .blueprint-border-r { border-right: 1px solid rgba(255, 255, 255, 0.12); }
+
+  /* Technical Precision — Active indicator (2px left border teal) */
+  .tp-active-indicator {
+    border-left: 2px solid var(--primary);
+  }
+
+  /* Tonal Layers (no shadows) */
+  .tp-panel {
+    background: var(--surface-container-low);
+    border: 1px solid var(--outline-variant);
+  }
+  .tp-panel-high {
+    background: var(--surface-container-high);
+    border: 1px solid var(--outline-variant);
+  }
+
+  /* Mono label — JetBrains Mono uppercase */
+  .mono-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--on-surface-variant);
+  }
+
+  /* Status chip sizes */
+  .status-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
 }
