@@ -16,7 +16,7 @@ export function SettingsNavTabs() {
   ];
 
   return (
-    <div className="flex items-center gap-2 border-b border-white/10 overflow-x-auto font-mono text-xs mb-8 pb-px">
+    <div className="flex items-center gap-0 border-b border-outline-variant/60 overflow-x-auto font-mono text-[11px] mb-6">
       {tabs.map((tab) => {
         const Icon = tab.icon;
         const active = pathname === tab.href;
@@ -25,13 +25,13 @@ export function SettingsNavTabs() {
           <Link
             key={tab.href}
             href={tab.href}
-            className={`flex items-center gap-2 px-4 py-2.5 font-bold transition-all border-b-2 uppercase tracking-wider whitespace-nowrap ${
+            className={`flex items-center gap-1.5 px-4 py-2.5 font-bold transition-colors border-b-2 uppercase tracking-wider whitespace-nowrap ${
               active
-                ? 'border-primary text-primary bg-primary/10'
-                : 'border-transparent text-on-surface-variant hover:text-white hover:bg-white/5'
+                ? 'border-primary text-primary bg-primary/5'
+                : 'border-transparent text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/40'
             }`}
           >
-            <Icon className="w-4 h-4" />
+            <Icon className="w-3.5 h-3.5" />
             <span>{tab.label}</span>
           </Link>
         );

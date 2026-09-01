@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Cpu, CheckCircle2, RefreshCw, Key, Shield, Plus, Lock, Globe, Server, Check, Edit2, Trash2 } from 'lucide-react';
+import { Cpu, CheckCircle2, RefreshCw, Key, Shield, Plus, Lock, Globe, Server, Check, Edit2, Trash2, Zap } from 'lucide-react';
 import { toast } from 'sonner';
 import { SettingsNavTabs } from './settings-nav-tabs';
 
@@ -40,10 +40,20 @@ export function AiProvidersSettings() {
       lastChecked: '10m ago',
     },
     {
+      id: 'grok',
+      name: 'xAI Grok',
+      envKey: 'GROK_API_KEY',
+      type: 'Frontier AI Engine (xAI)',
+      status: 'CONNECTED',
+      activeModel: 'grok-2-1212',
+      apiKeyMasked: 'xai-...7a44',
+      lastChecked: '1m ago',
+    },
+    {
       id: 'groq',
       name: 'Groq',
       envKey: 'GROQ_API_KEY',
-      type: 'Ultra-Fast Inference',
+      type: 'Ultra-Fast Inference LPU',
       status: 'CONNECTED',
       activeModel: 'llama-3.3-70b-versatile',
       apiKeyMasked: 'gsk_...7c11',
@@ -58,6 +68,16 @@ export function AiProvidersSettings() {
       activeModel: 'gemini-1.5-pro',
       apiKeyMasked: 'AIzaSy...4e19',
       lastChecked: '5m ago',
+    },
+    {
+      id: 'deepseek',
+      name: 'DeepSeek AI',
+      envKey: 'DEEPSEEK_API_KEY',
+      type: 'Reasoning & Coding LLM',
+      status: 'CONNECTED',
+      activeModel: 'deepseek-coder-v2',
+      apiKeyMasked: 'sk-ds-...32ac',
+      lastChecked: '15m ago',
     },
     {
       id: 'openrouter',
@@ -139,7 +159,7 @@ export function AiProvidersSettings() {
       )
     );
 
-    toast.success(`Successfully configured API key for ${selectedProvider.name}!`);
+    toast.success(`Successfully saved API Key for ${selectedProvider.name}!`);
     setModalOpen(false);
     setSelectedProvider(null);
   };
@@ -181,7 +201,7 @@ export function AiProvidersSettings() {
           <div>
             <h1 className="font-heading text-3xl font-extrabold text-white mb-1">AI Providers & BYOK Credentials</h1>
             <p className="font-sans text-xs text-on-surface-variant max-w-2xl">
-              Configure and manage BYOK (Bring Your Own Key) credentials for all 8 supported intelligence engines.
+              Configure, update, and manage BYOK (Bring Your Own Key) API credentials for OpenAI, Anthropic, Groq, xAI Grok, DeepSeek, Gemini, and all 10 supported engines.
             </p>
           </div>
           <button
@@ -202,7 +222,7 @@ export function AiProvidersSettings() {
         <div className="flex justify-between items-center mb-4">
           <h2 className="font-mono text-xs font-bold uppercase tracking-wider text-on-surface-variant flex items-center gap-2">
             <Server className="w-4 h-4 text-primary" />
-            <span>Configured Intelligence Engines ({providers.filter((p) => p.status === 'CONNECTED').length} / {providers.length} Connected)</span>
+            <span>Configured Intelligence Engines ({providers.filter((p) => p.status === 'CONNECTED').length} / {providers.length} Active)</span>
           </h2>
         </div>
 
@@ -224,6 +244,7 @@ export function AiProvidersSettings() {
                     </span>
                     <h3 className="font-heading text-xl font-bold text-white flex items-center gap-2">
                       {p.name}
+                      {p.id === 'grok' && <Zap className="w-4 h-4 text-warning fill-warning" />}
                     </h3>
                     <span className="font-mono text-[10px] text-on-surface-variant/70 block mt-0.5">
                       Env: <code className="text-primary">{p.envKey}</code>
@@ -353,7 +374,7 @@ export function AiProvidersSettings() {
                   type="text"
                   value={modelInput}
                   onChange={(e) => setModelInput(e.target.value)}
-                  placeholder="e.g. gpt-4o, claude-3-5-sonnet..."
+                  placeholder="e.g. grok-2-1212, gpt-4o, claude-3-5-sonnet..."
                   className="w-full bg-background border border-white/10 focus:border-primary text-white p-3 rounded font-mono text-xs outline-none"
                 />
               </div>
