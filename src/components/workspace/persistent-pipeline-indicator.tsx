@@ -30,7 +30,7 @@ export function PersistentPipelineIndicator({
   onSelectStage,
 }: PersistentPipelineIndicatorProps) {
   return (
-    <div className="flex items-center gap-1 bg-gray-900/90 border border-gray-800 rounded-lg p-1 text-xs font-mono">
+    <div className="flex items-center gap-1 bg-[#1b1b1b] border border-[#3c4949] rounded-sm p-1 text-xs font-mono">
       {stages.map((st, idx) => {
         const isCurrent = st.stage === currentStage || st.status === 'IN_PROGRESS';
         const isCompleted = st.status === 'COMPLETED';
@@ -38,34 +38,34 @@ export function PersistentPipelineIndicator({
 
         return (
           <React.Fragment key={st.stage}>
-            {idx > 0 && <span className="text-gray-700 font-bold px-0.5">→</span>}
+            {idx > 0 && <span className="text-[#3c4949] font-bold px-0.5">→</span>}
 
             <button
               onClick={() => onSelectStage?.(st.stage)}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded transition-all ${
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-sm transition-all text-[11px] ${
                 isCurrent
-                  ? 'bg-indigo-600/90 text-white font-bold shadow-sm ring-1 ring-indigo-400/30 animate-pulse'
+                  ? 'bg-[#56d9d9] text-black font-bold border border-[#76f6f5]'
                   : isCompleted
-                  ? 'bg-emerald-950/40 text-emerald-300 border border-emerald-800/40 hover:bg-emerald-900/40'
+                  ? 'bg-[#00acac]/10 text-[#56d9d9] border border-[#00acac]/40 hover:bg-[#00acac]/20'
                   : isReview
-                  ? 'bg-amber-950/40 text-amber-300 border border-amber-800/40 hover:bg-amber-900/40'
-                  : 'bg-gray-950/50 text-gray-500 hover:text-gray-300'
+                  ? 'bg-[#e1824e]/10 text-[#e1824e] border border-[#e1824e]/40 hover:bg-[#e1824e]/20'
+                  : 'bg-[#131313] text-[#869393] hover:text-[#e2e2e2] border border-[#353535]'
               }`}
             >
               {isCompleted ? (
-                <Check className="w-3.5 h-3.5 text-emerald-400 stroke-[3]" />
+                <Check className="w-3.5 h-3.5 text-[#56d9d9] stroke-[3]" />
               ) : isCurrent ? (
-                <Play className="w-3 h-3 text-indigo-200 fill-indigo-200" />
+                <Play className="w-3 h-3 text-black fill-black" />
               ) : isReview ? (
-                <AlertCircle className="w-3.5 h-3.5 text-amber-400" />
+                <AlertCircle className="w-3.5 h-3.5 text-[#e1824e]" />
               ) : (
-                <Circle className="w-3 h-3 text-gray-600" />
+                <Circle className="w-3 h-3 text-[#869393]" />
               )}
 
               <span>{st.stage}</span>
 
               {st.version && st.version > 1 && (
-                <span className="text-[10px] bg-gray-800 text-gray-300 px-1 rounded">
+                <span className="text-[9px] bg-[#353535] text-[#bbc9c8] px-1 rounded-xs">
                   v{st.version}
                 </span>
               )}

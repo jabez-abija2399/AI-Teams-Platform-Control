@@ -33,56 +33,58 @@ export function DesignerReviewCheckpoint({
   };
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 max-w-4xl mx-auto font-sans text-gray-200 space-y-6 shadow-2xl">
+    <div className="bg-[#1b1b1b] border border-[#3c4949] rounded-sm p-6 max-w-4xl mx-auto font-sans text-[#e2e2e2] space-y-6 shadow-2xl">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-gray-800 pb-4">
+      <div className="flex items-center justify-between border-b border-[#3c4949] pb-4">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="text-xl font-bold text-white font-mono">Designer — Design Specification Review</h2>
-            <Badge className="bg-indigo-500/10 text-indigo-400 border border-indigo-500/30">Checkpoint Gate</Badge>
+            <h2 className="text-sm font-bold text-[#56d9d9] font-mono uppercase tracking-wider">DESIGNER — DESIGN SPECIFICATION REVIEW</h2>
+            <span className="bg-[#56d9d9]/10 text-[#56d9d9] border border-[#56d9d9]/30 text-[10px] font-mono px-2 py-0.5 rounded-sm uppercase tracking-widest font-bold">
+              CHECKPOINT GATE
+            </span>
           </div>
-          <p className="text-xs text-gray-400 mt-1">
+          <p className="text-xs text-[#bbc9c8] mt-1 font-sans">
             Inspect design tokens, layout hierarchy, interaction states, and accessibility standards before Developer builds software.
           </p>
         </div>
       </div>
 
       {/* Palette Tokens */}
-      <div className="bg-gray-950/60 border border-gray-800 rounded-lg p-4 space-y-3">
-        <h3 className="font-mono text-xs font-bold text-purple-400 uppercase tracking-wider flex items-center gap-1.5">
+      <div className="bg-[#131313] border border-[#3c4949] rounded-sm p-4 space-y-3">
+        <h3 className="font-mono text-xs font-bold text-[#56d9d9] uppercase tracking-wider flex items-center gap-1.5">
           <Palette className="w-4 h-4" /> Design System Tokens & Color Palette
         </h3>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono">
-          <div className="bg-indigo-600/20 border border-indigo-500/40 p-3 rounded text-indigo-300">
-            <span className="block text-[10px] text-gray-400 uppercase">Primary</span>
+          <div className="bg-[#56d9d9]/10 border border-[#56d9d9]/40 p-3 rounded-sm text-[#56d9d9]">
+            <span className="block text-[10px] text-[#869393] uppercase">Primary</span>
             <span className="font-bold">{spec.colorPalette.primary}</span>
           </div>
-          <div className="bg-gray-900 border border-gray-700 p-3 rounded text-gray-200">
-            <span className="block text-[10px] text-gray-400 uppercase">Background</span>
+          <div className="bg-[#1b1b1b] border border-[#3c4949] p-3 rounded-sm text-[#e2e2e2]">
+            <span className="block text-[10px] text-[#869393] uppercase">Background</span>
             <span className="font-bold">{spec.colorPalette.background}</span>
           </div>
-          <div className="bg-emerald-950/40 border border-emerald-800/40 p-3 rounded text-emerald-300">
-            <span className="block text-[10px] text-gray-400 uppercase">Accent</span>
+          <div className="bg-[#00acac]/10 border border-[#00acac]/40 p-3 rounded-sm text-[#56d9d9]">
+            <span className="block text-[10px] text-[#869393] uppercase">Accent</span>
             <span className="font-bold">{spec.colorPalette.accent}</span>
           </div>
-          <div className="bg-purple-950/40 border border-purple-800/40 p-3 rounded text-purple-300">
-            <span className="block text-[10px] text-gray-400 uppercase">Typography</span>
+          <div className="bg-[#353535] border border-[#3c4949] p-3 rounded-sm text-[#e2e2e2]">
+            <span className="block text-[10px] text-[#869393] uppercase">Typography</span>
             <span className="font-bold">{spec.typography.split(' ')[0]}</span>
           </div>
         </div>
       </div>
 
       {/* Pages & Component Hierarchy */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
         {/* Pages */}
-        <div className="bg-gray-950/60 border border-gray-800 rounded-lg p-4 space-y-2">
-          <h3 className="font-mono text-xs font-bold text-indigo-400 uppercase tracking-wider flex items-center gap-1.5">
+        <div className="bg-[#131313] border border-[#3c4949] rounded-sm p-4 space-y-2">
+          <h3 className="font-mono text-xs font-bold text-[#56d9d9] uppercase tracking-wider flex items-center gap-1.5">
             <Layout className="w-3.5 h-3.5" /> Specified Page Layouts
           </h3>
-          <ul className="space-y-1.5 font-mono text-xs text-gray-300 pt-1">
+          <ul className="space-y-1.5 font-mono text-xs text-[#e2e2e2] pt-1">
             {spec.pages?.map((pg: string, idx: number) => (
-              <li key={idx} className="flex items-center gap-2 bg-gray-900 border border-gray-800 px-3 py-1.5 rounded">
-                <span className="text-indigo-400 font-bold">•</span>
+              <li key={idx} className="flex items-center gap-2 bg-[#1b1b1b] border border-[#3c4949] px-3 py-1.5 rounded-sm">
+                <span className="text-[#56d9d9] font-bold">•</span>
                 <span>{pg}</span>
               </li>
             ))}
@@ -90,50 +92,50 @@ export function DesignerReviewCheckpoint({
         </div>
 
         {/* States & Accessibility */}
-        <div className="bg-gray-950/60 border border-gray-800 rounded-lg p-4 space-y-3">
+        <div className="bg-[#131313] border border-[#3c4949] rounded-sm p-4 space-y-3">
           <div>
-            <h3 className="font-mono text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+            <h3 className="font-mono text-xs font-bold text-[#56d9d9] uppercase tracking-wider flex items-center gap-1.5">
               <Eye className="w-3.5 h-3.5" /> Interaction States Handled
             </h3>
             <div className="flex flex-wrap gap-1.5 font-mono text-xs pt-1.5">
               {spec.interactionStates?.map((st: string, idx: number) => (
-                <span key={idx} className="bg-emerald-950/40 border border-emerald-800/40 text-emerald-300 px-2.5 py-1 rounded text-[11px]">
+                <span key={idx} className="bg-[#00acac]/10 border border-[#00acac]/40 text-[#56d9d9] px-2.5 py-1 rounded-sm text-[11px]">
                   {st}
                 </span>
               ))}
             </div>
           </div>
 
-          <div className="pt-2 border-t border-gray-800">
-            <h3 className="font-mono text-xs font-bold text-blue-400 uppercase tracking-wider flex items-center gap-1.5">
+          <div className="pt-2 border-t border-[#3c4949]">
+            <h3 className="font-mono text-xs font-bold text-[#bbc9c8] uppercase tracking-wider flex items-center gap-1.5">
               <Accessibility className="w-3.5 h-3.5" /> Accessibility Guarantee
             </h3>
-            <p className="text-xs text-gray-300 pt-1 leading-relaxed font-mono">{spec.accessibility}</p>
+            <p className="text-xs text-[#e2e2e2] pt-1 leading-relaxed font-mono">{spec.accessibility}</p>
           </div>
         </div>
       </div>
 
       {/* Revision Form */}
       {showRevisionForm && (
-        <div className="bg-gray-950 border border-amber-800/50 rounded-lg p-4 space-y-3">
-          <label className="block text-xs font-mono font-bold text-amber-400">
+        <div className="bg-[#0e0e0e] border border-[#e1824e]/50 rounded-sm p-4 space-y-3">
+          <label className="block text-xs font-mono font-bold text-[#e1824e]">
             Request Revision — Feedback for Designer Agent:
           </label>
           <textarea
             value={revisionFeedback}
             onChange={(e) => setRevisionFeedback(e.target.value)}
             placeholder="Explain required UI/UX, color, or layout changes..."
-            className="w-full bg-gray-900 border border-gray-800 rounded-md p-3 text-xs text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+            className="w-full bg-[#131313] border border-[#3c4949] rounded-sm p-3 text-xs text-[#e2e2e2] placeholder-[#869393] focus:outline-none focus:border-[#56d9d9]"
             rows={3}
           />
           <div className="flex justify-end gap-2">
-            <Button variant="ghost" size="sm" onClick={() => setShowRevisionForm(false)} className="text-xs text-gray-400">
+            <Button variant="ghost" size="sm" onClick={() => setShowRevisionForm(false)} className="text-xs text-[#bbc9c8]">
               Cancel
             </Button>
             <Button
               size="sm"
               onClick={() => onRequestRevision(revisionFeedback)}
-              className="bg-amber-600 hover:bg-amber-500 text-white text-xs font-mono font-bold"
+              className="bg-[#e1824e] hover:bg-[#e1824e]/90 text-black text-xs font-mono font-bold rounded-sm"
             >
               Submit Design Feedback
             </Button>
@@ -142,19 +144,19 @@ export function DesignerReviewCheckpoint({
       )}
 
       {/* Actions */}
-      <div className="flex items-center justify-between pt-4 border-t border-gray-800">
+      <div className="flex items-center justify-between pt-4 border-t border-[#3c4949]">
         <Button
           variant="outline"
           onClick={() => setShowRevisionForm(!showRevisionForm)}
-          className="border-gray-800 text-gray-300 hover:text-white text-xs gap-1.5 font-mono"
+          className="border-[#3c4949] text-[#e2e2e2] hover:bg-[#2a2a2a] text-xs gap-1.5 font-mono rounded-sm"
         >
-          <RotateCcw className="w-3.5 h-3.5" />
+          <RotateCcw className="w-3.5 h-3.5 text-[#e1824e]" />
           Request Revision
         </Button>
 
         <Button
           onClick={onApprove}
-          className="bg-indigo-600 hover:bg-indigo-500 text-white font-mono font-bold text-xs px-6 py-2 gap-2 shadow-lg shadow-indigo-600/20"
+          className="bg-[#56d9d9] hover:bg-[#76f6f5] text-black font-mono font-bold text-xs px-6 py-2 gap-2 rounded-sm"
         >
           <Check className="w-4 h-4 stroke-[3]" />
           Approve Design Specification →

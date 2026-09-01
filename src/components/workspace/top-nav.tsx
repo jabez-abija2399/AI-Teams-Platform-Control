@@ -18,19 +18,22 @@ interface TopNavProps {
 
 export function TopNav({ state, onToggleMode, onTogglePause, onToggleDrawer, onSelectStage }: TopNavProps) {
   return (
-    <header className="border-b border-gray-800 bg-gray-950/80 backdrop-blur px-6 py-4 flex flex-col xl:flex-row xl:items-center justify-between gap-4 text-white">
-      {/* Left: Project Info & Current Phase */}
+    <header className="border-b border-[#3c4949] bg-[#131313] px-5 py-2.5 flex flex-col xl:flex-row xl:items-center justify-between gap-4 text-[#e2e2e2] font-sans">
+      {/* Left: Project Info & Brand Title */}
       <div className="flex items-center gap-4">
+        <span className="font-mono text-xs font-black text-[#56d9d9] tracking-widest uppercase border border-[#56d9d9]/30 px-2 py-0.5 rounded-sm">
+          HIBIR_DEV_AI
+        </span>
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold tracking-tight text-white">{state.projectName}</h1>
-            <Badge variant="outline" className="border-indigo-500/50 bg-indigo-500/10 text-indigo-400 font-medium">
+            <h1 className="text-sm font-bold tracking-tight text-[#e2e2e2] font-sans">{state.projectName}</h1>
+            <span className="font-mono text-[10px] font-bold text-[#56d9d9] bg-[#56d9d9]/10 border border-[#56d9d9]/30 px-2 py-0.5 rounded-sm uppercase tracking-wider">
               {state.currentPhase}
-            </Badge>
+            </span>
           </div>
-          <p className="text-xs text-gray-400 mt-0.5 flex items-center gap-1.5 font-mono">
-            <Clock className="w-3.5 h-3.5 text-gray-500" />
-            Estimated Remaining: <span className="text-gray-300 font-medium">{state.estimatedTimeRemaining}</span>
+          <p className="text-[11px] text-[#bbc9c8] mt-0.5 flex items-center gap-1.5 font-mono">
+            <Clock className="w-3 h-3 text-[#869393]" />
+            ETA: <span className="text-[#e2e2e2] font-medium">{state.estimatedTimeRemaining}</span>
           </p>
         </div>
       </div>
@@ -40,50 +43,50 @@ export function TopNav({ state, onToggleMode, onTogglePause, onToggleDrawer, onS
         <PersistentPipelineIndicator onSelectStage={onSelectStage} />
         
         <div className="hidden lg:block w-36 space-y-1">
-          <div className="flex items-center justify-between text-[11px]">
-            <span className="text-gray-400 font-mono">Progress</span>
-            <span className="text-indigo-400 font-bold">{state.overallProgress}%</span>
+          <div className="flex items-center justify-between font-mono text-[10px]">
+            <span className="text-[#bbc9c8] uppercase tracking-wider">Progress</span>
+            <span className="text-[#56d9d9] font-bold">{state.overallProgress}%</span>
           </div>
-          <Progress value={state.overallProgress} className="h-1.5 bg-gray-800" />
+          <Progress value={state.overallProgress} className="h-1 bg-[#1b1b1b]" />
         </div>
       </div>
 
       {/* Right: Controls, Context Drawer & Creator/Dev Mode Toggle */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
         {/* Context & Artifact Drawer Toggle */}
         <Button
           variant="outline"
           size="sm"
           onClick={onToggleDrawer}
-          className="border-gray-800 text-xs gap-1.5 bg-gray-900 text-gray-300 hover:bg-gray-800 hover:text-white font-mono"
+          className="border-[#3c4949] text-xs gap-1.5 bg-[#1b1b1b] text-[#e2e2e2] hover:bg-[#2a2a2a] hover:border-[#56d9d9] font-mono rounded-sm"
         >
-          <Layers className="w-3.5 h-3.5 text-indigo-400" />
+          <Layers className="w-3.5 h-3.5 text-[#56d9d9]" />
           Context & Artifacts
         </Button>
 
         {/* Creator / Developer Mode Switcher */}
-        <div className="bg-gray-900 border border-gray-800 rounded-lg p-1 flex items-center gap-1 text-xs font-mono">
+        <div className="bg-[#1b1b1b] border border-[#3c4949] rounded-sm p-0.5 flex items-center gap-1 font-mono text-xs">
           <button
             onClick={onToggleMode}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-colors ${
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-sm transition-colors text-[11px] ${
               state.mode === 'creator'
-                ? 'bg-indigo-600 text-white font-medium shadow-sm'
-                : 'text-gray-400 hover:text-white'
+                ? 'bg-[#56d9d9] text-black font-bold'
+                : 'text-[#bbc9c8] hover:text-[#e2e2e2]'
             }`}
           >
-            <Sparkles className="w-3.5 h-3.5" />
-            Creator Mode
+            <Sparkles className="w-3 h-3" />
+            Creator
           </button>
           <button
             onClick={onToggleMode}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-colors ${
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-sm transition-colors text-[11px] ${
               state.mode === 'developer'
-                ? 'bg-emerald-600 text-white font-medium shadow-sm'
-                : 'text-gray-400 hover:text-white'
+                ? 'bg-[#00acac] text-black font-bold'
+                : 'text-[#bbc9c8] hover:text-[#e2e2e2]'
             }`}
           >
-            <Code2 className="w-3.5 h-3.5" />
-            Developer Mode
+            <Code2 className="w-3 h-3" />
+            Developer
           </button>
         </div>
 
@@ -92,27 +95,27 @@ export function TopNav({ state, onToggleMode, onTogglePause, onToggleDrawer, onS
           variant="outline"
           size="sm"
           onClick={onTogglePause}
-          className={`border-gray-800 text-xs gap-1.5 font-mono ${
+          className={`border-[#3c4949] text-xs gap-1.5 font-mono rounded-sm ${
             state.isPaused
-              ? 'bg-amber-500/10 text-amber-400 border-amber-500/40 hover:bg-amber-500/20'
-              : 'bg-gray-900 text-gray-300 hover:bg-gray-800 hover:text-white'
+              ? 'bg-[#e1824e]/10 text-[#e1824e] border-[#e1824e]/40 hover:bg-[#e1824e]/20'
+              : 'bg-[#1b1b1b] text-[#e2e2e2] hover:bg-[#2a2a2a]'
           }`}
         >
           {state.isPaused ? (
             <>
-              <Play className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+              <Play className="w-3.5 h-3.5 text-[#e1824e] fill-[#e1824e]" />
               Resume
             </>
           ) : (
             <>
-              <Pause className="w-3.5 h-3.5 text-gray-400" />
+              <Pause className="w-3.5 h-3.5 text-[#bbc9c8]" />
               Pause
             </>
           )}
         </Button>
 
         {/* Settings Button */}
-        <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-white">
+        <Button variant="ghost" size="icon" className="h-8 w-8 text-[#bbc9c8] hover:text-[#56d9d9] rounded-sm">
           <Settings className="w-4 h-4" />
         </Button>
       </div>

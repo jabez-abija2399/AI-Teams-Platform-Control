@@ -36,162 +36,162 @@ export function ContextArtifactDrawer({ projectId, isOpen, onClose }: ContextArt
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-y-0 right-0 z-50 w-full max-w-md bg-gray-950 border-l border-gray-800 shadow-2xl flex flex-col font-sans text-gray-200 animate-in slide-in-from-right duration-200">
+    <div className="fixed inset-y-0 right-0 z-50 w-full max-w-md bg-[#131313] border-l border-[#3c4949] shadow-2xl flex flex-col font-sans text-[#e2e2e2] animate-in slide-in-from-right duration-200">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-gray-800 flex items-center justify-between bg-gray-900/60">
+      <div className="px-5 py-3 border-b border-[#3c4949] flex items-center justify-between bg-[#1b1b1b]">
         <div className="flex items-center gap-2">
-          <Layers className="w-5 h-5 text-indigo-400" />
-          <h2 className="font-bold text-base text-white">Project Context & Artifacts</h2>
+          <Layers className="w-4 h-4 text-[#56d9d9]" />
+          <h2 className="font-bold text-sm text-[#e2e2e2] font-sans">Project Context & Artifacts</h2>
         </div>
-        <Button variant="ghost" size="icon" onClick={onClose} className="text-gray-400 hover:text-white h-8 w-8">
+        <Button variant="ghost" size="icon" onClick={onClose} className="text-[#bbc9c8] hover:text-[#56d9d9] h-7 w-7 rounded-sm">
           <X className="w-4 h-4" />
         </Button>
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-gray-800 bg-gray-900/30 text-xs font-mono">
+      <div className="flex border-b border-[#3c4949] bg-[#131313] text-xs font-mono">
         <button
           onClick={() => setActiveTab('context')}
-          className={`flex-1 py-3 px-4 text-center transition-colors border-b-2 ${
+          className={`flex-1 py-2.5 px-3 text-center transition-colors border-b-2 text-[11px] ${
             activeTab === 'context'
-              ? 'border-indigo-500 text-indigo-400 font-bold bg-indigo-500/5'
-              : 'border-transparent text-gray-400 hover:text-gray-200'
+              ? 'border-[#56d9d9] text-[#56d9d9] font-bold bg-[#56d9d9]/5'
+              : 'border-transparent text-[#bbc9c8] hover:text-[#e2e2e2]'
           }`}
         >
-          Context & Decisions
+          Decisions
         </button>
         <button
           onClick={() => setActiveTab('artifacts')}
-          className={`flex-1 py-3 px-4 text-center transition-colors border-b-2 ${
+          className={`flex-1 py-2.5 px-3 text-center transition-colors border-b-2 text-[11px] ${
             activeTab === 'artifacts'
-              ? 'border-indigo-500 text-indigo-400 font-bold bg-indigo-500/5'
-              : 'border-transparent text-gray-400 hover:text-gray-200'
+              ? 'border-[#56d9d9] text-[#56d9d9] font-bold bg-[#56d9d9]/5'
+              : 'border-transparent text-[#bbc9c8] hover:text-[#e2e2e2]'
           }`}
         >
-          Artifact Versions
+          Artifacts
         </button>
         <button
           onClick={() => setActiveTab('traceability')}
-          className={`flex-1 py-3 px-4 text-center transition-colors border-b-2 ${
+          className={`flex-1 py-2.5 px-3 text-center transition-colors border-b-2 text-[11px] ${
             activeTab === 'traceability'
-              ? 'border-indigo-500 text-indigo-400 font-bold bg-indigo-500/5'
-              : 'border-transparent text-gray-400 hover:text-gray-200'
+              ? 'border-[#56d9d9] text-[#56d9d9] font-bold bg-[#56d9d9]/5'
+              : 'border-transparent text-[#bbc9c8] hover:text-[#e2e2e2]'
           }`}
         >
-          Traceability Matrix
+          Traceability
         </button>
       </div>
 
       {/* Body */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-6 text-sm">
+      <div className="flex-1 overflow-y-auto p-5 space-y-5 text-sm">
         {loading ? (
-          <div className="flex items-center justify-center py-12 text-gray-500 text-xs font-mono">
+          <div className="flex items-center justify-center py-12 text-[#869393] text-xs font-mono">
             Loading context drawer...
           </div>
         ) : activeTab === 'context' ? (
-          <div className="space-y-6">
+          <div className="space-y-5">
             {/* Architecture Decisions (ADRs) */}
             <div>
-              <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-indigo-400 mb-3 flex items-center gap-1.5">
+              <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-[#56d9d9] mb-2.5 flex items-center gap-1.5">
                 <Bookmark className="w-3.5 h-3.5" />
                 Architecture Decision Records (ADRs)
               </h3>
               {matrixData?.adrs?.length > 0 ? (
                 <div className="space-y-2">
                   {matrixData.adrs.map((adr: any) => (
-                    <div key={adr.id} className="bg-gray-900 border border-gray-800 rounded-lg p-3 space-y-1">
+                    <div key={adr.id} className="bg-[#1b1b1b] border border-[#3c4949] rounded-sm p-3 space-y-1">
                       <div className="flex items-center justify-between text-xs font-mono">
-                        <span className="text-indigo-300 font-bold">{adr.adrNumber}</span>
-                        <Badge variant="outline" className="border-indigo-500/30 text-indigo-400 text-[10px]">
+                        <span className="text-[#56d9d9] font-bold">{adr.adrNumber}</span>
+                        <span className="border border-[#56d9d9]/30 text-[#56d9d9] bg-[#56d9d9]/10 text-[9px] px-1.5 py-0.5 rounded-sm font-bold uppercase">
                           {adr.status}
-                        </Badge>
+                        </span>
                       </div>
-                      <p className="font-medium text-white text-xs">{adr.title}</p>
-                      <p className="text-gray-400 text-xs">{adr.decision}</p>
+                      <p className="font-bold text-[#e2e2e2] text-xs font-sans">{adr.title}</p>
+                      <p className="text-[#bbc9c8] text-xs font-mono">{adr.decision}</p>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-xs text-gray-500 italic">No ADRs recorded yet.</p>
+                <p className="text-xs text-[#869393] italic font-mono">No ADRs recorded yet.</p>
               )}
             </div>
 
             {/* Design Decisions (DESs) */}
             <div>
-              <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-purple-400 mb-3 flex items-center gap-1.5">
+              <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-[#56d9d9] mb-2.5 flex items-center gap-1.5">
                 <Sparkles className="w-3.5 h-3.5" />
                 Design Decision Records (DESs)
               </h3>
               {matrixData?.dess?.length > 0 ? (
                 <div className="space-y-2">
                   {matrixData.dess.map((des: any) => (
-                    <div key={des.id} className="bg-gray-900 border border-gray-800 rounded-lg p-3 space-y-1">
+                    <div key={des.id} className="bg-[#1b1b1b] border border-[#3c4949] rounded-sm p-3 space-y-1">
                       <div className="flex items-center justify-between text-xs font-mono">
-                        <span className="text-purple-300 font-bold">{des.desNumber}</span>
-                        <Badge variant="outline" className="border-purple-500/30 text-purple-400 text-[10px]">
+                        <span className="text-[#56d9d9] font-bold">{des.desNumber}</span>
+                        <span className="border border-[#56d9d9]/30 text-[#56d9d9] bg-[#56d9d9]/10 text-[9px] px-1.5 py-0.5 rounded-sm font-bold uppercase">
                           {des.status}
-                        </Badge>
+                        </span>
                       </div>
-                      <p className="font-medium text-white text-xs">{des.title}</p>
-                      <p className="text-gray-400 text-xs">{des.decision}</p>
+                      <p className="font-bold text-[#e2e2e2] text-xs font-sans">{des.title}</p>
+                      <p className="text-[#bbc9c8] text-xs font-mono">{des.decision}</p>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-xs text-gray-500 italic">No DESs recorded yet.</p>
+                <p className="text-xs text-[#869393] italic font-mono">No DESs recorded yet.</p>
               )}
             </div>
           </div>
         ) : activeTab === 'artifacts' ? (
-          <div className="space-y-3">
-            <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">
+          <div className="space-y-2.5">
+            <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-[#869393] mb-2">
               Domain Artifact Lineage
             </h3>
             {artifacts.length > 0 ? (
               artifacts.map((art) => (
-                <div key={art.id} className="bg-gray-900 border border-gray-800 rounded-lg p-3.5 space-y-2">
+                <div key={art.id} className="bg-[#1b1b1b] border border-[#3c4949] rounded-sm p-3 space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <span className="font-mono text-xs font-bold text-indigo-400">{art.artifactType}</span>
-                    <Badge variant="outline" className="border-gray-700 text-gray-300 font-mono text-[10px]">
+                    <span className="font-mono text-xs font-bold text-[#56d9d9]">{art.artifactType}</span>
+                    <span className="border border-[#3c4949] text-[#bbc9c8] font-mono text-[9px] px-1.5 py-0.5 rounded-sm">
                       v{art.version}
-                    </Badge>
+                    </span>
                   </div>
-                  <p className="text-xs text-gray-300">{art.contentSummary}</p>
-                  <div className="flex items-center justify-between text-[11px] text-gray-500 font-mono pt-1 border-t border-gray-800/60">
+                  <p className="text-xs text-[#e2e2e2] font-mono">{art.contentSummary}</p>
+                  <div className="flex items-center justify-between text-[10px] text-[#869393] font-mono pt-1 border-t border-[#3c4949]">
                     <span>Owner: {art.producerRole}</span>
                     <span>{new Date(art.createdAt).toLocaleTimeString()}</span>
                   </div>
                 </div>
               ))
             ) : (
-              <p className="text-xs text-gray-500 italic">No artifact versions saved yet.</p>
+              <p className="text-xs text-[#869393] italic font-mono">No artifact versions saved yet.</p>
             )}
           </div>
         ) : (
-          <div className="space-y-4">
-            <div className="bg-indigo-950/30 border border-indigo-800/40 rounded-lg p-3.5 flex items-center justify-between text-xs font-mono">
-              <span className="text-gray-400">Requirements Verification Coverage</span>
-              <span className="text-indigo-400 font-bold text-sm">{matrixData?.coveragePercentage ?? 0}%</span>
+          <div className="space-y-3">
+            <div className="bg-[#1b1b1b] border border-[#3c4949] rounded-sm p-3 flex items-center justify-between text-xs font-mono">
+              <span className="text-[#bbc9c8]">Requirements Coverage</span>
+              <span className="text-[#56d9d9] font-bold text-sm">{matrixData?.coveragePercentage ?? 0}%</span>
             </div>
 
             <div className="space-y-2">
               {matrixData?.requirements?.length > 0 ? (
                 matrixData.requirements.map((req: any) => (
-                  <div key={req.id} className="bg-gray-900 border border-gray-800 rounded-lg p-3 space-y-1.5 text-xs">
+                  <div key={req.id} className="bg-[#1b1b1b] border border-[#3c4949] rounded-sm p-3 space-y-1 text-xs">
                     <div className="flex items-center justify-between">
-                      <span className="font-mono text-indigo-300 font-bold">{req.requirementId}</span>
+                      <span className="font-mono text-[#56d9d9] font-bold">{req.requirementId}</span>
                       {req.verificationStatus === 'VERIFIED' ? (
-                        <span className="flex items-center gap-1 text-emerald-400 font-mono text-[11px]">
-                          <CheckCircle2 className="w-3.5 h-3.5" /> Verified
+                        <span className="flex items-center gap-1 text-[#56d9d9] font-mono text-[11px]">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-[#56d9d9]" /> Verified
                         </span>
                       ) : (
-                        <span className="flex items-center gap-1 text-amber-400 font-mono text-[11px]">
-                          <AlertCircle className="w-3.5 h-3.5" /> Unverified
+                        <span className="flex items-center gap-1 text-[#e1824e] font-mono text-[11px]">
+                          <AlertCircle className="w-3.5 h-3.5 text-[#e1824e]" /> Unverified
                         </span>
                       )}
                     </div>
-                    <p className="text-gray-200 font-medium">{req.title}</p>
-                    <div className="text-[11px] text-gray-400 font-mono space-y-0.5 pt-1">
+                    <p className="text-[#e2e2e2] font-medium font-sans">{req.title}</p>
+                    <div className="text-[10px] text-[#869393] font-mono space-y-0.5 pt-1">
                       <div>CEO Spec: v{req.ceoSpecVersion}</div>
                       {req.architectAdrId && <div>ADR: {req.architectAdrId}</div>}
                       {req.designerDesId && <div>DES: {req.designerDesId}</div>}
@@ -199,7 +199,7 @@ export function ContextArtifactDrawer({ projectId, isOpen, onClose }: ContextArt
                   </div>
                 ))
               ) : (
-                <p className="text-xs text-gray-500 italic">No requirement traceability items found.</p>
+                <p className="text-xs text-[#869393] italic font-mono">No requirement traceability items found.</p>
               )}
             </div>
           </div>
